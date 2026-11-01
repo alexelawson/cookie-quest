@@ -43,6 +43,9 @@ function openSettings(){ $('devRow').hidden=typeof devWinEverything!=='function'
 function closeSettings(){ $('settings').hidden=true; paused=!dlg.hidden||!$('titlecard').hidden; $('settingsBtn').blur() }
 const devOn=()=>{ try{return localStorage.getItem('cookie-quest-dev')==='1'}catch(e){return false} };
 $('settingsBtn').onclick=openSettings; $('settingsClose').onclick=closeSettings;
+// change outfit any time: on the rooftops it's the stealth outfit, everywhere else it's Joe's everyday look
+$('setOutfit').textContent=WARDROBE.changeOutfit;
+$('setOutfit').onclick=()=>{ $('settings').hidden=true; openWardrobe(()=>{ paused=!dlg.hidden||!$('titlecard').hidden },scene===SCENES.city?'heist':'look',true) };
 $('devToggle').onchange=()=>{ try{localStorage.setItem('cookie-quest-dev',$('devToggle').checked?'1':'0')}catch(e){} $('devArea').hidden=!$('devToggle').checked };
 function start(){$('titlecard').hidden=true; paused=false; if(!have.welcomed)welcome()}
 // the first time you press Start: Alex explains everything, then you pick Joe's look

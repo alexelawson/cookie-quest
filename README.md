@@ -59,7 +59,7 @@ Add an object to `SCENES` with `w`, `h`, `bounds`, `bg` (a canvas), `solids`, `t
 - [x] Fargo: cheapest-gas hunt, stop the pump on $30.00, pick Alex's drink + snack
 - [x] Disc golf (milk): 5 holes vs Jack and Margie
 - [x] Kitchen: everyone comes over, mix, bake, party, Joe's crown, final note
-- [x] Wardrobe: Joe picks his look at the start and a stealth outfit before the city (`WARDROBE` in story.js), incl. Vikings gameday + 70s disco
+- [x] Wardrobe: Joe picks his look at the start and a stealth outfit before the city (`WARDROBE` in story.js), incl. Vikings gameday, 70s disco, Avant Guard, and a Cupcake costume unlocked by finding the cupcake. Change outfits any time in ⚙ Settings
 - [x] Welcome from Alex when you first press Start (`ALEX_WELCOME` in story.js)
 - [x] Finale: Alex hugs Joe, crown, THE COOKIE DANCE
 

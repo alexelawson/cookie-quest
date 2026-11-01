@@ -194,12 +194,14 @@ canvas{border-radius:6px}
 
 /* the wardrobe (before the city) */
 .wardrobe{position:absolute;inset:0;z-index:6;display:flex;align-items:safe center;justify-content:center;overflow-y:auto;background:rgba(8,9,16,.6);padding:4px;border-radius:6px}
-.outfits{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;width:100%}
-.outfit{display:flex;flex-direction:column;align-items:center;gap:2px;background:#2a3044;border:2px solid #4d5a78;border-radius:6px;padding:4px 2px;cursor:pointer;color:var(--paper);font-family:var(--pixel);font-size:.62rem;line-height:1.1;min-width:0}
-.outfit canvas{width:28px;height:48px;image-rendering:pixelated;image-rendering:crisp-edges}
+.outfits{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;width:100%}
+.outfit{display:flex;flex-direction:column;align-items:center;gap:2px;background:#2a3044;border:2px solid #4d5a78;border-radius:6px;padding:4px 2px;cursor:pointer;color:var(--paper);font-family:var(--pixel);font-size:.56rem;line-height:1.1;min-width:0;padding:3px 1px}
+.outfit canvas{width:21px;height:36px;image-rendering:pixelated;image-rendering:crisp-edges}
 .outfit.on{border-color:var(--gold);background:#3a3550}
 .outfit:focus-visible{outline:2px solid var(--gold)}
-.wline{min-height:2.4em;font-size:.82rem!important}
+.wline{min-height:2.3em;font-size:.76rem!important;line-height:1.15!important}
+#wardrobe .vcard{gap:4px;padding:6px 8px}
+#wardIntro{font-size:.8rem}
 
 /* the baking card */
 .bake{position:absolute;inset:0;z-index:6;display:flex;align-items:safe center;justify-content:center;overflow-y:auto;background:rgba(8,9,16,.55);padding:4px;border-radius:6px}

@@ -31,6 +31,7 @@ const KEELAN = {
   cupcakeA:["Wait. Is that a cupcake?","...","Okay. I've got a second wind. I'll help you round them up."],
   cupcakeLate:["For me? You already did all the work.","...I'm eating it anyway. Thanks."],
   foundCupcake:"You found a cupcake hidden behind the barn. You think Keelan might want it?",
+  cupcakeUnlock:"🔓 New costume unlocked: Cupcake! Change outfits any time in ⚙ Settings.",
   midHello:"Keep going, you've got this!",
   midQ:"How am I doing?",
   backToIt:"Back to it",
@@ -137,11 +138,17 @@ const WARDROBE = {title:"Suit up, Joe", intro:"It's a stealth mission. What are 
     {id:'sweater', name:"Ugly Xmas Sweater",line:"Stealth: zero. Festive: maximum."},
     {id:'vikings', name:"Vikings Gameday",  line:"Purple jersey, gold pants, horned helmet. SKOL."},
     {id:'disco',   name:"70s Disco",        line:"White suit, gold chain, big hair. Stayin' alive."},
+    {id:'avant',   name:"Avant Guard",      line:"Black turtleneck, one enormous white shoulder, red beret, tiny sunglasses. It's a statement."},
+    {id:'cupcake', name:"Cupcake",          line:"A whole cupcake. Frosting hat, sprinkles, cherry on top. Unlocked by finding the cupcake.", unlock:'cupcakeCostume'},
   ],
+  changeOutfit:"Change outfit",   // the button in Settings
+  changeIntro:"Change it up any time. What's Joe wearing?",
   react:{cape:[['Lars',"Very dramatic. The cape is a lot."],['John',"I love the cape."]], ninja:[['John',"I can't see you. That's the point, right?"]],
          burglar:[['Lars',"You look like a cartoon robber."],['John',"It's perfect."]], hoodie:[['John',"Respect. Comfort first."]],
          sweater:[['Lars',"They're going to see you from space."],['John',"Festive though."]],
          vikings:[['John',"SKOL!!!"],['Lars',"We're breaking into a vault, not tailgating."],['John',"Why not both."]],
+         avant:[['Lars',"Is that... art?"],['John',"He looks like a security guard from the year 3000."],['Lars',"Avant Guard. I get it. I hate that I get it."]],
+         cupcake:[['John',"Oh no. He's a cupcake."],['Lars',"Every searchlight in the city is about to want a bite."],['John',"I'd eat him. Respectfully."]],
          disco:[['John',"Bro."],['John',"BRO. It's a heist, not a roller rink."],['Lars',"Is that a gold chain?"],['John',"The searchlights are gonna think you're a disco ball. Do NOT do the Hustle up there."]]}};
 
 // ---------- The vault puzzles (the heist's last lock) ----------

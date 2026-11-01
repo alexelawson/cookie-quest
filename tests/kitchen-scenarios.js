@@ -57,7 +57,7 @@ await fresh({});
 r=await p.evaluate(()=>{P.x=134;P.y=244;update(16.7); action(); const open=!$('wardrobe').hidden, n=$('outfits').children.length;
   [...$('outfits').children].find(b=>b.dataset.id==='sweater').click(); const line=$('wardLine').textContent; $('wardGo').click(); T.run(40);
   return {open,n,line,outfit:have.outfit,city:scene===SCENES.city}});
-ok('F the elevator opens the wardrobe first; pick an outfit; then the city',r.open&&r.n===7&&r.line.includes('Festive')&&r.outfit==='sweater'&&r.city,r.line);
+ok('F the elevator opens the wardrobe first; pick an outfit; then the city',r.open&&r.n===8&&r.line.includes('Festive')&&r.outfit==='sweater'&&r.city,r.line);
 r=await p.evaluate(()=>{const seen=[]; for(let i=0;i<20&&!dlg.hidden;i++){seen.push($('dspeaker').textContent+': '+$('dtext').textContent); [...$('dbtns').querySelectorAll('button')][0].click(); if(!$('howto').hidden)$('howOk').click(); T.run(2)} T.run(5); for(let i=0;i<5&&!dlg.hidden;i++){seen.push($('dspeaker').textContent+': '+$('dtext').textContent);[...$('dbtns').querySelectorAll('button')][0].click(); T.run(2)} return seen});
 ok('F the crew reacts to the outfit',r.some(l=>l.includes('from space')),r.slice(-2).join(' | '));
 // G. the welcome from Alex, and Joe's look
@@ -66,7 +66,7 @@ r=await p.evaluate(()=>{const sp=$('dspeaker').textContent, pages=[]; while(T.bt
   const open=!$('wardrobe').hidden, n=$('outfits').children.length, first=$('outfits').children[0].dataset.id, title=$('wardTitle').textContent;
   [...$('outfits').children].find(b=>b.dataset.id==='vikings').click(); $('wardGo').click(); return {sp,pages,open,n,first,title,look:have.look,welcomed:have.welcomed}});
 ok('G Alex welcomes Joe and explains the game',r.sp==='Alex'&&r.pages.join(' ').includes('Five stops')&&r.pages.join(' ').includes('kitchen'),r.pages.length+' pages');
-ok('G then Joe picks his look (jersey first), and it sticks',r.open&&r.n===8&&r.first==='jersey'&&r.look==='vikings'&&r.welcomed,r.title);
+ok('G then Joe picks his look (jersey first), and it sticks',r.open&&r.n===9&&r.first==='jersey'&&r.look==='vikings'&&r.welcomed,r.title);
 await p.reload(); await p.click('#startBtn'); r=await p.evaluate(()=>({dlg:!dlg.hidden,ward:!$('wardrobe').hidden})); ok('G no welcome the second time',!r.dlg&&!r.ward);
 // H. the dev button jumps to the ending (remove js/devtools.js before giving it to Joe)
 r=await p.evaluate(()=>{const hiddenWin=$('devArea').hidden; $('settingsBtn').click(); const offByDefault=!$('devToggle').checked&&$('devArea').hidden; $('devToggle').click(); const shows=!$('devArea').hidden;
@@ -82,4 +82,13 @@ r.after=await p.evaluate(()=>({basket:$('basket').textContent, have:!!have.sprin
 ok('I Bryan is chill and gives Joe sprinkles',r.lbl==='Talk to Bryan'&&r.pages.join(' ').includes('sprinkles')&&r.reward==='Sprinkles'&&r.after.have&&r.after.basket.includes('Sprinkles'),r.pages.slice(-1)[0]);
 r=await p.evaluate(()=>{goTo('kitchen','fromDoor'); T.run(40); openBake(); const n=bakeSteps().length; bake.i=n-1; bakeSetup(); const step=$('bakeStep').textContent, btn=$('bakeBtn').textContent; for(let k=0;k<6;k++)bakePress(); return {n,step,btn,state:bake.state,crowd:CROWD.some(c=>c.name==='Bryan')}});
 ok('I with sprinkles there is a shake-the-sprinkles step, and Bryan comes to the party',r.n===7&&r.step.includes("Bryan's sprinkles")&&r.btn==='Shake!'&&r.state==='good'&&r.crowd,r.step);
+// J. the cupcake unlocks a cupcake costume; Settings > Change outfit works anywhere
+await fresh({welcomed:true});
+r=await p.evaluate(()=>{const before=WARDROBE.outfits.filter(o=>!o.unlock||have[o.unlock]).map(o=>o.id);
+  P.x=CUPCAKE.x; P.y=CUPCAKE.y+4; update(16.7); const pages=[]; while(T.btns().includes('Next')){pages.push($('dtext').textContent);T.click('Next')} pages.push($('dtext').textContent); T.click('Close');
+  $('settingsBtn').click(); $('setOutfit').click(); const ids=[...$('outfits').children].map(b=>b.dataset.id); const title=$('wardTitle').textContent;
+  [...$('outfits').children].find(b=>b.dataset.id==='cupcake').click(); $('wardGo').click(); update(16.7);
+  return {before,pages,ids,title,look:have.look,paused,avant:ids.includes('avant')}});
+ok('J Avant Guard is there; Cupcake is locked until you find the cupcake',r.avant&&!r.before.includes('cupcake')&&r.pages.join(' ').includes('unlocked'),r.pages.slice(-1)[0]);
+ok('J Settings > Change outfit: pick the Cupcake costume any time',r.ids.includes('cupcake')&&r.look==='cupcake'&&!r.paused&&r.title.includes('look'),r.ids.join(','));
 console.log(R.join('\n')); console.log('page errors:',errs.length?errs:'none'); await b.close()})();

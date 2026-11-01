@@ -145,7 +145,8 @@ function farmUpdate(dt){
   // the cupcake
   if(!have.cupcake&&!have.gaveCupcake&&Math.abs(P.x-CUPCAKE.x)<16&&P.y<=CUPCAKE.y+7){
     have.cupcake=true; save(); renderBasket();
-    showDialog({place:'Under a tree',speaker:'Ooh',pages:[KEELAN.foundCupcake],actions:[CLOSE]}); return;
+    have.cupcakeCostume=true; save();
+    showDialog({place:'Behind the barn',speaker:'Ooh',pages:[KEELAN.foundCupcake,KEELAN.cupcakeUnlock],actions:[CLOSE]}); return;
   }
   const k=farm.keelan, helping=have.gaveCupcake&&farm.active;
 
