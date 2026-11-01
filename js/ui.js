@@ -51,6 +51,12 @@ const ART={
     F('#f7dd7a',25,14,12,7); F('#fbe9a6',25,14,12,2); F('#e2c35a',36,15,1,6);
     F('#ffffff',27,17,6,3); F('#3d8ad6',28,18,4,1);                    // paper wrapper label
   },
+  mill(g){ const F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};
+    // a sack of flour tied with twine, a little puff of flour
+    F('#efe6d2',9,8,22,20); F('#e2d6bc',9,8,2,20); F('#f8f3e6',27,10,3,17); F('#e2d6bc',12,4,16,5); F('#d6c8a8',14,3,3,2); F('#d6c8a8',22,2,3,3);
+    F('#8a5a34',11,8,18,1); F('#4f2683',13,14,14,8); F('#ffc62f',13,14,14,1); F('#ffc62f',13,21,14,1); F('#efe6d2',16,16,8,4);
+    F('#ffffff',32,6,3,2); F('#ffffff',34,4,2,2); F('#f8f3e6',5,24,3,2);
+  },
   golf(g){ const F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};
     // a gallon jug of whole milk, plus a cookie for scale
     F('#e8eef3',10,8,18,20); F('#ffffff',11,9,16,18); F('#d6dde3',26,9,1,18); F('#ffffff',12,4,8,5); F('#d33b2f',14,2,5,3);
@@ -79,6 +85,7 @@ const REWARDS={
   fargo:{from:'From Bob', name:'Sugar', hint:'Tap it to put it in your basket.'},
   city:{from:'From a grateful city', name:'Chocolate', hint:'Tap it to put it in your basket.'},
   golf:{from:'From Margie, Jack and the creamery', name:'Milk', hint:'Tap it to put it in your basket.'},
+  mill:{from:'From the Miller (and the Vikings)', name:'Flour', hint:'Tap it to put it in your basket.'},
 };
 let rewardKey=null;
 function showReward(key){

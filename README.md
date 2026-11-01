@@ -17,6 +17,7 @@ For live reload while editing: `python3 -m http.server` and visit http://localho
 | `js/larsgames.js` | Pick-a-game menu at the end of the heist, quick draw, darts, and the how-to-play card. Difficulty in `QUICKDRAW` and `DARTS` |
 | `js/anagrams.js` | Anagrams vs. Lars: letter sets + accepted words, scoring, Lars's difficulty in `ANAGRAM.LARS` |
 | `js/golf.js` | Creamery Hills Disc Golf: 5 holes vs Jack and Margie (incl. a platform tee and a hike-it-through-your-legs hole) for the milk. Holes in `HOLES`, difficulty in `GOLF` |
+| `js/birkie.js` | The Birkie at the mill: guide the Vikings from Cable to Main Street, Hayward (pole in rhythm, tuck, snowplow, feed stations) for the flour. Course in `BIRK_SECTIONS`, difficulty in `BIRK` |
 | `js/fargo.js` | Fargo: drive the CR-V, find the cheapest gas, Bob's $30.00 pump, then the snack stop for Alex. Car color in `CAR_COLOR`, fuel/speeds in `FUEL` |
 | `js/state.js` | Player, basket save (localStorage), particles |
 | `js/input.js` | Keyboard + touch d-pad |
@@ -34,6 +35,8 @@ Needs Node and Playwright (`npm i -D playwright && npx playwright install chromi
 - `node tests/heist-scenarios.js` plays the heist start to finish (every skill, every way to get caught, reloads).
 - `node tests/golf-scenarios.js` plays the disc golf course (hazards, winning, losing).
 - `node tests/golf-difficulty.js '{}'` simulates players of different precision against Margie and Jack.
+- `node tests/birkie-scenarios.js` skis the Birkie (crashes, deep snow, feeds, cutoff, winning, reloads).
+- `node tests/birkie-difficulty.js '{}'` simulates skiers with different rhythm against the 3:00:00 cutoff.
 - `node tests/farm-difficulty.js '{}'` simulates players of different skill; pass JSON to try other `FARM` settings.
 
 ## Adding a new place
@@ -42,7 +45,8 @@ Add an object to `SCENES` with `w`, `h`, `bounds`, `bg` (a canvas), `solids`, `t
 ## Roadmap
 - [x] Farm: Keelan Q&A, hen chase, hidden cupcake (Keelan helps if you give it to him)
 - [ ] Farm: butter churning
-- [ ] Mill: wheat harvest + crossword + millstone timing
+- [x] Mill: the Birkie with the Vikings
+- [ ] Mill: crossword (Alex's words and clues)
 - [x] Night city: rooftop chocolate heist with John and Lars
 - [x] Fargo: cheapest-gas hunt, stop the pump on $30.00, pick Alex's drink + snack
 - [x] Disc golf (milk): 5 holes vs Jack and Margie

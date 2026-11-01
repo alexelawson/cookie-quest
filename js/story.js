@@ -7,11 +7,6 @@ const ITEMS = [
   {key:'golf',  label:'Milk'},
 ];
 const STORY = {
-  mill:{place:'The Old Mill', speaker:'The Miller',
-    lines:["Flour? I can grind you some flour.",
-           "But first you'll solve my crossword. I don't make the rules. Well. I do."],
-    mission:"Mission preview: harvest the wheat, solve the crossword, then time the millstone just right.",
-    done:"You got a sack of flour!", again:"Come back anytime. Bring a pencil."},
 };
 // ---------- The farm: Keelan ----------
 // Each question is a button; the answer plays as one page per string.
@@ -121,6 +116,39 @@ const HEIST = {
   strangerRematch:"Your friend wants his rematch.",
   after:"The cookie signal's up. The city sleeps easy tonight.",
   climbDown:"Climb down the ladder",
+};
+
+// ---------- The mill: the Vikings ski the Birkie with the Miller's flour, then the crossword ----------
+const BIRKIE = {
+  place:'The Old Mill', miller:'The Miller',
+  millerHello:["You're here for flour? Great. Problem.",
+    "My flour's in Cable. The bakery's in Hayward. Fifty kilometers of hills in between.",
+    "The Vikings offered to ski it over, Birkebeiner-style. Like the old legend, but the baby prince is a sack of flour.",
+    "They're strong. They are NOT good skiers. Guide them, would you?"],
+  go:"Head to the start line",
+  later:"Later",
+  millerDone:"My flour made it! Now, the crossword...",
+  crosswordSoon:"(The crossword is coming soon. For now, take the flour.)",
+  takeFlour:"Take the flour",
+  millerAfter:"Come back anytime. Bring a pencil.",
+  howToTitle:"The Birkie",
+  howToSteps:["Steer with left and right. The Vikings follow your tracks exactly.",
+    "Uphill: tap A (or Space) in rhythm, right when the ring closes in. Good timing pushes you up. Mashing tires you out.",
+    "Downhill: hold Down to tuck for speed. Hold Up to snowplow.",
+    "Stay on the trail. Deep snow is slow, and skiers who fell need avoiding.",
+    "Ski through a feed station to fill your energy back up.",
+    "Get the flour to Main Street before the sweep snowmobile closes the course at 3:00:00."],
+  howToOk:"Let's ski",
+  vikingsHello:[['Viking',"SKOL! Which way is Hayward?"],['Viking',"Is it uphill? Please say it's not uphill."]],
+  crash:["Yard sale!","Down goes the Viking!","Face plant.","Skis everywhere."],
+  bonk:"Out of gas! Find a feed station or ease off the poling.",
+  feed:"Feed station! Water, warm Gatorade... and a cookie.",
+  finishWin:t=>[`Main Street, Hayward! Finish time ${t}.`,"The crowd is going nuts. The flour made it."],
+  finishLate:t=>[`The sweep snowmobile caught you at ${t}.`,"The Vikings are sitting in the snow eating the flour. Try again?"],
+  elite:"Under 2:30?! Elite wave next year. The flour made it, the crowd is losing it.",
+  vikingsWin:[['Viking',"SKOL!!!"],['Viking',"We carried the prince! I mean the flour!"]],
+  again:"Try again",
+  leave:"Back to the mill",
 };
 
 // ---------- The disc golf course: Jack and Margie (milk for the cookies) ----------
