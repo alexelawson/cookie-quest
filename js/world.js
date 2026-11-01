@@ -38,11 +38,6 @@ const bg=document.createElement('canvas'); bg.width=WW; bg.height=WH;
   F('#b9905c',93,63,54,54); for(let i=0;i<120;i++)F('#a67f4e',93+rnd()*54|0,63+rnd()*54|0,1,1);
   F('#f1e3c9',90,60,60,3);F('#f1e3c9',90,117,60,3);F('#f1e3c9',90,60,3,60);F('#f1e3c9',147,60,3,60);
   for(let x=90;x<150;x+=8){F('#d9c6a5',x,60,2,3);F('#d9c6a5',x,117,2,3)}
-  F('#7a2a22',16,26,64,10); F('#8f3328',20,22,56,6); F('#b7412e',20,36,56,38);
-  for(let y=40;y<74;y+=5)F('#a5392a',20,y,56,1);
-  F('#f1e3c9',38,52,20,22); F('#5a2a20',40,54,16,20); F('#f1e3c9',40,54,16,1);
-  g.strokeStyle='#f1e3c9';g.lineWidth=1;g.beginPath();g.moveTo(40.5,54.5);g.lineTo(55.5,73.5);g.moveTo(55.5,54.5);g.lineTo(40.5,73.5);g.stroke();
-  F('#f1e3c9',26,40,8,6);F('#f1e3c9',62,40,8,6);
   // mill: wheat field
   F('#d9b24a',236,82,140,54);
   for(let y=84;y<136;y+=6){F('#c09634',236,y,140,1); for(let x=238;x<376;x+=4)F('#ecd06a',x+(y%4),y-2,1,2)}
@@ -80,6 +75,17 @@ const bg=document.createElement('canvas'); bg.width=WW; bg.height=WH;
   F('#8a5a34',112,117,16,3); F('#6b4428',112,118,16,1); F('#5a3a22',112,117,1,3); F('#5a3a22',127,117,1,3);
 })();
 
+// The barn is a sprite too, so you (and the hens) can walk behind it.
+const barnSprite=document.createElement('canvas'); barnSprite.width=64; barnSprite.height=52;
+(function(){const g=barnSprite.getContext('2d'); g.translate(-16,-22); const F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};
+  F('#7a2a22',16,26,64,10); F('#8f3328',20,22,56,6); F('#b7412e',20,36,56,38);
+  for(let y=40;y<74;y+=5)F('#a5392a',20,y,56,1);
+  F('#f1e3c9',38,52,20,22); F('#5a2a20',40,54,16,20); F('#f1e3c9',40,54,16,1);
+  g.strokeStyle='#f1e3c9';g.lineWidth=1;g.beginPath();g.moveTo(40.5,54.5);g.lineTo(55.5,73.5);g.moveTo(55.5,54.5);g.lineTo(40.5,73.5);g.stroke();
+  F('#f1e3c9',26,40,8,6);F('#f1e3c9',62,40,8,6);
+})();
+const drawBarn=()=>ctx.drawImage(barnSprite,16,22);
+
 // Trees are drawn as sprites, depth-sorted with people, so you can walk behind them.
 const treeSprite=document.createElement('canvas'); treeSprite.width=12; treeSprite.height=17;
 (function(){const g=treeSprite.getContext('2d'); const F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};
@@ -109,7 +115,7 @@ SCENES.world={
     drawCupcake();
     for(const p of smoke){ctx.fillStyle=`rgba(240,240,240,${Math.max(0,p.a)*.7})`;ctx.fillRect(Math.round(p.x),Math.round(p.y),3,3)}
   },
-  ents(list){trees.forEach(([x,y])=>list.push({y,draw:()=>drawTree(x,y)})); farmEntities(list)},
+  ents(list){trees.forEach(([x,y])=>list.push({y,draw:()=>drawTree(x,y)})); list.push({y:74,draw:drawBarn}); farmEntities(list)},
   over(){
     farmOverlay();
     ctx.fillStyle='#c7372f';ctx.fillRect(244,184,52,6);ctx.fillStyle='#f1f4f8';ctx.fillRect(244,189,52,2);   // gas canopy

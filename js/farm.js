@@ -21,7 +21,7 @@ const BARN = R(20,30,56,44);
 const DROP = R(108,118,24,14);              // stand here holding a hen to put it back
 const GATE = {x:120, y:124};
 const FARM_AREA = R(4,12,158,134);          // loose hens stay in here
-const CUPCAKE = {x:207, y:61};              // tucked under the tree at (212,64); its wrapper peeks out
+const CUPCAKE = {x:80, y:27};               // behind the barn; a corner of its wrapper peeks out past the roof
 const KEELAN_HOME = {x:142, y:134};
 
 const rand=(a,b)=>a+Math.random()*(b-a);
@@ -63,6 +63,7 @@ function escapeOne(){
 function talkToKeelan(){
   const K=KEELAN, say=(pages,after)=>showDialog({place:K.place,speaker:K.name,pages,actions:[{label:'OK',fn:after||talkToKeelan}]});
   if(have.farm) return showDialog({place:K.place,speaker:K.name,pages:[K.after],actions:[CLOSE]});
+  if(farm.won) return showReward('farm');   // won but didn't take them yet
   const opts=[];
   if(farm.active){
     opts.push({label:K.midQ,fn:()=>say([`${farm.penned.length} of ${FARM.HENS} in the pen. ${farm.loose.length} running around.`,
@@ -190,8 +191,8 @@ function farmUpdate(dt){
   if(farm.loose.length>=FARM.LOSE_AT){
     farmReset(); showDialog({place:KEELAN.place,speaker:KEELAN.name,pages:KEELAN.lose,actions:[CLOSE]});
   } else if(farm.escapesLeft<=0&&!farm.loose.length&&!farm.carrying&&!k.carrying){
-    farm.active=false; have.farm=true; save(); renderBasket();
-    showDialog({place:KEELAN.place,speaker:KEELAN.name,pages:[...KEELAN.win,KEELAN.winItem],actions:[CLOSE]});
+    farm.active=false; farm.won=true;
+    showDialog({place:KEELAN.place,speaker:KEELAN.name,pages:KEELAN.win,actions:[{label:KEELAN.thanks,fn:()=>{closeDialog();showReward('farm')}}]});
   }
 }
 
@@ -247,7 +248,7 @@ function drawCupcake(){
 // a sparkle flashes beside the tree every few seconds
 function drawCupcakeGlint(){
   if(have.cupcake||have.gaveCupcake||(time%3000)>450)return;
-  const x=202,y=60; ctx.fillStyle='#fff3a8';
+  const x=86,y=24; ctx.fillStyle='#fff3a8';
   ctx.fillRect(x,y-2,1,5); ctx.fillRect(x-2,y,5,1); ctx.fillStyle='#ffffff'; ctx.fillRect(x,y,1,1);
 }
 // entities for depth sorting

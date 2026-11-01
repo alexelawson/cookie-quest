@@ -34,4 +34,7 @@ Add an object to `SCENES` with `w`, `h`, `bounds`, `bg` (a canvas), `solids`, `t
 - [ ] Kitchen: mix, bake, decorate, final note
 
 ## Spoilers
-The cupcake is under the tree just up and to the right of the kitchen roof (the lower-right tree of the little grove). Its pink wrapper peeks out on the left side of the trunk, and a sparkle flashes beside it every few seconds.
+The cupcake is behind the barn. A corner of it peeks out past the top-right of the roof, and a sparkle flashes beside it every few seconds. You can walk behind the barn to grab it.
+
+## Rewards
+Finishing a land shows a pop-up with the item's pixel art; tapping it flies it into the basket. Add the art for a new item to `ART` and its text to `REWARDS` in `js/ui.js`, then call `showReward('key')`.

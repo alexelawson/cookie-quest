@@ -31,8 +31,45 @@ function openLand(key){
 }
 function action(){
   if(!$('titlecard').hidden){start();return}
+  if(!$('reward').hidden){collectReward();return}
   if(!dlg.hidden){const f=document.activeElement, b=$('dbtns').contains(f)?f:$('dbtns').querySelector('button'); b&&b.click(); return}
   if(near)near.act();
 }
 function start(){$('titlecard').hidden=true; paused=false}
 $('startBtn').onclick=start;
+
+// ---------- reward pop-up ----------
+// showReward('farm') shows the item art; tapping it flies it into the basket and marks it collected.
+const ART={
+  farm(g){ const F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};
+    // egg carton
+    F('#a9875f',2,16,22,10); F('#c4a173',2,14,22,3); F('#8d6e4a',2,25,22,1);
+    for(const [x,c] of [[4,'#fff8ec'],[11,'#e9c9a0'],[18,'#fff8ec']]){F(c,x,9,5,7);F(c,x+1,8,3,1);F('#ffffff',x+1,10,1,2)}
+    // butter on a dish
+    F('#e6ebef',22,21,17,4); F('#c9d1d8',23,24,15,1);
+    F('#f7dd7a',25,14,12,7); F('#fbe9a6',25,14,12,2); F('#e2c35a',36,15,1,6);
+    F('#ffffff',27,17,6,3); F('#3d8ad6',28,18,4,1);                    // paper wrapper label
+  },
+};
+const REWARDS={farm:{from:'From Keelan', name:'Eggs & butter', hint:'Tap them to put them in your basket.'}};
+let rewardKey=null;
+function showReward(key){
+  const r=REWARDS[key], c=$('rewardCanvas'), g=c.getContext('2d');
+  g.clearRect(0,0,c.width,c.height); ART[key](g);
+  $('rewardFrom').textContent=r.from; $('rewardName').textContent=r.name; $('rewardHint').textContent=r.hint;
+  rewardKey=key; paused=true; prompt.hidden=true; $('reward').hidden=false;
+  setTimeout(()=>$('rewardArt').focus({preventScroll:true}),0);
+}
+function collectReward(){
+  if(!rewardKey)return; const key=rewardKey; rewardKey=null;
+  have[key]=true; save();
+  const art=$('rewardArt'), i=ITEMS.findIndex(it=>it.key===key);
+  const slot=$('basket').children[i], a=art.getBoundingClientRect(), b=slot?slot.getBoundingClientRect():a;
+  const done=()=>{$('reward').hidden=true; renderBasket(); const sl=$('basket').children[i]; sl&&sl.classList.add('pop'); paused=false};
+  const still=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(still||!art.animate)return done();
+  art.style.animation='none';
+  art.animate([{transform:'none',opacity:1},{transform:`translate(${b.x+b.width/2-(a.x+a.width/2)}px,${b.y+b.height/2-(a.y+a.height/2)}px) scale(.15)`,opacity:.6}],
+    {duration:550,easing:'cubic-bezier(.5,0,.75,0)'}).onfinish=()=>{art.style.animation='';done()};
+}
+$('rewardArt').onclick=collectReward;

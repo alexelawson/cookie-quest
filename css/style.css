@@ -65,3 +65,18 @@ canvas{width:100%;height:100%;display:block;image-rendering:pixelated;image-rend
 canvas{border-radius:6px}
 .dialog{z-index:5}
 .dialog.tall{top:22%;bottom:auto;max-height:none;box-shadow:0 8px 24px rgba(0,0,0,.45)}
+
+/* reward pop-up: tap the item to put it in your basket */
+.reward{position:absolute;inset:0;z-index:6;display:flex;align-items:center;justify-content:center;background:rgba(8,9,16,.55);padding:12px;border-radius:6px}
+.rcard{background:var(--paper);color:var(--ink);border:3px solid var(--ink);border-radius:8px;padding:12px 18px 10px;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.5);animation:rin .25s ease-out}
+.rcard small{font-family:var(--pixel);font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;opacity:.65}
+.rcard h3{font-family:var(--pixel);font-weight:600;color:var(--berry);font-size:1.3rem;margin:0}
+.rcard p{margin:0;font-size:.9rem}
+.rart{background:radial-gradient(circle,rgba(239,195,90,.45),rgba(239,195,90,0) 70%);border:none;padding:6px 16px;cursor:pointer;border-radius:12px;animation:bob 1.4s ease-in-out infinite}
+.rart canvas{width:160px;height:120px;image-rendering:pixelated;image-rendering:crisp-edges;display:block}
+.rart:focus-visible{outline:3px solid var(--berry);outline-offset:2px}
+.slot.pop{animation:pop .5s ease-out}
+@keyframes rin{from{transform:scale(.85);opacity:0}to{transform:none;opacity:1}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.25);background:rgba(239,195,90,.45)}100%{transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){.rart,.rcard,.slot.pop{animation:none}}

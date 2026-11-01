@@ -51,7 +51,7 @@ const KEELAN = {
   backToIt:"Back to it",
   lose:["Whoa. Whoa. That's too many.","Let's get them settled and try again. Talk to me when you're ready."],
   win:["That's all twenty. You're a natural.","Eggs are yours. I'll throw in some butter too."],
-  winItem:"Eggs and butter are in your basket!",
+  thanks:"Thanks, Keelan!",
   after:"All twenty, home and accounted for. Thanks again.",
   bye:"Bye",
 };
