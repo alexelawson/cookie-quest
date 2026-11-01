@@ -114,9 +114,8 @@ const HEIST = {
 const ALEX_WELCOME = {speaker:'Alex', place:'Home',
   pages:["Joe! Merry Christmas!",
     "Okay. We're making the best chocolate chip cookies ever made. And I need your help.",
-    "Five stops: Keelan's farm for eggs and butter, the Birkie trailhead for flour, the city rooftops for chocolate, Fargo for sugar, and Wylee Woods for milk.",
     "Walk with the arrow keys (or the pad under the screen). Press Space or A to talk to people and do things.",
-    "Everything you get goes in the basket up top. When it's full, meet me in the kitchen. Everyone's coming over.",
+    "Everything you get goes in the basket up top. When it's full, meet me in the kitchen.",
     "Oh, and look around. Some people might need a little favor..."],
   go:"Let's go!",
   lookTitle:"Pick Joe's look", lookIntro:"First things first. What's Joe wearing today?", lookGo:"Looks good"};
