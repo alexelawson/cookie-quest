@@ -58,16 +58,39 @@ const fargoBg=document.createElement('canvas'); fargoBg.width=FW; fargoBg.height
     if(r.w>r.h){F('#b09a68',r.x,r.y,r.w,1);F('#b09a68',r.x,r.y+r.h-1,r.w,1); for(let x=r.x;x<r.x+r.w;x+=10)F('#e2c75a',x,r.y+(r.h>>1),5,1)}
     else{F('#b09a68',r.x,r.y,1,r.h);F('#b09a68',r.x+r.w-1,r.y,1,r.h); for(let y=r.y;y<r.y+r.h;y+=10)F('#e2c75a',r.x+(r.w>>1),y,1,5)}
   }
+  for(const r of ROADS)for(let i=0;i<(r.w*r.h)/600;i++){const x=r.x+3+rnd()*(r.w-8)|0, y=r.y+3+rnd()*(r.h-8)|0;   // tar-sealed cracks + patches
+    if(rnd()<.6){F('#6f6c67',x,y,1,1);F('#6f6c67',x+1,y+1,1,1);F('#6f6c67',x+2,y+1,1,1);F('#6f6c67',x+3,y+2,1,1)} else F('#8c8882',x,y,5,3)}
+  for(const v of ROADS.filter(r=>r.h>r.w))for(const h of ROADS.filter(r=>r.w>r.h)){   // crosswalks at every intersection
+    F('#9a9690',v.x+1,h.y+1,v.w-2,h.h-2);
+    for(let x=v.x+2;x<v.x+v.w-2;x+=3){F('#e9e6dc',x,h.y-4,2,3);F('#e9e6dc',x,h.y+h.h+1,2,3)}
+    for(let y=h.y+2;y<h.y+h.h-2;y+=3){if(v.x>4)F('#e9e6dc',v.x-4,y,3,2);F('#e9e6dc',v.x+v.w+1,y,3,2)}}
+  for(let i=0;i<500;i++){const x=rnd()*FW|0,y=rnd()*FH|0; if(ROADS.some(r=>x>=r.x-2&&x<=r.x+r.w+2&&y>=r.y-2&&y<=r.y+r.h+2))continue;   // grass tufts
+    F('#a9a35a',x,y,1,2); F('#8f9a4a',x+1,y-1,1,3); F('#a9a35a',x+2,y,1,2)}
   for(const s of STATIONS){
     F('#b4b2ad',s.lot.x,s.lot.y,s.lot.w,s.lot.h); for(let x=s.lot.x+4;x<s.lot.x+44;x+=8)F('#a3a19c',x,s.lot.y+4,1,20);
+    F('#d6d3cc',s.lot.x,s.lot.y,s.lot.w,1); F('#d6d3cc',s.lot.x,s.lot.y+s.lot.h-1,s.lot.w,1);   // curbs
+    for(let i=0;i<3;i++)F('#9a9893',s.lot.x+6+rnd()*36|0,s.lot.y+5+rnd()*16|0,3,2);              // oil spots
     const st=s.store; F('#d9d4c8',st.x,st.y,st.w,st.h); F(s.brand,st.x,st.y,st.w,4); F('#9fd2f0',st.x+4,st.y+8,10,7); F('#9fd2f0',st.x+26,st.y+8,10,7);
+    F('#c4bfb2',st.x,st.y+4,st.w,1); F('#bdb7aa',st.x,st.y+st.h-1,st.w,1); F('#e6e2d8',st.x,st.y+4,1,st.h-4);
+    F('#ffffff',st.x+4,st.y+8,10,1); F('#ffffff',st.x+26,st.y+8,10,1); F('#7fb8dc',st.x+4,st.y+14,10,1); F('#7fb8dc',st.x+26,st.y+14,10,1);
+    F('#f4d35e',st.x+6,st.y+10,3,3); F('#e54b4b',st.x+29,st.y+10,4,3); F('#3d8ad6',st.x+10,st.y+11,2,2);   // posters in the windows
+    F('#e9eef3',st.x+st.w-3,st.y+6,4,6); F('#3d8ad6',st.x+st.w-3,st.y+7,4,1);               // ice chest
     F('#6b6f7a',st.x+16,s.face==='up'?st.y+2:st.y+st.h-12,8,12); F('#ffd98a',st.x+22,s.face==='up'?st.y+8:st.y+st.h-6,1,2); F('#c9c4b8',st.x,st.y-2,st.w,2);
-    F('#8a8f9a',s.island.x,s.island.y,s.island.w,s.island.h); F(s.brand,s.island.x+2,s.island.y-3,3,6); F(s.brand,s.island.x+7,s.island.y-3,3,6);
+    F('#a9aeb8',s.island.x-1,s.island.y+s.island.h,s.island.w+2,1); F('#8a8f9a',s.island.x,s.island.y,s.island.w,s.island.h); F('#a9aeb8',s.island.x,s.island.y,s.island.w,1); F(s.brand,s.island.x+2,s.island.y-3,3,6); F(s.brand,s.island.x+7,s.island.y-3,3,6);
     F('#8a8f9a',s.sign.x+8,s.sign.y+9,2,14);   // sign pole
   }
   for(const h of HOUSES){
-    F('#b5654f',h.x,h.y+6,h.w,h.h-6); F('#5f564e',h.x-1,h.y,h.w+2,8); F('#4a433c',h.x-1,h.y+6,h.w+2,2); F('#6f665d',h.x,h.y+2,h.w,1);
-    F('#ffd98a',h.x+4,h.y+11,5,4); F('#ffd98a',h.x+h.w-9,h.y+11,5,4); F('#5a3a22',h.x+h.w/2-2|0,h.y+h.h-7,5,7);
+    const wall=['#b5654f','#e8dcc2','#7fa0b8','#c9a06a','#9fb38a','#f0ece2'][(h.x*7+h.y)%6], roof=['#5f564e','#4a5a6a','#6b4a3a'][(h.x+h.y)%3];
+    F('rgba(60,50,30,.25)',h.x+1,h.y+h.h,h.w,2);                                                    // shadow
+    F(wall,h.x,h.y+6,h.w,h.h-6); for(let y=h.y+9;y<h.y+h.h;y+=2)F('rgba(0,0,0,.07)',h.x,y,h.w,1);   // lap siding
+    F(roof,h.x-1,h.y,h.w+2,8); for(let y=h.y+1;y<h.y+6;y+=2)for(let x=h.x-1+(y%4?0:2);x<h.x+h.w;x+=4)F('rgba(0,0,0,.18)',x,y,1,1);   // shingles
+    F('#4a433c',h.x-1,h.y+6,h.w+2,2); F('rgba(255,255,255,.18)',h.x,h.y,h.w,1);
+    F('#8a5a44',h.x+h.w-6,h.y-3,3,5); F('#6b4434',h.x+h.w-6,h.y-3,3,1);                             // chimney
+    for(const wx of [h.x+3,h.x+h.w-10]){F('#f6efe2',wx,h.y+10,7,6); F('#ffd98a',wx+1,h.y+11,5,4); F('#f6efe2',wx+3,h.y+11,1,4); F('#5a6a4a',wx-1,h.y+10,1,6); F('#5a6a4a',wx+7,h.y+10,1,6)}
+    F('#f6efe2',h.x+h.w/2-3|0,h.y+h.h-8,7,8); F('#5a3a22',h.x+h.w/2-2|0,h.y+h.h-7,5,7); F('#f4d35e',h.x+h.w/2+1|0,h.y+h.h-4,1,1);
+    F('#8a8f9a',h.x+h.w/2-4|0,h.y+h.h,9,2);                                                          // front step
+    if((h.x+h.y)%2){F('#6b4a2f',h.x-4,h.y+h.h-4,1,5); F('#3d6fb0',h.x-5,h.y+h.h-6,3,2)}              // mailbox
+    else for(let x=h.x+1;x<h.x+h.w;x+=5){F('#4f7d3a',x,h.y+h.h-2,3,2); F('#e54b7a',x+1,h.y+h.h-2,1,1)}   // flower bed
   }
   // welcome sign
   F('#8a8f9a',WELCOME.x+3,WELCOME.y+10,2,6); F('#8a8f9a',WELCOME.x+19,WELCOME.y+10,2,6);
@@ -86,6 +109,7 @@ const fargoBg=document.createElement('canvas'); fargoBg.width=FW; fargoBg.height
   const blocked=r=>[...ROADS,...HOUSES,...STATIONS.flatMap(s=>[s.lot,s.store,R(s.sign.x-2,s.sign.y-2,22,24)]),R(TOWER.x-18,TOWER.y-40,36,46),R(0,160,40,60),WELCOME,...EXIT_SIGNS.map(s=>R(s.x,s.y,26,18)),...fargoTrees.map(([x,y])=>R(x-6,y-16,12,17))]
     .some(o=>hit(R(r.x-4,r.y-4,r.w+8,r.h+8),o));
   let n=0; for(let k=0;k<300&&n<6;k++){const f=R(8+rnd()*(FW-60)|0,12+rnd()*(FH-40)|0,44,26); if(blocked(f))continue; n++;
+    for(let x=f.x-2;x<=f.x+f.w+1;x+=6){F('#7a5a3a',x,f.y-3,1,3); F('#7a5a3a',x,f.y+f.h,1,3)} F('#9a7a5a',f.x-2,f.y-2,f.w+4,1); F('#9a7a5a',f.x-2,f.y+f.h+1,f.w+4,1);   // a split-rail fence
     if(n%2){F('#d9b24a',f.x,f.y,f.w,f.h); for(let y=f.y+2;y<f.y+f.h;y+=4){F('#c09634',f.x,y,f.w,1); for(let x=f.x+1;x<f.x+f.w;x+=3)F('#ecd06a',x,y-2,1,2)}}   // wheat
     else {F('#6f8f3a',f.x,f.y,f.w,f.h); for(let y=f.y+2;y<f.y+f.h-1;y+=5)for(let x=f.x+2;x<f.x+f.w-2;x+=4){F('#f4c430',x,y,3,3); F('#6b4a2a',x+1,y+1,1,1)}}   // sunflowers
   }
@@ -93,7 +117,8 @@ const fargoBg=document.createElement('canvas'); fargoBg.width=FW; fargoBg.height
 const pineSprite=document.createElement('canvas'); pineSprite.width=12; pineSprite.height=18;
 (function(){const g=pineSprite.getContext('2d'), F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};
   // a summer cottonwood (it used to be a snowy pine; the name stuck)
-  F('#5a3a22',5,11,2,7); F('#4f7d3a',1,3,10,9); F('#5f9444',2,1,8,4); F('#6aa84a',3,2,4,3); F('#3f6b30',2,9,8,2); F('#6aa84a',8,5,2,2);})();
+  F('rgba(60,50,30,.3)',2,16,9,2); F('#5a3a22',5,11,2,7); F('#7a5232',5,11,1,6); F('#4a2e1a',4,17,4,1); F('#4f7d3a',1,3,10,9); F('#5f9444',2,1,8,4); F('#6aa84a',3,2,4,3); F('#3f6b30',2,9,8,2); F('#6aa84a',8,5,2,2);
+  F('#3f6b30',0,6,1,4); F('#3f6b30',11,6,1,3); F('#8cc463',4,2,2,1); F('#8cc463',2,5,1,2); F('#355a28',6,8,2,2); F('#355a28',3,10,2,1);})();
 
 // ---------- the CR-V ----------
 const carSprites={}, carSpritesEmpty={};
@@ -178,6 +203,11 @@ function drawWaterTower(){
   const F=(c,x,y,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,h)}, x=TOWER.x, y=TOWER.y;
   F('#7d8694',x-12,y-18,2,18); F('#7d8694',x+10,y-18,2,18); F('#7d8694',x-1,y-18,2,18); F('#7d8694',x-11,y-10,22,1);
   F('#9fb0c2',x-15,y-36,30,18); F('#b9c8d6',x-15,y-36,30,3); F('#7d8fa2',x-15,y-20,30,2); F('#8a96a6',x-13,y-39,26,3);
+  for(let i=-14;i<15;i+=4)F('#8ea0b4',x+i,y-32,1,1);                                   // rivets
+  F('#6c7a8a',x+13,y-36,2,18); F('#c9d6e2',x-13,y-34,2,10);                            // shade + shine
+  F('#5f6874',x+5,y-18,1,18); for(let k=y-16;k<y;k+=3)F('#5f6874',x+5,k,3,1); F('#5f6874',x+8,y-18,1,18);   // ladder
+  F('#e54b4b',x-1,y-42,2,3);                                                           // the blinking light's mount
+  if((time/700|0)%2)F('#ff6b6b',x-1,y-43,2,1);
   pixText(ctx,'FARGO',x-10,y-30,'#2f5f9e');
 }
 // the name board on each shop (Bob's moves around, so it's drawn live)
