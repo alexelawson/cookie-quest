@@ -48,21 +48,22 @@ function fargoNewRun(){
 const fargoBg=document.createElement('canvas'); fargoBg.width=FW; fargoBg.height=FH;
 (function(){
   const g=fargoBg.getContext('2d'), F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};
-  F('#eef3f7',0,0,FW,FH); for(let i=0;i<900;i++)F(rnd()<.5?'#dde6ef':'#ffffff',rnd()*FW|0,rnd()*FH|0,2,1);
+  // summer on the plains: dry grass, flat as a table
+  F('#cdb978',0,0,FW,FH); for(let i=0;i<1100;i++)F(['#bfa865','#d9c98e','#a9a35a','#c4ad6c'][i%4],rnd()*FW|0,rnd()*FH|0,2,1);
   for(const r of ROADS){F('#9a9690',r.x,r.y,r.w,r.h); for(let i=0;i<r.w*r.h/25;i++)F(rnd()<.5?'#8b8780':'#a9a59e',r.x+rnd()*r.w|0,r.y+rnd()*r.h|0,1,1)}
-  for(const r of ROADS){   // slushy tire tracks + snowbank edges
-    if(r.w>r.h){F('#86827b',r.x,r.y+7,r.w,2);F('#86827b',r.x,r.y+15,r.w,2);F('#dfe7ee',r.x,r.y,r.w,1);F('#dfe7ee',r.x,r.y+r.h-1,r.w,1)}
-    else{F('#86827b',r.x+7,r.y,2,r.h);F('#86827b',r.x+15,r.y,2,r.h);F('#dfe7ee',r.x,r.y,1,r.h);F('#dfe7ee',r.x+r.w-1,r.y,1,r.h)}
+  for(const r of ROADS){   // dusty shoulders + a faded center line
+    if(r.w>r.h){F('#b09a68',r.x,r.y,r.w,1);F('#b09a68',r.x,r.y+r.h-1,r.w,1); for(let x=r.x;x<r.x+r.w;x+=10)F('#e2c75a',x,r.y+(r.h>>1),5,1)}
+    else{F('#b09a68',r.x,r.y,1,r.h);F('#b09a68',r.x+r.w-1,r.y,1,r.h); for(let y=r.y;y<r.y+r.h;y+=10)F('#e2c75a',r.x+(r.w>>1),y,1,5)}
   }
   for(const s of STATIONS){
     F('#b4b2ad',s.lot.x,s.lot.y,s.lot.w,s.lot.h); for(let x=s.lot.x+4;x<s.lot.x+44;x+=8)F('#a3a19c',x,s.lot.y+4,1,20);
     const st=s.store; F('#d9d4c8',st.x,st.y,st.w,st.h); F(s.brand,st.x,st.y,st.w,4); F('#9fd2f0',st.x+4,st.y+8,10,7); F('#9fd2f0',st.x+26,st.y+8,10,7);
-    F('#6b6f7a',st.x+16,s.face==='up'?st.y+2:st.y+st.h-12,8,12); F('#ffd98a',st.x+22,s.face==='up'?st.y+8:st.y+st.h-6,1,2); F('#ffffff',st.x,st.y-2,st.w,2);
+    F('#6b6f7a',st.x+16,s.face==='up'?st.y+2:st.y+st.h-12,8,12); F('#ffd98a',st.x+22,s.face==='up'?st.y+8:st.y+st.h-6,1,2); F('#c9c4b8',st.x,st.y-2,st.w,2);
     F('#8a8f9a',s.island.x,s.island.y,s.island.w,s.island.h); F(s.brand,s.island.x+2,s.island.y-3,3,6); F(s.brand,s.island.x+7,s.island.y-3,3,6);
     F('#8a8f9a',s.sign.x+8,s.sign.y+9,2,14);   // sign pole
   }
   for(const h of HOUSES){
-    F('#b5654f',h.x,h.y+6,h.w,h.h-6); F('#ffffff',h.x-1,h.y,h.w+2,8); F('#e3ebf2',h.x-1,h.y+6,h.w+2,2);
+    F('#b5654f',h.x,h.y+6,h.w,h.h-6); F('#5f564e',h.x-1,h.y,h.w+2,8); F('#4a433c',h.x-1,h.y+6,h.w+2,2); F('#6f665d',h.x,h.y+2,h.w,1);
     F('#ffd98a',h.x+4,h.y+11,5,4); F('#ffd98a',h.x+h.w-9,h.y+11,5,4); F('#5a3a22',h.x+h.w/2-2|0,h.y+h.h-7,5,7);
   }
   // welcome sign
@@ -73,13 +74,23 @@ const fargoBg=document.createElement('canvas'); fargoBg.width=FW; fargoBg.height
 (function(){
   const blocked=r=>[...ROADS,...HOUSES,...STATIONS.flatMap(s=>[s.lot,s.store,R(s.sign.x-2,s.sign.y-2,22,24)]),R(TOWER.x-18,TOWER.y-40,36,46),R(0,160,40,60),WELCOME]
     .some(o=>hit(R(r.x-3,r.y-3,r.w+6,r.h+6),o));
-  for(let n=0;n<400&&fargoTrees.length<34;n++){const x=8+rnd()*(FW-16)|0, y=16+rnd()*(FH-20)|0; const box=R(x-6,y-16,12,17);
+  for(let n=0;n<400&&fargoTrees.length<16;n++){const x=8+rnd()*(FW-16)|0, y=16+rnd()*(FH-20)|0; const box=R(x-6,y-16,12,17);
     if(!blocked(box)&&!fargoTrees.some(([tx,ty])=>Math.abs(tx-x)<12&&Math.abs(ty-y)<14))fargoTrees.push([x,y])}
+})();
+// wheat and sunflower fields on the open land (painted onto the town background)
+(function(){
+  const g=fargoBg.getContext('2d'), F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};
+  const blocked=r=>[...ROADS,...HOUSES,...STATIONS.flatMap(s=>[s.lot,s.store,R(s.sign.x-2,s.sign.y-2,22,24)]),R(TOWER.x-18,TOWER.y-40,36,46),R(0,160,40,60),WELCOME,...fargoTrees.map(([x,y])=>R(x-6,y-16,12,17))]
+    .some(o=>hit(R(r.x-4,r.y-4,r.w+8,r.h+8),o));
+  let n=0; for(let k=0;k<300&&n<6;k++){const f=R(8+rnd()*(FW-60)|0,12+rnd()*(FH-40)|0,44,26); if(blocked(f))continue; n++;
+    if(n%2){F('#d9b24a',f.x,f.y,f.w,f.h); for(let y=f.y+2;y<f.y+f.h;y+=4){F('#c09634',f.x,y,f.w,1); for(let x=f.x+1;x<f.x+f.w;x+=3)F('#ecd06a',x,y-2,1,2)}}   // wheat
+    else {F('#6f8f3a',f.x,f.y,f.w,f.h); for(let y=f.y+2;y<f.y+f.h-1;y+=5)for(let x=f.x+2;x<f.x+f.w-2;x+=4){F('#f4c430',x,y,3,3); F('#6b4a2a',x+1,y+1,1,1)}}   // sunflowers
+  }
 })();
 const pineSprite=document.createElement('canvas'); pineSprite.width=12; pineSprite.height=18;
 (function(){const g=pineSprite.getContext('2d'), F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};
-  F('#5a3a22',5,14,2,4); F('#2f5e3a',1,10,10,5); F('#356b42',2,6,8,5); F('#3d7a4a',4,2,4,5); F('#5a3a22',5,0,2,2);
-  F('#ffffff',1,10,4,1); F('#ffffff',7,10,3,1); F('#ffffff',2,6,3,1); F('#ffffff',6,6,3,1); F('#ffffff',4,2,4,1);})();
+  // a summer cottonwood (it used to be a snowy pine; the name stuck)
+  F('#5a3a22',5,11,2,7); F('#4f7d3a',1,3,10,9); F('#5f9444',2,1,8,4); F('#6aa84a',3,2,4,3); F('#3f6b30',2,9,8,2); F('#6aa84a',8,5,2,2);})();
 
 // ---------- the CR-V ----------
 const carSprites={}, carSpritesEmpty={};
@@ -91,7 +102,6 @@ function buildCar(into,withPeople){
   F(C.light,16,3,6,8);                                                        // hood
   F('#2b3a4f',13,3,3,8); F('#2b3a4f',2,3,2,8); F('#2b3a4f',5,2,7,1); F('#2b3a4f',5,11,7,1);  // windshield, rear glass, side windows
   F(C.dark,4,3,9,8); F('#c9d1d8',5,4,7,1); F('#c9d1d8',5,9,7,1);            // roof + roof rails
-  F('#ffffff',6,5,3,1); F('#ffffff',9,7,2,1);                               // a little snow on the roof
   F('#fff3c4',23,3,1,2); F('#fff3c4',23,9,1,2); F('#d33b2f',0,3,1,2); F('#d33b2f',0,9,1,2);   // lights
   if(withPeople){   // seen through the glass roof: you driving (top), Alex riding shotgun (bottom)
     F('#4a5a70',7,3,7,8);
@@ -141,13 +151,13 @@ function drawAttendant(x,y,i){
   F('rgba(0,0,0,.2)',1,16,8,2); F('#2c3e5a',2,11,3,5); F('#2c3e5a',5,11,3,5);
   F(coats[i%coats.length],1,5,8,7); F('#e9b98f',2,1,6,4); F(['#c8322b','#f4d35e','#3d8ad6'][i%3],2,0,6,2); F('#2b2b2b',3,3,1,1); F('#2b2b2b',6,3,1,1);
 }
-// Alex: long dark brown hair, brown eyes, green winter coat. Her mood shows in a little bubble.
+// Alex: long dark brown hair, brown eyes, a summer tee. Her mood shows in a little bubble.
 function drawAlex(x,y,mood){
   const F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(Math.round(x)-6+dx,Math.round(y)-19+dy,w,h)};
-  const hair='#3b2416', hairL='#4e3020', skin='#f2c9a5', eye='#5a3a22', coat='#3f6b4f';
+  const hair='#3b2416', hairL='#4e3020', skin='#f2c9a5', eye='#5a3a22', coat='#5fa8c8';
   F('rgba(0,0,0,.2)',1,18,10,2);
   F('#2c2c34',3,13,3,5); F('#2c2c34',6,13,3,5); F('#3b2a1e',2,17,4,2); F('#3b2a1e',6,17,4,2);
-  F(coat,2,7,8,7); F(coat,1,8,1,5); F(coat,10,8,1,5); F('#335a42',6,7,1,7);
+  F(coat,2,7,8,6); F('#3a3f55',2,12,8,2); F(coat,1,8,1,2); F(coat,10,8,1,2); F(skin,1,10,1,3); F(skin,10,10,1,3);
   F(hair,2,0,8,3); F(hair,1,2,2,10); F(hair,9,2,2,10); F(hairL,2,1,3,1);   // long hair down past the shoulders
   F(skin,3,2,6,5); F(hair,3,2,4,1); F(hair,3,3,1,1);   // side-swept fringe
   F(eye,4,4,1,1); F(eye,7,4,1,1);
@@ -164,7 +174,7 @@ function drawAlex(x,y,mood){
 function drawWaterTower(){
   const F=(c,x,y,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,h)}, x=TOWER.x, y=TOWER.y;
   F('#7d8694',x-12,y-18,2,18); F('#7d8694',x+10,y-18,2,18); F('#7d8694',x-1,y-18,2,18); F('#7d8694',x-11,y-10,22,1);
-  F('#9fb0c2',x-15,y-36,30,18); F('#b9c8d6',x-15,y-36,30,3); F('#7d8fa2',x-15,y-20,30,2); F('#ffffff',x-13,y-39,26,3);
+  F('#9fb0c2',x-15,y-36,30,18); F('#b9c8d6',x-15,y-36,30,3); F('#7d8fa2',x-15,y-20,30,2); F('#8a96a6',x-13,y-39,26,3);
   pixText(ctx,'FARGO',x-10,y-30,'#2f5f9e');
 }
 function drawSign(s){
@@ -280,8 +290,8 @@ SCENES.fargo={
       ctx.fillStyle='rgba(0,0,0,.08)'; ctx.fillRect(s.x+6,s.y+8,40,14);
       ctx.fillStyle='rgba(241,244,248,.6)'; ctx.fillRect(s.x+8,s.y+3,32,10); ctx.fillStyle=s.brand; ctx.fillRect(s.x+8,s.y+11,32,2);   // see-through so the car shows
     }
-    ctx.fillStyle='rgba(255,255,255,.85)';  // light snow
-    for(let i=0;i<50;i++){const sx=(i*97+time*.02*(1+i%3))%FW, sy=(i*53+time*.03*(1+i%2))%FH; ctx.fillRect(sx|0,sy|0,1,1)}
+    ctx.fillStyle='rgba(120,100,60,.35)';    // a little summer dust drifting across the plains
+    for(let i=0;i<14;i++){const sx=(i*97+time*.03*(1+i%3))%FW, sy=(i*53+Math.sin(time/700+i)*6+FH)%FH; ctx.fillRect(sx|0,sy|0,1,1)}
   },
   hud(){
     if(fargo.onFoot) return `<span>Wallet $${fargo.wallet.toFixed(2)}</span><span class="pips" title="Strikes">Strikes ${[...Array(FARGO.strikesOut)].map((_,i)=>`<i class="${i<fargo.strikes?'on':''}"></i>`).join('')}</span>`;

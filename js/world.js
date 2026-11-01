@@ -4,7 +4,7 @@ const WW=384, WH=288, VW=224, VH=168;
 const cv=document.getElementById('game'), ctx=cv.getContext('2d'); ctx.imageSmoothingEnabled=false;
 const R=(x,y,w,h)=>({x,y,w,h});
 const REG={farm:R(0,0,164,144), mill:R(220,0,164,144), city:R(0,170,164,118), fargo:R(220,170,164,118)};
-const trees=[[172,30],[212,30],[172,64],[212,64],[172,98],[170,200],[214,228],[110,154],[270,154]];
+const trees=[[172,30],[212,30],[172,64],[212,64],[170,200],[214,228],[110,154],[270,154]];
 // snowy pines around the Birkie trailhead, dark pines in Wylee Woods (the disc golf entrance)
 const pines=[[228,14],[244,30],[262,12],[284,26],[232,52],[268,48],[290,62],[352,10],[372,24],[358,44],[378,62],[346,30],[236,74]];
 const woods=[[168,250],[176,240],[171,270],[166,284],[212,248],[217,262],[211,282],[218,242]];
@@ -16,14 +16,15 @@ const solids=[
   R(237,90,10,14),R(261,90,10,14),R(273,124,10,14),          // parked cars
   R(327,77,8,4),                                             // John
   R(178,282,4,4),R(201,282,4,4),                             // Wylee Woods arch posts
-  R(170,108,44,34),                                          // kitchen
+  R(166,98,52,42),                                           // farmhouse (your kitchen)
+  R(67,204,3,3),R(103,260,3,3),                              // city streetlamps
   R(8,178,40,52),R(110,184,48,56),R(16,246,44,38),           // city buildings
   R(310,180,60,40),R(256,198,6,10),R(280,198,6,10),R(235,214,3,12), // gas shop, pumps, sign pole
   ...[...trees,...pines,...woods].map(([x,y])=>R(x-3,y-3,6,4)),
 ];
 const triggers=[
   {z:R(320,70,24,18),  label:'Talk to John', btn:'Talk', act:()=>talkJohn()},
-  {z:R(124,240,20,12), label:'Enter the city',     act:()=>goTo('city','fromStreet')},
+  {z:R(124,240,20,12), label:'Climb the fire escape', act:()=>goTo('city','fromStreet')},
   {z:R(330,220,20,12), label:'Drive into Fargo',   act:()=>goTo('fargo','fromHighway')},
   {z:R(182,142,20,10), label:'Enter your kitchen', act:()=>goTo('kitchen','fromDoor')},
   {z:R(184,276,16,10), label:'Go to the disc golf course', act:()=>goTo('golf','fromRoad')},
@@ -34,7 +35,8 @@ const GLYPH={'0':'111101101101111','1':'010110010010111','2':'111001111100111','
   '5':'111100111001111','6':'111100111101111','7':'111001010010010','8':'111101111101111','9':'111101111001111',
   '?':'111001011000010','F':'111100110100100','A':'010101111101101','R':'110101110101101','G':'011100101101011','O':'010101101101010',
   'B':'110101110101110','C':'011100100100011','D':'110101101101110','E':'111100110100111','I':'111010010010111','K':'101101110101101',
-  'L':'100100100100111','M':'1000111011101011000110001','N':'10011101101110011001','S':'011100010001110','W':'1000110001101011101110001','Y':'101101010010010'};
+  'L':'100100100100111','M':'1000111011101011000110001','N':'10011101101110011001','S':'011100010001110','W':'1000110001101011101110001','Y':'101101010010010',
+  'T':'111010010010010','H':'101101111101101','P':'110101110100100','U':'101101101101111','V':'101101101101010'};
 function pixText(g,str,x,y,color){
   g.fillStyle=color;
   for(const ch of str){
@@ -72,17 +74,28 @@ const bg=document.createElement('canvas'); bg.width=WW; bg.height=WH;
   const car=(x,y,c,rack)=>{F('rgba(0,0,0,.25)',x+1,y+14,10,2); F(c,x,y,10,15); F('#9fc4dc',x+1,y+2,8,3); F('#9fc4dc',x+1,y+11,8,2); F('#ffffff',x,y,10,1);
     if(rack){F('#2b2b2b',x+1,y+5,8,1); F('#2b2b2b',x+1,y+9,8,1); F('#c8322b',x+2,y+5,1,5); F('#ffc62f',x+5,y+5,1,5)} };
   car(237,90,'#2f6b36',true); car(261,90,'#2f6db0',false); car(273,124,'#8a8f9a',true);
-  // city
+  // city (night, rain): wet sidewalks, a diner, a tall building with a fire escape (the way up), an old candy warehouse
   F('#262a38',0,170,164,118);
   for(let i=0;i<60;i++)F('#323a52',rnd()*164|0,170+rnd()*118|0,4,1);
-  for(const b of [R(8,178,40,52),R(110,184,48,56),R(16,246,44,38)]){
-    F('#2c3044',b.x-1,b.y-4,b.w+2,5); F('#3b4058',b.x,b.y,b.w,b.h);
-    for(let y=b.y+5;y<b.y+b.h-8;y+=8)for(let x=b.x+4;x<b.x+b.w-5;x+=7)F(rnd()<.45?'#f3d27a':'#4c5373',x,y,4,5);
-  }
-  F('#15171f',128,226,12,14); F('#f3d27a',129,224,10,1);
+  for(let x=0;x<164;x+=8)for(let y=172;y<288;y+=8)F('#2d3242',x,y,1,1);                         // sidewalk slabs
+  const win=(b,lit)=>{for(let y=b.y+5;y<b.y+b.h-8;y+=8)for(let x=b.x+4;x<b.x+b.w-5;x+=7)F(rnd()<lit?'#f3d27a':'#4c5373',x,y,4,5)};
+  // the diner: brick, big lit front windows, a neon sign (it flickers; see over())
+  {const b=R(8,178,40,52); F('#3a2830',b.x-1,b.y-4,b.w+2,5); F('#5a3434',b.x,b.y,b.w,b.h); for(let y=b.y+2;y<b.y+b.h;y+=4)F('#4c2c2e',b.x,y,b.w,1);
+    win(R(b.x,b.y,b.w,24),.5); F('#ffd98a',b.x+3,b.y+34,34,9); F('#e8b04a',b.x+3,b.y+38,34,1); F('#2b2b2b',b.x+18,b.y+42,6,10);
+    F('#c8322b',b.x+2,b.y+31,36,3); for(let x=b.x+2;x<b.x+38;x+=4)F('#ffffff',x,b.y+31,2,3);       // striped awning
+    F('#6b4a34',30,170,10,7); F('#4a3424',30,170,10,1); F('#4a3424',31,177,1,2); F('#4a3424',38,177,1,2)}   // rooftop water tank
+  // the tall one: stone, a zigzag fire escape down the front, a ladder to the street
+  {const b=R(110,184,48,56); F('#2c3044',b.x-1,b.y-4,b.w+2,5); F('#3b4058',b.x,b.y,b.w,b.h); win(b,.45);
+    for(const [y,l] of [[198,1],[212,0],[226,1]]){F('#14161f',122,y-6,26,6); F('#7d8694',121,y,28,1); for(let x=121;x<149;x+=3)F('#7d8694',x,y-5,1,5); F('#7d8694',121,y-6,28,1);
+      for(let k=0;k<12;k++)F('#9aa3b2',l?124+k*2:146-k*2,y+1+k,2,1)}                           // landings + stairs
+    for(let y=227;y<240;y+=3)F('#9aa3b2',128,y,7,1); F('#7d8694',128,226,1,14); F('#7d8694',134,226,1,14)}   // ladder down
+  // the old candy works: boarded windows, a faded painted sign, a roll-up door
+  {const b=R(16,246,44,38); F('#2c3044',b.x-1,b.y-4,b.w+2,5); F('#4a4038',b.x,b.y,b.w,b.h); for(let y=b.y+3;y<b.y+b.h;y+=4)F('#41372f',b.x,y,b.w,1);
+    pixText(g,'CANDY CO',b.x+5,b.y+4,'#8a7a62'); F('#5a5048',b.x+12,b.y+22,20,16); for(let y=b.y+24;y<b.y+38;y+=3)F('#4a4038',b.x+12,y,20,1);
+    for(const x of [b.x+3,b.x+35]){F('#3a2a1e',x,b.y+14,6,6); F('#8a6a4a',x-1,b.y+15,8,1); F('#8a6a4a',x-1,b.y+18,8,1)}}
   // fargo
-  F('#eef3f7',220,170,164,118);
-  for(let i=0;i<300;i++)F(rnd()<.5?'#d6e0ea':'#ffffff',220+rnd()*164|0,170+rnd()*118|0,2,1);
+  F('#cdb978',220,170,164,118);                                                                            // fargo: dry, flat, summer
+  for(let i=0;i<360;i++)F(['#bfa865','#d9c98e','#a9a35a'][i%3],220+rnd()*164|0,170+rnd()*118|0,2,1);
   F('#d9d4c8',310,180,60,40); F('#2f6db0',310,180,60,8); F('#f1f4f8',316,182,48,4);
   F('#6b6f7a',334,206,12,14); F('#9fd2f0',314,194,14,9); F('#9fd2f0',352,194,14,9);
   F('#c7372f',256,198,6,10); F('#c7372f',280,198,6,10); F('#f1f4f8',257,200,4,3); F('#f1f4f8',281,200,4,3);
@@ -93,16 +106,32 @@ const bg=document.createElement('canvas'); bg.width=WW; bg.height=WH;
   // roads
   const road=(x,y,w,h)=>{F('#c9a46b',x,y,w,h); for(let i=0;i<w*h/30;i++)F('#b8935b',x+rnd()*w|0,y+rnd()*h|0,1,1)};
   road(0,150,WW,14); road(184,164,16,124); road(187,140,10,12);
-  road(42,74,12,76); road(310,74,12,76); road(72,164,12,92); road(72,244,72,12); road(298,164,10,66); road(298,222,48,10);
+  road(310,74,12,76); road(298,164,10,66); road(298,222,48,10);
+  // city streets: wet asphalt, dashed lines, puddles reflecting the lights, a manhole (it steams)
+  F('#22252f',72,164,12,92); F('#22252f',72,244,72,12); F('#3a3f50',71,164,1,80); F('#3a3f50',84,164,1,80);
+  for(let y=168;y<244;y+=8)F('#c9a640',77,y,2,4); for(let x=88;x<144;x+=8)F('#c9a640',x,249,4,2);
+  for(const [x,y,w] of [[74,186,8],[96,252,12],[74,232,6]]){F('#2e3a55',x,y,w,3); F('#f3d27a',x+2,y+1,w-5,1)}
+  F('#14161f',75,214,6,4); F('#30343f',76,215,4,2);
   // Wylee Woods: forest floor around the end of the south road (the arch itself is a sprite)
   F('#3f6b3a',164,236,56,52); for(let i=0;i<160;i++)F(rnd()<.5?'#355c31':'#4d7d45',164+rnd()*56|0,236+rnd()*52|0,1,1);
   for(let i=0;i<30;i++)F('#7a5a3a',164+rnd()*56|0,236+rnd()*52|0,1,1);
   road(184,236,16,52); for(let i=0;i<16;i++)F('#5a7f3f',184+rnd()*16|0,240+rnd()*48|0,1,1);
-  // kitchen
-  F('#7f3434',166,104,52,12); F('#8f3d3d',170,100,44,6); F('#5a4a44',204,92,6,12);
-  F('#f0dcc0',170,116,44,26); F('#e2cba9',170,116,44,2);
-  F('#6b4430',186,128,12,14); F('#e8b04a',196,134,1,2); F('#a99a86',184,141,16,2);
-  F('#ffd98a',174,122,8,7); F('#ffd98a',202,122,8,7); F('#a8794f',174,125,8,1); F('#a8794f',202,125,8,1);
+  // your kitchen: an old white farmhouse with a gray shingle roof, a front gable, green shutters and a wraparound porch
+  F('#8a3a2a',172,76,6,14); F('#6b2a1e',172,76,6,2); F('#a54a36',173,80,4,1); F('#a54a36',173,85,4,1);   // brick chimney
+  F('#5f6470',164,86,56,20); F('#3f434c',164,86,56,2); for(let y=89;y<106;y+=3)F('#4f545e',164,y,56,1);   // shingle roof
+  for(let k=0;k<13;k++){const y=80+k, hw=k+1; F('#4f545e',192-hw-2,y,hw*2+4,1); if(k>1)F('#f2efe6',192-hw+1,y,hw*2-2,1)}   // front gable
+  F('#ffd98a',189,86,6,5); F('#cbb67a',191,86,1,5); F('#cbb67a',189,88,6,1);                               // attic window
+  F('#f2efe6',168,104,48,24); for(let y=106;y<128;y+=3)F('#dcd6c8',168,y,48,1);                            // white clapboard
+  for(const x of [172,204]){F('#ffd98a',x,109,8,10); F('#cbb67a',x+3,109,1,10); F('#cbb67a',x,113,8,1); F('#2f5a3a',x-3,109,3,10); F('#2f5a3a',x+8,109,3,10)}
+  F('#2f5a3a',187,112,10,16); F('#26493a',187,112,10,1); F('#e8b04a',195,120,1,2);                         // front door
+  F('#3d8443',189,114,6,6); F('#2f5a3a',191,116,2,2); F('#c8322b',191,119,2,2);                            // wreath with a bow
+  F('#7d8290',164,126,56,3); F('#9a9fab',164,126,56,1);                                                    // porch roof
+  for(let x=166,i=0;x<219;x+=4,i++)F(['#e54b4b','#f4d35e','#4fbf73','#5fa8e8'][i%4],x,129,1,1);           // Christmas lights
+  F('#8a6a4a',164,137,56,5); F('#755a3e',164,139,56,1);                                                    // porch floor
+  for(const x of [165,177,206,217])F('#f2efe6',x,129,2,9);                                                 // posts
+  F('#f2efe6',164,133,20,1); F('#f2efe6',200,133,20,1); for(let x=167;x<184;x+=3)F('#e4ded0',x,133,1,4); for(let x=202;x<217;x+=3)F('#e4ded0',x,133,1,4);   // railings
+  F('#6b4430',209,131,4,6); F('#6b4430',208,136,6,1);                                                      // rocking chair
+  F('#a99a86',186,142,12,2);                                                                              // steps
   // trees
   // pen gate (bottom fence, hens squeeze under it)
   F('#8a5a34',112,117,16,3); F('#6b4428',112,118,16,1); F('#5a3a22',112,117,1,3); F('#5a3a22',127,117,1,3);
@@ -165,8 +194,8 @@ SCENES.world={
   dynTrigger:()=>farmTrigger(),
   ambient(dt){
     for(const r of rain){r.y+=dt*.25;r.x-=dt*.05;if(r.y>288){r.y=170;r.x=rnd()*170}if(r.x<0)r.x+=164}
-    for(const s of snow){s.y+=dt*s.s*.12;s.x+=Math.sin((time+s.y*40)/600)*.15;if(s.y>288){s.y=170;s.x=220+rnd()*164}}
-    if(Math.random()<dt/400)smoke.push({x:207,y:90,a:1}); if(Math.random()<dt/500)smoke.push({x:361,y:92,a:1});
+    for(const s of snow){s.y+=dt*s.s*.12;s.x+=Math.sin((time+s.y*40)/600)*.15;if(s.y>144){s.y=0;s.x=220+rnd()*164}}   // snowing at the Birkie trailhead
+    if(Math.random()<dt/400)smoke.push({x:174,y:72,a:1}); if(Math.random()<dt/300)smoke.push({x:77,y:212,a:.8}); if(Math.random()<dt/500)smoke.push({x:361,y:92,a:1});
     for(const p of smoke){p.y-=dt*.012;p.x+=dt*.004;p.a-=dt/2600} while(smoke.length&&smoke[0].a<=0)smoke.shift();
     farmAmbient(dt);
   },
@@ -189,6 +218,15 @@ SCENES.world={
     ctx.fillStyle='rgba(255,240,180,.08)'; ctx.beginPath(); ctx.moveTo(78,288);
     ctx.lineTo(78+Math.sin(ang-.12)*220,288-Math.cos(ang-.12)*220); ctx.lineTo(78+Math.sin(ang+.12)*220,288-Math.cos(ang+.12)*220); ctx.fill();
     ctx.fillStyle='rgba(170,190,230,.55)'; for(const r of rain)ctx.fillRect(Math.round(r.x),Math.round(r.y),1,3);
+    for(const [x,y] of [[68,206],[104,262]]){ctx.fillStyle='#4a4f60'; ctx.fillRect(x,y-16,1,16); ctx.fillRect(x-1,y-17,4,1); ctx.fillStyle='#ffe9a8'; ctx.fillRect(x+1,y-16,2,2);   // streetlamps
+      const gr=ctx.createRadialGradient(x+2,y-8,1,x+2,y-4,20); gr.addColorStop(0,'rgba(255,225,150,.32)'); gr.addColorStop(1,'rgba(255,225,150,0)'); ctx.fillStyle=gr; ctx.fillRect(x-20,y-28,44,40)}
+    const flick=Math.sin(time/90)>-.9&&!(Math.floor(time/1700)%7===3&&Math.sin(time/40)>0);                                         // the diner's neon
+    ctx.fillStyle='#1a1420'; ctx.fillRect(13,190,30,9); pixText(ctx,'DINER',18,192,flick?'#ff5fa2':'#5a2a40');
+    if(flick){ctx.fillStyle='rgba(255,95,162,.15)'; ctx.fillRect(9,186,38,17)}
+    ctx.fillStyle='#7d8694'; ctx.fillRect(150,170,1,10); if(Math.floor(time/700)%2){ctx.fillStyle='#ff3b3b'; ctx.fillRect(149,170,3,2)}   // antenna
+    if(have.city){ // the cookie signal, up on the clouds
+      ctx.fillStyle='rgba(255,240,180,.22)'; ctx.beginPath(); ctx.ellipse(46,184,16,9,0,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='rgba(30,22,16,.55)'; ctx.beginPath(); ctx.arc(46,184,6,0,Math.PI*2); ctx.fill(); ctx.fillStyle='rgba(255,240,180,.5)'; ctx.fillRect(43,182,2,2); ctx.fillRect(48,185,2,2); ctx.fillRect(45,187,1,1)}
     ctx.restore();
     ctx.fillStyle='#ffffff'; for(const s of snow)ctx.fillRect(Math.round(s.x),Math.round(s.y),1,1);
   },
