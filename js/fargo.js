@@ -1,4 +1,5 @@
-// Fargo: drive the CR-V around town on fumes, find the cheapest gas, then stop Gary's pump on exactly $30.00.
+// Fargo: drive the CR-V around town on fumes, find the cheapest gas, stop Gary's pump on exactly $30.00,
+// then walk into his shop and pick the right drink + snack for Alex.
 const FW=448, FH=336;
 const FUEL = {START:30, DRAIN:.03, ROAD:.12, SNOW:.06, PUSH:.025};  // fuel 0-100, drain per px; speeds in px/ms
 const PRICES = ['2.99','3.09','3.15','3.19','3.29'];  // the others; Gary's is always 2.79
@@ -16,7 +17,8 @@ const STATIONS=[
   {x:300,y:262,face:'down', brand:'#d2a32a'},
 ].map(s=>{
   const lot=R(s.x,s.y,48,28), store=s.face==='up'?R(s.x+4,s.y+28,40,20):R(s.x+4,s.y-20,40,20);
-  return {...s, lot, store, island:R(s.x+18,s.y+11,12,6), sign:{x:s.x+50,y:s.y+2},
+  const door=s.face==='up'?R(s.x+16,s.y+20,16,9):R(s.x+16,s.y-1,16,9);   // the shop door, from the lot side
+  return {...s, lot, store, door, island:R(s.x+18,s.y+11,12,6), sign:{x:s.x+50,y:s.y+2},
     person:{x:s.x+38,y:s.y+20}, price:'', seen:false, name:''};
 });
 const HOUSES=[R(70,124,24,20),R(110,132,26,20),R(244,74,26,20),R(244,118,26,20),R(284,130,22,20),
@@ -25,13 +27,16 @@ const HOUSES=[R(70,124,24,20),R(110,132,26,20),R(244,74,26,20),R(244,118,26,20),
 const TOWER={x:186,y:142};
 const WELCOME=R(12,196,24,12);
 
-const fargo={fuel:FUEL.START, gary:0, introPending:false, warned:false, won:false};
+const fargo={fuel:FUEL.START, gary:0, introPending:false, warned:false, won:false,
+  onFoot:false, car:null, alex:null, alexMood:'ok', moodT:0, wallet:0, strikes:0};
+// have.fargoStage remembers progress across reloads: 'store' (pump done, go shopping), 'reward' (sugar not yet taken)
 let fargoTrees=[];
 
 function fargoNewRun(){
   fargo.fuel=FUEL.START; fargo.warned=false;
   const others=[...PRICES].sort(()=>Math.random()-.5), names=[...FARGO.attendants].sort(()=>Math.random()-.5);
-  fargo.gary=Math.floor(Math.random()*STATIONS.length);
+  fargo.gary=have.fargoGary!=null?have.fargoGary:Math.floor(Math.random()*STATIONS.length);
+  fargo.onFoot=false; fargo.car=null; fargo.alex=null; fargo.alexMood='ok'; fargo.strikes=0;
   let k=0; STATIONS.forEach((s,i)=>{s.seen=false; s.price=i===fargo.gary?CHEAPEST:others[k]; s.name=i===fargo.gary?FARGO.gary:names[k]; if(i!==fargo.gary)k++});
 }
 
@@ -61,7 +66,7 @@ const fargoBg=document.createElement('canvas'); fargoBg.width=FW; fargoBg.height
   for(const s of STATIONS){
     F('#b4b2ad',s.lot.x,s.lot.y,s.lot.w,s.lot.h); for(let x=s.lot.x+4;x<s.lot.x+44;x+=8)F('#a3a19c',x,s.lot.y+4,1,20);
     const st=s.store; F('#d9d4c8',st.x,st.y,st.w,st.h); F(s.brand,st.x,st.y,st.w,4); F('#9fd2f0',st.x+4,st.y+8,10,7); F('#9fd2f0',st.x+26,st.y+8,10,7);
-    F('#6b6f7a',st.x+16,s.face==='up'?st.y+8:st.y+8,8,12); F('#ffffff',st.x,st.y-2,st.w,2);
+    F('#6b6f7a',st.x+16,s.face==='up'?st.y+2:st.y+st.h-12,8,12); F('#ffd98a',st.x+22,s.face==='up'?st.y+8:st.y+st.h-6,1,2); F('#ffffff',st.x,st.y-2,st.w,2);
     F('#8a8f9a',s.island.x,s.island.y,s.island.w,s.island.h); F(s.brand,s.island.x+2,s.island.y-3,3,6); F(s.brand,s.island.x+7,s.island.y-3,3,6);
     F('#8a8f9a',s.sign.x+8,s.sign.y+9,2,14);   // sign pole
   }
@@ -103,11 +108,11 @@ const carSprites={};
   carSprites.down=mk(14,24,x=>{x.translate(14,0);x.rotate(Math.PI/2);x.drawImage(base,0,0)});
   carSprites.up=mk(14,24,x=>{x.translate(0,24);x.rotate(-Math.PI/2);x.drawImage(base,0,0)});
 })();
-function drawCar(x,y){
-  const s=carSprites[P.dir]||carSprites.right, ox=Math.round(x-s.width/2), oy=Math.round(y-s.height/2);
+function drawCar(x,y,dir=P.dir){
+  const s=carSprites[dir]||carSprites.right, ox=Math.round(x-s.width/2), oy=Math.round(y-s.height/2);
   ctx.fillStyle='rgba(0,0,0,.18)'; ctx.fillRect(ox+1,oy+s.height-2,s.width-2,3);
   ctx.drawImage(s,ox,oy);
-  if(fargo.fuel<=0&&P.moving){ctx.fillStyle='#fff'; ctx.fillRect(ox-3+((time/120|0)%2),oy+s.height/2,2,2)}   // puffs while pushing
+  if(fargo.fuel<=0&&P.moving&&!fargo.onFoot){ctx.fillStyle='#fff'; ctx.fillRect(ox-3+((time/120|0)%2),oy+s.height/2,2,2)}   // puffs while pushing
 }
 
 // ---------- people ----------
@@ -124,6 +129,26 @@ function drawAttendant(x,y,i){
   const coats=['#2f6db0','#2f8a4a','#7a4fa0','#e08a2a','#555b66'], F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(Math.round(x)-5+dx,Math.round(y)-17+dy,w,h)};
   F('rgba(0,0,0,.2)',1,16,8,2); F('#2c3e5a',2,11,3,5); F('#2c3e5a',5,11,3,5);
   F(coats[i%coats.length],1,5,8,7); F('#e9b98f',2,1,6,4); F(['#c8322b','#f4d35e','#3d8ad6'][i%3],2,0,6,2); F('#2b2b2b',3,3,1,1); F('#2b2b2b',6,3,1,1);
+}
+// Alex: long dark brown hair, brown eyes, green winter coat. Her mood shows in a little bubble.
+function drawAlex(x,y,mood){
+  const F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(Math.round(x)-6+dx,Math.round(y)-19+dy,w,h)};
+  const hair='#3b2416', hairL='#4e3020', skin='#f2c9a5', eye='#5a3a22', coat='#3f6b4f';
+  F('rgba(0,0,0,.2)',1,18,10,2);
+  F('#2c2c34',3,13,3,5); F('#2c2c34',6,13,3,5); F('#3b2a1e',2,17,4,2); F('#3b2a1e',6,17,4,2);
+  F(coat,2,7,8,7); F(coat,1,8,1,5); F(coat,10,8,1,5); F('#335a42',6,7,1,7);
+  F(hair,2,0,8,3); F(hair,1,2,2,10); F(hair,9,2,2,10); F(hairL,2,1,3,1);   // long hair down past the shoulders
+  F(skin,3,2,6,5); F(hair,3,2,6,1);
+  F(eye,4,4,1,1); F(eye,7,4,1,1);
+  if(mood==='happy'){F('#c0645a',5,6,2,1); F('#f0a39a',3,5,1,1); F('#f0a39a',8,5,1,1)}
+  else if(mood==='frown'){F('#8a4a40',5,6,2,1); F('#8a4a40',4,7,1,1); F('#8a4a40',7,7,1,1); F(hair,4,3,1,1); F(hair,7,3,1,1)}
+  else F('#b5735a',5,6,2,1);
+  if(mood!=='ok'){ // bubble
+    const bx=Math.round(x)+5, by=Math.round(y)-30; ctx.fillStyle='#ffffff'; ctx.fillRect(bx,by,9,8); ctx.fillRect(bx+1,by+8,2,2);
+    ctx.fillStyle=mood==='happy'?'#e54b7a':'#4a4a5a';
+    if(mood==='happy'){ctx.fillRect(bx+2,by+2,2,2);ctx.fillRect(bx+5,by+2,2,2);ctx.fillRect(bx+2,by+3,5,2);ctx.fillRect(bx+3,by+5,3,1);ctx.fillRect(bx+4,by+6,1,1)}
+    else {ctx.fillRect(bx+2,by+2,1,1);ctx.fillRect(bx+6,by+2,1,1);ctx.fillRect(bx+3,by+5,3,1);ctx.fillRect(bx+2,by+6,1,1);ctx.fillRect(bx+6,by+6,1,1)}
+  }
 }
 function drawWaterTower(){
   const F=(c,x,y,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,h)}, x=TOWER.x, y=TOWER.y;
@@ -156,8 +181,8 @@ function pumpRelease(){
     $('pumpMsg').textContent=FARGO.bust[pump.tries++%FARGO.bust.length]; pump.lock=1300;
   } else if(pump.cents===3000){
     pump.lock=99999; $('pumpMsg').textContent='$30.00 on the nose!';
-    setTimeout(()=>{ $('pump').hidden=true; pump.open=false; fargo.won=true; have.fargoWon=true; save();
-      showDialog({place:FARGO.place,speaker:FARGO.gary,pages:FARGO.win,actions:[{label:FARGO.thanks,fn:()=>{closeDialog();showReward('fargo')}}]}) },700);
+    setTimeout(()=>{ $('pump').hidden=true; pump.open=false; have.fargoStage='store'; have.fargoGary=fargo.gary; save();
+      showDialog({place:FARGO.place,speaker:FARGO.gary,pages:FARGO.pumpWin,actions:[{label:FARGO.goInside,fn:()=>{closeDialog();parkAndGetOut()}}]}) },700);
   }
 }
 function pumpTick(dt){
@@ -179,9 +204,11 @@ function pullIn(i){
   const s=STATIONS[i]; s.seen=true;
   if(i===fargo.gary){
     if(have.fargo) return showDialog({place:FARGO.place,speaker:FARGO.gary,pages:[FARGO.after],actions:[CLOSE]});
-    if(fargo.won||have.fargoWon) return showReward('fargo');
+    if(have.fargoStage==='reward') return showReward('fargo');
+    if(have.fargoStage==='store') return showDialog({place:FARGO.place,speaker:FARGO.gary,pages:[FARGO.garyWaiting],actions:[CLOSE]});
     return showDialog({place:FARGO.place,speaker:FARGO.gary,pages:[...FARGO.garyHello,...FARGO.garyBet],actions:[{label:FARGO.fill,fn:()=>{closeDialog();openPump()}}]});
   }
+  if(fargo.onFoot) return;
   showDialog({place:FARGO.place,speaker:s.name,pages:[FARGO.ask(s.price)],actions:[
     {label:FARGO.fill,fn:()=>{
       if(have.fargo) return showDialog({place:FARGO.place,speaker:s.name,pages:[`Tank's full. At $${s.price} a gallon. Gary's is cheaper, ya know.`],actions:[CLOSE]});
@@ -195,38 +222,57 @@ const FARGO_TRIGGERS=[
 const onRoad=(x,y)=>ROADS.some(r=>x>=r.x&&x<=r.x+r.w&&y>=r.y&&y<=r.y+r.h)||STATIONS.some(s=>x>=s.lot.x&&x<=s.lot.x+s.lot.w&&y>=s.lot.y&&y<=s.lot.y+s.lot.h);
 
 SCENES.fargo={
-  w:FW, h:FH, bounds:R(0,0,FW,FH), bg:fargoBg, triggers:FARGO_TRIGGERS,
-  solids:[...HOUSES, ...STATIONS.flatMap(s=>[s.store,s.island,R(s.sign.x+7,s.sign.y+14,4,4),R(s.person.x-3,s.person.y-3,6,4)]),
+  w:FW, h:FH, bounds:R(0,0,FW,FH), bg:fargoBg,
+  get triggers(){ return fargo.onFoot?[]:FARGO_TRIGGERS },
+  baseSolids:[...HOUSES, ...STATIONS.flatMap(s=>[s.store,s.island,R(s.sign.x+7,s.sign.y+14,4,4),R(s.person.x-3,s.person.y-3,6,4)]),
     ...fargoTrees.map(([x,y])=>R(x-3,y-2,6,3)), R(TOWER.x-13,TOWER.y-4,26,5), R(WELCOME.x,WELCOME.y+10,24,6)],
+  get solids(){ if(!fargo.onFoot||!fargo.car)return this.baseSolids; const c=fargo.car, a=fargo.alex;
+    return [...this.baseSolids, c.dir==='up'||c.dir==='down'?R(c.x-6,c.y-11,12,22):R(c.x-11,c.y-6,22,12), ...(a?[R(a.x-3,a.y-3,6,4)]:[])] },
   entries:{start:{x:20,y:180,dir:'right'}, fromHighway:{x:20,y:180,dir:'right'}},
-  feet:(x,y)=>R(x-6,y-4,12,8),
-  speed:()=>fargo.fuel<=0?FUEL.PUSH:(onRoad(P.x,P.y)?FUEL.ROAD:FUEL.SNOW),
+  feet:(x,y)=>fargo.onFoot?R(x-4,y-3,8,4):R(x-6,y-4,12,8),
+  speed:()=>fargo.onFoot?.07:fargo.fuel<=0?FUEL.PUSH:(onRoad(P.x,P.y)?FUEL.ROAD:FUEL.SNOW),
+  dynTrigger(){
+    const g=STATIONS[fargo.gary];
+    if(!fargo.onFoot)return null;
+    if(have.fargoStage==='store'&&hit(R(P.x-4,P.y-3,8,4),g.door))return SHOP_TRIGGER;
+    if(fargo.alex&&Math.hypot(P.x-fargo.alex.x,P.y-fargo.alex.y)<14)return ALEX_TRIGGER;
+    if(Math.hypot(P.x-g.person.x,P.y-g.person.y)<14)return GARY_TRIGGER;
+    return null;
+  },
   moved(d){
-    if(fargo.fuel>0){fargo.fuel=Math.max(0,fargo.fuel-d*FUEL.DRAIN);
+    if(!fargo.onFoot&&fargo.fuel>0){fargo.fuel=Math.max(0,fargo.fuel-d*FUEL.DRAIN);
       if(fargo.fuel<=0&&!fargo.warned){fargo.warned=true; showDialog({place:FARGO.place,speaker:'Uh oh',pages:[FARGO.empty],actions:[CLOSE]})}}
   },
-  enter(){ fargoNewRun(); fargo.introPending=!have.fargo&&!have.fargoWon },
-  ambient(dt){ pumpTick(dt) },
+  enter(){
+    fargoNewRun(); fargo.introPending=!have.fargo&&!have.fargoStage&&!have.fargoIntro;
+    if(have.fargoStage==='store'){   // came back mid-errand (e.g. after a reload): car's already parked at Gary's
+      const g=STATIONS[fargo.gary]; STATIONS.forEach(s=>s.seen=true); P.x=g.lot.x+10; P.y=g.lot.y+22; P.dir='right'; parkAndGetOut();
+    }
+  },
+  ambient(dt){ pumpTick(dt); if(fargo.moodT>0){fargo.moodT-=dt; if(fargo.moodT<=0)fargo.alexMood='ok'} },
   update(){
-    if(fargo.introPending){fargo.introPending=false; return showDialog({place:FARGO.place,speaker:'Welcome to Fargo',pages:FARGO.intro,actions:[CLOSE]})}
+    if(fargo.introPending){fargo.introPending=false; have.fargoIntro=true; save(); return showDialog({place:FARGO.place,speaker:'Welcome to Fargo',pages:FARGO.intro,actions:[CLOSE]})}
     for(const s of STATIONS)if(!s.seen&&Math.hypot(P.x-(s.sign.x+9),P.y-(s.sign.y+5))<80)s.seen=true;
   },
-  drawPlayer:drawCar,
+  drawPlayer:(x,y)=>fargo.onFoot?drawPlayer(x,y):drawCar(x,y),
   ents(list){
     fargoTrees.forEach(([x,y])=>list.push({y,draw:()=>ctx.drawImage(pineSprite,x-6,y-17)}));
     list.push({y:TOWER.y,draw:drawWaterTower});
     STATIONS.forEach((s,i)=>list.push({y:s.person.y,draw:()=>i===fargo.gary?drawGary(s.person.x,s.person.y):drawAttendant(s.person.x,s.person.y,i)}));
+    if(fargo.onFoot&&fargo.car){const c=fargo.car, a=fargo.alex; list.push({y:c.y+5,draw:()=>drawCar(c.x,c.y,c.dir)});
+      if(a)list.push({y:a.y,draw:()=>drawAlex(a.x,a.y,fargo.alexMood)})}
   },
   under(){ STATIONS.forEach(drawSign) },
   over(){
     for(const s of STATIONS){ // canopies over the pumps
       ctx.fillStyle='rgba(0,0,0,.08)'; ctx.fillRect(s.x+6,s.y+8,40,14);
-      ctx.fillStyle='#f1f4f8'; ctx.fillRect(s.x+8,s.y+3,32,10); ctx.fillStyle=s.brand; ctx.fillRect(s.x+8,s.y+11,32,2);
+      ctx.fillStyle='rgba(241,244,248,.6)'; ctx.fillRect(s.x+8,s.y+3,32,10); ctx.fillStyle=s.brand; ctx.fillRect(s.x+8,s.y+11,32,2);   // see-through so the car shows
     }
     ctx.fillStyle='rgba(255,255,255,.85)';  // light snow
     for(let i=0;i<50;i++){const sx=(i*97+time*.02*(1+i%3))%FW, sy=(i*53+time*.03*(1+i%2))%FH; ctx.fillRect(sx|0,sy|0,1,1)}
   },
   hud(){
+    if(fargo.onFoot) return `<span>Wallet $${fargo.wallet.toFixed(2)}</span><span class="pips" title="Strikes">Strikes ${[...Array(FARGO.strikesOut)].map((_,i)=>`<i class="${i<fargo.strikes?'on':''}"></i>`).join('')}</span>`;
     const bars=10, on=Math.ceil(fargo.fuel/10);
     const gauge=[...Array(bars)].map((_,i)=>`<i class="${i<on?'on fuel':''}"></i>`).join('');
     const seen=STATIONS.filter(s=>s.seen).map(s=>s.price).sort();
@@ -234,3 +280,105 @@ SCENES.fargo={
   },
 };
 fargoNewRun();
+
+// ---------- on foot + the shop ----------
+const SHOP_TRIGGER={label:'Go inside', act:()=>openShop()};
+const ALEX_TRIGGER={label:'Talk to Alex', btn:'Talk', act:()=>showDialog({place:FARGO.place,speaker:'Alex',pages:[fargo.alexMood==='frown'?FARGO.alexOutside:FARGO.alexWaiting],actions:[CLOSE]})};
+const GARY_TRIGGER={label:'Talk to Gary', btn:'Talk', act:()=>showDialog({place:FARGO.place,speaker:FARGO.gary,pages:[FARGO.garyWaiting],actions:[CLOSE]})};
+function parkAndGetOut(){
+  // the car pulls up to the pump on the side away from the shop, so the door is always clear
+  const g=STATIONS[fargo.gary];
+  const c={x:g.x+24, y:g.face==='up'?g.y+5:g.y+23, dir:'right'}; fargo.car=c; fargo.onFoot=true; fargo.wallet=FARGO.wallet; fargo.strikes=0;
+  fargo.alex=null; const a=freeSpotNear(c.x-18, c.y); fargo.alex=a;        // Alex leans by the back of the car
+  const me=freeSpotNear(g.x+9, g.face==='up'?g.y+22:g.y+6); P.x=me.x; P.y=me.y;   // you, on the shop side
+  P.dir=g.face==='up'?'down':'up'; P.moving=false;
+}
+// nearest place you can stand around (cx,cy), not on top of the car, Alex, or the door itself
+function freeSpotNear(cx,cy){
+  const sc=SCENES.fargo, door=STATIONS[fargo.gary].door;
+  for(let r=0;r<40;r+=2)for(let a=0;a<16;a++){const x=Math.round(cx+Math.cos(a/16*Math.PI*2)*r), y=Math.round(cy+Math.sin(a/16*Math.PI*2)*r);
+    if(!blocked(x,y,sc)&&!hit(R(x-4,y-3,8,4),door))return {x,y}}
+  return {x:cx,y:cy};
+}
+function backInTheCar(){ if(fargo.car){P.x=fargo.car.x;P.y=fargo.car.y;P.dir=fargo.car.dir} fargo.onFoot=false; fargo.car=null; fargo.alex=null; fargo.fuel=100 }
+
+const shop={open:false, drink:null, snack:null};
+function itemButton(it,kind){
+  const b=document.createElement('button'); b.className='item'; b.dataset.id=it.id; b.setAttribute('aria-pressed','false');
+  const c=document.createElement('canvas'); c.width=16; c.height=20; ITEM_ART[it.id](c.getContext('2d'));
+  const l=document.createElement('span'); l.textContent=it.name; b.append(c,l);
+  b.onclick=()=>{shop[kind]=it.id; [...b.parentNode.children].forEach(x=>x.setAttribute('aria-pressed',x===b?'true':'false')); updateShop()};
+  return b;
+}
+function openShop(){
+  shop.open=true; shop.drink=null; shop.snack=null; fargo.strikes=0;
+  $('shopName').textContent=FARGO.shop;
+  $('fridge').replaceChildren(...FARGO.drinks.map(d=>itemButton(d,'drink')));
+  $('shelf').replaceChildren(...FARGO.snacks.map(d=>itemButton(d,'snack')));
+  $('giveBtn').textContent=FARGO.give;
+  alexSays(FARGO.alexHello,'ok'); updateShop();
+  paused=true; prompt.hidden=true; $('shop').hidden=false; $('shop').scrollTop=0;
+  setTimeout(()=>$('fridge').querySelector('button').focus({preventScroll:true}),0);
+}
+function updateShop(){
+  $('giveBtn').disabled=!(shop.drink&&shop.snack);
+  $('shopWallet').textContent='$'+fargo.wallet.toFixed(2);
+  $('shopStrikes').innerHTML=[...Array(FARGO.strikesOut)].map((_,i)=>`<i class="${i<fargo.strikes?'on':''}"></i>`).join('');
+}
+function alexSays(text,mood){
+  $('alexLine').textContent=text; fargo.alexMood=mood; fargo.moodT=0;
+  const c=$('alexFace'), g=c.getContext('2d'); g.clearRect(0,0,c.width,c.height); drawAlexFace(g,mood);
+}
+function giveToAlex(){
+  if(!shop.open||!(shop.drink&&shop.snack))return;
+  const C=FARGO.correct, d=FARGO.drinks.find(x=>x.id===shop.drink), k=FARGO.snacks.find(x=>x.id===shop.snack);
+  if(shop.drink===C.drink&&shop.snack===C.snack){
+    alexSays(FARGO.alexWin,'happy'); $('giveBtn').disabled=true;
+    setTimeout(()=>{ closeShop(); fargo.alexMood='happy'; fargo.moodT=4000; have.fargoStage='reward'; save();
+      showDialog({place:FARGO.place,speaker:FARGO.gary,pages:FARGO.win,actions:[{label:FARGO.thanks,fn:()=>{closeDialog();backInTheCar();showReward('fargo')}}]}) },1400);
+    return;
+  }
+  const lines=[]; if(shop.drink!==C.drink)lines.push(d.react); if(shop.snack!==C.snack)lines.push(k.react);
+  fargo.strikes++; fargo.wallet=Math.max(0,fargo.wallet-FARGO.wrongCost);
+  alexSays(lines.join(' ')+` (-$${FARGO.wrongCost})`,'frown'); updateShop();
+  if(fargo.strikes>=FARGO.strikesOut){
+    $('giveBtn').disabled=true;
+    setTimeout(()=>{ alexSays(FARGO.kickedOut,'frown'); setTimeout(()=>{
+      closeShop(); fargo.alexMood='frown'; fargo.moodT=5000;
+      const g=STATIONS[fargo.gary], d=g.door, cx=g.x+9, cy=g.face==='up'?g.y+22:g.y+6;   // back outside, beside the door
+      const spot=freeSpotNear(cx,cy); P.x=spot.x; P.y=spot.y; P.dir=g.face==='up'?'down':'up';
+    },1500) },1500);
+  }
+}
+function closeShop(){ shop.open=false; $('shop').hidden=true; paused=false }
+$('giveBtn').onclick=giveToAlex;
+
+// Alex's face for the shop panel (24x24)
+function drawAlexFace(g,mood){
+  const F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};
+  const hair='#3b2416', hairL='#4e3020', skin='#f2c9a5', eye='#5a3a22';
+  F(hair,4,1,16,6); F(hair,2,4,5,20); F(hair,17,4,5,20); F(hairL,6,2,6,1); F(hairL,3,10,1,10); F(hairL,20,12,1,8);
+  F(skin,6,5,12,14); F(skin,7,19,10,2); F(hair,6,5,12,2); F(hair,6,7,3,1);
+  F('#3f6b4f',4,21,16,3); F(skin,10,20,4,2);
+  if(mood==='frown'){F(hair,7,8,4,1); F(hair,13,8,4,1); F(hair,9,7,2,1); F(hair,13,7,2,1)} else {F(hair,7,8,4,1); F(hair,13,8,4,1)}
+  F('#ffffff',8,10,3,3); F('#ffffff',13,10,3,3); F(eye,9,10,2,3); F(eye,14,10,2,3); F('#ffffff',9,10,1,1); F('#ffffff',14,10,1,1);
+  F('#e0aa88',11,13,2,2);
+  if(mood==='happy'){F('#b04a44',9,16,6,1); F('#b04a44',8,15,1,1); F('#b04a44',15,15,1,1); F('#ffffff',10,16,4,1); F('#f0a39a',7,14,2,1); F('#f0a39a',15,14,2,1)}
+  else if(mood==='frown'){F('#8a4a40',9,16,6,1); F('#8a4a40',8,17,1,1); F('#8a4a40',15,17,1,1)}
+  else F('#b5735a',9,16,6,1);
+}
+
+// pixel art for the shop items (16x20). Simple shapes and colors, no real packaging.
+const ITEM_ART={
+  coke(g){const F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)}; F('#c9ced4',4,2,8,2); F('#c8102e',4,4,8,14); F('#9e0c24',4,4,1,14); F('#ffffff',5,10,2,1); F('#ffffff',7,11,3,1); F('#ffffff',10,10,2,1); F('#c9ced4',4,18,8,1)},
+  sprite(g){const F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)}; F('#2e9e4f',7,0,2,2); F('#7fd39a',7,2,2,3); F('#4fbf73',5,5,6,14); F('#2e9e4f',5,5,1,14); F('#f2e14c',5,10,6,3); F('#ffffff',9,6,1,3)},
+  gingerale(g){const F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)}; F('#c9ced4',4,2,8,2); F('#2f7a46',4,4,8,14); F('#245e36',4,4,1,14); F('#e0c068',4,8,8,4); F('#ffffff',6,9,4,1); F('#c9ced4',4,18,8,1)},
+  pepsi(g){const F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)}; F('#c9ced4',4,2,8,2); F('#1c3f94',4,4,8,14); F('#152f70',4,4,1,14); F('#ffffff',4,10,8,1); F('#d0213a',4,9,8,1); F('#c9ced4',4,18,8,1)},
+  pedialyte(g){const F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)}; F('#7a4fa0',6,0,4,2); F('#e9eef3',5,2,6,3); F('#f3b7cf',4,5,8,14); F('#ffffff',4,9,8,5); F('#7a4fa0',5,11,6,1); F('#ffffff',10,6,1,2)},
+  pringles(g){const F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)}; F('#d9b44a',4,0,8,2); F('#c8102e',4,2,8,17); F('#9e0c24',4,2,1,17); F('#f4d35e',6,9,4,3); F('#e0b040',6,11,4,1)},
+  cheetos(g){const F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)}; F('#d9661e',2,2,12,2); F('#f28c28',2,4,12,14); F('#d9661e',2,17,12,1); F('#ffb347',5,8,6,3); F('#e8741a',6,11,4,2); F('#ffffff',11,5,1,3)},
+  smartfood(g){const F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)}; F('#141420',2,2,12,16); F('#f4d35e',2,4,12,2); F('#fff8e6',6,9,2,2); F('#fff8e6',8,8,2,2); F('#fff8e6',7,11,2,2); F('#f4d35e',9,11,1,1)},
+  almondjoy(g){const F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)}; F('#1f4fa0',1,7,14,7); F('#173d7c',1,7,14,1); F('#ffffff',5,8,6,5); F('#6b3f22',6,9,4,3); F('#ffffff',7,10,2,1)},
+  snickers(g){const F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)}; F('#5a3220',1,7,14,7); F('#46271a',1,7,14,1); F('#2f6db0',4,9,8,3); F('#ffffff',5,10,6,1)},
+  motts(g){const F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)}; F('#7a2b5a',3,3,10,15); F('#5e2046',3,3,10,1); F('#e54b4b',5,8,2,2); F('#3d8ad6',8,9,2,2); F('#f4d35e',6,12,2,2); F('#a03d6a',9,12,2,2); F('#ffffff',4,15,8,1)},
+};

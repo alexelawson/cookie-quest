@@ -31,7 +31,7 @@ function openLand(key){
 }
 function action(){
   if(!$('titlecard').hidden){start();return}
-  if(!$('pump').hidden)return;   // the pump has its own button
+  if(!$('pump').hidden||!$('shop').hidden)return;   // the pump and shop have their own buttons
   if(!$('reward').hidden){collectReward();return}
   if(!dlg.hidden){const f=document.activeElement, b=$('dbtns').contains(f)?f:$('dbtns').querySelector('button'); b&&b.click(); return}
   if(near)near.act();

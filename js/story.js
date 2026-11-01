@@ -65,11 +65,45 @@ const FARGO = {
   pumpTitle:"Gary's bet: stop on exactly $30.00",
   pumpHint:"Hold to pump. Let go to stop. Quick taps for the last few cents.",
   bust:["Ohhh, a penny over. So close.","Shoot. Over again. Go ahead, I'll reset it.","Thirty and what now? Again!","Uff da. One more try."],
-  win:["Thirty dollars even! Well, I'll be.","Here ya go. Sugar, fresh from the Red River Valley."],
+  pumpWin:["Thirty dollars even! Well, I'll be.","Now go on inside and grab something for your co-pilot. She's been real patient."],
+  goInside:"Go inside",
+  garyWaiting:"Go on in, she's waiting. Don't come back with the wrong snack, now.",
+  win:["Now that's a good road-trip partner.","Here ya go. Sugar, fresh from the Red River Valley."],
   thanks:"Thanks, Gary!",
   after:"Come back anytime. It's not this cheap anywhere else, ya know.",
   empty:"Out of gas! You're pushing the CR-V now.",
   leave:"Head back to the highway",
+
+  // ---- the snack stop: Alex (the passenger) ----
+  // Change her lines here. `correct` says which drink + snack she wants.
+  shop:"Gary's Gas & Go",
+  wallet:20,          // dollars left after $30 of gas
+  wrongCost:3,        // each wrong pick costs this much
+  strikesOut:2,       // this many wrong picks and you get sent back outside
+  correct:{drink:'gingerale', snack:'motts'},
+  drinks:[
+    {id:'coke',      name:'Coke',        react:"Coke? Close. But no."},
+    {id:'sprite',    name:'Sprite',      react:"Sprite?? We are not on the same page."},
+    {id:'gingerale', name:'Ginger Ale',  react:"Ginger ale!"},
+    {id:'pepsi',     name:'Pepsi',       react:"Pepsi. Who even are you right now."},
+    {id:'pedialyte', name:'Pedialyte',   react:"Pedialyte? Do I look hungover to you?"},
+  ],
+  snacks:[
+    {id:'pringles',  name:'Pringles Original', react:"Pringles. Bold choice. Wrong, but bold."},
+    {id:'cheetos',   name:'Cheetos',           react:"Cheetos? My fingers will be orange the whole drive."},
+    {id:'smartfood', name:'Smartfood Popcorn', react:"Smartfood is fine. It's not what I wanted, but it's fine."},
+    {id:'almondjoy', name:'Almond Joy',        react:"Almond Joy?! Do you know me at all?"},
+    {id:'snickers',  name:'Snickers',          react:"Snickers. Nope."},
+    {id:'motts',     name:"Mott's Berry Gummies", react:"Mott's!"},
+  ],
+  alexHello:"Okay. You know what I like. Don't mess this up.",
+  pickBoth:"Pick a drink and a snack.",
+  give:"Give to Alex",
+  alexWin:"Ginger ale AND Mott's? You know me so well.",
+  strike:"That'll cost you.",
+  kickedOut:"Okay. Out. Go think about what you've done.",
+  alexOutside:"...",
+  alexWaiting:"Snacks. Please. I've been in this car for nine hours.",
 };
 
 const KITCHEN = {place:'Home', speaker:'Your kitchen',

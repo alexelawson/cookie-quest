@@ -44,6 +44,13 @@
         <button class="pbtn" id="pumpBtn">Hold to pump</button>
       </div>
     </div>
+    <div class="shop" id="shop" hidden role="dialog" aria-labelledby="shopName">
+      <div class="shophead"><h3 id="shopName"></h3><span>Wallet <b id="shopWallet"></b></span><span class="pips">Strikes <span id="shopStrikes"></span></span></div>
+      <div class="alexrow"><canvas id="alexFace" width="24" height="24" aria-hidden="true"></canvas><p id="alexLine" aria-live="polite"></p></div>
+      <div class="case fridgecase"><span class="caselbl">Drinks</span><div class="items" id="fridge"></div></div>
+      <div class="case shelfcase"><span class="caselbl">Snacks</span><div class="items" id="shelf"></div></div>
+      <button class="btn givebtn" id="giveBtn" disabled></button>
+    </div>
     <div class="titlecard" id="titlecard">
       <small>A Christmas game</small>
       <h2>The Great<br>Cookie Quest</h2>
