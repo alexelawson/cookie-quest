@@ -36,7 +36,8 @@ For live reload while editing: `python3 -m http.server` and visit http://localho
 Everything is drawn with `fillRect` on a 224×168 canvas scaled up with `image-rendering: pixelated`.
 
 ## Before giving it to Joe
-Press **Start over** so the game starts fresh with Alex's welcome.
+Delete `js/devskip.js` and its `<script>` line in `index.html` (the "Testing" skip buttons in ⚙ Settings).
+Then press **Start over** so the game starts fresh with Alex's welcome.
 
 ## Tests
 Needs Node and Playwright (`npm i -D playwright && npx playwright install chromium`).
