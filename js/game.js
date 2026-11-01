@@ -79,7 +79,9 @@ function drawPlayer(x0,y0){
     if(P.dir==='left'){F(hair,7,2,3,4);F(hairD,3,2,3,1);F(eye,3,4,1,1);F(red,3,7,2,1)}
     if(P.dir==='right'){F(hair,2,2,3,4);F(hairD,6,2,3,1);F(eye,8,4,1,1);F(red,7,7,2,1)}
   }
+  if(have.crown&&scene!==SCENES.kitchen)drawCrown(x0,y0-23);   // the Cookie King
 }
+
 function draw(){
   // camera follows you; scenes smaller than the screen are centered
   const cam=(p,size,view)=>size<=view?Math.round((size-view)/2):Math.round(Math.max(0,Math.min(size-view,p-view/2)));

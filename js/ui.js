@@ -31,7 +31,7 @@ function openLand(key){
 }
 function action(){
   if(!$('titlecard').hidden){start();return}
-  if(!$('pump').hidden||!$('shop').hidden||!$('vault').hidden||!$('anagram').hidden||!$('howto').hidden)return;   // the pump and shop have their own buttons
+  if(!$('pump').hidden||!$('shop').hidden||!$('vault').hidden||!$('anagram').hidden||!$('howto').hidden||!$('wardrobe').hidden||!$('bake').hidden)return;   // the pump and shop have their own buttons
   if(!$('reward').hidden){collectReward();return}
   if(!dlg.hidden){const f=document.activeElement, b=$('dbtns').contains(f)?f:$('dbtns').querySelector('button'); b&&b.click(); return}
   if(near)near.act(); else if(scene.ability)scene.ability();

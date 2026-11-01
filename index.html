@@ -88,6 +88,24 @@
       <ul id="howControls"></ul>
       <button class="btn" id="howOk"></button>
     </div>
+    <div class="wardrobe" id="wardrobe" hidden role="dialog" aria-labelledby="wardTitle">
+      <div class="vcard">
+        <small id="wardTitle"></small>
+        <p id="wardIntro"></p>
+        <div class="outfits" id="outfits"></div>
+        <p class="wline" id="wardLine"></p>
+        <button class="btn" id="wardGo"></button>
+      </div>
+    </div>
+    <div class="bake" id="bake" hidden role="dialog" aria-labelledby="bakeTitle">
+      <div class="pcard bcard">
+        <small id="bakeTitle"></small>
+        <div class="bstep" id="bakeStep"></div>
+        <canvas id="bakeArt" width="96" height="64" aria-hidden="true"></canvas>
+        <p id="bakeMsg" aria-live="polite"></p>
+        <div class="brow"><button class="pbtn" id="bakeBtn"></button><button class="btn ghost" id="bakeAlt" hidden></button></div>
+      </div>
+    </div>
     <div class="titlecard" id="titlecard">
       <small>A Christmas game</small>
       <h2>The Great<br>Cookie Quest</h2>

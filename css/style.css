@@ -191,3 +191,25 @@ canvas{border-radius:6px}
 .howto ul{margin:0;padding-left:1.1em;font-size:.85rem;line-height:1.35;display:flex;flex-direction:column;gap:3px;color:#cdd5e6}
 .crewbar .help{padding:6px 12px;font-weight:600}
 /* Lars's games */
+
+/* the wardrobe (before the city) */
+.wardrobe{position:absolute;inset:0;z-index:6;display:flex;align-items:safe center;justify-content:center;overflow-y:auto;background:rgba(8,9,16,.6);padding:4px;border-radius:6px}
+.outfits{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;width:100%}
+.outfit{display:flex;flex-direction:column;align-items:center;gap:2px;background:#2a3044;border:2px solid #4d5a78;border-radius:6px;padding:4px 2px;cursor:pointer;color:var(--paper);font-family:var(--pixel);font-size:.62rem;line-height:1.1;min-width:0}
+.outfit canvas{width:42px;height:60px;image-rendering:pixelated;image-rendering:crisp-edges}
+.outfit.on{border-color:var(--gold);background:#3a3550}
+.outfit:focus-visible{outline:2px solid var(--gold)}
+.wline{min-height:2.4em;font-size:.82rem!important}
+
+/* the baking card */
+.bake{position:absolute;inset:0;z-index:6;display:flex;align-items:safe center;justify-content:center;overflow-y:auto;background:rgba(8,9,16,.55);padding:4px;border-radius:6px}
+.bcard{background:var(--paper)}
+.bstep{font-family:var(--pixel);font-size:.95rem;color:var(--ink)}
+.bstep.timer{font-size:1.5rem;color:#2b2236;letter-spacing:.06em}
+#bakeArt{width:144px;height:96px;image-rendering:pixelated;image-rendering:crisp-edges;border-radius:6px;background:#efe2c4;border:2px solid var(--ink)}
+.brow{display:flex;gap:8px;align-items:center;justify-content:center}
+.bcard{gap:4px;padding:8px 12px}
+.bcard p{min-height:2.5em;font-size:.82rem}
+.bcard .pbtn{padding:7px 14px}
+.bstep{font-size:.85rem}
+.brow .pbtn{flex:1;width:auto}

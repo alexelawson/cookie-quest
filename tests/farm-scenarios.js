@@ -92,7 +92,7 @@ ok('9 chase pauses inside the kitchen',r.frozen); ok('9 and can still be won aft
 
 // 10. Play again from the kitchen resets the farm fully
 r=await p.evaluate(()=>{T.pages(); T.click('Thanks, Keelan!'); collectReward(); return 1}); await p.waitForTimeout(900);
-r=await p.evaluate(()=>{for(const k of ['mill','city','fargo','golf'])have[k]=true; goTo('kitchen','fromDoor'); for(let i=0;i<40;i++)update(16.7);
+r=await p.evaluate(()=>{for(const k of ['mill','city','fargo','golf','baked'])have[k]=true; goTo('kitchen','fromDoor'); for(let i=0;i<40;i++)update(16.7);
   startBaking(); T.pages(); T.click('Play again'); for(let i=0;i<40;i++)update(16.7);
   T.talk(); return {menu:T.btns(),reward:$('reward').hidden,basket:$('basket').textContent,scene:scene===SCENES.world}});
 ok('10 Play again gives a fresh farm',r.menu.includes("I'm ready")&&r.reward&&r.scene,r.basket);

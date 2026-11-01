@@ -12,14 +12,14 @@ const helpers=()=>{window.T={
      for(const k in dirs)dirs[k]=false; return Math.hypot(x-P.x,y-P.y)<3?'ok':'stuck at '+(P.x|0)+','+(P.y|0)},
   path:(pts)=>{for(const [x,y] of pts){const r=T.walkTo(x,y); if(r!=='ok')return r} return 'ok'},
   hints:[],
-  enter:()=>{P.x=134;P.y=244;update(16.7);action();T.run(40)},
+  enter:()=>{P.x=134;P.y=244;update(16.7);action(); if(!$('wardrobe').hidden)$('wardGo').click(); T.run(40)},
 }};
 const fresh=async()=>{await p.goto(URL);await p.evaluate(()=>localStorage.clear());await p.reload();await p.click('#startBtn');await p.evaluate(helpers)};
 const R=[];const ok=(n,c,x='')=>R.push((c?'PASS ':'FAIL ')+n+(x?'  ('+x+')':''));
 await fresh();
 
 // A. briefing
-let r=await p.evaluate(()=>{T.enter(); const face=!$('dportrait').hidden&&$('dspeaker').textContent==='The Stranger'; const lines=T.clickThrough(); const how=!$('howto').hidden, rows=$('howRows').children.length, ctl=$('howControls').textContent; $('howOk').click(); update(16.7); return {face,how,rows,ctl,lines,bar:!$('crewbar').hidden,hud:$('hud').textContent,lab:$('alabel').textContent}});
+let r=await p.evaluate(()=>{T.enter(); const face=!$('dportrait').hidden&&$('dspeaker').textContent==='The Stranger'; const lines=T.clickThrough(); const how=!$('howto').hidden, rows=$('howRows').children.length, ctl=$('howControls').textContent; $('howOk').click(); update(16.7); T.clickThrough(); update(16.7); return {face,how,rows,ctl,lines,bar:!$('crewbar').hidden,hud:$('hud').textContent,lab:$('alabel').textContent}});
 ok('A the stranger\'s face shows beside his lines',r.face);
 ok('A stranger briefs the crew, John + Lars chime in',r.lines[0].startsWith('The Stranger')&&r.lines.some(l=>l.startsWith('John'))&&r.lines.some(l=>l.startsWith('Lars')),r.lines.length+' lines');
 r.portrait=await p.evaluate(()=>1);

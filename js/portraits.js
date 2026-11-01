@@ -30,13 +30,23 @@ PORTRAITS['John']={size:32, bg:'#f2d9c4', draw(g){ const F=px(g);
   F('#3b2a1e',11,10,4,1); F('#3b2a1e',17,10,4,1); F('#2b2b2b',12,12,2,2); F('#2b2b2b',18,12,2,2);
   F('#c98f66',15,13,2,3); F('#a86a50',13,17,6,1);
 }};
-// You (in the heist): mask, cape collar, light brown hair
-PORTRAITS['You']={size:32, bg:'#2a3044', draw(g){ const F=px(g);
-  F('#0e1017',3,22,26,10); F('#34405c',8,24,16,8); F('#1d2130',5,20,4,6); F('#1d2130',23,20,4,6);
-  F('#f0c6a0',13,19,6,4); F('#f0c6a0',10,6,12,15);
-  F('#b08355',9,3,14,6); F('#8d6440',11,4,8,1); F('#b08355',9,8,2,6); F('#b08355',21,8,2,5);
-  F('#0b0c12',9,10,14,4); F('#3d8ad6',12,11,2,2); F('#3d8ad6',18,11,2,2);           // mask
-  F('#e0aa88',15,14,2,2); F('#b5654f',14,17,4,1);
+// You / Joe (in the heist): follows the outfit from the wardrobe
+PORTRAITS['You']={size:32, bg:'#2a3044', draw(g){ const F=px(g), L=(typeof heroLook==='function')?heroLook():{top:'#34405c',head:'hair',mask:'#0b0c12',cape:1};
+  const skin='#f0c6a0', hair='#b08355', eye='#3d8ad6';
+  // shoulders
+  if(L.top==='stripes'){F('#f2f2ee',5,22,22,10); for(let y=23;y<32;y+=3)F('#1d1d22',5,y,22,1)}
+  else if(L.top==='sweater'){F('#c8322b',4,22,24,10); F('#2f8a4a',4,25,24,1); for(let x=6;x<26;x+=4)F('#ffffff',x,28,1,1)}
+  else F(L.top,6,22,20,10);
+  if(L.cape){F('#0e1017',3,22,4,10); F('#0e1017',25,22,4,10); F('#1d2130',5,20,4,6); F('#1d2130',23,20,4,6)}
+  if(L.sack){F('#c9b07a',24,18,7,12); F('#a8905a',25,18,4,2)}
+  F(skin,13,19,6,4); F(skin,10,6,12,15);
+  if(L.head==='wrap'){F(L.top,9,3,14,18); F(skin,11,10,10,4); F(eye,12,11,2,2); F(eye,18,11,2,2); return}
+  if(L.head==='hood'){F(L.hat,7,3,18,7); F(L.hat,7,9,4,14); F(L.hat,21,9,4,14); F('#d9ad88',11,9,10,2); F(eye,12,11,2,2); F(eye,18,11,2,2); F('#b5654f',14,17,4,1); F('#e8e8e0',12,22,1,4); F('#e8e8e0',19,22,1,4); return}
+  F(hair,9,3,14,6); F('#8d6440',11,4,8,1); F(hair,9,8,2,6); F(hair,21,8,2,5);
+  if(L.mask)F(L.mask,9,10,14,4);
+  F(eye,12,11,2,2); F(eye,18,11,2,2); F('#e0aa88',15,14,2,2); F('#b5654f',14,17,4,1);
+  if(L.head==='beanie'){F(L.hat,8,1,16,7); F('#3a3a44',8,7,16,2)}
+  if(L.head==='santa'){F('#c8322b',9,0,14,6); F('#c8322b',20,-1,6,4); F('#ffffff',25,0,4,4); F('#ffffff',8,5,16,3)}
 }};
 // Keelan: lanky farmer, short brown hair, red plaid
 PORTRAITS['Keelan']={size:32, bg:'#d8ecc6', draw(g){ const F=px(g);

@@ -109,6 +109,19 @@ const HEIST = {
   stairsDown:"Take the stairs down to the street",
 };
 
+// ---------- Joe's stealth wardrobe (picked before the city) ----------
+const WARDROBE = {title:"Suit up, Joe", intro:"It's a stealth mission. What are you wearing?", go:"Suit up",
+  outfits:[
+    {id:'cape',    name:"The Classic",      line:"Dark suit, mask, dramatic cape. Very brooding."},
+    {id:'ninja',   name:"All-Black Ninja",  line:"Head to toe in black. Only your eyes show."},
+    {id:'burglar', name:"Cat Burglar",      line:"Striped shirt, beanie, eye mask, and a sack for the loot."},
+    {id:'hoodie',  name:"Hoodie & Sweats",  line:"Hood up. Mysterious. Mostly just comfy."},
+    {id:'sweater', name:"Ugly Xmas Sweater",line:"Stealth: zero. Festive: maximum."},
+  ],
+  react:{cape:[['Lars',"Very dramatic. The cape is a lot."],['John',"I love the cape."]], ninja:[['John',"I can't see you. That's the point, right?"]],
+         burglar:[['Lars',"You look like a cartoon robber."],['John',"It's perfect."]], hoodie:[['John',"Respect. Comfort first."]],
+         sweater:[['Lars',"They're going to see you from space."],['John',"Festive though."]]}};
+
 // ---------- The vault puzzles (the heist's last lock) ----------
 // One is picked at random each time, and the crates are shuffled, so the right one moves around.
 // Each puzzle has three crates, X, Y and Z. `answer` is the one with the chocolate.
@@ -284,6 +297,32 @@ const KITCHEN = {place:'Home', speaker:'Your kitchen',
   oven:"The oven's warming up. It already smells like home in here.",
   tree:"The tree's a little crooked. It's perfect.",
   missing:"The recipe card says you still need:",
-  ready:["Everything's in the basket.","Time to bake."],
-  finale:"Coming next: add the ingredients in the right order, pull the cookies out before they burn, then decorate them however you like.",
+  ready:["Everything's in the basket.","And... everyone came over? Everyone came over.","Time to bake."],
+  // what everyone says if you talk to them in the kitchen before baking
+  crowd:{Keelan:"Those are my eggs. Treat them with respect.", Alex:"I'm on dough-tasting duty.", Bob:"Thirty bucks of gas for this. Better be good, ya know.",
+         Lars:"I'll time the oven. I have a watch with splits.", John:"I'll carry the tray. Or the whole oven.", 'The Stranger':"The city sleeps soundly tonight. Because of cookies.",
+         Jack:"Big cookie vibes in here.", Margie:"I brought the milk. You're welcome.", 'Trail John':"Flour made it all fifty kilometers.", Viking:"SKOL! When do we eat?"},
+  // the baking card: one step per ingredient, in recipe order. target and tol are in cups.
+  bakeTitle:"Bake the cookies",
+  steps:[
+    {key:'butter',   name:'Butter',          kind:'pour', target:1,    label:'1 cup',   max:1.5, rate:.5,  tol:.08, color:'#f4e3a1', who:'Keelan', good:"That's a cup. Perfect."},
+    {key:'sugar',    name:'Sugar',           kind:'pour', target:.75,  label:'¾ cup',   max:1.5, rate:.45, tol:.07, color:'#fbfbf7', who:'Bob',    good:"Three quarters. Sweet, ya know."},
+    {key:'eggs',     name:'Eggs',            kind:'count',target:2,    label:'2 eggs',                                   who:'Keelan', good:"Two eggs. My girls are proud."},
+    {key:'flour',    name:'Flour',           kind:'pour', target:2.25, label:'2¼ cups', max:3,   rate:.9,  tol:.12, color:'#f3eadb', who:'Trail John', face:'Trail John', good:"Two and a quarter. Fifty K well spent."},
+    {key:'chocolate',name:'Chocolate chips', kind:'pour', target:2,    label:'2 cups',  max:3,   rate:.8,  tol:.12, color:'#5a3220', who:'Lars',   good:"Two cups. Heist: worth it."},
+    {key:'stir',     name:'Stir it up',      kind:'stir', taps:12,                                                       who:'John',   good:"Now THAT is dough."},
+  ],
+  pourHold:"Hold to pour", pourHint:t=>`Pour ${t}. Let go right on the gold line.`,
+  tooMuch:"Whoa, way too much. Scoop it out and try again.", tooLittle:"Not quite enough. Dump it back and try again.", spilled:"It's everywhere. Again!",
+  eggTap:"Crack an egg", eggDone:"That's enough", eggHint:"Crack 2 eggs.", eggMany:"That's a lot of eggs. Start the eggs over.", eggFew:"Need one more.",
+  stirTap:"Stir!", stirHint:"Tap fast to stir it all together.",
+  next:"Next",
+  bakeHint:"Bake 10 minutes. Take them out when the timer hits 10:00. Golden, not burnt.", bakeStart:"Put them in", bakeOut:"Take them out",
+  raw:"Still raw in the middle! New tray, try again.", burnt:"Burnt. Lars is already opening a window. New tray!", perfect:"Golden brown. PERFECT.",
+  // the party, in order. [speaker, line] (or [speaker, line, portrait] to borrow someone's face)
+  party:[['Alex',"THEY'RE PERFECT."],['Keelan',"Best eggs in the county. Best cookies in the world."],['Bob',"Worth every penny of thirty bucks."],
+    ['Lars',"Okay. These beat my PR."],['John',"Can I have six? I'm having six."],['The Stranger',"The city finally has the cookies it deserves."],
+    ['Margie',"Milk for dunking. Obviously."],['Jack',"Vibes: immaculate."],['John',"SKOL!!! (the Vikings taught me that)",'Trail John'],
+    ['','Everyone agrees. There is only one Cookie King.'],['','Joe gets a crown.']],
+  playAgain:"Play again", keepExploring:"Keep exploring",
   note:"Merry Christmas! Love, Alex"};

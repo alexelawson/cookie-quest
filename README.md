@@ -23,6 +23,7 @@ For live reload while editing: `python3 -m http.server` and visit http://localho
 | `js/state.js` | Player, basket save (localStorage), particles |
 | `js/input.js` | Keyboard + touch d-pad |
 | `js/ui.js` | Dialog system (pages + button menus), land/kitchen interactions |
+| `js/kitchen.js` | The kitchen and the finale: everyone comes over, pour each ingredient to the gold line, crack 2 eggs, stir, bake to 10:00, party, crown. Amounts and tolerances in `KITCHEN.steps` (story.js), oven speed in `BAKE` |
 | `js/farm.js` | Farm mission: Keelan, hen chase, hidden cupcake. Difficulty knobs in `FARM` at the top |
 | `js/game.js` | Runs the current scene: movement, collision, `goTo()` fade transitions, rendering, main loop |
 | `css/style.css` | Page and UI styling |
@@ -38,6 +39,7 @@ Needs Node and Playwright (`npm i -D playwright && npx playwright install chromi
 - `node tests/golf-difficulty.js '{}'` simulates players of different precision against Margie and Jack.
 - `node tests/birkie-scenarios.js` skis the Birkie (crashes, deep snow, feeds, cutoff, winning, reloads).
 - `node tests/birkie-difficulty.js '{}'` simulates skiers with different rhythm against the 3:00:00 cutoff.
+- `node tests/kitchen-scenarios.js` bakes the cookies (every way to mess up a pour, the eggs, the oven) and plays the party; also the wardrobe.
 - `node tests/farm-difficulty.js '{}'` simulates players of different skill; pass JSON to try other `FARM` settings.
 
 ## Adding a new place
@@ -51,7 +53,8 @@ Add an object to `SCENES` with `w`, `h`, `bounds`, `bg` (a canvas), `solids`, `t
 - [x] Night city: rooftop chocolate heist with John and Lars
 - [x] Fargo: cheapest-gas hunt, stop the pump on $30.00, pick Alex's drink + snack
 - [x] Disc golf (milk): 5 holes vs Jack and Margie
-- [ ] Kitchen: mix, bake, decorate, final note
+- [x] Kitchen: everyone comes over, mix, bake, party, Joe's crown, final note
+- [x] Wardrobe: Joe picks a stealth outfit before the city (`WARDROBE` in story.js)
 
 ## Spoilers
 The cupcake is behind the barn, in the middle. Its frosting peeks up over the roof, and a sparkle flashes beside it every few seconds. Walk behind the barn to grab it.
