@@ -2,18 +2,18 @@
 // All the difficulty knobs live in FARM.
 const FARM = {
   HENS: 20,            // hens in a full pen
-  ESCAPES: 20,         // how many escapes happen in one attempt (including the ones already out)
-  START_LOOSE: 3,      // already out when the chase starts
-  FIRST_GAP: 1800,     // ms between escapes at the start...
-  LAST_GAP: 5000,      // ...stretching to this by the last escape
+  ESCAPES: 18,         // how many escapes happen in one attempt (including the ones already out)
+  START_LOOSE: 2,      // already out when the chase starts
+  FIRST_GAP: 2300,     // ms between escapes at the start...
+  LAST_GAP: 5500,      // ...stretching to this by the last escape
   LOSE_AT: 8,          // this many loose at once and they scatter
-  FLEE_RADIUS: 40,     // how close you get before a hen runs
-  FLEE_SPEED: .058,    // px/ms (you walk at .07)
+  FLEE_RADIUS: 38,     // how close you get before a hen runs
+  FLEE_SPEED: .054,    // px/ms (you walk at .07)
   WANDER_SPEED: .018,
   KEELAN_SPEED: .05,
 };
-// Tuned with a bot (30 runs each): a perfect player always wins, a good one ~90%,
-// a sloppy one ~13%. With Keelan helping, everyone wins. Lower FLEE_SPEED or raise
+// Tuned with a bot (30 runs each): a perfect or good player always wins,
+// a sloppy one ~60%. With Keelan helping, everyone wins. Lower FLEE_SPEED or raise
 // FIRST_GAP to make it easier.
 const PEN = R(94,64,52,52);                 // inside of the fence, where penned hens wander
 const PEN_FENCE = R(90,60,60,60);
