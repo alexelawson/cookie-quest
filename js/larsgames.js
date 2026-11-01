@@ -13,9 +13,9 @@ function openHowTo(){
   $('howTitle').textContent=H.howToTitle; $('howRows').replaceChildren(...rows);
   $('howControls').replaceChildren(...H.howToControls.map(t=>{const li=document.createElement('li'); li.textContent=t; return li}));
   $('howOk').textContent=H.howToOk;
+  $('howOk').onclick=()=>{ $('howto').hidden=true; paused=false; have.heistHowTo=true; save() };
   paused=true; prompt.hidden=true; $('howto').hidden=false; setTimeout(()=>$('howOk').focus({preventScroll:true}),0);
 }
-$('howOk').onclick=()=>{ $('howto').hidden=true; paused=false; have.heistHowTo=true; save() };
 
 // ---------- the menu ----------
 const LARS_GAMES=['anagrams','quickdraw','darts'];

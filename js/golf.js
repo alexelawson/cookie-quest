@@ -120,6 +120,7 @@ function golfTap(){
 }
 function golfLand(){
   const f=golf.flight, h=golfHole(), T=GOLF_TEXT;
+  if(golf.practice){ if(f.result!=='water'&&f.result!=='ob')golf.lie={...f.end}; P.x=golf.lie.x; P.y=golf.lie.y+4; return golfPracticeResult() }
   if(f.result==='in'){ golf.msg=golf.strokes===1?T.ace:T.chains; return golfHoleDone() }
   if(f.result==='water'||f.result==='ob'){ golf.strokes++; golf.msg=f.result==='water'?T.water:T.ob }
   else { golf.prevLie={...golf.lie}; golf.lie={...f.end}; if(f.result==='tree')golf.msg=T.tree }
@@ -156,13 +157,40 @@ function golfRoundOver(){
   if(won){ have.golfWon=true; save(); say([['',card],...GOLF_TEXT.win.map(t=>['Margie',t]),['Jack',GOLF_TEXT.jackWin]],()=>showReward('golf')) }
   else say([['',card],['Margie',GOLF_TEXT.lose[0]]],()=>{ showDialog({place:GOLF_TEXT.place,speaker:'Margie',pages:['Another round?'],actions:[{label:GOLF_TEXT.again,fn:()=>{closeDialog();golfStartRound()}},{label:GOLF_TEXT.notYet,ghost:true,fn:closeDialog}]}) });
 }
-function golfStartRound(){ Object.assign(golf,{active:true,hole:0,you:[],margie:[],jack:[]}); golfStartHole() }
+function golfStartRound(){ Object.assign(golf,{active:true,practice:false,hole:0,you:[],margie:[],jack:[]}); golfStartHole() }
 
 function talkMargie(){
   const T=GOLF_TEXT;
   if(have.golf)return say([['Margie',T.after]]);
   if(have.golfWon)return showReward('golf');
-  showDialog({place:T.place,speaker:'Margie',pages:[...T.margieHello,T.howTo],actions:[{label:T.ready,fn:()=>{closeDialog();golfStartRound()}},{label:T.notYet,ghost:true,fn:closeDialog}]});
+  showDialog({place:T.place,speaker:'Margie',pages:T.margieHello,actions:[{label:T.ready,fn:()=>{closeDialog();golfHowTo(golfPracticeAsk)}},{label:T.notYet,ghost:true,fn:closeDialog}]});
+}
+// instructions card, then the offer of a practice throw
+function golfHowTo(then){
+  const T=GOLF_TEXT;
+  const rows=['Margie','Jack'].map(name=>{const p=PORTRAITS[name], c=document.createElement('canvas'); c.width=c.height=p.size; const g=c.getContext('2d'); g.fillStyle=p.bg; g.fillRect(0,0,p.size,p.size); p.draw(g);
+    const row=document.createElement('div'); row.className='hrow'; const t=document.createElement('div'); t.innerHTML='<b></b><span></span>'; t.querySelector('b').textContent=name; t.querySelector('span').textContent=T.howToPeople[name]; row.append(c,t); return row});
+  $('howTitle').textContent=T.howToTitle; $('howRows').replaceChildren(...rows);
+  $('howControls').replaceChildren(...T.howToSteps.map(x=>{const li=document.createElement('li'); li.textContent=x; return li}));
+  $('howOk').textContent=T.howToOk; $('howOk').onclick=()=>{ $('howto').hidden=true; paused=false; then&&then() };
+  paused=true; prompt.hidden=true; $('howto').hidden=false; setTimeout(()=>$('howOk').focus({preventScroll:true}),0);
+}
+function golfPracticeAsk(){
+  const T=GOLF_TEXT;
+  showDialog({place:T.place,speaker:'Margie',pages:[T.practiceAsk],actions:[
+    {label:T.practice,fn:()=>{closeDialog();golfPractice()}},{label:T.startRound,fn:()=>{closeDialog();golfStartRound()}}]});
+}
+function golfPractice(){
+  Object.assign(golf,{active:true,practice:true,hole:0,you:[],margie:[],jack:[]});
+  const h=HOLES[0]; golf.lie={...h.tee}; golf.prevLie={...h.tee}; golf.strokes=0; golf.state='aim'; golf.t=Math.random()*1000; golf.msg='';
+  P.x=h.tee.x; P.y=h.tee.y+4; P.dir='right'; flashGolf(GOLF_TEXT.practice);
+}
+function golfPracticeResult(){
+  const T=GOLF_TEXT, f=golf.flight, b=golfHole().basket;
+  const line=f.result==='in'?T.practiceIn:f.result==='water'?T.practiceWater:f.result==='ob'?T.practiceOb:(f.result==='tree'?T.practiceTree+' ':'')+T.practiceDist(Math.round(Math.hypot(f.end.x-b.x,f.end.y-b.y)));
+  golf.state='between';
+  setTimeout(()=>showDialog({place:T.place,speaker:'Margie',pages:[line],actions:[
+    {label:T.practiceAgain,fn:()=>{closeDialog();golfPractice()}},{label:T.startRound,fn:()=>{closeDialog();golf.practice=false;golfStartRound()}}]}),400);
 }
 const MARGIE_SPOT={x:46,y:118}, JACK_SPOT={x:62,y:128};
 SCENES.golf={
@@ -225,6 +253,7 @@ SCENES.golf={
   },
   hud(){
     if(!golf.active)return '';
+    if(golf.practice)return `<span>Practice throw: doesn't count</span>`;
     const sum=a=>a.reduce((x,y)=>x+y,0), fmt=v=>v===0?'E':v>0?`+${v}`:`${v}`;
     return `<span>H${golf.hole+1} · ${isPutt()?'Putt':'Throw '+(golf.strokes+1)}</span><span>You ${fmt(sum(golf.you))}</span><span>M ${fmt(sum(golf.margie))}</span><span>J ${fmt(sum(golf.jack))}</span>`;
   },

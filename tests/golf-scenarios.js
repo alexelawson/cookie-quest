@@ -17,8 +17,20 @@ const R=[];const ok=(n,c,x='')=>R.push((c?'PASS ':'FAIL ')+n+(x?'  ('+x+')':''))
 await fresh();
 let r=await p.evaluate(()=>{P.x=192;P.y=281;update(16.7); const lbl=prompt.textContent; action(); T.run(40); return {lbl,scene:scene===SCENES.golf,slot:$('basket').textContent}});
 ok('A the south road leads to the course',r.lbl==='Go to the disc golf course'&&r.scene,r.lbl); ok('A milk is on the shopping list',r.slot.includes('Milk'),r.slot);
-r=await p.evaluate(()=>{P.x=MARGIE_SPOT.x+12;P.y=MARGIE_SPOT.y;update(16.7); const lbl=prompt.textContent; action(); const face=!$('dportrait').hidden; const pages=[]; while(T.btns().includes('Next')){pages.push($('dtext').textContent);T.click('Next')} const btns=T.btns(); T.click("Let's play"); update(16.7); return {lbl,face,pages,btns,active:golf.active,label:$('alabel').textContent,hud:$('hud').textContent}});
-ok('B talk to Margie (portrait shows), she explains, you start a round',r.lbl==='Talk to Margie'&&r.face&&r.active,r.pages[0]); ok('B A button says Aim, HUD shows the hole',r.label==='Aim'&&r.hud.includes('H1'),r.hud);
+r=await p.evaluate(()=>{P.x=MARGIE_SPOT.x+12;P.y=MARGIE_SPOT.y;update(16.7); const lbl=prompt.textContent; action(); const face=!$('dportrait').hidden; const pages=[]; while(T.btns().includes('Next')){pages.push($('dtext').textContent);T.click('Next')} const btns=T.btns(); T.click("Let's play"); const card=!$('howto').hidden, steps=$('howControls').children.length, rows=$('howRows').textContent; $('howOk').click();
+  const ask=T.btns(); T.click('Practice throw'); update(16.7); const prac=$('hud').textContent;
+  golfTap(); golf.angle=aimBase(); golfTap(); golf.flight=golfFlight(golfHole(),golf.lie,golf.angle,.5,false); golf.flight.i=0; for(let i=0;i<200&&golf.state==='flight';i++)update(16.7);
+  return {lbl,face,pages,btns,card,steps,rows,ask,prac,active:golf.active};});
+ok('B talk to Margie (portrait shows) and she explains the stakes',r.lbl==='Talk to Margie'&&r.face&&r.pages[0].includes('milk'),r.pages[0]);
+ok('B instructions card first (Margie + Jack + steps)',r.card&&r.steps>=5&&r.rows.includes('Margie')&&r.rows.includes('Jack'),r.steps+' steps');
+ok('B then a practice throw is offered',r.ask.join()==='Practice throw,Start the round'&&r.prac.includes('Practice'),r.ask.join(' | '));
+await p.waitForFunction(()=>!dlg.hidden&&T.btns().includes('Throw again'),null,{timeout:5000});
+r=await p.evaluate(()=>{const said=$('dtext').textContent; T.click('Throw again'); const again=golf.practice&&golf.state==='aim'&&golf.lie.x===HOLES[0].tee.x; const counted=golf.you.length;
+  golfTap(); golfTap(); golf.flight=golfFlight(golfHole(),golf.lie,aimBase(),.5,false); golf.flight.i=0; for(let i=0;i<200&&golf.state==='flight';i++)update(16.7); return {said,again,counted}});
+ok('B practice shows how close you got; throw again resets to the tee; nothing counts',r.said.includes('feet')&&r.again&&r.counted===0,r.said);
+await p.waitForFunction(()=>!dlg.hidden&&T.btns().includes('Start the round'),null,{timeout:5000});
+r=await p.evaluate(()=>{T.click('Start the round'); update(16.7); return {active:golf.active,practice:golf.practice,label:$('alabel').textContent,hud:$('hud').textContent}});
+ok('B the round starts: A says Aim, HUD shows hole 1',r.active&&!r.practice&&r.label==='Aim'&&r.hud.includes('H1'),r.hud);
 // the sweep and meter actually move
 r=await p.evaluate(()=>{const a1=aimNow(); T.run(20); const a2=aimNow(); golfTap(); const p1=powerNow(); T.run(15); const p2=powerNow(); update(16.7); return {aim:Math.abs(a2-a1)>.01, pow:Math.abs(p2-p1)>.01, label:$('alabel').textContent}});
 ok('B aim sweeps, power pulses, A says Throw',r.aim&&r.pow&&r.label==='Throw');
