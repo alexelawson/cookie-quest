@@ -13,6 +13,8 @@ For live reload while editing: `python3 -m http.server` and visit http://localho
 | `js/world.js` | Overworld map: collision rects (`solids`), doors (`triggers`), painting. Also defines the scene system (`SCENES`) |
 | `js/kitchen.js` | Kitchen interior scene; baking starts at the counter, recipe card on the fridge |
 | `js/city.js` | The chocolate heist: crew switching (you/Lars/John), sonar, sprint, lift, searchlights, guard, lasers, vault, cookie signal |
+| `js/portraits.js` | Faces shown beside dialog text, one painter per speaker name |
+| `js/anagrams.js` | Anagrams vs. Lars: letter sets + accepted words, scoring, Lars's difficulty in `ANAGRAM.LARS` |
 | `js/fargo.js` | Fargo: drive the CR-V, find the cheapest gas, Bob's $30.00 pump, then the snack stop for Alex. Car color in `CAR_COLOR`, fuel/speeds in `FUEL` |
 | `js/state.js` | Player, basket save (localStorage), particles |
 | `js/input.js` | Keyboard + touch d-pad |
@@ -48,7 +50,7 @@ The cupcake is behind the barn, in the middle. Its frosting peeks up over the ro
 Bob's station (always $2.79) moves each attempt. Alex wants ginger ale + Mott's berry gummies. Two wrong picks and she sends you back outside.
 
 ## Spoilers: the heist
-Switch to John to lift the beam. Set the crew to Hold, switch to Lars, and sprint through a gap in the searchlights to the fuse box. On the last roof, wait for the guard to walk away, ping sonar, and follow the gaps in the lasers: bottom row left of center, middle row on the right, top row in the middle. Switch to John for the grate. In the vault, ping sonar: the chocolate is the crate with bars.
+Switch to John to lift the beam. Set the crew to Hold, switch to Lars, and sprint through a gap in the searchlights to the fuse box. On the last roof, wait for the guard to walk away, ping sonar, and follow the gaps in the lasers: bottom row left of center, middle row on the right, top row in the middle. Switch to John for the grate. In the vault, ping sonar: the chocolate is the crate with bars. Then beat Lars at anagrams (he scores about 3,300; one six-letter word is 2,000).
 
 ## Rewards
 Finishing a land shows a pop-up with the item's pixel art; tapping it flies it into the basket. Add the art for a new item to `ART` and its text to `REWARDS` in `js/ui.js`, then call `showReward('key')`.

@@ -19,6 +19,7 @@
     <div class="prompt" id="prompt" hidden></div>
     <div class="hud" id="hud" hidden></div>
     <div class="dialog" id="dialog" hidden role="dialog" aria-live="polite">
+      <canvas class="portrait" id="dportrait" width="32" height="32" hidden aria-hidden="true"></canvas>
       <div class="place" id="dplace"></div>
       <div class="speaker" id="dspeaker"></div>
       <p id="dtext"></p>
@@ -62,6 +63,22 @@
         <button class="btn" id="vaultPing"></button>
       </div>
     </div>
+    <div class="anagram" id="anagram" hidden role="dialog" aria-labelledby="anaTitle">
+      <div class="acard">
+        <div class="ahead"><h3 id="anaTitle"></h3><span class="atime" id="anaTime">60</span></div>
+        <div class="ascores"><span>You <b id="anaYou">0</b></span><span>Lars <b id="anaLars">0</b></span></div>
+        <p id="anaMsg" aria-live="polite"></p>
+        <button class="btn" id="anaStart"></button>
+        <div id="anaPlay" hidden>
+          <div class="aword" id="anaWord"> </div>
+          <div class="tiles" id="anaTiles"></div>
+          <div class="acontrols"><button class="btn ghost" id="anaClear">Clear</button><button class="btn ghost" id="anaBack">⌫</button><button class="btn" id="anaEnter">Enter</button></div>
+          <p class="afound" id="anaFound"></p>
+          <p class="alars" id="anaLarsWord"></p>
+        </div>
+        <div id="anaEnd" hidden><p class="aresult" id="anaResult"></p><p id="anaMissed"></p><button class="btn" id="anaNext"></button></div>
+      </div>
+    </div>
     <div class="titlecard" id="titlecard">
       <small>A Christmas game</small>
       <h2>The Great<br>Cookie Quest</h2>
@@ -99,6 +116,8 @@
 <script src="js/kitchen.js"></script>
 <script src="js/city.js"></script>
 <script src="js/fargo.js"></script>
+<script src="js/portraits.js"></script>
+<script src="js/anagrams.js"></script>
 <script src="js/game.js"></script>
 </body>
 </html>

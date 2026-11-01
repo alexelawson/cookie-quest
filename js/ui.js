@@ -9,7 +9,7 @@ function renderBasket(){
 // menu:true lays the buttons out as a grid of choices (used for asking questions).
 function showDialog({place,speaker,pages,actions,noteLast,menu}){
   paused=true; prompt.hidden=true; let i=0;
-  $('dplace').textContent=place||''; $('dspeaker').textContent=speaker||'';
+  $('dplace').textContent=place||''; $('dspeaker').textContent=speaker||''; showPortrait(speaker);
   const draw=()=>{
     const t=$('dtext'); t.textContent=pages[i]; t.className=(noteLast&&i===pages.length-1)?'note':'';
     const box=$('dbtns'); box.innerHTML=''; const last=i===pages.length-1; box.classList.toggle('menu',!!menu&&last); dlg.classList.toggle('tall',!!menu&&last);
@@ -31,7 +31,7 @@ function openLand(key){
 }
 function action(){
   if(!$('titlecard').hidden){start();return}
-  if(!$('pump').hidden||!$('shop').hidden||!$('vault').hidden)return;   // the pump and shop have their own buttons
+  if(!$('pump').hidden||!$('shop').hidden||!$('vault').hidden||!$('anagram').hidden)return;   // the pump and shop have their own buttons
   if(!$('reward').hidden){collectReward();return}
   if(!dlg.hidden){const f=document.activeElement, b=$('dbtns').contains(f)?f:$('dbtns').querySelector('button'); b&&b.click(); return}
   if(near)near.act(); else if(scene.ability)scene.ability();

@@ -37,7 +37,7 @@ const heist={
   lead:0, follow:true, trail:[], sprintT:0, sprintCd:0, sonarT:0, sonarCd:0, sonarAt:null,
   guardY:GUARD.y0, guardDir:1, guardWait:0, flashT:0, caught:false, hinted:{},
 };
-const heistStage=()=>have.heistStage||0;   // 0 nothing, 1 beam up, 2 lights out, 3 grate off, 4 got the chocolate (pending reward)
+const heistStage=()=>have.heistStage||0;   // 0 nothing, 1 beam up, 2 lights out, 3 grate off, 4 got the chocolate, 5 beat Lars at anagrams (reward pending)
 
 // ---------- background ----------
 const cityRain=[...Array(160)].map(()=>({x:Math.random()*CW,y:Math.random()*CH}));
@@ -143,7 +143,11 @@ function drawGuard(){
 function drawBeam(){
   ctx.fillStyle='#7d8694';
   if(heistStage()>=1){const b=BEAM_SLOT; ctx.fillRect(b.x,b.y+2,b.w,8); ctx.fillStyle='#5f6676'; ctx.fillRect(b.x,b.y+5,b.w,2); for(let x=b.x+3;x<b.x+b.w;x+=6)ctx.fillRect(x,b.y+3,1,6)}
-  else {const b=LOOSE_BEAM; ctx.fillRect(b.x,b.y,b.w,b.h); ctx.fillStyle='#5f6676'; ctx.fillRect(b.x+3,b.y,2,b.h)}
+  else {const b=LOOSE_BEAM; ctx.fillRect(b.x,b.y,b.w,b.h); ctx.fillStyle='#5f6676'; ctx.fillRect(b.x+3,b.y,2,b.h);
+    ctx.fillStyle='#c9d1db'; ctx.fillRect(b.x+1,b.y+((time/30)%(b.h+20))-10,b.w-2,3);          // a glint runs along it
+    // dashed outline across the gap, showing where it'd fit
+    const s=BEAM_SLOT, on=(time/300|0)%2; ctx.fillStyle=`rgba(200,215,235,${on?.55:.3})`;
+    for(let x=s.x;x<s.x+s.w;x+=6){ctx.fillRect(x,s.y+2,3,1); ctx.fillRect(x,s.y+9,3,1)} ctx.fillRect(s.x,s.y+2,1,8); ctx.fillRect(s.x+s.w-1,s.y+2,1,8)}
 }
 function drawGrate(){
   if(heistStage()>=3){ctx.fillStyle='#5f6676'; ctx.fillRect(SKYLIGHT.x+26,SKYLIGHT.y+18,12,10); return}   // tossed aside
@@ -202,18 +206,22 @@ function segHitsBox(x1,y1,x2,y2,b){ // thin laser vs feet box
 function checkHazards(){
   const pos=crewPositions();
   for(const p of pos){
-    if(heistStage()<2) for(const L of LIGHTS){const l=lightPos(L); if(Math.hypot(p.x-l.x,p.y-3-l.y)<LIGHT_R+2)return HEIST.spottedLight}
+    if(heistStage()<2) for(const L of LIGHTS){const l=lightPos(L); if(Math.hypot(p.x-l.x,p.y-7-l.y)<LIGHT_R-2)return {msg:HEIST.spottedLight, who:p.id}}
     // guard's flashlight cone (he faces the way he's walking)
     const gx=GUARD.x, gy=heist.guardY-6, along=(p.y-3-gy)*heist.guardDir, perp=Math.abs(p.x-gx);
-    if(heist.guardWait<=0&&along>0&&along<62&&perp<along*.5+3)return HEIST.spottedGuard;
+    if(heist.guardWait<=0&&along>0&&along<62&&perp<along*.5+3)return {msg:HEIST.spottedGuard, who:p.id};
     const box=R(p.x-3,p.y-3,6,4);
-    for(const [x1,y1,x2,y2] of LASERS)if(segHitsBox(x1,y1,x2,y2,box))return HEIST.spottedLaser;
+    for(const [x1,y1,x2,y2] of LASERS)if(segHitsBox(x1,y1,x2,y2,box))return {msg:HEIST.spottedLaser, who:p.id};
   }
   return null;
 }
-function caught(msg){
-  heist.flashT=500; for(const k in dirs)dirs[k]=false;
-  showDialog({place:HEIST.place,speaker:'Spotted!',pages:[msg,HEIST.backToCheckpoint],actions:[{label:'OK',fn:()=>{closeDialog();placeAtCheckpoint()}}]});
+function caught(hz){
+  heist.flashT=500; heist.caughtWho=hz.who; for(const k in dirs)dirs[k]=false;
+  const name=HEIST.crew[hz.who], you=hz.who===lead().id;
+  const pages=[hz.msg.replace('{who}',you?'you':name).replace('{Who}',you?'You':name)];
+  if(!you&&heist.follow)pages.push(hz.who==='hero'?HEIST.followTipYou.replace('{lead}',HEIST.crew[lead().id]):HEIST.followTip.replace('{who}',name));
+  pages.push(HEIST.backToCheckpoint);
+  showDialog({place:HEIST.place,speaker:'Spotted!',pages,actions:[{label:'OK',fn:()=>{closeDialog();heist.caughtWho=null;placeAtCheckpoint()}}]});
 }
 
 // ---------- story beats ----------
@@ -227,9 +235,16 @@ function briefing(){
   say([...HEIST.briefing.map(t=>[HEIST.stranger,t]),...HEIST.crewHello,['Tip',HEIST.howTo]]);
 }
 function hintOnce(key,who,text){ if(heist.hinted[key])return; heist.hinted[key]=true; say([[who,text]]) }
+// walking up to the beam gives you a choice; only John can actually swing it over the gap
+function beamChoice(){
+  const H=HEIST;
+  showDialog({place:H.place,speaker:'',pages:[H.beamLook],menu:true,actions:[
+    {label:H.beamBridge,fn:()=>{ if(lead().id!=='john')return say(H.beamTooHeavy); closeDialog(); liftBeam() }},
+    {label:H.beamCut,fn:()=>say(H.beamCutReply)},
+    {label:H.beamLeave,ghost:true,fn:closeDialog}]});
+}
 function liftBeam(){
-  if(lead().id!=='john')return flashPrompt(HEIST.onlyJohn);
-  have.heistStage=1; save(); say([['John',HEIST.beamDone]]);
+  have.heistStage=1; save(); heist.beamAnim=600; say([['John',HEIST.beamDone]]);
 }
 function cutFuse(){
   if(lead().id!=='lars')return flashPrompt(HEIST.onlyLars);
@@ -263,7 +278,7 @@ function pickCrate(i){
   if(!vault.open)return;
   if(i!==vault.choc){ $('vault').hidden=true; say(HEIST.raisins,()=>{ $('vault').hidden=false; paused=true }); return }
   vault.open=false; $('vault').hidden=true; have.heistStage=4; save();
-  say([['',HEIST.gotIt],['',HEIST.villainNote],...HEIST.finale],()=>{showReward('city')});
+  say([['',HEIST.gotIt],['',HEIST.villainNote],...HEIST.finale,...HEIST.larsChallenge],()=>openAnagrams());
 }
 $('vaultPing').onclick=pingVault; $('crateA').parentNode.onclick=()=>pickCrate(0); $('crateB').parentNode.onclick=()=>pickCrate(1);
 
@@ -274,10 +289,11 @@ function heistTrigger(){
   if(hit(feet,LADDER))return {label:HEIST.climbDown, act:()=>goTo('world','fromCity')};
   if(Math.hypot(P.x-STRANGER.x,P.y-STRANGER.y)<16)return {label:'Talk to the stranger', btn:'Talk', act:()=>{
     if(have.city)return say([[HEIST.stranger,HEIST.after]]);
-    if(st>=4)return showReward('city');
+    if(st>=5)return showReward('city');
+    if(st===4)return say([[HEIST.stranger,HEIST.strangerRematch],...HEIST.larsChallenge.slice(1,2)],()=>openAnagrams());
     if(!have.heistBriefed)return briefing();
     say([[HEIST.stranger,HEIST.strangerAgain]])}};
-  if(st<1&&hit(feet,R(LOOSE_BEAM.x-10,LOOSE_BEAM.y-6,LOOSE_BEAM.w+20,LOOSE_BEAM.h+12)))return {label:'Lift the beam', act:liftBeam};
+  if(st<1&&hit(feet,R(LOOSE_BEAM.x-10,LOOSE_BEAM.y-6,LOOSE_BEAM.w+20,LOOSE_BEAM.h+12)))return {label:'Look at the beam', act:beamChoice};
   if(st<2&&hit(feet,R(FUSE.x-10,FUSE.y,20,14)))return {label:HEIST.fuse, act:cutFuse};
   if(st===2&&hit(feet,R(SKYLIGHT.x-4,SKYLIGHT.y+SKYLIGHT.h,SKYLIGHT.w+8,12)))return {label:HEIST.grate, act:ripGrate};
   if(st===3&&hit(feet,R(SKYLIGHT.x-4,SKYLIGHT.y+SKYLIGHT.h,SKYLIGHT.w+8,12)))return {label:HEIST.dropIn, act:openVault};
@@ -317,12 +333,13 @@ SCENES.city={
     heist.briefPending=!have.heistBriefed;
   },
   leave(){ $('crewbar').hidden=true },
-  speed:()=>heist.sprintT>0?.17:.07,
+  speed:()=>heist.sprintT>0?.19:(lead().id==='lars'?.09:.07),
   dynTrigger:()=>heistTrigger(),
   ability:()=>useSkill(),
   key(code){ const i={Digit1:0,Digit2:1,Digit3:2}[code]; if(i!=null){switchTo(i);return true} if(code==='KeyF'){toggleFollow();return true} return false },
   abilityLabel:()=>HEIST.skills[lead().id],
   ambient(dt){
+    anaTick(dt);
     for(const r of cityRain){r.y+=dt*.32;r.x-=dt*.08;if(r.y>CH){r.y=-4;r.x=Math.random()*(CW+40)}}
     for(const c of cars){c.y+=c.v*dt; if(c.y>CH+6)c.y=-6; if(c.y<-6)c.y=CH+6}
     nextFlash-=dt; if(nextFlash<=0){flashT=140; nextFlash=8000+Math.random()*9000} if(flashT>0)flashT-=dt;
@@ -380,6 +397,8 @@ SCENES.city={
     hole(STRANGER.x,STRANGER.y-8,20);
     ctx.drawImage(darkMask,cx,cy);
     // sonar ring
+    if(heist.sprintT>0){const c=lead(); for(let i=0;i<4;i++){ctx.fillStyle=`rgba(190,210,255,${.5-i*.1})`; const back=P.dir==='left'?1:P.dir==='right'?-1:0, up=P.dir==='up'?1:P.dir==='down'?-1:0;
+      ctx.fillRect(Math.round(c.x+back*(6+i*4)+((time/40+i)%3)-1),Math.round(c.y-2+up*(6+i*4)),2,1)}}
     if(heist.sonarT>3400&&heist.sonarAt){const r=(4200-heist.sonarT)/800*150; ctx.strokeStyle=`rgba(127,211,255,${1-r/150})`; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(heist.sonarAt.x,heist.sonarAt.y-6,r,0,Math.PI*2); ctx.stroke()}
     if(reveal){ctx.fillStyle=`rgba(80,160,255,${.08*reveal})`; ctx.fillRect(cx,cy,VW,VH)}
     // the cookie signal, once the job's done
@@ -391,7 +410,8 @@ SCENES.city={
       ctx.fillStyle='rgba(60,36,18,.85)'; [[-14,-8],[4,-12],[14,2],[-4,8],[-20,2],[2,-2],[16,-10],[-10,12]].forEach(([dx,dy])=>{ctx.fillRect(sx+dx,sy+dy,5,4)})}
     if(flashT>0){ctx.fillStyle=`rgba(220,230,255,${flashT/140*.3})`; ctx.fillRect(cx,cy,VW,VH)}
     if(heist.flashT>0){ctx.fillStyle=`rgba(255,40,40,${heist.flashT/500*.35})`; ctx.fillRect(cx,cy,VW,VH)}
+    if(heist.caughtWho){const c=heist.crew.find(c=>c.id===heist.caughtWho); if(c){ctx.fillStyle='#ff4a4a'; ctx.fillRect(c.x-1,c.y-34,3,7); ctx.fillRect(c.x-1,c.y-25,3,2)}}
   },
-  hud(){ const st=heistStage(); const steps=['Bridge the gap','Kill the searchlights','Open the skylight','Crack the vault','Done!'];
-    return st>=4||have.city?'':`<span>${steps[st]}</span>` },
+  hud(){ const st=heistStage(); const steps=['Bridge the gap','Kill the searchlights','Open the skylight','Crack the vault','Beat Lars at anagrams','Done!'];
+    return st>=5||have.city?'':`<span>${steps[st]}</span>` },
 };

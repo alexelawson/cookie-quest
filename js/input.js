@@ -9,7 +9,7 @@ addEventListener('keydown',e=>{
     e.preventDefault(); return}
   if(dlg.hidden&&!paused&&scene.key&&scene.key(e.code)){e.preventDefault();return}
   if(KEYMAP[e.code]){dirs[KEYMAP[e.code]]=true;e.preventDefault()}
-  if(['Space','Enter','KeyE'].includes(e.code)){if(document.activeElement&&document.activeElement.tagName==='BUTTON'&&(!dlg.hidden||!$('reward').hidden||!$('shop').hidden||!$('vault').hidden))return; e.preventDefault(); action()}
+  if(['Space','Enter','KeyE'].includes(e.code)){if(document.activeElement&&document.activeElement.tagName==='BUTTON'&&(!dlg.hidden||!$('reward').hidden||!$('shop').hidden||!$('vault').hidden||!$('anagram').hidden))return; e.preventDefault(); action()}
 });
 addEventListener('keyup',e=>{if(KEYMAP[e.code])dirs[KEYMAP[e.code]]=false});
 addEventListener('blur',()=>{for(const k in dirs)dirs[k]=false});
