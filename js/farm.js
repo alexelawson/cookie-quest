@@ -21,7 +21,7 @@ const BARN = R(20,30,56,44);
 const DROP = R(108,118,24,14);              // stand here holding a hen to put it back
 const GATE = {x:120, y:124};
 const FARM_AREA = R(4,12,158,134);          // loose hens stay in here
-const CUPCAKE = {x:212, y:56};              // under the canopy of the tree at (212,64)
+const CUPCAKE = {x:207, y:61};              // tucked under the tree at (212,64); its wrapper peeks out
 const KEELAN_HOME = {x:142, y:134};
 
 const rand=(a,b)=>a+Math.random()*(b-a);
@@ -134,7 +134,7 @@ function farmAmbient(dt){
 
 function farmUpdate(dt){
   // the cupcake
-  if(!have.cupcake&&!have.gaveCupcake&&Math.abs(P.x-CUPCAKE.x)<7&&Math.abs(P.y-CUPCAKE.y-2)<7){
+  if(!have.cupcake&&!have.gaveCupcake&&Math.abs(P.x-CUPCAKE.x)<10&&Math.abs(P.y-CUPCAKE.y-2)<9){
     have.cupcake=true; save(); renderBasket();
     showDialog({place:'Under a tree',speaker:'Ooh',pages:[KEELAN.foundCupcake],actions:[CLOSE]}); return;
   }
@@ -196,9 +196,10 @@ function farmUpdate(dt){
 }
 
 // Keelan's talk zone follows him around
+const KEELAN_TRIGGER={label:'Talk to Keelan', btn:'Talk', act:()=>talkToKeelan()};
 function farmTrigger(){
   const k=farm.keelan;
-  return Math.hypot(P.x-k.x,P.y-k.y)<16?{key:'keelan',label:'Talk to Keelan'}:null;
+  return Math.hypot(P.x-k.x,P.y-k.y)<16?KEELAN_TRIGGER:null;
 }
 
 // ---------- HUD ----------
@@ -240,12 +241,14 @@ function drawKeelan(k){
 function drawCupcake(){
   if(have.cupcake||have.gaveCupcake)return;
   const x=CUPCAKE.x-2,y=CUPCAKE.y-3, F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x+dx,y+dy,w,h)};
-  F('#c98a5a',0,3,5,3); F('#5a3220',0,0,5,3); F('#e54b7a',1,0,1,1); F('#f4d35e',3,1,1,1); F('#e54b7a',2,-1,1,1);
+  F('#e9a6c0',0,3,5,3); F('#c77a9a',1,3,1,3); F('#c77a9a',3,3,1,3);   // pink striped wrapper (this bit peeks out)
+  F('#5a3220',0,0,5,3); F('#e54b7a',1,0,1,1); F('#f4d35e',3,1,1,1); F('#e54b7a',2,-1,1,1);
 }
-// a sparkle peeks out from the edge of the tree now and then
+// a sparkle flashes beside the tree every few seconds
 function drawCupcakeGlint(){
-  if(have.cupcake||have.gaveCupcake||(time%4800)>260)return;
-  ctx.fillStyle='#fff6c8'; ctx.fillRect(218,57,1,1); ctx.fillRect(217,58,3,1); ctx.fillRect(218,59,1,1);
+  if(have.cupcake||have.gaveCupcake||(time%3000)>450)return;
+  const x=202,y=60; ctx.fillStyle='#fff3a8';
+  ctx.fillRect(x,y-2,1,5); ctx.fillRect(x-2,y,5,1); ctx.fillStyle='#ffffff'; ctx.fillRect(x,y,1,1);
 }
 // entities for depth sorting
 function farmEntities(list){

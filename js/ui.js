@@ -1,4 +1,4 @@
-// Basket strip, dialog boxes, and what happens at each land and the kitchen.
+// Basket strip, dialog boxes, and what happens at each land.
 const $=id=>document.getElementById(id);
 const dlg=$('dialog'), prompt=$('prompt');
 function renderBasket(){
@@ -29,18 +29,10 @@ function openLand(key){
       showDialog({place:s.place,speaker:'Nice!',pages:[s.done+' It\'s in your basket.'],actions:[CLOSE]})}},
     {label:'Later',ghost:true,fn:closeDialog}]});
 }
-function openKitchen(){
-  const missing=ITEMS.filter(i=>!have[i.key]).map(i=>i.label);
-  if(missing.length) return showDialog({place:KITCHEN.place,speaker:KITCHEN.speaker,pages:[KITCHEN.missing+' '+missing.join(', ')+'.'],actions:[CLOSE]});
-  showDialog({place:KITCHEN.place,speaker:KITCHEN.speaker,pages:[...KITCHEN.ready,KITCHEN.finale,KITCHEN.note],noteLast:true,actions:[
-    {label:'Play again',fn:()=>{have={};save();renderBasket();P.x=192;P.y=156;closeDialog()}},
-    {label:'Keep walking',ghost:true,fn:closeDialog}]});
-}
 function action(){
   if(!$('titlecard').hidden){start();return}
   if(!dlg.hidden){const f=document.activeElement, b=$('dbtns').contains(f)?f:$('dbtns').querySelector('button'); b&&b.click(); return}
-  if(!near)return;
-  if(near.key==='kitchen')openKitchen(); else if(near.key==='keelan')talkToKeelan(); else openLand(near.key);
+  if(near)near.act();
 }
 function start(){$('titlecard').hidden=true; paused=false}
 $('startBtn').onclick=start;

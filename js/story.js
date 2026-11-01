@@ -57,6 +57,10 @@ const KEELAN = {
 };
 
 const KITCHEN = {place:'Home', speaker:'Your kitchen',
+  recipeTitle:"Chocolate Chip Cookies",
+  recipeFooter:"Bake at 375° for 10 minutes. Do not eat all the dough first.",
+  oven:"The oven's warming up. It already smells like home in here.",
+  tree:"The tree's a little crooked. It's perfect.",
   missing:"The recipe card says you still need:",
   ready:["Everything's in the basket.","Time to bake."],
   finale:"Coming next: add the ingredients in the right order, pull the cookies out before they burn, then decorate them however you like.",
