@@ -40,16 +40,14 @@ Delete `js/devskip.js` and its `<script>` line in `index.html` (the "Testing" sk
 Then press **Start over** so the game starts fresh with Alex's welcome.
 
 ## Tests
-Needs Node and Playwright (`npm i -D playwright && npx playwright install chromium`).
-- `node tests/farm-scenarios.js` plays through every farm path (cupcake before/during/after, losing, reloads, kitchen detours).
-- `node tests/fargo-scenarios.js` plays through Fargo (wrong station, running out of gas, pump, wrong snacks, kicked out, reloads).
-- `node tests/heist-scenarios.js` plays the heist start to finish (every skill, every way to get caught, reloads).
-- `node tests/golf-scenarios.js` plays the disc golf course (hazards, winning, losing).
-- `node tests/golf-difficulty.js '{}'` simulates players of different precision against Margie and Jack.
-- `node tests/birkie-scenarios.js` skis the Birkie (crashes, deep snow, feeds, cutoff, winning, reloads).
-- `node tests/birkie-difficulty.js '{}'` simulates skiers with different rhythm against the 3:00:00 cutoff.
-- `node tests/kitchen-scenarios.js` bakes the cookies (every way to mess up a pour, the eggs, the oven) and plays the party; also the wardrobe.
-- `node tests/farm-difficulty.js '{}'` simulates players of different skill; pass JSON to try other `FARM` settings.
+Needs Node and Playwright (`npm install && npx playwright install chromium`).
+
+**Run everything:** `npm test` (or `node tests/run-all.js`). It first checks every `.js` file for typos that would stop the game loading (a stray quote in `story.js` is the usual one), then runs every suite below and prints a summary. It also runs automatically on GitHub every time anything is pushed, including edits made on github.com: a green check next to the commit means all good, a red X means something broke (click it to see what).
+
+- `tests/full-playthrough.js`: the whole game start to finish (welcome, every stop in an odd order, all seven secrets, the crossword typed on the keyboard, baking, the party, the ending, Play again), reloading after every step.
+- `tests/robustness.js`: every pop-up on desktop, phones and a phone held sideways; blocked or broken saves; ⚙ Settings opened over other pop-ups; walking away mid-task; in and out of every place; sound settings; Start over.
+- `tests/farm-scenarios.js`, `birkie-scenarios.js`, `golf-scenarios.js`, `heist-scenarios.js`, `fargo-scenarios.js`, `kitchen-scenarios.js`: each place in detail (the kitchen suite also covers the crossword, wardrobe, music, exits, gear, Logan, Jackie, hints and the ending).
+- Difficulty simulators (not part of `npm test`): `node tests/farm-difficulty.js '{}'`, `node tests/birkie-difficulty.js '{}'`, `node tests/golf-difficulty.js '{}'` play hundreds of rounds with players of different skill. Pass JSON to try other settings.
 
 ## Adding a new place
 Add an object to `SCENES` with `w`, `h`, `bounds`, `bg` (a canvas), `solids`, `triggers` and `entries`, plus optional `ambient/update/under/ents/over` hooks. Doors call `goTo('sceneName','entryName')`.

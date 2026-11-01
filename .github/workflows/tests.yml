@@ -1,0 +1,15 @@
+# Runs every test whenever anything is pushed (including edits made on github.com).
+# A green check on the commit means everything passed; a red X means something broke. Click it to see what.
+name: tests
+on: [push, workflow_dispatch]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: npm install --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - run: npm test

@@ -33,17 +33,12 @@ function showDialog({place,speaker,face,pages,actions,noteLast,menu}){
   };
   dlg.hidden=false; draw(); sfx('blip');
 }
-function closeDialog(){dlg.hidden=true; paused=false; cv.focus?.()}
+// is any pop-up still open? (so closing one menu never unpauses the game under another)
+const OVERLAYS=['dialog','reward','pump','shop','vault','anagram','howto','wardrobe','bake','xword','ending','settings','titlecard'];
+const overlayOpen=()=>OVERLAYS.some(id=>!$(id).hidden);
+function closeDialog(){dlg.hidden=true; paused=overlayOpen(); cv.focus?.()}
 const CLOSE={label:'Close',fn:closeDialog};
 
-function openLand(key){
-  const s=STORY[key];
-  if(have[key]) return showDialog({place:s.place,speaker:s.speaker,pages:[s.again],actions:[CLOSE]});
-  showDialog({place:s.place,speaker:s.speaker,pages:[...s.lines,s.mission],actions:[
-    {label:'Finish mission (preview)',fn:()=>{have[key]=true;save();renderBasket();
-      showDialog({place:s.place,speaker:'Nice!',pages:[s.done+' It\'s in your basket.'],actions:[CLOSE]})}},
-    {label:'Later',ghost:true,fn:closeDialog}]});
-}
 function action(){
   if(!$('titlecard').hidden){start();return}
   if(!$('pump').hidden||!$('shop').hidden||!$('vault').hidden||!$('anagram').hidden||!$('howto').hidden||!$('wardrobe').hidden||!$('bake').hidden||!$('xword').hidden||!$('ending').hidden||!$('settings').hidden)return;   // the pump and shop have their own buttons
@@ -55,14 +50,14 @@ function action(){
 function openSettings(){
   $('soundToggle').checked=!muted; $('musicToggle').checked=musicOn; $('musicToggle').disabled=muted; renderGearSettings();
   $('settings').hidden=false; paused=true; prompt.hidden=true; setTimeout(()=>$('settingsClose').focus({preventScroll:true}),0) }
-function closeSettings(){ $('settings').hidden=true; paused=!dlg.hidden||!$('titlecard').hidden; $('settingsBtn').blur() }
+function closeSettings(){ $('settings').hidden=true; paused=overlayOpen(); $('settingsBtn').blur() }
 $('soundToggle').onchange=()=>{setSound($('soundToggle').checked); $('musicToggle').disabled=muted};
 $('musicToggle').onchange=()=>setMusic($('musicToggle').checked);
 $('setAlbum').onclick=()=>{ $('settings').hidden=true; openAlbum() };
 $('settingsBtn').onclick=openSettings; $('settingsClose').onclick=closeSettings;
 // change outfit any time: on the rooftops it's the stealth outfit, everywhere else it's Joe's everyday look
 $('setOutfit').textContent=WARDROBE.changeOutfit;
-$('setOutfit').onclick=()=>{ $('settings').hidden=true; openWardrobe(()=>{ paused=!dlg.hidden||!$('titlecard').hidden },scene===SCENES.city?'heist':'look',true) };
+$('setOutfit').onclick=()=>{ $('settings').hidden=true; openWardrobe(()=>{ paused=overlayOpen() },scene===SCENES.city?'heist':'look',true) };
 function start(){$('titlecard').hidden=true; paused=false; audioInit(); sceneMusic(); if(!have.welcomed)welcome()}
 // the first time you press Start: Alex explains everything, then you pick Joe's look
 function welcome(){

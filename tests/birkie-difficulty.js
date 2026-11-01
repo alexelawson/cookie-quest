@@ -18,7 +18,7 @@ const out=await p.evaluate((OV)=>{Object.assign(BIRK,OV); have.miller=true; scen
     for(const k in dirs)dirs[k]=false; return {made:P.y>=FINISH_Y, t:birk.t*BIRK.CLOCK/1000}}
   const fmt=s=>`${Math.floor(s/3600)}:${String(Math.floor(s%3600/60)).padStart(2,'0')}`;
   const res={}; for(const [name,sig,pole,se] of [['great rhythm',40,true,0],['ok rhythm',90,true,4],['sloppy rhythm',160,true,8],['never poles',0,false,6]]){
-    let made=0, ts=[]; for(let k=0;k<20;k++){const r=run(sig,pole,se); if(r.made)made++; ts.push(r.t)} ts.sort((a,b)=>a-b);
-    res[name]=`finishes ${made}/20, median ${fmt(ts[10])}, best ${fmt(ts[0])}`}
+    let made=0, ts=[]; for(let k=0;k<20;k++){const r=run(sig,pole,se); if(r.made){made++; ts.push(r.t)}} ts.sort((a,b)=>a-b);   // times of finishers only (the sweep catching you isn't a 'best time')
+    res[name]=made?`finishes ${made}/20, median ${fmt(ts[ts.length>>1])}, best ${fmt(ts[0])}`:`finishes 0/20`}
   return res},OV);
 console.log(OV,out);await b.close()})();

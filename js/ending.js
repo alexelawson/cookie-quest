@@ -53,7 +53,7 @@ const photoUnlocked=id=>id==='kitchen'?!!have.baked:!!have[id];
 const ending={page:null, photo:0, fromSettings:false};
 function openEnding(){ ending.fromSettings=false; $('ending').hidden=false; paused=true; prompt.hidden=true; playSong('kitchen'); showCredits() }
 function openAlbum(){ ending.fromSettings=true; $('ending').hidden=false; paused=true; prompt.hidden=true; showAlbum() }
-function closeEnding(){ $('ending').hidden=true; $('creditRoll').getAnimations().forEach(a=>a.cancel()); paused=false; sceneMusic() }
+function closeEnding(){ $('ending').hidden=true; $('creditRoll').getAnimations().forEach(a=>a.cancel()); paused=overlayOpen(); sceneMusic() }
 function endButtons(next,skip){
   $('endNext').hidden=!next; $('endSkip').hidden=!skip;
   if(next){$('endNext').textContent=next.label; $('endNext').onclick=next.fn; setTimeout(()=>$('endNext').focus({preventScroll:true}),0)}

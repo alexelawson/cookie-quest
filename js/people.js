@@ -89,10 +89,10 @@ function jackieArrives(){
 function talkJackie(){ const n=Math.min(fargo.jackieHint||0,JACKIE.hints.length-1); fargo.jackieHint=n+1;
   showDialog({place:FARGO.place,speaker:'Jackie',pages:[JACKIE.hints[n]],actions:[CLOSE]}) }
 
-// every frame (from game.js), even while paused
+// every frame (from game.js), even while paused. Logan's search only counts down while Joe is still on the map.
 function peopleTick(dt){
   if(fargo.thinkT>0)fargo.thinkT-=dt;
-  if(logan.searchT>0){ logan.searchT-=dt; if(logan.searchT<=0&&!paused){ have.gear=have.gear||{}; have.gear.clover=1; save(); sfx('reward');
+  if(logan.searchT>0&&scene===SCENES.world){ logan.searchT-=dt; if(logan.searchT<=0&&!paused){ have.gear=have.gear||{}; have.gear.clover=1; save(); sfx('reward');
     showDialog({place:LOGAN_TEXT.place,speaker:'Logan',pages:LOGAN_TEXT.found,actions:[{label:LOGAN_TEXT.wear,fn:closeDialog}]}) } else if(logan.searchT<=0)logan.searchT=1 }
   if(paused&&!$('hint').hidden)hideHint();
   hintTick(dt);

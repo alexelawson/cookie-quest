@@ -6,8 +6,6 @@ const ITEMS = [
   {key:'fargo', label:'Sugar'},
   {key:'golf',  label:'Milk'},
 ];
-const STORY = {
-};
 // ---------- The farm: Keelan ----------
 // Each question is a button; the answer plays as one page per string.
 const KEELAN = {
