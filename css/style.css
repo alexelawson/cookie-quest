@@ -21,7 +21,12 @@ h1{font-family:var(--pixel);font-weight:600;color:var(--gold);font-size:1.25rem;
 .slot.got{border-color:var(--gold);color:var(--gold);background:rgba(239,195,90,.12)}
 .screen{position:relative;background:var(--ink);border:4px solid var(--bezel);border-radius:10px;overflow:hidden;aspect-ratio:4/3;width:100%;max-width:100%}
 canvas{width:100%;height:100%;display:block;image-rendering:pixelated;image-rendering:crisp-edges}
-.prompt{position:absolute;top:8px;left:50%;transform:translateX(-50%);background:var(--shade);border:2px solid var(--gold);color:var(--paper);font-family:var(--pixel);padding:3px 10px;border-radius:4px;font-size:.85rem;white-space:nowrap}
+.prompt{position:absolute;top:8px;left:50%;transform:translateX(-50%);background:var(--gold);border:3px solid var(--ink);color:var(--ink);font-family:var(--pixel);font-weight:700;padding:5px 12px;border-radius:6px;font-size:1.05rem;white-space:nowrap;box-shadow:0 4px 0 rgba(0,0,0,.35),0 0 0 3px rgba(244,211,94,.35);z-index:3;animation:promptIn .22s ease-out,promptPulse 1.6s ease-in-out .22s infinite;display:flex;align-items:center;gap:8px}
+.prompt[hidden]{display:none}
+.prompt::after{content:'Space';font-size:.72rem;font-weight:600;background:var(--ink);color:var(--gold);border-radius:4px;padding:2px 6px}
+@media (pointer:coarse){.prompt::after{content:'tap A'}}
+@keyframes promptIn{from{transform:translate(-50%,-8px) scale(.85);opacity:0}to{transform:translate(-50%,0) scale(1);opacity:1}}
+@keyframes promptPulse{0%,100%{box-shadow:0 4px 0 rgba(0,0,0,.35),0 0 0 3px rgba(244,211,94,.35)}50%{box-shadow:0 4px 0 rgba(0,0,0,.35),0 0 0 7px rgba(244,211,94,.15)}}
 .dialog{position:absolute;left:8px;right:8px;bottom:8px;background:var(--paper);color:var(--ink);border:3px solid var(--ink);border-radius:6px;padding:10px 12px;max-height:calc(100% - 16px);overflow:auto}
 .place{font-family:var(--pixel);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;opacity:.65}
 .speaker{font-family:var(--pixel);font-weight:600;color:var(--berry);font-size:1.05rem}

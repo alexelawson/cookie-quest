@@ -109,4 +109,19 @@ r=await p.evaluate(async()=>{const out={}; for(const [s,e] of [['world','start']
   return {...out,box,off,on}});
 ok('L each place plays its own song',r.world==='farm'&&r.golf==='golf'&&r.birkie==='birkie'&&r.fargo==='fargo'&&r.city==='heist'&&r.kitchen==='kitchen',JSON.stringify(r));
 ok('L the Cookie Dance switches to Jingle Bells; Settings > Music turns it off and on',r.dance==='jingle'&&r.box&&r.off===null&&r.on==='kitchen');
+// M. exits: walk into them and you leave, no button; arriving next to one doesn't bounce you straight back out
+await fresh(ALL);
+r=await p.evaluate(()=>{const out={}; goTo('kitchen','fromDoor'); T.run(40); out.stay=scene===SCENES.kitchen; P.x=112;P.y=162; T.run(40); out.kitchen=scene===SCENES.world;
+  goTo('fargo','fromHighway'); T.run(40); try{closeDialog()}catch(e){} paused=false; P.x=3;P.y=180; T.run(40); out.fargo=scene===SCENES.world;
+  have.heistBriefed=true; have.heistHowTo=true; goTo('city','fromStreet'); T.run(40); try{closeDialog()}catch(e){} paused=false; P.x=20;P.y=172; T.run(40); out.city=scene===SCENES.world; return out});
+ok('M exits: kitchen door, Fargo highway and the rooftop ladder all just take you out',r.stay&&r.kitchen&&r.fargo&&r.city,JSON.stringify(r));
+// N. gear: find it on the map, Joe wears it, Settings can take it off
+await fresh({});
+r=await p.evaluate(()=>{const got=[]; for(const k in GEAR){P.x=GEAR[k].x;P.y=GEAR[k].y; T.run(1); got.push(k+':'+(have.gear&&have.gear[k])+':'+$('dtext').textContent.slice(0,20)); closeDialog(); paused=false}
+  $('settingsBtn').click(); const rows=[...$('gearRows').querySelectorAll('input')]; rows[0].checked=false; rows[0].onchange(); const off=have.gear.oakleys; $('settingsClose').click(); return {got,rows:rows.length,off}});
+ok('N Oakleys, headband and carbon shoes can be found; Joe wears them',r.got.every(g=>g.split(':')[1]==='1'),r.got.join(' | '));
+ok('N Settings lists the gear and can take it off',r.rows===3&&r.off===0);
+// O. the signpost, the Fargo signs, and the ice cream served with the cookies
+r=await p.evaluate(()=>{P.x=SIGNPOST_AT.x;P.y=SIGNPOST_AT.y+3; T.run(1); const lbl=prompt.textContent; action(); const t=$('dtext').textContent; closeDialog(); return {lbl,t}});
+ok('O the signpost by the kitchen reads out the joke distances',r.lbl==='Read the signpost'&&r.t.includes('North Pole')&&r.t.includes('Fargo'),r.t.split('\n')[0]);
 console.log(R.join('\n')); console.log('page errors:',errs.length?errs:'none'); await b.close()})();

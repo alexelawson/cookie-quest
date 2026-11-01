@@ -4,7 +4,6 @@ const KIT_TRIGGERS=[
   {z:R(124,54,28,8),  label:'Check the oven',       act:()=>say1(KITCHEN.oven)},
   {z:R(158,54,26,8),  label:'Read the recipe card', act:()=>readRecipe()},
   {z:R(184,112,34,12),label:'Look at the tree',     act:()=>say1(KITCHEN.tree)},
-  {z:R(100,160,24,8), label:'Go outside',           act:()=>goTo('world','fromKitchen')},
 ];
 const say1=t=>showDialog({place:KITCHEN.place,speaker:KITCHEN.speaker,pages:[t],actions:[CLOSE]});
 function readRecipe(){
@@ -269,9 +268,13 @@ function drawTable(){
   F('#6a4224',80,100,8,4); F('#6a4224',136,100,8,4);
   F('#5a3a22',80,92,8,9); F('#7a4e2c',81,93,6,1); F('#5a3a22',136,92,8,9); F('#7a4e2c',137,93,6,1);   // chair backs
   F('#8a5a34',86,100,52,16); F('#a26c40',86,100,52,3); F('#7a4e2c',86,107,52,1); F('#6a4224',86,115,52,1);
-  F('#efe2c4',96,102,32,1); F('#c64b3d',96,101,32,1);                                 // a table runner F('#6a4224',88,116,3,4); F('#6a4224',133,116,3,4);
-  F('#fffdf6',104,103,14,8); F('#c98a5a',107,105,3,3); F('#c98a5a',112,106,3,3);   // a plate of (empty) promise
-  if(have.icecream){F('#f7f2e6',122,100,6,7); F('#9a5a2a',122,103,6,2); F('#3f7a45',124,99,1,2)}   // the Maple Rosemary pint
+  F('#efe2c4',96,102,32,1); F('#c64b3d',96,101,32,1);                                 // a table runner
+  F('#6a4224',88,116,3,4); F('#6a4224',133,116,3,4);
+  F('#fffdf6',104,103,14,8); F('#e8e2d6',104,110,14,1);
+  if(!have.baked){F('#c98a5a',107,105,3,3); F('#c98a5a',112,106,3,3)}                // a plate of (empty) promise
+  else for(const [cx,cy] of [[106,104],[111,104],[108,106],[113,107],[106,108],[110,101]]){F('#c98a3a',cx,cy,4,3); F('#e0a85a',cx,cy,2,1); F('#5a3220',cx+2,cy+1,1,1); if(have.sprinkles)F('#e54b7a',cx+1,cy+2,1,1)}   // a pile of the real thing
+  if(have.icecream){F('#f7f2e6',122,100,6,7); F('#9a5a2a',122,103,6,2); F('#3f7a45',124,99,1,2)   // the Maple Rosemary pint
+    if(have.baked)for(const bx of [90,128]){F('#e8edf1',bx,106,8,4); F('#c4ccd3',bx+1,109,6,1); F('#f3e3c0',bx+1,103,6,4); F('#fff3dc',bx+2,103,3,1); F('#c9853a',bx+3,105,3,1); F('#3f7a45',bx+5,102,1,2); F('#c98a3a',bx+6,104,3,2)}}   // bowls: a scoop, a maple swirl, a rosemary sprig, a cookie on the side
 }
 function drawXmasTree(){
   const F=(c,x,y,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,h)};

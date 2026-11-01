@@ -285,7 +285,6 @@ function pullIn(i){
     {label:FARGO.keep,ghost:true,fn:closeDialog}]});
 }
 const FARGO_TRIGGERS=[
-  {z:R(0,166,6,28), label:FARGO.leave, act:()=>goTo('world','fromFargo')},
   ...STATIONS.map((s,i)=>({z:s.lot, label:'Pull up to the pump', act:()=>pullIn(i)})),
 ];
 const onRoad=(x,y)=>ROADS.some(r=>x>=r.x&&x<=r.x+r.w&&y>=r.y&&y<=r.y+r.h)||STATIONS.some(s=>x>=s.lot.x&&x<=s.lot.x+s.lot.w&&y>=s.lot.y&&y<=s.lot.y+s.lot.h);

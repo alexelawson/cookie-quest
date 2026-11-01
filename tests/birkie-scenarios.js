@@ -36,12 +36,11 @@ await fresh(); r=await p.evaluate(()=>{P.x=320;P.y=84;update(16.7);action(); whi
   T.ski(30000,false); const lines=T.through(); return {lines,btns:T.btns(),done:!!have.birkie}});
 ok('C no poling: the sweep snowmobile catches you, try again offered',r.lines.join().includes('sweep')&&r.lines.every(l=>l.startsWith('John:'))&&r.btns.includes('Try again')&&!r.done,r.lines[0]);
 // win: decent rhythm finishes, back at the trailhead, flour from John
-r=await p.evaluate(()=>{T.click('Try again'); T.ski(); const lines=T.through(); T.run(45); return {lines,world:scene===SCENES.world,done:!!have.birkie,time:have.birkieTime}});
-ok('D good rhythm makes the cutoff; Vikings celebrate; back at the trailhead',r.done&&r.world&&r.lines.join().includes('SKOL')&&r.lines.every(l=>l.startsWith('John:')),r.time+' | '+r.lines[0]);
-r=await p.evaluate(()=>{P.x=320;P.y=84;update(16.7);action(); const pages=[]; while(T.btns().includes('Next')){pages.push($('dtext').textContent);T.click('Next')} T.click('Take the flour'); return {pages,reward:!$('reward').hidden,name:$('rewardName').textContent}});
-ok('D John hands over the flour',r.reward&&r.name==='Flour',r.pages[0]);
+r=await p.evaluate(()=>{T.click('Try again'); T.ski(); const lines=T.through(); return {lines,done:!!have.birkie,time:have.birkieTime,reward:!$('reward').hidden,name:$('rewardName').textContent}});
+ok('D good rhythm makes the cutoff; Vikings celebrate',r.done&&r.lines.join().includes('SKOL')&&r.lines.every(l=>l.startsWith('John:')),r.time+' | '+r.lines[0]);
+ok('D John hands over the flour right at the finish (no need to talk to him again)',r.reward&&r.name==='Flour',r.lines.slice(-1)[0]);
 await p.click('#rewardArt',{force:true}); await p.waitForTimeout(900);
-r=await p.evaluate(()=>({mill:!!have.mill,basket:$('basket').textContent})); ok('D flour in the basket',r.mill&&r.basket.includes('✓ Flour'),r.basket);
+r=await p.evaluate(()=>{T.run(45); return {mill:!!have.mill,basket:$('basket').textContent,world:scene===SCENES.world}}); ok('D flour in the basket, back at the trailhead',r.mill&&r.world&&r.basket.includes('✓ Flour'),r.basket);
 await fresh(); r=await p.evaluate(()=>{P.x=320;P.y=84;update(16.7);action(); while(T.btns().includes('Next'))T.click('Next'); T.click('Head to the start line'); T.run(45); $('howOk').click(); T.through(); const s0=sweepY(); birk.t=(BIRK.CUTOFF/2)*1000/BIRK.CLOCK; const mid=sweepY(); P.y=mid+40; P.x=trailX(P.y); update(16.7); const warn=birk.msg, still=birk.running; P.y=mid-1; update(16.7); return {s0,mid,warn:warn===BIRKIE.sweepClose,still,caught:!birk.running}});
 ok('F the sweep starts behind you, warns you when close, and catches you if it reaches you',r.s0===0&&r.still&&r.warn&&r.caught,JSON.stringify(r));
 // the course: you can't fall off the edge of the world; the bridge is narrow; Main Street is wide

@@ -113,7 +113,7 @@ r=await p.evaluate(()=>({city:!!have.city,basket:$('basket').textContent,exit:!!
 // H. the way home: Lars lugs the crate to the grate, John rolls his eyes, everyone goes down the grate, back on the main map
 r=await p.evaluate(()=>{const L=heist.crew.find(c=>c.id==='lars'), y0=L.y; for(let i=0;i<220;i++)SCENES.city.ambient(16.7); const y1=L.y, lines=T.clickThrough(); for(let i=0;i<60;i++){SCENES.city.ambient(16.7);update(16.7)}
   return {y0,y1,lines,world:scene===SCENES.world,bar:$('crewbar').hidden}});
-ok('H Lars carries the crate to the grate, John rolls his eyes, and you land back on the map',r.y1<r.y0-30&&r.lines.join().includes('rolls eyes')&&r.world&&r.bar,r.lines.join(' / '));
+ok('H Lars carries the crate to the grate, John rolls his eyes, and you land back on the map',r.y1<r.y0-30&&r.lines.join().includes('rolls eyes')&&r.world&&r.bar,JSON.stringify(r));
 // I. reload mid-heist resumes at the right checkpoint
 await fresh(); await p.evaluate(()=>{have.heistStage=2; have.heistBriefed=true; save()}); await p.reload(); await p.click('#startBtn'); await p.evaluate(()=>skipWelcome()); await p.evaluate(helpers);
 r=await p.evaluate(()=>{T.enter(); const sp=dlg.hidden?'':$('dspeaker').textContent; return {sp,pos:(P.x|0)+','+(P.y|0),onC:hit(R(P.x-1,P.y-1,2,2),ROOF_C)}}); ok('I reload at stage 2 starts on roof C, no briefing',r.sp!=='The Stranger'&&r.onC,r.pos+' '+r.sp);

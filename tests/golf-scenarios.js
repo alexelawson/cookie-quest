@@ -78,6 +78,6 @@ await fresh(); r=await p.evaluate(async()=>{const wait=ms=>new Promise(r=>setTim
 ok('E a weak round loses and Margie offers another',r.btns.includes('Play again')&&!r.golf,r.last.join(' | '));
 if(!r.btns.includes('Play again')){console.log(R.join('\n'));console.log('weak round ended with',JSON.stringify(r).slice(0,600));process.exit(1)}
 // leaving the course
-r=await p.evaluate(()=>{T.click('Maybe later'); P.x=112;P.y=164;update(16.7); const lbl=prompt.textContent; action(); T.run(40); return {lbl,world:scene===SCENES.world}});
-ok('F walk back out to the road',r.lbl==='Head back to the road'&&r.world,r.lbl);
+r=await p.evaluate(()=>{T.click('Maybe later'); P.x=112;P.y=150;update(16.7); P.y=164;update(16.7); T.run(40); return {world:scene===SCENES.world}});
+ok('F walk out the EXIT at the bottom and you are back on the road (no button)',r.world);
 console.log(R.join('\n')); console.log('page errors:',errs.length?errs:'none'); await b.close()})();

@@ -77,7 +77,7 @@ const cityBg=document.createElement('canvas'); cityBg.width=CW; cityBg.height=CH
 })();
 
 // ---------- crew sprites ----------
-function crewSprite(c,g=ctx){ ({hero:drawHero,lars:drawLars,john:drawJohn})[c.id](c,g) }
+function crewSprite(c,g=ctx){ ({hero:drawHero,lars:drawLars,john:drawJohn})[c.id](c,g); if(c.id==='hero'&&g===ctx)drawGear(c,g,heroLook()) }
 function legs(c){ return [c.moving&&c.step%2?1:0, c.moving&&!(c.step%2)?1:0] }
 // Joe: whatever he picked in the wardrobe (WARDROBE in story.js). Colors and pieces for each outfit:
 const OUTFIT_LOOK={
@@ -455,7 +455,6 @@ $('vaultHint').onclick=vaultHint; [0,1,2].forEach(i=>$('crate'+i).onclick=()=>pi
 const nearCrew=(z,id)=>heist.crew.some(c=>(!id||c.id===id)&&hit(R(c.x-4,c.y-3,8,4),z));
 function heistTrigger(){
   const feet=R(P.x-4,P.y-3,8,4), st=heistStage();
-  if(hit(feet,LADDER))return {label:HEIST.climbDown, act:()=>goTo('world','fromCity')};
   if(Math.hypot(P.x-STRANGER.x,P.y-STRANGER.y)<16)return {label:'Talk to the stranger', btn:'Talk', act:()=>{
     if(have.city)return say([[HEIST.stranger,HEIST.after]]);
     if(st>=5)return showReward('city');

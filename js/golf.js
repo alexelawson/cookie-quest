@@ -218,7 +218,7 @@ SCENES.golf={ place:GOLF_TEXT.place, music:'golf',
   w:GW, h:GH, bounds:R(4,30,216,136),
   get bg(){ return golfBgs[golf.active||golf.state==='between'?golf.hole:0] },
   get solids(){ return golf.active?[]:[CREAMERY,...HOLES[0].trees.map(([x,y])=>R(x-3,y-3,6,4)),R(MARGIE_SPOT.x-4,MARGIE_SPOT.y-3,8,4),R(JACK_SPOT.x-4,JACK_SPOT.y-3,8,4),R(188,30,8,8)] },
-  get triggers(){ return golf.active?[]:[{z:R(96,160,32,8),label:GOLF_TEXT.leave,act:()=>goTo('world','fromGolf')}] },
+  triggers:[],   // the way out is an exit at the bottom (extras.js)
   entries:{start:{x:112,y:154,dir:'up'}, fromRoad:{x:112,y:154,dir:'up'}},
   enter(){ golf.active=false; golf.state='idle' },
   speed:()=>golf.active?0:.07,

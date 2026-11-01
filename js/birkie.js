@@ -139,7 +139,7 @@ function birkFinish(made){
   sfx(made?'fanfare':'buzz');
   birk.running=false; const tm=clockStr(birk.t); FEEDS.forEach(f=>f.used=false);
   if(made){ have.birkie=true; have.birkieTime=tm; save(); const elite=birk.t*BIRK.CLOCK/1000<BIRK.ELITE;
-    say([J(BIRKIE.finishWin(tm)[0]),J(elite?BIRKIE.elite:BIRKIE.finishWin(tm)[1]),J(BIRKIE.vikingsWin)],()=>goTo('world','fromMill')) }
+    say([J(BIRKIE.finishWin(tm)[0]),J(elite?BIRKIE.elite:BIRKIE.finishWin(tm)[1]),J(BIRKIE.vikingsWin),J(BIRKIE.johnDone)],()=>showReward('mill',()=>goTo('world','fromMill'))) }   // John hands you the flour right there
   else say([J(BIRKIE.finishLate(tm)[0]),J(BIRKIE.finishLate(tm)[1])],()=>showDialog({place:BIRKIE.place,speaker:BIRKIE.john,face:'Trail John',pages:[BIRKIE.againAsk],actions:[{label:BIRKIE.again,fn:()=>{closeDialog();birkStart()}},{label:BIRKIE.leave,ghost:true,fn:()=>{closeDialog();goTo('world','fromMill')}}]}));
 }
 function birkHowTo(then){

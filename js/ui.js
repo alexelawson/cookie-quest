@@ -40,7 +40,7 @@ function action(){
 }
 // ---------- settings ----------
 function openSettings(){
-  $('soundToggle').checked=!muted; $('musicToggle').checked=musicOn; $('musicToggle').disabled=muted;
+  $('soundToggle').checked=!muted; $('musicToggle').checked=musicOn; $('musicToggle').disabled=muted; renderGearSettings();
   $('settings').hidden=false; paused=true; prompt.hidden=true; setTimeout(()=>$('settingsClose').focus({preventScroll:true}),0) }
 function closeSettings(){ $('settings').hidden=true; paused=!dlg.hidden||!$('titlecard').hidden; $('settingsBtn').blur() }
 $('soundToggle').onchange=()=>{setSound($('soundToggle').checked); $('musicToggle').disabled=muted};

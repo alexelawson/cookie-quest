@@ -4,7 +4,7 @@ const WW=384, WH=288, VW=224, VH=168;
 const cv=document.getElementById('game'), ctx=cv.getContext('2d'); ctx.imageSmoothingEnabled=false;
 const R=(x,y,w,h)=>({x,y,w,h});
 const REG={farm:R(0,0,164,144), mill:R(220,0,164,144), city:R(0,170,164,118), fargo:R(220,170,164,118)};
-const trees=[[172,30],[212,30],[172,64],[212,64],[170,200],[214,228],[110,154],[270,154]];
+const trees=[[172,30],[212,30],[172,64],[212,64],[214,228],[110,154],[270,154]];
 // snowy pines around the Birkie trailhead, dark pines in Wylee Woods (the disc golf entrance)
 const pines=[[228,14],[244,30],[262,12],[284,26],[232,52],[268,48],[290,62],[352,10],[372,24],[358,44],[378,62],[346,30],[236,74]];
 const cedars=[[100,194],[62,224],[154,252]];   // mossy cedars in the city
@@ -130,7 +130,7 @@ const bg=document.createElement('canvas'); bg.width=WW; bg.height=WH;
   // fargo
   F('#cdb978',220,170,164,118);                                                                            // fargo: dry, flat, summer
   for(let i=0;i<360;i++)F(['#bfa865','#d9c98e','#a9a35a'][i%3],220+rnd()*164|0,170+rnd()*118|0,2,1);
-  F('#d9d4c8',310,180,60,40); F('#2f6db0',310,180,60,8); F('#1d3f73',314,181,52,7); pixText(g,'GAS N SNACKS',316,182,'#ffffff');
+  F('#d9d4c8',310,180,60,40); F('#2f6db0',310,180,60,8); F('#1d3f73',314,181,52,7); pixText(g,'FARGO GAS',322,182,'#ffffff');
   F('#6b6f7a',334,206,12,14); F('#9fd2f0',314,194,14,9); F('#9fd2f0',352,194,14,9);
   F('#c7372f',256,198,6,10); F('#c7372f',280,198,6,10); F('#f1f4f8',257,200,4,3); F('#f1f4f8',281,200,4,3);
   F('#8a8f9a',235,214,3,12); F('#1d3f73',222,200,30,15); F('#c7372f',222,200,30,3);

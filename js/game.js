@@ -10,7 +10,7 @@ function goTo(name,entry){
 function finishSwap(){
   const {name,entry}=fade.next; scene.leave&&scene.leave(); scene=SCENES[name];
   const e=scene.entries[entry]||scene.entries.start; P.x=e.x; P.y=e.y; P.dir=e.dir||'down'; P.moving=false;
-  scene.enter&&scene.enter(); sceneMusic();
+  scene.enter&&scene.enter(); sceneMusic(); exitArmed=false;
 }
 
 function blocked(nx,ny,sc=scene){
@@ -45,6 +45,7 @@ function update(dt){
   }
   scene.update&&scene.update(dt); updateHud();
   if(paused)return;  // a mission may have opened a dialog
+  extrasTick(); if(paused||fade.next)return;   // exits, picking up gear (extras.js)
   const feet=scene.feet?scene.feet(P.x,P.y):R(P.x-4,P.y-3,8,4);
   const t=(scene.dynTrigger&&scene.dynTrigger())||scene.triggers.find(tr=>hit(feet,tr.z))||null;
   if((t&&t.label)!==(near&&near.label)){prompt.hidden=!t; if(t)prompt.textContent=t.label}
@@ -64,7 +65,8 @@ function updateHud(){
 // Joe's look on the map: the white jersey, or whatever he picked at the start (have.look)
 function drawPlayer(x0,y0){
   const c={x:x0,y:y0,dir:P.dir,moving:P.moving,step:P.step};
-  if(have.look&&have.look!=='jersey'&&OUTFIT_LOOK[have.look])drawHero(c,ctx,OUTFIT_LOOK[have.look]); else drawJoeJersey(c,ctx);
+  const look=have.look&&have.look!=='jersey'&&OUTFIT_LOOK[have.look]; if(look)drawHero(c,ctx,look); else drawJoeJersey(c,ctx);
+  drawGear(c,ctx,look||null);   // Oakleys, headband, racing shoes, if he found them
   if(have.crown&&scene!==SCENES.kitchen)drawCrown(x0,y0-23);   // the Cookie King
 }
 function drawJoeJersey(P,g=ctx){
@@ -100,6 +102,7 @@ function draw(){
   ents.push({y:P.y,draw:()=>{(scene.drawPlayer||drawPlayer)(P.x,P.y); if(farm.carrying&&scene===SCENES.world)drawHen(P.x,P.y-20,P.dir==='left'?-1:1)}});
   ents.sort((a,b)=>a.y-b.y).forEach(e=>e.draw());
   scene.over&&scene.over();
+  extrasDraw();
   if(fade.next){
     const a=fade.t<fade.dur?fade.t/fade.dur:Math.max(0,2-fade.t/fade.dur);
     ctx.setTransform(1,0,0,1,0,0); ctx.fillStyle=`rgba(8,9,16,${a})`; ctx.fillRect(0,0,VW,VH);
