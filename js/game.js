@@ -8,7 +8,7 @@ function goTo(name,entry){
   for(const k in dirs)dirs[k]=false;
 }
 function finishSwap(){
-  const {name,entry}=fade.next; scene=SCENES[name];
+  const {name,entry}=fade.next; scene.leave&&scene.leave(); scene=SCENES[name];
   const e=scene.entries[entry]||scene.entries.start; P.x=e.x; P.y=e.y; P.dir=e.dir||'down'; P.moving=false;
   scene.enter&&scene.enter();
 }
@@ -47,7 +47,8 @@ function update(dt){
   if(paused)return;  // a mission may have opened a dialog
   const feet=scene.feet?scene.feet(P.x,P.y):R(P.x-4,P.y-3,8,4);
   const t=(scene.dynTrigger&&scene.dynTrigger())||scene.triggers.find(tr=>hit(feet,tr.z))||null;
-  if((t&&t.label)!==(near&&near.label)){prompt.hidden=!t; if(t)prompt.textContent=t.label; $('alabel').textContent=t?(t.btn||'Enter'):''}
+  if((t&&t.label)!==(near&&near.label)){prompt.hidden=!t; if(t)prompt.textContent=t.label}
+  $('alabel').textContent=t?(t.btn||'Enter'):(scene.abilityLabel?scene.abilityLabel():'');
   near=t;
 }
 

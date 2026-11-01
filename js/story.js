@@ -11,12 +11,6 @@ const STORY = {
            "But first you'll solve my crossword. I don't make the rules. Well. I do."],
     mission:"Mission preview: harvest the wheat, solve the crossword, then time the millstone just right.",
     done:"You got a sack of flour!", again:"Come back anytime. Bring a pencil."},
-  city:{place:'The City at Night', speaker:'A voice in the rain',
-    lines:["The chocolate's gone. Taken right off the shelf.",
-           "This city needs someone to get it back.",
-           "...Yes, it's for cookies. That doesn't make it any less serious."],
-    mission:"Mission preview: cape on, sneak across the rooftops, dodge the searchlights and recover the chocolate.",
-    done:"You recovered the chocolate!", again:"The city sleeps a little easier tonight."},
 };
 // ---------- The farm: Keelan ----------
 // Each question is a button; the answer plays as one page per string.
@@ -49,6 +43,47 @@ const KEELAN = {
   thanks:"Thanks, Keelan!",
   after:"All twenty, home and accounted for. Thanks again.",
   bye:"Bye",
+};
+
+// ---------- The city: the chocolate heist ----------
+// You, Lars and John vs. The Confectioner. Change any of these lines.
+const HEIST = {
+  place:'The City at Night', stranger:'The Stranger', villain:'The Confectioner',
+  crew:{hero:'You', lars:'Lars', john:'John'},
+  briefing:["The chocolate's gone. Every last bar in the city.",
+            "Someone calling himself The Confectioner. He's holed up in the old candy works, three rooftops east.",
+            "Searchlights. Guards. Tripwires you can't see.",
+            "...Yes, it's for cookies. That doesn't make it any less serious."],
+  crewHello:[['John',"We got you, man."],['Lars',"I already stretched."]],
+  strangerAgain:"Three rooftops east. Watch the lights.",
+  howTo:"Tap a face (or press 1, 2, 3) to switch who you control. A uses their skill. Hold keeps the others in place.",
+  skills:{hero:'Sonar', lars:'Sprint', john:'Lift'},
+  johnGap:"That beam's not gonna lift itself. Well. I'll lift it.",
+  onlyJohn:"Only John can lift that.",
+  beamDone:"Bridge is up.",
+  larsLights:"Searchlights. Tell these guys to hold up, and let me run it.",
+  fuse:"Cut the power",
+  onlyLars:"It's across the searchlights. Lars is the only one fast enough.",
+  fuseDone:"Lights out.",
+  heroLasers:"Tripwires around the skylight. Can't see them... unless I ping the sonar.",
+  grate:"Rip off the grate",
+  grateDone:"Grate's off.",
+  dropIn:"Drop through the skylight",
+  spottedLight:"A searchlight catches you!",
+  spottedGuard:"\"Hey! Who's up there?!\"",
+  spottedLaser:"You tripped a laser. Alarms everywhere!",
+  backToCheckpoint:"Back to the last checkpoint.",
+  vaultTitle:"The Confectioner's vault",
+  vaultNote:"Two crates and a note: \"One holds the chocolate. The other holds raisins. Choose wisely. —The Confectioner\"",
+  vaultPing:"Ping sonar",
+  vaultPinged:"The sonar shows bars in one crate... and lots of tiny lumps in the other.",
+  raisins:[['John',"Raisins. In a cookie. ABSOLUTELY not."],['Lars',"That's a crime. Pick the other one."]],
+  gotIt:"Chocolate. A whole crate of it.",
+  villainNote:"A last note, taped inside the lid: \"Fine. Keep your chocolate. Why so salty? —The Confectioner\"",
+  finale:[['The Stranger',"You found it."],['The Stranger',"You're not the hero this city deserves..."],['The Stranger',"...you're the one with the chocolate."],['John',"Can we go home now? It's cold."]],
+  thanks:"Let's go bake",
+  after:"The cookie signal's up. The city sleeps easy tonight.",
+  climbDown:"Climb down the ladder",
 };
 
 // ---------- Fargo: Bob (runs the cheapest gas station in the country) and Alex, your passenger ----------

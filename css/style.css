@@ -125,3 +125,21 @@ canvas{border-radius:6px}
 .givebtn:disabled{opacity:.45;cursor:default}
 #fridge{grid-template-columns:repeat(5,minmax(0,1fr))}
 #shelf{grid-template-columns:repeat(3,minmax(0,1fr))}
+
+/* heist: crew switcher under the screen */
+.crewbar{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.crewbar button{display:flex;align-items:center;gap:6px;font-family:var(--pixel);font-size:.8rem;color:var(--paper);background:var(--bezel);border:2px solid var(--line);border-radius:6px;padding:3px 8px 3px 4px;cursor:pointer}
+.crewbar button canvas{width:24px;height:39px;image-rendering:pixelated;image-rendering:crisp-edges;background:#0d0f1a;border-radius:3px}
+.crewbar button[aria-pressed="true"]{border-color:var(--gold);background:#3a3352;box-shadow:0 0 0 2px rgba(239,195,90,.35)}
+.crewbar .follow{padding:6px 10px}
+.crewbar .follow[aria-pressed="true"]{border-color:var(--berry);background:rgba(212,71,60,.3)}
+.crewbar button:focus-visible{outline:3px solid var(--berry);outline-offset:2px}
+/* heist: the vault */
+.vault{position:absolute;inset:0;z-index:6;display:flex;align-items:center;justify-content:center;background:rgba(8,9,16,.6);padding:10px;border-radius:6px}
+.vcard{background:#1d2130;color:var(--paper);border:3px solid #4d5a78;border-radius:8px;padding:10px 14px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;width:min(100%,320px);box-shadow:0 10px 30px rgba(0,0,0,.5);animation:rin .25s ease-out}
+.vcard small{font-family:var(--pixel);font-size:.85rem;color:var(--gold);letter-spacing:.06em;text-transform:uppercase}
+.vcard p{margin:0;font-size:.88rem;line-height:1.35}
+.crates{display:flex;gap:10px}
+.crate{display:flex;flex-direction:column;align-items:center;gap:2px;background:#2a3044;border:2px solid #4d5a78;border-radius:6px;padding:6px 10px;cursor:pointer;color:var(--paper);font-family:var(--pixel);font-size:.8rem}
+.crate canvas{width:64px;height:60px;image-rendering:pixelated;image-rendering:crisp-edges}
+.crate:hover,.crate:focus-visible{border-color:var(--gold);outline:none}

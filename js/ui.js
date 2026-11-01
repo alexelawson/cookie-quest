@@ -31,10 +31,10 @@ function openLand(key){
 }
 function action(){
   if(!$('titlecard').hidden){start();return}
-  if(!$('pump').hidden||!$('shop').hidden)return;   // the pump and shop have their own buttons
+  if(!$('pump').hidden||!$('shop').hidden||!$('vault').hidden)return;   // the pump and shop have their own buttons
   if(!$('reward').hidden){collectReward();return}
   if(!dlg.hidden){const f=document.activeElement, b=$('dbtns').contains(f)?f:$('dbtns').querySelector('button'); b&&b.click(); return}
-  if(near)near.act();
+  if(near)near.act(); else if(scene.ability)scene.ability();
 }
 function start(){$('titlecard').hidden=true; paused=false}
 $('startBtn').onclick=start;
@@ -51,6 +51,13 @@ const ART={
     F('#f7dd7a',25,14,12,7); F('#fbe9a6',25,14,12,2); F('#e2c35a',36,15,1,6);
     F('#ffffff',27,17,6,3); F('#3d8ad6',28,18,4,1);                    // paper wrapper label
   },
+  city(g){ const F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};
+    // a stack of chocolate bars, one unwrapped
+    F('#c8322b',4,18,22,8); F('#e8e2d6',4,21,22,2); F('#9e2620',4,25,22,1);
+    F('#2f6db0',8,12,22,7); F('#e8e2d6',8,14,22,2); F('#245a94',8,18,22,1);
+    F('#5a3220',14,4,22,9); F('#6e3f28',14,4,22,1); for(let x=14;x<36;x+=5)F('#46271a',x,4,1,9); F('#46271a',14,8,22,1);
+    F('#e9e2d2',30,10,8,8); F('#d8cfba',30,10,2,8);                    // peeled-back foil
+  },
   fargo(g){ const F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};
     // paper sack of beet sugar, a little spilled
     F('#e9e2d2',11,6,18,22); F('#d8cfba',11,6,18,2); F('#cfc5ae',11,6,2,22); F('#f3eee3',27,8,2,20);
@@ -63,6 +70,7 @@ const ART={
 const REWARDS={
   farm:{from:'From Keelan', name:'Eggs & butter', hint:'Tap them to put them in your basket.'},
   fargo:{from:'From Bob', name:'Sugar', hint:'Tap it to put it in your basket.'},
+  city:{from:'From a grateful city', name:'Chocolate', hint:'Tap it to put it in your basket.'},
 };
 let rewardKey=null;
 function showReward(key){
