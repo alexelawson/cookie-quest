@@ -223,6 +223,9 @@ const FARGO = {
   intro:["We're running on fumes.","Somewhere in this town is the cheapest gas in the whole country. Find it. I believe in you."],
   introSpeaker:'Alex',
   attendants:['Deb','Lars','Shelly','Ole','Marv'],
+  // the signs on the gas station shops (keep them short: about 9 letters fits). Bob's always says BOB'S GAS.
+  stationSigns:['GAS N GO','PRAIRIE','RED RIVER','BISON','STAR GAS'],
+  bobSign:"BOB'S GAS",
   ask:p=>`$${p} a gallon. Fill 'er up?`,
   fill:"Fill up", keep:"Keep looking",
   wrong:p=>[`Tank's full. At $${p} a gallon.`,"On your way out of town you pass a sign that says $2.79.","Oof."],

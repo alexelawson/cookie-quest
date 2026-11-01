@@ -39,7 +39,8 @@ function fargoNewRun(){
   const pool=STATIONS.map((_,i)=>i).filter(i=>!NEAR_START.includes(i));
   fargo.bob=(have.fargoStage&&!have.fargo&&have.fargoBob!=null)?have.fargoBob:pool[Math.floor(Math.random()*pool.length)];
   fargo.onFoot=false; fargo.car=null; fargo.alex=null; fargo.alexMood='ok'; fargo.strikes=0;
-  let k=0; STATIONS.forEach((s,i)=>{s.seen=false; s.price=i===fargo.bob?CHEAPEST:others[k]; s.name=i===fargo.bob?FARGO.bob:names[k]; if(i!==fargo.bob)k++});
+  const signs=[...FARGO.stationSigns].sort(()=>Math.random()-.5);
+  let k=0; STATIONS.forEach((s,i)=>{s.seen=false; s.price=i===fargo.bob?CHEAPEST:others[k]; s.name=i===fargo.bob?FARGO.bob:names[k]; s.signText=i===fargo.bob?FARGO.bobSign:signs[k]; if(i!==fargo.bob)k++});
 }
 
 // (the tiny pixel font, GLYPH and pixText, lives in world.js)
@@ -177,6 +178,12 @@ function drawWaterTower(){
   F('#9fb0c2',x-15,y-36,30,18); F('#b9c8d6',x-15,y-36,30,3); F('#7d8fa2',x-15,y-20,30,2); F('#8a96a6',x-13,y-39,26,3);
   pixText(ctx,'FARGO',x-10,y-30,'#2f5f9e');
 }
+// the name board on each shop (Bob's moves around, so it's drawn live)
+function textW(t){let w=0; for(const ch of t){const m=GLYPH[ch]; w+=(ch==='.'?2:(m?m.length/5:3)+1)} return w-1}
+function drawShopSign(s){
+  if(!s.signText)return; const st=s.store, w=textW(s.signText)+4, x=Math.round(st.x+(st.w-w)/2), y=s.face==='up'?st.y+st.h-8:st.y;
+  ctx.fillStyle=s.brand; ctx.fillRect(x,y,w,8); ctx.fillStyle='rgba(255,255,255,.35)'; ctx.fillRect(x,y,w,1); pixText(ctx,s.signText,x+2,y+2,'#ffffff');
+}
 function drawSign(s){
   const near=s.seen, x=s.sign.x, y=s.sign.y;
   ctx.fillStyle='#1d2433'; ctx.fillRect(x,y,18,10); ctx.fillStyle=s.brand; ctx.fillRect(x,y,18,2);
@@ -284,7 +291,7 @@ SCENES.fargo={
     if(fargo.onFoot&&fargo.car){const c=fargo.car, a=fargo.alex; list.push({y:c.y+5,draw:()=>drawCar(c.x,c.y,c.dir,true)});
       if(a)list.push({y:a.y,draw:()=>drawAlex(a.x,a.y,fargo.alexMood)})}
   },
-  under(){ STATIONS.forEach(drawSign) },
+  under(){ STATIONS.forEach(drawSign); STATIONS.forEach(drawShopSign) },
   over(){
     for(const s of STATIONS){ // canopies over the pumps
       ctx.fillStyle='rgba(0,0,0,.08)'; ctx.fillRect(s.x+6,s.y+8,40,14);
