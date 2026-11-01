@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Great Cookie Quest</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600&family=Nunito:wght@400;700&display=swap">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>The Great Cookie Quest</h1>
+    <div class="basket" id="basket"></div>
+  </header>
+  <div class="screen">
+    <canvas id="game" width="224" height="168"></canvas>
+    <div class="prompt" id="prompt" hidden></div>
+    <div class="dialog" id="dialog" hidden role="dialog" aria-live="polite">
+      <div class="place" id="dplace"></div>
+      <div class="speaker" id="dspeaker"></div>
+      <p id="dtext"></p>
+      <div class="dbtns" id="dbtns"></div>
+    </div>
+    <div class="titlecard" id="titlecard">
+      <small>A Christmas game</small>
+      <h2>The Great<br>Cookie Quest</h2>
+      <p>Four lands. One basket. The best chocolate chip cookies ever made.</p>
+      <button class="btn" id="startBtn">Start</button>
+      <small>Prototype · missions coming soon</small>
+    </div>
+  </div>
+  <div class="controls">
+    <div class="pad">
+      <button class="u" data-dir="up" aria-label="Up">▲</button>
+      <button class="l" data-dir="left" aria-label="Left">◀</button>
+      <button class="r" data-dir="right" aria-label="Right">▶</button>
+      <button class="d" data-dir="down" aria-label="Down">▼</button>
+    </div>
+    <div class="awrap"><button class="abtn" id="abtn" aria-label="Action">A</button><span class="alabel" id="alabel"></span></div>
+  </div>
+  <p class="hint">Arrow keys or WASD to walk · Space to talk</p>
+</div>
+
+<!-- Plain scripts (no modules) so the game also runs by double-clicking index.html. Order matters. -->
+<script src="js/story.js"></script>
+<script src="js/world.js"></script>
+<script src="js/state.js"></script>
+<script src="js/input.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/game.js"></script>
+</body>
+</html>

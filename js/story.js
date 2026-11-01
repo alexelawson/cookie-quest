@@ -1,0 +1,36 @@
+// Dialogue, character names and the ending note. Edit the words here.
+const ITEMS = [
+  {key:'farm',  label:'Eggs & butter'},
+  {key:'mill',  label:'Flour'},
+  {key:'city',  label:'Chocolate'},
+  {key:'fargo', label:'Sugar'},
+];
+const STORY = {
+  farm:{place:'The Farm', speaker:'Farmer Hazel',
+    lines:["Oh, thank goodness you're here. The hens have staged a breakout.",
+           "Round them up and I'll throw in fresh butter. You'll be churning it yourself, mind."],
+    mission:"Mission preview: chase down the escaped hens, then a butter-churning rhythm game.",
+    done:"You got eggs and butter!", again:"The hens are back where they belong. Thanks again."},
+  mill:{place:'The Old Mill', speaker:'The Miller',
+    lines:["Flour? I can grind you some flour.",
+           "But first you'll solve my crossword. I don't make the rules. Well. I do."],
+    mission:"Mission preview: harvest the wheat, solve the crossword, then time the millstone just right.",
+    done:"You got a sack of flour!", again:"Come back anytime. Bring a pencil."},
+  city:{place:'The City at Night', speaker:'A voice in the rain',
+    lines:["The chocolate's gone. Taken right off the shelf.",
+           "This city needs someone to get it back.",
+           "...Yes, it's for cookies. That doesn't make it any less serious."],
+    mission:"Mission preview: cape on, sneak across the rooftops, dodge the searchlights and recover the chocolate.",
+    done:"You recovered the chocolate!", again:"The city sleeps a little easier tonight."},
+  fargo:{place:'Fargo', speaker:'Gas Station Gary',
+    lines:["Oh ya, you made it! Rolled in on fumes, I bet.",
+           "Two seventy-nine a gallon. Cheapest gas in all the land, don'tcha know.",
+           "Fill 'er up, then head out back. Farmer Lyle's got sugar beets coming out his ears."],
+    mission:"Mission preview: find the cheapest pump, then harvest sugar beets in the snow.",
+    done:"You got the sugar!", again:"Drive safe now. It's not this cheap anywhere else, ya know."},
+};
+const KITCHEN = {place:'Home', speaker:'Your kitchen',
+  missing:"The recipe card says you still need:",
+  ready:["Everything's in the basket.","Time to bake."],
+  finale:"Coming next: add the ingredients in the right order, pull the cookies out before they burn, then decorate them however you like.",
+  note:"Merry Christmas! Love, Alex"};

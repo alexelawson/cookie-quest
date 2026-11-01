@@ -1,0 +1,79 @@
+// World size, collision boxes, door zones, and the one-time painting of the map.
+const WW=384, WH=288, VW=224, VH=168;
+const cv=document.getElementById('game'), ctx=cv.getContext('2d'); ctx.imageSmoothingEnabled=false;
+const R=(x,y,w,h)=>({x,y,w,h});
+const REG={farm:R(0,0,164,144), mill:R(220,0,164,144), city:R(0,170,164,118), fargo:R(220,170,164,118)};
+const trees=[[172,30],[212,30],[172,64],[212,64],[172,98],[170,200],[214,228],[170,262],[214,276],[110,154],[270,154]];
+const solids=[
+  R(20,30,56,44),                                            // barn
+  R(90,60,60,3),R(90,117,60,3),R(90,60,3,60),R(147,60,3,60), // pen fence
+  R(300,26,32,48),                                           // windmill
+  R(170,108,44,34),                                          // kitchen
+  R(8,178,40,52),R(110,184,48,56),R(16,246,44,38),           // city buildings
+  R(310,180,60,40),R(256,198,6,10),R(280,198,6,10),R(235,214,3,12), // gas shop, pumps, sign pole
+  ...trees.map(([x,y])=>R(x-3,y-3,6,4)),
+];
+const triggers=[
+  {key:'farm', z:R(38,74,20,12), name:'The Farm'},
+  {key:'mill', z:R(306,74,20,12), name:'The Old Mill'},
+  {key:'city', z:R(124,240,20,12), name:'The City at Night'},
+  {key:'fargo',z:R(330,220,20,12), name:'Fargo'},
+  {key:'kitchen',z:R(182,142,20,10), name:'Your kitchen'},
+];
+const hit=(a,b)=>a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y;
+
+// seeded random so the world looks the same every time
+let seed=7; const rnd=()=>((seed=(seed*16807)%2147483647)/2147483647);
+
+const bg=document.createElement('canvas'); bg.width=WW; bg.height=WH;
+(function paint(){
+  const g=bg.getContext('2d');
+  const F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};
+  F('#6aa84a',0,0,WW,WH);
+  for(let i=0;i<900;i++)F(rnd()<.5?'#5e9a40':'#79b857',rnd()*WW|0,rnd()*WH|0,1,2);
+  // farm
+  F('#78b955',0,0,164,144);
+  for(let i=0;i<250;i++)F('#8cc866',rnd()*164|0,rnd()*144|0,1,1);
+  F('#b9905c',93,63,54,54); for(let i=0;i<120;i++)F('#a67f4e',93+rnd()*54|0,63+rnd()*54|0,1,1);
+  F('#f1e3c9',90,60,60,3);F('#f1e3c9',90,117,60,3);F('#f1e3c9',90,60,3,60);F('#f1e3c9',147,60,3,60);
+  for(let x=90;x<150;x+=8){F('#d9c6a5',x,60,2,3);F('#d9c6a5',x,117,2,3)}
+  F('#7a2a22',16,26,64,10); F('#8f3328',20,22,56,6); F('#b7412e',20,36,56,38);
+  for(let y=40;y<74;y+=5)F('#a5392a',20,y,56,1);
+  F('#f1e3c9',38,52,20,22); F('#5a2a20',40,54,16,20); F('#f1e3c9',40,54,16,1);
+  g.strokeStyle='#f1e3c9';g.lineWidth=1;g.beginPath();g.moveTo(40.5,54.5);g.lineTo(55.5,73.5);g.moveTo(55.5,54.5);g.lineTo(40.5,73.5);g.stroke();
+  F('#f1e3c9',26,40,8,6);F('#f1e3c9',62,40,8,6);
+  // mill: wheat field
+  F('#d9b24a',236,82,140,54);
+  for(let y=84;y<136;y+=6){F('#c09634',236,y,140,1); for(let x=238;x<376;x+=4)F('#ecd06a',x+(y%4),y-2,1,2)}
+  F('#cbbfa6',302,32,28,42); for(let y=36;y<74;y+=6)F('#b7aa8f',302,y,28,1);
+  F('#6b4a34',298,24,36,10); F('#4b3426',310,58,12,16); F('#f3d27a',312,40,8,6);
+  // city
+  F('#262a38',0,170,164,118);
+  for(let i=0;i<60;i++)F('#323a52',rnd()*164|0,170+rnd()*118|0,4,1);
+  for(const b of [R(8,178,40,52),R(110,184,48,56),R(16,246,44,38)]){
+    F('#2c3044',b.x-1,b.y-4,b.w+2,5); F('#3b4058',b.x,b.y,b.w,b.h);
+    for(let y=b.y+5;y<b.y+b.h-8;y+=8)for(let x=b.x+4;x<b.x+b.w-5;x+=7)F(rnd()<.45?'#f3d27a':'#4c5373',x,y,4,5);
+  }
+  F('#15171f',128,226,12,14); F('#f3d27a',129,224,10,1);
+  // fargo
+  F('#eef3f7',220,170,164,118);
+  for(let i=0;i<300;i++)F(rnd()<.5?'#d6e0ea':'#ffffff',220+rnd()*164|0,170+rnd()*118|0,2,1);
+  F('#d9d4c8',310,180,60,40); F('#2f6db0',310,180,60,8); F('#f1f4f8',316,182,48,4);
+  F('#6b6f7a',334,206,12,14); F('#9fd2f0',314,194,14,9); F('#9fd2f0',352,194,14,9);
+  F('#c7372f',256,198,6,10); F('#c7372f',280,198,6,10); F('#f1f4f8',257,200,4,3); F('#f1f4f8',281,200,4,3);
+  F('#8a8f9a',235,214,3,12); F('#1d3f73',222,200,30,15); F('#c7372f',222,200,30,3);
+  const DIG={'2':['111','001','111','100','111'],'7':['111','001','010','010','010'],'9':['111','101','111','001','111'],'.':['0','0','0','0','1']};
+  let tx=230; for(const ch of '2.79'){const m=DIG[ch]; m.forEach((row,ry)=>[...row].forEach((c,rx)=>{if(c==='1')F('#ffd84d',tx+rx,206+ry,1,1)})); tx+=m[0].length+1}
+  for(let y=244;y<284;y+=8){F('#9a7b66',236,y,140,4); for(let x=240;x<374;x+=6){F('#7d2b52',x,y+1,3,2);F('#4f9a3c',x+1,y-2,1,3)}}
+  // roads
+  const road=(x,y,w,h)=>{F('#c9a46b',x,y,w,h); for(let i=0;i<w*h/30;i++)F('#b8935b',x+rnd()*w|0,y+rnd()*h|0,1,1)};
+  road(0,150,WW,14); road(184,0,16,108); road(184,164,16,124);
+  road(42,74,12,76); road(310,74,12,76); road(72,164,12,92); road(72,244,72,12); road(298,164,10,66); road(298,222,48,10);
+  // kitchen
+  F('#7f3434',166,104,52,12); F('#8f3d3d',170,100,44,6); F('#5a4a44',204,92,6,12);
+  F('#f0dcc0',170,116,44,26); F('#e2cba9',170,116,44,2);
+  F('#6b4430',186,128,12,14); F('#e8b04a',196,134,1,2);
+  F('#ffd98a',174,122,8,7); F('#ffd98a',202,122,8,7); F('#a8794f',174,125,8,1); F('#a8794f',202,125,8,1);
+  // trees
+  for(const [x,y] of trees){F('#6b4a2f',x-1,y-3,3,4); F('#2f6b36',x-6,y-14,12,11); F('#3d8443',x-4,y-16,8,6); F('#4d9a50',x-3,y-13,3,3)}
+})();
