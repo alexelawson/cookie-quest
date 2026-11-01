@@ -142,7 +142,7 @@ const WARDROBE = {title:"Suit up, Joe", intro:"It's a stealth mission. What are 
     {id:'cupcake', name:"Cupcake",          line:"A whole cupcake. Frosting hat, sprinkles, cherry on top. Unlocked by finding the cupcake.", unlock:'cupcakeCostume'},
   ],
   changeOutfit:"Change outfit",   // the button in Settings
-  changeIntro:"Change it up any time. What's Joe wearing?",
+  changeIntro:"Change it up any time. What are you wearing?",
   react:{cape:[['Lars',"Very dramatic. The cape is a lot."],['John',"I love the cape."]], ninja:[['John',"I can't see you. That's the point, right?"]],
          burglar:[['Lars',"You look like a cartoon robber."],['John',"It's perfect."]], hoodie:[['John',"Respect. Comfort first."]],
          sweater:[['Lars',"They're going to see you from space."],['John',"Festive though."]],

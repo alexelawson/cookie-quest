@@ -65,7 +65,7 @@ await p.goto(URL); await p.evaluate(()=>localStorage.clear()); await p.reload();
 r=await p.evaluate(()=>{const sp=$('dspeaker').textContent, pages=[]; while(T.btns().includes('Next')){pages.push($('dtext').textContent);T.click('Next')} pages.push($('dtext').textContent); T.click("Let's go!");
   const open=!$('wardrobe').hidden, n=$('outfits').children.length, first=$('outfits').children[0].dataset.id, title=$('wardTitle').textContent;
   [...$('outfits').children].find(b=>b.dataset.id==='vikings').click(); $('wardGo').click(); return {sp,pages,open,n,first,title,look:have.look,welcomed:have.welcomed}});
-ok('G Alex welcomes Joe and explains the game',r.sp==='Alex'&&r.pages.join(' ').includes('Five stops')&&r.pages.join(' ').includes('kitchen'),r.pages.length+' pages');
+ok('G Alex welcomes Joe and explains the game',r.sp==='Alex'&&r.pages.join(' ').includes('Merry Christmas')&&r.pages.join(' ').includes('kitchen'),r.pages.length+' pages');
 ok('G then Joe picks his look (jersey first), and it sticks',r.open&&r.n===9&&r.first==='jersey'&&r.look==='vikings'&&r.welcomed,r.title);
 await p.reload(); await p.click('#startBtn'); r=await p.evaluate(()=>({dlg:!dlg.hidden,ward:!$('wardrobe').hidden})); ok('G no welcome the second time',!r.dlg&&!r.ward);
 // H. the dev button jumps to the ending (remove js/devtools.js before giving it to Joe)

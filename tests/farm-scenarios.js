@@ -7,7 +7,7 @@ installT=()=>{
     click:t=>{const b=[...$('dbtns').querySelectorAll('button')].find(b=>b.textContent===t); if(!b)throw new Error('no button '+t+' in '+T.btns()); b.click()},
     pages:()=>{while(T.btns().includes('Next'))T.click('Next')},
     talk:()=>{closeDialog(); const k=farm.keelan; P.x=k.x-10;P.y=k.y; update(16.7); if(!near||near.label!=='Talk to Keelan')throw new Error('not near keelan: '+(near&&near.label)); action()},
-    start:()=>{T.talk(); T.click("I'm ready"); T.pages(); T.click('Go!')},
+    start:()=>{T.talk(); T.click("I'm ready!"); T.pages(); T.click('Go!')},
     issues:[], kHelped:false,
     step:(n,opts={})=>{for(let i=0;i<n;i++){
       if(!dlg.hidden&&$('dspeaker').textContent==='Ooh'){closeDialog(); T.foundByAccident=true}
@@ -41,7 +41,7 @@ r=await p.evaluate(()=>{T.talk(); return T.btns()}); ok('1 after winning, Keelan
 
 // 2. cupcake before starting: Keelan helps
 await fresh(); r=await p.evaluate(()=>{have.cupcake=true;renderBasket();T.talk();T.click('Give Keelan the cupcake');T.pages();T.click('OK');
-  const menu=T.btns(); T.click("I'm ready");T.pages();T.click('Go!'); T.kHelped=false; T.issues=[]; const e=T.runToEnd();
+  const menu=T.btns(); T.click("I'm ready!");T.pages();T.click('Go!'); T.kHelped=false; T.issues=[]; const e=T.runToEnd();
   return {menu,e,helped:T.kHelped,pen:farm.penned.length,basket:$('basket').textContent,issues:T.issues.slice(0,3)}});
 ok('2 cupcake gone from menu after giving',!r.menu.includes('Give Keelan the cupcake'),r.menu.join(' / ')); ok('2 Keelan helps',r.helped); ok('2 win',r.e==='paused'&&r.pen===20); ok('2 cupcake leaves basket',!r.basket.includes('Cupcake'),r.basket);
 
@@ -95,7 +95,7 @@ r=await p.evaluate(()=>{T.pages(); T.click('Thanks, Keelan!'); collectReward(); 
 r=await p.evaluate(()=>{for(const k of ['mill','city','fargo','golf','baked'])have[k]=true; goTo('kitchen','fromDoor'); for(let i=0;i<40;i++)update(16.7);
   startBaking(); T.pages(); T.click('Play again'); for(let i=0;i<40;i++)update(16.7);
   T.talk(); return {menu:T.btns(),reward:$('reward').hidden,basket:$('basket').textContent,scene:scene===SCENES.world}});
-ok('10 Play again gives a fresh farm',r.menu.includes("I'm ready")&&r.reward&&r.scene,r.basket);
+ok('10 Play again gives a fresh farm',r.menu.includes("I'm ready!")&&r.reward&&r.scene,r.basket);
 
 r=await p.evaluate(()=>[...new Set(T.issues)].slice(0,5)); ok('no lost or hidden hens in any run',r.length===0,r.join('; '));
 console.log(R.join('\n')); console.log('page errors:',errs.length?errs:'none'); await b.close()})()
