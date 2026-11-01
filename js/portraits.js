@@ -54,6 +54,21 @@ PORTRAITS['Bob']={size:32, bg:'#f2dcc0', draw(g){ const F=px(g);
   F('#c98f66',15,12,2,2); F('#a86a50',14,15,4,1);
   F('#e8742a',9,2,14,5); F('#1c1c20',12,3,1,1); F('#1c1c20',17,4,1,1); F('#1c1c20',20,2,1,1); F('#e8742a',23,4,3,2);
 }};
+// Jack: short blond hair, teal polo
+PORTRAITS['Jack']={size:32, bg:'#cdeee8', draw(g){ const F=px(g);
+  F('#2a9d8f',6,24,20,8); F('#ffffff',14,24,4,3); F('#f3cba8',4,25,3,7); F('#f3cba8',25,25,3,7);
+  F('#f3cba8',13,20,6,4); F('#f3cba8',10,6,12,15); F('#e2b58f',10,17,1,3); F('#e2b58f',21,17,1,3);
+  F('#e6c46a',9,3,14,5); F('#f2d88a',12,3,7,1); F('#e6c46a',9,7,2,3); F('#e6c46a',21,7,2,2);
+  F('#2b2b2b',13,11,2,2); F('#2b2b2b',18,11,2,2); F('#d9a37f',15,13,2,3); F('#b4544c',13,17,6,1); F('#ffffff',14,17,4,1);
+}};
+// Margie: long blond hair, fun heart-shaped pink sunglasses
+PORTRAITS['Margie']={size:32, bg:'#ffe0ef', draw(g){ const F=px(g);
+  F('#e6c46a',6,4,20,26); F('#f2d88a',9,4,6,2); F('#d9b356',6,18,3,12); F('#d9b356',23,18,3,12);   // long hair
+  F('#e54b7a',8,26,16,6); F('#ffd84d',14,28,4,2);
+  F('#f3cba8',13,21,6,5); F('#f3cba8',10,7,12,15); F('#e6c46a',10,6,12,3); F('#e6c46a',10,8,4,2);
+  F('#ff4fa3',10,11,5,4); F('#ff4fa3',17,11,5,4); F('#ff4fa3',15,12,2,1); F('#ffffff',11,12,1,1); F('#ffffff',18,12,1,1);   // heart shades
+  F('#e0aa88',15,15,2,2); F('#c9576a',13,18,6,1); F('#ffffff',14,18,4,1); F('#f2a7a0',10,16,2,1); F('#f2a7a0',20,16,2,1);
+}};
 // Alex: same face as the shop
 PORTRAITS['Alex']={size:40, bg:'#e3d6bd', draw(g){ drawAlexFace(g,'ok') }};
 

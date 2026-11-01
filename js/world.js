@@ -19,6 +19,7 @@ const triggers=[
   {z:R(124,240,20,12), label:'Enter the city',     act:()=>goTo('city','fromStreet')},
   {z:R(330,220,20,12), label:'Drive into Fargo',   act:()=>goTo('fargo','fromHighway')},
   {z:R(182,142,20,10), label:'Enter your kitchen', act:()=>goTo('kitchen','fromDoor')},
+  {z:R(184,276,16,10), label:'Go to the disc golf course', act:()=>goTo('golf','fromRoad')},
   // Keelan's trigger moves with him; see farm.js
 ];
 const hit=(a,b)=>a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y;
@@ -65,6 +66,9 @@ const bg=document.createElement('canvas'); bg.width=WW; bg.height=WH;
   const road=(x,y,w,h)=>{F('#c9a46b',x,y,w,h); for(let i=0;i<w*h/30;i++)F('#b8935b',x+rnd()*w|0,y+rnd()*h|0,1,1)};
   road(0,150,WW,14); road(184,164,16,124); road(187,140,10,12);
   road(42,74,12,76); road(310,74,12,76); road(72,164,12,92); road(72,244,72,12); road(298,164,10,66); road(298,222,48,10);
+  // disc golf course gate at the end of the south road: two posts, a sign with a little basket
+  F('#6b4a2f',180,268,3,18); F('#6b4a2f',201,268,3,18); F('#2f6b36',178,264,28,8); F('#3d8443',178,264,28,2);
+  F('#8a8f9a',190,265,1,6); F('#c9ced4',187,266,7,1); F('#8a8f9a',187,269,7,2); F('#f4d35e',187,267,7,1);
   // kitchen
   F('#7f3434',166,104,52,12); F('#8f3d3d',170,100,44,6); F('#5a4a44',204,92,6,12);
   F('#f0dcc0',170,116,44,26); F('#e2cba9',170,116,44,2);
@@ -98,7 +102,7 @@ const drawTree=(x,y)=>ctx.drawImage(treeSprite,x-6,y-16);
 const SCENES={};
 SCENES.world={
   w:WW, h:WH, bounds:R(2,10,WW-4,WH-12), bg, solids, triggers,
-  entries:{start:{x:192,y:156,dir:'down'}, fromKitchen:{x:192,y:157,dir:'down'}, fromCity:{x:134,y:256,dir:'down'}, fromFargo:{x:340,y:238,dir:'down'}},
+  entries:{start:{x:192,y:156,dir:'down'}, fromKitchen:{x:192,y:157,dir:'down'}, fromCity:{x:134,y:256,dir:'down'}, fromFargo:{x:340,y:238,dir:'down'}, fromGolf:{x:192,y:266,dir:'up'}},
   hud:()=>farmHud(),
   dynTrigger:()=>farmTrigger(),
   ambient(dt){

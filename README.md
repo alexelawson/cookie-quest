@@ -9,13 +9,14 @@ For live reload while editing: `python3 -m http.server` and visit http://localho
 ## Layout
 | File | What's in it |
 |---|---|
-| `js/story.js` | All dialogue, character names, the ending note. Keelan is in `KEELAN`; the heist crew + The Confectioner in `HEIST`; Bob, Alex's snack reactions and the correct drink/snack are in `FARGO` |
+| `js/story.js` | All dialogue, character names, the ending note. Keelan is in `KEELAN`; Jack + Margie in `GOLF_TEXT`; the heist crew + The Confectioner in `HEIST`; Bob, Alex's snack reactions and the correct drink/snack are in `FARGO` |
 | `js/world.js` | Overworld map: collision rects (`solids`), doors (`triggers`), painting. Also defines the scene system (`SCENES`) |
 | `js/kitchen.js` | Kitchen interior scene; baking starts at the counter, recipe card on the fridge |
 | `js/city.js` | The chocolate heist: crew switching (you/Lars/John), sonar, sprint, lift, searchlights, guard, lasers, vault, cookie signal |
 | `js/portraits.js` | Faces shown beside dialog text, one painter per speaker name |
 | `js/larsgames.js` | Pick-a-game menu at the end of the heist, quick draw, darts, and the how-to-play card. Difficulty in `QUICKDRAW` and `DARTS` |
 | `js/anagrams.js` | Anagrams vs. Lars: letter sets + accepted words, scoring, Lars's difficulty in `ANAGRAM.LARS` |
+| `js/golf.js` | Creamery Hills Disc Golf: 3 holes vs Jack and Margie for the milk. Holes in `HOLES`, difficulty in `GOLF` |
 | `js/fargo.js` | Fargo: drive the CR-V, find the cheapest gas, Bob's $30.00 pump, then the snack stop for Alex. Car color in `CAR_COLOR`, fuel/speeds in `FUEL` |
 | `js/state.js` | Player, basket save (localStorage), particles |
 | `js/input.js` | Keyboard + touch d-pad |
@@ -31,6 +32,8 @@ Needs Node and Playwright (`npm i -D playwright && npx playwright install chromi
 - `node tests/farm-scenarios.js` plays through every farm path (cupcake before/during/after, losing, reloads, kitchen detours).
 - `node tests/fargo-scenarios.js` plays through Fargo (wrong station, running out of gas, pump, wrong snacks, kicked out, reloads).
 - `node tests/heist-scenarios.js` plays the heist start to finish (every skill, every way to get caught, reloads).
+- `node tests/golf-scenarios.js` plays the disc golf course (hazards, winning, losing).
+- `node tests/golf-difficulty.js '{}'` simulates players of different precision against Margie and Jack.
 - `node tests/farm-difficulty.js '{}'` simulates players of different skill; pass JSON to try other `FARM` settings.
 
 ## Adding a new place
@@ -42,6 +45,7 @@ Add an object to `SCENES` with `w`, `h`, `bounds`, `bg` (a canvas), `solids`, `t
 - [ ] Mill: wheat harvest + crossword + millstone timing
 - [x] Night city: rooftop chocolate heist with John and Lars
 - [x] Fargo: cheapest-gas hunt, stop the pump on $30.00, pick Alex's drink + snack
+- [x] Disc golf (milk): 3 holes vs Jack and Margie
 - [ ] Kitchen: mix, bake, decorate, final note
 
 ## Spoilers

@@ -4,6 +4,7 @@ const ITEMS = [
   {key:'mill',  label:'Flour'},
   {key:'city',  label:'Chocolate'},
   {key:'fargo', label:'Sugar'},
+  {key:'golf',  label:'Milk'},
 ];
 const STORY = {
   mill:{place:'The Old Mill', speaker:'The Miller',
@@ -120,6 +121,32 @@ const HEIST = {
   strangerRematch:"Your friend wants his rematch.",
   after:"The cookie signal's up. The city sleeps easy tonight.",
   climbDown:"Climb down the ladder",
+};
+
+// ---------- The disc golf course: Jack and Margie (milk for the cookies) ----------
+const GOLF_TEXT = {
+  place:'Creamery Hills Disc Golf',
+  jack:'Jack', margie:'Margie',
+  margieHello:["Oh hey! You here for the milk?","The creamery only gives the good stuff to whoever wins the round. House rules.","Three holes. Beat Jack, and at least keep up with me."],
+  jackHello:"Margie's been on fire all week. I'm just here for the vibes.",
+  ready:"Let's play",
+  notYet:"Maybe later",
+  howTo:"Tap once to lock your aim, again to set your power. Inside the circle around the basket, it's a putt: easier to aim, shorter throw.",
+  holeNames:["Hole 1: The Opener","Hole 2: Cow Pond","Hole 3: The Tunnel"],
+  water:"Splash. That's a penalty stroke, back to where you threw from.",
+  ob:"Out of bounds. Penalty stroke, back to where you threw from.",
+  tree:"*THWACK* Right off a tree.",
+  chains:"Chains!",
+  ace:"ACE!!! In one throw!",
+  margieHole:{'-1':"Birdie. Obviously.",'0':"Par. Boring, but I'll take it.",'1':"Bogey?! The cows distracted me."},
+  jackHole:{'-1':"BIRDIE! Did everyone see that?!",'0':"Par! Nice.",'1':"Bogey. It was the wind.",'2':"Double bogey. I'm going to go stand in the pond."},
+  win:["Okay, okay. You earned it.","Jack, give them the milk."],
+  jackWin:"A whole gallon. Whole milk, obviously. Cookies deserve it.",
+  lose:["Good round though! Want to go again?"],
+  again:"Play again",
+  after:"Come back anytime. The cows like you.",
+  enter:"Go to the disc golf course",
+  leave:"Head back to the road",
 };
 
 // ---------- Fargo: Bob (runs the cheapest gas station in the country) and Alex, your passenger ----------

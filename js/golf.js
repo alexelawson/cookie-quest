@@ -1,0 +1,207 @@
+// Creamery Hills Disc Golf: a three-hole round against Jack and Margie. Win it and the creamery hands over the milk.
+// Throwing: tap once to lock your aim (the arrow sweeps), tap again to lock your power (the meter pulses).
+// Inside the circle around the basket it's a putt: slower sweep, shorter throw, easier to sink.
+const GOLF={
+  MAX:150, PUTT_MAX:58, PUTT_RANGE:45,              // throw distances (px)
+  AIM_SPAN:.6, AIM_PERIOD:1600,                      // drive aim sweeps +-0.6 rad
+  PUTT_SPAN:.32, PUTT_PERIOD:2100,                   // putt aim sweeps slower and narrower
+  POWER_PERIOD:1300, PUTT_POWER_PERIOD:1700,
+  CHAINS:6, PUTT_CHAINS:7.5, TREE_R:6, FADE:.35, SPEED:.22, MAX_STROKES:7,
+  // opponents' score on each hole relative to par (chances). Margie's the better player.
+  MARGIE:{'-1':.42,'0':.50,'1':.08},     // simulated: a careful player with average timing wins ~45%
+  JACK:{'-1':.10,'0':.45,'1':.35,'2':.10},
+};
+const GW=224, GH=168, GOLF_OB=R(4,8,216,156);
+const HOLES=[
+  {tee:{x:24,y:138}, basket:{x:192,y:36}, par:3, water:[],
+   trees:[[70,112],[100,84],[132,124],[152,62],[176,98],[62,52],[122,30],[40,96]]},
+  {tee:{x:20,y:90}, basket:{x:204,y:88}, par:3, water:[{x:110,y:90,rx:40,ry:32}],
+   trees:[[182,58],[186,122],[162,96],[60,40],[60,140],[140,30],[140,150]]},
+  {tee:{x:112,y:146}, basket:{x:112,y:24}, par:3, water:[],
+   trees:[...[30,48,66,84,102,120,138].flatMap(y=>[[82,y],[142,y]]),[112,92]]},
+];
+const CREAMERY=R(8,10,44,30);
+const golf={active:false, hole:0, strokes:0, lie:null, prevLie:null, state:'idle', t:0, angle:0, power:0, flight:null,
+  you:[], margie:[], jack:[], msg:'', done:false};
+
+function drawBasket(x,y){
+  const F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x+dx,y+dy,w,h)};
+  F('rgba(0,0,0,.25)',-5,6,11,2); F('#8a8f9a',-1,-14,2,20); F('#c9ced4',-5,-14,11,2); F('#f4d35e',-5,-12,11,1);
+  for(let i=-4;i<=4;i+=2)F('#b4bac3',i,-11,1,6); F('#8a8f9a',-5,-5,11,4); F('#5f6676',-4,-4,9,2);
+}
+function drawCow(x,y){
+  const F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x+dx,y+dy,w,h)};
+  F('rgba(0,0,0,.2)',0,8,14,2); F('#fffaf0',0,0,12,7); F('#2b2b2b',2,1,3,3); F('#2b2b2b',8,3,3,2);
+  F('#fffaf0',11,-2,5,5); F('#f2a7a0',14,1,2,2); F('#2b2b2b',13,-1,1,1); F('#3b2a1e',1,7,2,2); F('#3b2a1e',9,7,2,2);
+  if((time/1500|0)%3===0)F('#2b2b2b',-1,1,1,3);   // tail swish
+}
+// Jack: short blond hair, teal polo, khaki shorts
+function drawJack(x,y){
+  const F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(Math.round(x)-6+dx,Math.round(y)-19+dy,w,h)};
+  F('rgba(0,0,0,.2)',1,18,10,2); F('#f3cba8',3,13,2,5); F('#f3cba8',7,13,2,5); F('#ffffff',3,17,2,1); F('#ffffff',7,17,2,1); F('#3b3b44',2,18,4,1); F('#3b3b44',6,18,4,1);
+  F('#c9b17a',2,11,8,3); F('#2a9d8f',2,6,8,6); F('#ffffff',5,6,2,1); F('#f3cba8',1,7,1,4); F('#f3cba8',10,7,1,4);
+  F('#f3cba8',3,1,6,5); F('#e6c46a',3,0,6,2); F('#2b2b2b',4,3,1,1); F('#2b2b2b',7,3,1,1); F('#c9876f',5,5,2,1);
+  F('#f4d35e',11,9,4,1); F('#e8742a',11,8,4,1);   // a disc in hand
+}
+// Margie: long blond hair, fun heart-shaped pink sunglasses, bright top
+function drawMargie(x,y){
+  const F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(Math.round(x)-6+dx,Math.round(y)-19+dy,w,h)};
+  F('rgba(0,0,0,.2)',1,18,10,2); F('#f3cba8',3,13,2,5); F('#f3cba8',7,13,2,5); F('#ffffff',2,17,3,2); F('#ffffff',7,17,3,2);
+  F('#3a5f9e',2,11,8,3); F('#e54b7a',2,6,8,6); F('#ffd84d',4,8,4,2); F('#f3cba8',1,7,1,4); F('#f3cba8',10,7,1,4);
+  F('#e6c46a',2,0,8,3); F('#e6c46a',1,2,2,9); F('#e6c46a',9,2,2,9); F('#f2d88a',3,1,3,1);   // long blond hair
+  F('#f3cba8',3,2,6,5); F('#e6c46a',3,2,6,1);
+  F('#ff4fa3',3,3,3,2); F('#ff4fa3',6,3,3,2); F('#ffffff',4,3,1,1); F('#ffffff',7,3,1,1);   // heart sunglasses
+  F('#c9576a',5,6,2,1);
+  F('#7fd3ff',-3,8,4,1); F('#2f6db0',-3,9,4,1);   // a disc in hand
+}
+
+// ---------- backgrounds, one per hole ----------
+const golfBgs=HOLES.map((h,i)=>{
+  const c=document.createElement('canvas'); c.width=GW; c.height=GH; const g=c.getContext('2d'), F=(col,x,y,w,hh)=>{g.fillStyle=col;g.fillRect(x,y,w,hh)};
+  F('#5e9a40',0,0,GW,GH); F('#6aa84a',GOLF_OB.x,GOLF_OB.y,GOLF_OB.w,GOLF_OB.h);
+  for(let k=0;k<500;k++)F(rnd()<.5?'#79b857':'#5e9a40',GOLF_OB.x+rnd()*GOLF_OB.w|0,GOLF_OB.y+rnd()*GOLF_OB.h|0,1,2);
+  // OB line (white stakes)
+  for(let x=GOLF_OB.x;x<GOLF_OB.x+GOLF_OB.w;x+=8){F('#ffffff',x,GOLF_OB.y-1,4,1);F('#ffffff',x,GOLF_OB.y+GOLF_OB.h,4,1)}
+  for(let y=GOLF_OB.y;y<GOLF_OB.y+GOLF_OB.h;y+=8){F('#ffffff',GOLF_OB.x-1,y,1,4);F('#ffffff',GOLF_OB.x+GOLF_OB.w,y,1,4)}
+  // fairway hint from tee to basket
+  const t=h.tee,b=h.basket; for(let s=0;s<=1;s+=.01){const x=t.x+(b.x-t.x)*s, y=t.y+(b.y-t.y)*s; F('#74b552',x-9,y-9,18,18)}
+  for(const w of h.water){g.fillStyle='#3d7fb8'; g.beginPath(); g.ellipse(w.x,w.y,w.rx,w.ry,0,0,Math.PI*2); g.fill();
+    g.fillStyle='#5a9bd0'; g.beginPath(); g.ellipse(w.x-6,w.y-6,w.rx*.6,w.ry*.5,0,0,Math.PI*2); g.fill(); F('#d7ecf8',w.x-10,w.y-8,6,1); F('#d7ecf8',w.x+8,w.y+6,5,1)}
+  F('#9a9690',t.x-8,t.y-5,16,10); F('#b4b2ad',t.x-7,t.y-4,14,8);           // tee pad
+  // the circle (putting range)
+  g.strokeStyle='rgba(255,255,255,.35)'; g.setLineDash([3,3]); g.beginPath(); g.arc(b.x,b.y,GOLF.PUTT_RANGE,0,Math.PI*2); g.stroke(); g.setLineDash([]);
+  if(i===0){ // the creamery
+    const r=CREAMERY; F('#b7412e',r.x,r.y+6,r.w,r.h-6); F('#7a2a22',r.x-2,r.y,r.w+4,8); F('#f1e3c9',r.x+16,r.y+14,12,16);
+    F('#fffaf0',r.x+4,r.y+12,8,6); F('#3d8ad6',r.x+5,r.y+14,6,1);
+  }
+  return c;
+});
+
+// ---------- throwing ----------
+const golfHole=()=>HOLES[golf.hole];
+const isPutt=()=>Math.hypot(golf.lie.x-golfHole().basket.x,golf.lie.y-golfHole().basket.y)<=GOLF.PUTT_RANGE;
+const aimBase=()=>{const b=golfHole().basket; return Math.atan2(b.y-golf.lie.y,b.x-golf.lie.x)};
+function aimNow(){const span=isPutt()?GOLF.PUTT_SPAN:GOLF.AIM_SPAN, per=isPutt()?GOLF.PUTT_PERIOD:GOLF.AIM_PERIOD; return aimBase()+span*Math.sin(golf.t/per*Math.PI*2)}
+function powerNow(){const per=isPutt()?GOLF.PUTT_POWER_PERIOD:GOLF.POWER_PERIOD, ph=(golf.t%per)/per; return ph<.5?ph*2:2-ph*2}
+const inWater=(h,x,y)=>h.water.some(w=>((x-w.x)/w.rx)**2+((y-w.y)/w.ry)**2<=1);
+// where a throw goes: returns {path, end, result:'in'|'tree'|'water'|'ob'|'land'}
+function golfFlight(h,lie,angle,power,putt){
+  const D=Math.max(8,power*(putt?GOLF.PUTT_MAX:GOLF.MAX)), path=[]; let x=lie.x,y=lie.y,a=angle;
+  for(let s=0;s<=D;s+=1){
+    if(!putt){const f=s/D; if(f>.72)a-=GOLF.FADE/(D*.28)}    // backhand fade at the end
+    x+=Math.cos(a); y+=Math.sin(a); path.push({x,y});
+    const db=Math.hypot(x-h.basket.x,y-h.basket.y);
+    if(db<(putt?GOLF.PUTT_CHAINS:GOLF.CHAINS)&&(putt||s>D*.55))return {path,end:{x:h.basket.x,y:h.basket.y},result:'in'};
+    for(const [tx,ty] of h.trees)if(Math.hypot(x-tx,y-ty+3)<GOLF.TREE_R){
+      const bx=x-Math.cos(a)*4, by=y-Math.sin(a)*4; path.push({x:bx,y:by}); return {path,end:{x:bx,y:by},result:'tree'}}
+    if(x<GOLF_OB.x||y<GOLF_OB.y||x>GOLF_OB.x+GOLF_OB.w||y>GOLF_OB.y+GOLF_OB.h)return {path,end:{x,y},result:'ob'};
+  }
+  return {path,end:{x,y},result:inWater(h,x,y)?'water':'land'};
+}
+function golfTap(){
+  if(!golf.active)return;
+  if(golf.state==='aim'){golf.angle=aimNow(); golf.state='power'; golf.t=Math.random()*400; return}
+  if(golf.state==='power'){
+    golf.power=powerNow(); const putt=isPutt();
+    golf.flight=golfFlight(golfHole(),golf.lie,golf.angle,golf.power,putt); golf.flight.i=0; golf.flight.putt=putt;
+    golf.strokes++; golf.state='flight'; golf.msg='';
+  }
+}
+function golfLand(){
+  const f=golf.flight, h=golfHole(), T=GOLF_TEXT;
+  if(f.result==='in'){ golf.msg=golf.strokes===1?T.ace:T.chains; return golfHoleDone() }
+  if(f.result==='water'||f.result==='ob'){ golf.strokes++; golf.msg=f.result==='water'?T.water:T.ob }
+  else { golf.prevLie={...golf.lie}; golf.lie={...f.end}; if(f.result==='tree')golf.msg=T.tree }
+  P.x=golf.lie.x; P.y=golf.lie.y+4;
+  if(golf.strokes>=GOLF.MAX_STROKES)return golfHoleDone(true);
+  golf.state='aim'; golf.t=Math.random()*1000;
+}
+function sampleScore(dist){let r=Math.random(); for(const [k,p] of Object.entries(dist)){r-=p; if(r<=0)return +k} return 0}
+function golfHoleDone(pickedUp){
+  golf.state='between'; const h=golfHole(), T=GOLF_TEXT, rel=golf.strokes-h.par;
+  const m=sampleScore(GOLF.MARGIE), j=sampleScore(GOLF.JACK);
+  golf.you.push(rel); golf.margie.push(m); golf.jack.push(j);
+  const word=r=>r<=-2?'Eagle':r===-1?'Birdie':r===0?'Par':r===1?'Bogey':r===2?'Double bogey':`+${r}`;
+  const lines=[['',`${golf.msg?golf.msg+' ':''}${pickedUp?'You pick up.':''} ${word(rel)} (${golf.strokes} throws).`.trim()],
+    ['Margie',T.margieHole[String(m)]],['Jack',T.jackHole[String(j)]]];
+  setTimeout(()=>say(lines,()=>{ if(golf.hole<HOLES.length-1){golf.hole++; golfStartHole()} else golfRoundOver() }),500);
+}
+function golfStartHole(){
+  const h=golfHole(); golf.lie={...h.tee}; golf.prevLie={...h.tee}; golf.strokes=0; golf.state='aim'; golf.t=Math.random()*1000; golf.msg='';
+  P.x=h.tee.x; P.y=h.tee.y+4; P.dir='right';
+  flashGolf(GOLF_TEXT.holeNames[golf.hole]);
+}
+function flashGolf(t){prompt.textContent=t; prompt.hidden=false; golf.promptT=1800}
+function golfRoundOver(){
+  golf.active=false; golf.state='idle';
+  const sum=a=>a.reduce((x,y)=>x+y,0), you=sum(golf.you), m=sum(golf.margie), j=sum(golf.jack);
+  const fmt=v=>v===0?'E':v>0?`+${v}`:`${v}`;
+  const card=`Final: You ${fmt(you)} · Margie ${fmt(m)} · Jack ${fmt(j)}`;
+  const won=you<j&&you<=m;
+  const h=HOLES[0]; P.x=h.tee.x+30; P.y=h.tee.y-10;
+  if(won){ have.golfWon=true; save(); say([['',card],...GOLF_TEXT.win.map(t=>['Margie',t]),['Jack',GOLF_TEXT.jackWin]],()=>showReward('golf')) }
+  else say([['',card],['Margie',GOLF_TEXT.lose[0]]],()=>{ showDialog({place:GOLF_TEXT.place,speaker:'Margie',pages:['Another round?'],actions:[{label:GOLF_TEXT.again,fn:()=>{closeDialog();golfStartRound()}},{label:GOLF_TEXT.notYet,ghost:true,fn:closeDialog}]}) });
+}
+function golfStartRound(){ Object.assign(golf,{active:true,hole:0,you:[],margie:[],jack:[]}); golfStartHole() }
+
+function talkMargie(){
+  const T=GOLF_TEXT;
+  if(have.golf)return say([['Margie',T.after]]);
+  if(have.golfWon)return showReward('golf');
+  showDialog({place:T.place,speaker:'Margie',pages:[...T.margieHello,T.howTo],actions:[{label:T.ready,fn:()=>{closeDialog();golfStartRound()}},{label:T.notYet,ghost:true,fn:closeDialog}]});
+}
+const MARGIE_SPOT={x:46,y:118}, JACK_SPOT={x:62,y:128};
+SCENES.golf={
+  w:GW, h:GH, bounds:R(4,30,216,136),
+  get bg(){ return golfBgs[golf.active||golf.state==='between'?golf.hole:0] },
+  get solids(){ return golf.active?[]:[CREAMERY,...HOLES[0].trees.map(([x,y])=>R(x-3,y-3,6,4)),R(MARGIE_SPOT.x-4,MARGIE_SPOT.y-3,8,4),R(JACK_SPOT.x-4,JACK_SPOT.y-3,8,4),R(188,30,8,8)] },
+  get triggers(){ return golf.active?[]:[{z:R(96,160,32,8),label:GOLF_TEXT.leave,act:()=>goTo('world','fromGolf')}] },
+  entries:{start:{x:112,y:154,dir:'up'}, fromRoad:{x:112,y:154,dir:'up'}},
+  enter(){ golf.active=false; golf.state='idle' },
+  speed:()=>golf.active?0:.07,
+  dynTrigger(){
+    if(golf.active)return null;
+    if(Math.hypot(P.x-MARGIE_SPOT.x,P.y-MARGIE_SPOT.y)<15)return {label:'Talk to Margie',btn:'Talk',act:talkMargie};
+    if(Math.hypot(P.x-JACK_SPOT.x,P.y-JACK_SPOT.y)<15)return {label:'Talk to Jack',btn:'Talk',act:()=>say([['Jack',GOLF_TEXT.jackHello]])};
+    return null;
+  },
+  ability:()=>golfTap(),
+  abilityLabel:()=>golf.active?(golf.state==='aim'?'Aim':golf.state==='power'?'Throw':''):'',
+  ambient(dt){ if(golf.promptT>0){golf.promptT-=dt; if(golf.promptT<=0&&!near)prompt.hidden=true} },
+  update(dt){
+    if(!golf.active)return;
+    if(golf.state==='aim'||golf.state==='power')golf.t+=dt;
+    if(golf.state==='flight'){const f=golf.flight; f.i=Math.min(f.path.length-1,f.i+dt*GOLF.SPEED*(f.putt?.8:1)); if(f.i>=f.path.length-1)golfLand()}
+  },
+  drawPlayer:(x,y)=>drawPlayer(x,y),
+  under(){
+    const h=golf.active||golf.state==='between'?golfHole():HOLES[0]; drawBasket(h.basket.x,h.basket.y);
+    if(!golf.active&&golf.state!=='between'){drawCow(18,46); drawCow(60,20)}
+  },
+  ents(list){
+    const h=golf.active||golf.state==='between'?golfHole():HOLES[0];
+    h.trees.forEach(([x,y])=>list.push({y,draw:()=>drawTree(x,y)}));
+    const m=golf.active?{x:h.tee.x+(h.tee.x>150?-16:16),y:h.tee.y-14}:MARGIE_SPOT, j=golf.active?{x:h.tee.x+(h.tee.x>150?-28:28),y:h.tee.y-4}:JACK_SPOT;
+    list.push({y:m.y,draw:()=>drawMargie(m.x,m.y)},{y:j.y,draw:()=>drawJack(j.x,j.y)});
+  },
+  over(){
+    if(!golf.active)return;
+    const L=golf.lie, putt=isPutt();
+    if(golf.state==='aim'||golf.state==='power'){
+      const a=golf.state==='aim'?aimNow():golf.angle, len=putt?24:34;
+      ctx.fillStyle='rgba(255,255,255,.85)'; for(let s=6;s<len;s+=4)ctx.fillRect(Math.round(L.x+Math.cos(a)*s)-1,Math.round(L.y+Math.sin(a)*s)-1,2,2);
+      ctx.fillStyle='#f4d35e'; ctx.fillRect(Math.round(L.x+Math.cos(a)*len)-2,Math.round(L.y+Math.sin(a)*len)-2,4,4);
+    }
+    if(golf.state==='power'){ // pulsing meter by your feet
+      const pw=powerNow(), bx=Math.round(L.x)+9, by=Math.round(L.y)-26;
+      ctx.fillStyle='#1d2130'; ctx.fillRect(bx,by,5,28); ctx.fillStyle=pw>.85?'#e54b4b':pw>.5?'#f4d35e':'#8cff8c'; ctx.fillRect(bx+1,by+27-Math.round(pw*26),3,Math.round(pw*26));
+    }
+    if(golf.state==='flight'){const p=golf.flight.path[Math.floor(golf.flight.i)]; ctx.fillStyle='rgba(0,0,0,.25)'; ctx.fillRect(p.x-2,p.y+3,5,2); ctx.fillStyle='#e8742a'; ctx.fillRect(Math.round(p.x)-2,Math.round(p.y)-2,5,3); ctx.fillStyle='#f4d35e'; ctx.fillRect(Math.round(p.x)-1,Math.round(p.y)-2,3,1)}
+    else if(golf.lie&&golf.state!=='between'){ctx.fillStyle='#e8742a'; ctx.fillRect(Math.round(L.x)-2,Math.round(L.y)-1,5,2)}
+  },
+  hud(){
+    if(!golf.active)return '';
+    const sum=a=>a.reduce((x,y)=>x+y,0), fmt=v=>v===0?'E':v>0?`+${v}`:`${v}`;
+    return `<span>H${golf.hole+1} · ${isPutt()?'Putt':'Throw '+(golf.strokes+1)}</span><span>You ${fmt(sum(golf.you))}</span><span>M ${fmt(sum(golf.margie))}</span><span>J ${fmt(sum(golf.jack))}</span>`;
+  },
+};
