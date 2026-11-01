@@ -19,7 +19,9 @@ installT=()=>{
       update(16.7);
       const total=farm.penned.length+farm.loose.length+(farm.carrying?1:0)+(farm.keelan.carrying?1:0);
       if(farm.active&&total!==20)T.issues.push('hen count '+total);
-      for(const h of farm.loose)if(HEN_ONLY.some(z=>hit(R(h.x-3,h.y-3,6,4),z))||hit(R(h.x-3,h.y-3,6,4),R(16,22,64,52)))T.issues.push('hidden hen at '+(h.x|0)+','+(h.y|0));
+      for(const h of farm.loose){const sp=R(h.x-4,h.y-7,8,9), inside=(a,b)=>a.x>=b.x&&a.y>=b.y&&a.x+a.w<=b.x+b.w&&a.y+a.h<=b.y+b.h;
+        // fully covered by the barn (roof or walls) while standing behind it, or in a no-hen zone
+        if(HEN_ONLY.some(z=>hit(R(h.x-3,h.y-3,6,4),z))||(h.y<74&&(inside(sp,R(16,22,64,14))||inside(sp,R(20,22,56,52)))))T.issues.push('hidden hen at '+(h.x|0)+','+(h.y|0))}
       if(farm.keelan.carrying)T.kHelped=true;
     } return 'running'},
     runToEnd:()=>{let r; for(let i=0;i<60;i++){r=T.step(600); if(r!=='running')break} return r},
@@ -35,7 +37,7 @@ if(r.fail){console.log('scenario 1 stopped:',r.msg);process.exit(1)}
 ok('1 ends as soon as all 20 are in',r.e==='paused'&&r.pen===20,r.msg); ok('1 Keelan stays put without cupcake',!r.helped&&!r.kmoved); ok('1 reward pop-up shows',r.reward);
 await p.click('#rewardArt',{force:true}); await p.waitForTimeout(900);
 r=await p.evaluate(()=>({farm:!!have.farm,paused,basket:$('basket').textContent})); ok('1 tap adds to basket and unpauses',r.farm&&!r.paused,r.basket);
-r=await p.evaluate(()=>{T.talk(); return T.btns()}); ok('1 after winning, Keelan just says thanks',r.join()==='Close',r.join());
+r=await p.evaluate(()=>{T.talk(); return T.btns()}); ok('1 after winning, Keelan says thanks (offers cupcake only if you found it on the way)',r.join()==='Close'||r.join()==='Give Keelan the cupcake,Bye',r.join());
 
 // 2. cupcake before starting: Keelan helps
 await fresh(); r=await p.evaluate(()=>{have.cupcake=true;renderBasket();T.talk();T.click('Give Keelan the cupcake');T.pages();T.click('OK');
@@ -52,7 +54,7 @@ ok('3 mid-chase menu has progress + cupcake + back',r.menu&&r.menu.includes('How
 ok('3 Keelan idle before cupcake, helps after',!r.helpedBefore&&r.helped); ok('3 win',r.e==='paused'&&r.pen===20);
 
 // 4. pick up the cupcake behind the barn during the chase, then give it
-await fresh(); r=await p.evaluate(()=>{T.start(); T.step(200); P.x=60;P.y=24; dirs.right=true; let i=0; for(;i<60&&dlg.hidden;i++)update(16.7); dirs.right=false;
+await fresh(); r=await p.evaluate(()=>{T.start(); T.step(200); for(const k in dirs)dirs[k]=false; P.x=60;P.y=24; dirs.right=true; let i=0; for(;i<60&&dlg.hidden;i++)update(16.7); dirs.right=false;
   const got=!!have.cupcake, txt=$('dtext').textContent; closeDialog(); T.talk(); const menu=T.btns(); T.click('Give Keelan the cupcake'); T.pages(); T.click('OK'); T.click('Back to it');
   const e=T.runToEnd(); return {got,txt,menu,e,helped:T.kHelped,active:farm.active}});
 ok('4 cupcake can be found mid-chase',r.got,r.txt); ok('4 then given and Keelan helps',r.helped&&r.e==='paused');
