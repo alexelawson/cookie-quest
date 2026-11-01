@@ -52,13 +52,19 @@ const cityBg=document.createElement('canvas'); cityBg.width=CW; cityBg.height=CH
     F('#2a2e3e',r.x-3,r.y-3,r.w+6,r.h+6); F('#3a3f52',r.x,r.y,r.w,r.h);
     for(let i=0;i<r.w*r.h/18;i++)F(rnd()<.5?'#353a4c':'#41475c',r.x+rnd()*r.w|0,r.y+rnd()*r.h|0,1,1);
     for(let i=0;i<5;i++)F('#30354a',r.x+rnd()*(r.w-20)|0,r.y+rnd()*(r.h-10)|0,14+rnd()*12|0,3);   // puddles
+    F('#4d5468',r.x-3,r.y-3,r.w+6,1); F('#20232f',r.x,r.y,r.w,1); F('#20232f',r.x,r.y,1,r.h);                         // parapet highlight + inner shadow
+    for(let x=r.x+12;x<r.x+r.w-8;x+=26)F('#343a4c',x,r.y+2,1,r.h-4);                                                  // roofing seams
+    for(let k=0;k<3;k++){const vx=r.x+10+rnd()*(r.w-30)|0, vy=r.y+10+rnd()*(r.h-30)|0;                                // little vents and drains
+      if(k%2){F('#6b7280',vx,vy,5,4); F('#4a4f60',vx+1,vy+1,3,1); F('#4a4f60',vx+1,vy+3,3,1)} else {F('#1d2130',vx,vy,3,3); F('#4a4f60',vx+1,vy+1,1,1)}}
+    F('#4a4f60',r.x+r.w-4,r.y+6,2,r.h-12); F('#5a6070',r.x+r.w-4,r.y+6,1,r.h-12);                                     // a pipe along the edge
   }
   const plank=p=>{F('#5a4128',p.x,p.y,p.w,p.h); for(let x=p.x;x<p.x+p.w;x+=5)F('#46321e',x,p.y,1,p.h); F('#6e5034',p.x,p.y,p.w,1)};
   plank(PLANK_BC);
   // roof clutter
-  F('#8b93a3',24,40,16,10); F('#5f6676',26,42,12,6);                           // AC unit
-  F('#8b93a3',230,160,16,10); F('#5f6676',232,162,12,6);
-  F('#6b3b32',170,32,10,10); F('#4a2a24',172,34,6,6);                           // chimney
+  const ac=(x,y)=>{F('rgba(0,0,0,.3)',x+1,y+10,16,2); F('#8b93a3',x,y,16,10); F('#a5adbb',x,y,16,1); F('#5f6676',x+2,y+2,7,6);   // AC units with a fan grille
+    for(let k=0;k<3;k++)F('#3a3f52',x+2,y+3+k*2,7,1); F('#6b7280',x+11,y+2,3,6); F('#c9ced4',x+12,y+3,1,1)};
+  ac(24,40); ac(230,160);
+  F('#6b3b32',170,32,10,10); F('#4a2a24',172,34,6,6); F('#7a4a3e',170,32,10,1); for(let y=35;y<42;y+=2)F('#5a332b',170,y,10,1);   // brick chimney
   F('#8b93a3',12,170,2,10); F('#8b93a3',28,170,2,10); for(let y=171;y<180;y+=2)F('#8b93a3',12,y,18,1);   // ladder top
   // fuse box
   // (the big LIGHT POWER switch is drawn live in drawPowerSwitch, since it flips)

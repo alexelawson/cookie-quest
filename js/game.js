@@ -76,12 +76,12 @@ function drawJoeJersey(P,g=ctx){
   F(skin,3,14,2,3-a); F(skin,7,14,2,3-b); F(blk,3,14,2,1); F(blk,7,14,2,1);
   F(blk,2,17-a,3,1); F(blk,7,17-b,3,1);
   F(blk,2,12,8,3);
-  F(shirt,2,7,8,5); F(shirt,1,7,1,2); F(shirt,10,7,1,2); F(red,1,8,1,1); F(red,10,8,1,1);
+  F(shirt,2,7,8,5); F(shirt,1,7,1,2); F(shirt,10,7,1,2); F(red,1,8,1,1); F(red,10,8,1,1); F('#e2e2d8',8,8,2,4); F('#e2e2d8',2,11,8,1);   // a little shading on the jersey
   F(skin,1,9,1,3); F(skin,10,9,1,3);
   F(skin,3,2,6,5);
   if(P.dir==='up'){F(hair,2,0,8,6); F(hairD,3,5,6,1); F(shirt,4,7,4,1)}
   else{
-    F(hair,2,0,8,3);
+    F(hair,2,0,8,3); F('#c89a6a',3,0,3,1);   // hair highlight
     if(P.dir==='down'){F(hair,2,3,1,2);F(hair,9,3,1,2);F(hairD,3,2,4,1);F(eye,4,4,1,1);F(eye,7,4,1,1);F('#b5654f',5,6,2,1);F(red,5,7,2,1)}
     if(P.dir==='left'){F(hair,7,2,3,4);F(hairD,3,2,3,1);F(eye,3,4,1,1);F(red,3,7,2,1)}
     if(P.dir==='right'){F(hair,2,2,3,4);F(hairD,6,2,3,1);F(eye,8,4,1,1);F(red,7,7,2,1)}

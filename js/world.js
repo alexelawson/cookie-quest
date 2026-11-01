@@ -63,9 +63,17 @@ const bg=document.createElement('canvas'); bg.width=WW; bg.height=WH;
   // farm
   F('#78b955',0,0,164,144);
   for(let i=0;i<250;i++)F('#8cc866',rnd()*164|0,rnd()*144|0,1,1);
+  for(let i=0;i<420;i++){const x=rnd()*WW|0, y=rnd()*WH|0; F('#4f8a37',x,y,1,2); F('#4f8a37',x+2,y,1,2); F('#5e9a40',x+1,y-1,1,3)}   // grass tufts
+  for(let i=0;i<110;i++){const x=rnd()*WW|0, y=rnd()*WH|0, c=['#ffffff','#f4d35e','#f2a7c8','#c9b7f0'][i%4];   // wildflowers
+    F(c,x-1,y,1,1); F(c,x+1,y,1,1); F(c,x,y-1,1,1); F(c,x,y+1,1,1); F(i%4===1?'#e8742a':'#f4d35e',x,y,1,1)}
   F('#b9905c',93,63,54,54); for(let i=0;i<120;i++)F('#a67f4e',93+rnd()*54|0,63+rnd()*54|0,1,1);
   F('#f1e3c9',90,60,60,3);F('#f1e3c9',90,117,60,3);F('#f1e3c9',90,60,3,60);F('#f1e3c9',147,60,3,60);
-  for(let x=90;x<150;x+=8){F('#d9c6a5',x,60,2,3);F('#d9c6a5',x,117,2,3)}
+  for(let x=90;x<150;x+=8){F('#b8a07a',x,59,2,4);F('#b8a07a',x,116,2,4)} for(let y=60;y<120;y+=8){F('#b8a07a',89,y,4,2);F('#b8a07a',146,y,4,2)}
+  for(let i=0;i<80;i++)F(rnd()<.6?'#e8c35a':'#d9b04a',94+rnd()*52|0,64+rnd()*52|0,2,1);                                  // straw
+  F('#7a5232',128,66,14,5); F('#5a3d26',128,70,14,1); F('#e8c35a',129,66,12,2); F('#d9a63a',131,66,2,1); F('#d9a63a',136,67,2,1);   // feed trough
+  F('#8a8f9a',97,104,8,5); F('#5fa8e8',98,105,6,3); F('#9fd2f0',99,105,2,1);             // water dish
+  // hay bales by the barn
+  for(const [hx,hy] of [[60,78],[68,80]]){F('rgba(0,0,0,.15)',hx,hy+6,8,2); F('#d9b04a',hx,hy,8,6); F('#e8c35a',hx,hy,8,2); F('#b8903a',hx+2,hy,1,6); F('#b8903a',hx+5,hy,1,6)}
   // Bryan's pond in the corner of the farm, with a little dock
   for(let y=14;y<48;y++){const t=(y-31)/17, hw=Math.sqrt(Math.max(0,1-t*t))*27+Math.sin(y/3)*1.5; F('#3d7fb8',134-hw|0,y,hw*2|0,1)}
   for(let y=18;y<44;y++){const t=(y-31)/13, hw=Math.sqrt(Math.max(0,1-t*t))*20; F('#4a8ec6',134-hw|0,y,hw*2|0,1)}
@@ -130,7 +138,10 @@ const bg=document.createElement('canvas'); bg.width=WW; bg.height=WH;
   let tx=230; for(const ch of '2.79'){const m=DIG[ch]; m.forEach((row,ry)=>[...row].forEach((c,rx)=>{if(c==='1')F('#ffd84d',tx+rx,206+ry,1,1)})); tx+=m[0].length+1}
   for(let y=244;y<284;y+=8){F('#9a7b66',236,y,140,4); for(let x=240;x<374;x+=6){F('#7d2b52',x,y+1,3,2);F('#4f9a3c',x+1,y-2,1,3)}}
   // roads
-  const road=(x,y,w,h)=>{F('#c9a46b',x,y,w,h); for(let i=0;i<w*h/30;i++)F('#b8935b',x+rnd()*w|0,y+rnd()*h|0,1,1)};
+  const road=(x,y,w,h)=>{F('#c9a46b',x,y,w,h); for(let i=0;i<w*h/30;i++)F('#b8935b',x+rnd()*w|0,y+rnd()*h|0,1,1);
+    for(let i=0;i<w*h/140;i++)F(rnd()<.5?'#a9a39a':'#d8c49a',x+rnd()*w|0,y+rnd()*h|0,1,1);                                 // pebbles
+    if(w>h){F('#b38c58',x,y,w,1); F('#b38c58',x,y+h-1,w,1); for(let k=0;k<w;k+=3)if(rnd()<.5)F('#8cc866',x+k,y-1,1,1)}   // edges, grass creeping in
+    else {F('#b38c58',x,y,1,h); F('#b38c58',x+w-1,y,1,h)}};
   road(0,150,WW,14); road(184,164,16,124); road(187,140,10,12);
   road(310,74,12,76); road(298,164,10,66); road(298,222,48,10);
   // city streets: wet asphalt, dashed lines, puddles reflecting the lights, a manhole (it steams)
@@ -165,21 +176,40 @@ const bg=document.createElement('canvas'); bg.width=WW; bg.height=WH;
 })();
 
 // The barn is a sprite too, so you (and the hens) can walk behind it.
-const barnSprite=document.createElement('canvas'); barnSprite.width=64; barnSprite.height=52;
-(function(){const g=barnSprite.getContext('2d'); g.translate(-16,-22); const F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};
-  F('#7a2a22',16,26,64,10); F('#8f3328',20,22,56,6); F('#b7412e',20,36,56,38);
-  for(let y=40;y<74;y+=5)F('#a5392a',20,y,56,1);
-  F('#f1e3c9',38,52,20,22); F('#5a2a20',40,54,16,20); F('#f1e3c9',40,54,16,1);
-  g.strokeStyle='#f1e3c9';g.lineWidth=1;g.beginPath();g.moveTo(40.5,54.5);g.lineTo(55.5,73.5);g.moveTo(55.5,54.5);g.lineTo(40.5,73.5);g.stroke();
-  F('#f1e3c9',26,40,8,6);F('#f1e3c9',62,40,8,6);
+const barnSprite=document.createElement('canvas'); barnSprite.width=64; barnSprite.height=62;
+(function(){const g=barnSprite.getContext('2d'); g.translate(-16,-14); const F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};
+  F('rgba(0,0,0,.18)',18,73,60,3);                                                       // shadow at the base
+  // roof: shingle rows, darker toward the eaves, white trim
+  F('#7a2a22',16,26,64,10); F('#8f3328',20,22,56,6);
+  for(let y=23;y<36;y+=2){F('#6a2219',y<28?20:16,y,y<28?56:64,1); for(let x=(y%4?18:20);x<80;x+=4)F('#9a3a2e',x,y-1,1,1)}
+  F('#f1e3c9',16,35,64,1); F('#f1e3c9',20,22,56,1);
+  // walls: vertical planks with a bit of shading
+  F('#b7412e',20,36,56,38); for(let x=22;x<76;x+=4)F('#a5392a',x,36,1,38); F('#c9523c',20,36,56,1); F('#8f3328',20,72,56,2);
+  F('#f1e3c9',20,36,1,38); F('#f1e3c9',75,36,1,38);                                      // corner trim
+  // big doors
+  F('#f1e3c9',38,52,20,22); F('#5a2a20',40,54,16,20); F('#f1e3c9',40,54,16,1); F('#f1e3c9',47,54,2,20);
+  g.strokeStyle='#f1e3c9';g.lineWidth=1;g.beginPath();g.moveTo(40.5,54.5);g.lineTo(47.5,73.5);g.moveTo(47.5,54.5);g.lineTo(40.5,73.5);g.moveTo(49.5,54.5);g.lineTo(55.5,73.5);g.moveTo(55.5,54.5);g.lineTo(49.5,73.5);g.stroke();
+  F('#c9a24a',46,63,1,2); F('#c9a24a',49,63,1,2);                                        // handles
+  // hayloft with hay poking out, and two windows
+  F('#f1e3c9',43,39,10,10); F('#3a1a14',44,40,8,8); F('#e8c35a',44,45,8,3); F('#f4d77a',45,44,2,2); F('#d9b04a',49,45,1,2); F('#e8c35a',43,47,2,2);
+  F('#f1e3c9',26,40,8,6); F('#5a7a9a',27,41,6,4); F('#f1e3c9',29,41,1,4);
+  F('#f1e3c9',62,40,8,6); F('#5a7a9a',63,41,6,4); F('#f1e3c9',65,41,1,4);
+  // a rooster weathervane on the left of the roof
+  F('#3a3a3a',29,15,1,8); F('#3a3a3a',26,17,7,1); F('#3a3a3a',30,13,4,2); F('#3a3a3a',33,12,1,2); F('#3a3a3a',28,14,2,1);
 })();
-const drawBarn=()=>ctx.drawImage(barnSprite,16,22);
+const drawBarn=()=>ctx.drawImage(barnSprite,16,14);
 
 // Trees are drawn as sprites, depth-sorted with people, so you can walk behind them.
-const treeSprite=document.createElement('canvas'); treeSprite.width=12; treeSprite.height=17;
+const treeSprite=document.createElement('canvas'); treeSprite.width=16; treeSprite.height=20;
 (function(){const g=treeSprite.getContext('2d'); const F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};
-  F('#6b4a2f',5,13,3,4); F('#2f6b36',0,2,12,11); F('#3d8443',2,0,8,6); F('#4d9a50',3,3,3,3);})();
-const drawTree=(x,y)=>ctx.drawImage(treeSprite,x-6,y-16);
+  F('rgba(0,0,0,.18)',2,17,12,3);                                                        // shadow on the ground
+  F('#5a3d26',6,13,4,6); F('#7a5232',7,13,1,5); F('#4a3020',9,14,1,5); F('#5a3d26',5,18,6,1);   // trunk with bark + root flare
+  F('#24532c',1,5,14,9); F('#24532c',2,3,12,12); F('#24532c',4,1,8,15);                  // dark outer canopy
+  F('#2f6b36',2,4,12,9); F('#2f6b36',4,2,8,12);                                          // mid
+  F('#3d8443',3,3,8,6); F('#3d8443',5,2,6,8); F('#4d9a50',4,3,4,3); F('#4d9a50',8,5,2,2); F('#6ab563',5,3,2,1);   // light from the top left
+  F('#1f472a',9,10,4,2); F('#1f472a',3,12,3,1); F('#24532c',12,8,2,3);                   // shade underneath
+})();
+const drawTree=(x,y)=>ctx.drawImage(treeSprite,x-8,y-19);
 // Bryan: medium brown hair, buzzed super short, gray tee, jeans. Very chill.
 function drawBryan(x,y,dir='right',g=ctx){
   const X=Math.round(x)-6, Y=Math.round(y)-19, F=(c,dx,dy,w,h)=>{g.fillStyle=c;g.fillRect(X+dx,Y+dy,w,h)};
@@ -264,6 +294,14 @@ SCENES.world={
     list.push({y:124,draw:()=>ctx.drawImage(yurt,336,94)}); list.push({y:81,draw:()=>drawTrailJohn(331,81,trailJohnDir())}); list.push({y:74,draw:drawBarn}); farmEntities(list)},
   over(){
     farmOverlay();
+    // a little life: drifting cloud shadows, butterflies, the odd bird
+    ctx.fillStyle='rgba(20,40,30,.07)';
+    for(let k=0;k<3;k++){const cx=((time/90+k*170)%(WW+160))-80, cy=40+k*85; ctx.beginPath(); ctx.ellipse(cx,cy,46,20,0,0,Math.PI*2); ctx.ellipse(cx+30,cy+8,30,14,0,0,Math.PI*2); ctx.fill()}
+    for(const [bx,by,c] of [[70,110,'#f4d35e'],[180,40,'#ffffff'],[200,200,'#f2a7c8'],[20,120,'#9fd2f0']]){
+      const t=time/900+bx, x=Math.round(bx+Math.sin(t)*14), y=Math.round(by+Math.sin(t*1.7)*7), open=Math.floor(time/120+bx)%2;
+      ctx.fillStyle=c; ctx.fillRect(x-(open?2:1),y,open?2:1,2); ctx.fillRect(x+1,y,open?2:1,2); ctx.fillStyle='#3a3a3a'; ctx.fillRect(x,y,1,2)}
+    {const cyc=(time%14000)/14000; if(cyc<.5){const x=Math.round(-20+cyc*2*(WW+40)), y=Math.round(20+Math.sin(cyc*20)*4), f=Math.floor(time/200)%2;   // a bird crossing
+      ctx.fillStyle='#2b2b36'; ctx.fillRect(x,y,1,1); ctx.fillRect(x-1,y-f,1,1); ctx.fillRect(x+1,y-f,1,1); ctx.fillRect(x-2,y-1+f,1,1); ctx.fillRect(x+2,y-1+f,1,1)}}
     ctx.fillStyle='#c7372f';ctx.fillRect(244,184,52,6);ctx.fillStyle='#f1f4f8';ctx.fillRect(244,189,52,2);   // gas canopy
     ctx.fillStyle='#8a8f9a';ctx.fillRect(246,191,2,14);ctx.fillRect(292,191,2,14);
     ctx.save(); ctx.beginPath(); ctx.rect(0,170,164,118); ctx.clip();                                        // city: dark, rain, searchlight

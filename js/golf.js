@@ -68,19 +68,26 @@ const golfBgs=HOLES.map((h,i)=>{
   const c=document.createElement('canvas'); c.width=GW; c.height=GH; const g=c.getContext('2d'), F=(col,x,y,w,hh)=>{g.fillStyle=col;g.fillRect(x,y,w,hh)};
   F('#5e9a40',0,0,GW,GH); F('#6aa84a',GOLF_OB.x,GOLF_OB.y,GOLF_OB.w,GOLF_OB.h);
   for(let k=0;k<500;k++)F(rnd()<.5?'#79b857':'#5e9a40',GOLF_OB.x+rnd()*GOLF_OB.w|0,GOLF_OB.y+rnd()*GOLF_OB.h|0,1,2);
+  for(let k=0;k<160;k++){const x=rnd()*GW|0, y=rnd()*GH|0; F('#4f8a37',x,y,1,2); F('#4f8a37',x+2,y,1,2); F('#5e9a40',x+1,y-1,1,3)}   // tufts
+  for(let k=0;k<26;k++){const x=6+rnd()*(GW-12)|0, y=10+rnd()*(GH-20)|0, c=['#ffffff','#f4d35e','#f2a7c8'][k%3]; F(c,x-1,y,1,1); F(c,x+1,y,1,1); F(c,x,y-1,1,1); F(c,x,y+1,1,1); F('#f4d35e',x,y,1,1)}
   // OB line (white stakes)
   for(let x=GOLF_OB.x;x<GOLF_OB.x+GOLF_OB.w;x+=8){F('#ffffff',x,GOLF_OB.y-1,4,1);F('#ffffff',x,GOLF_OB.y+GOLF_OB.h,4,1)}
   for(let y=GOLF_OB.y;y<GOLF_OB.y+GOLF_OB.h;y+=8){F('#ffffff',GOLF_OB.x-1,y,1,4);F('#ffffff',GOLF_OB.x+GOLF_OB.w,y,1,4)}
   // fairway hint from tee to basket
-  const t=h.tee,b=h.basket; for(let s=0;s<=1;s+=.01){const x=t.x+(b.x-t.x)*s, y=t.y+(b.y-t.y)*s; F('#74b552',x-9,y-9,18,18)}
+  const t=h.tee,b=h.basket; for(let s=0;s<=1;s+=.01){const x=t.x+(b.x-t.x)*s, y=t.y+(b.y-t.y)*s; F(Math.floor(s*14)%2?'#7aba57':'#6fae4d',x-9,y-9,18,18)}   // mowed stripes
+  for(let s=0;s<=1;s+=.02){const x=t.x+(b.x-t.x)*s, y=t.y+(b.y-t.y)*s; F('#82c25e',x-9,y-9,1,1); F('#82c25e',x+8,y+8,1,1)}
   for(const w of h.water){g.fillStyle='#3d7fb8'; g.beginPath(); g.ellipse(w.x,w.y,w.rx,w.ry,0,0,Math.PI*2); g.fill();
     g.fillStyle='#5a9bd0'; g.beginPath(); g.ellipse(w.x-6,w.y-6,w.rx*.6,w.ry*.5,0,0,Math.PI*2); g.fill(); F('#d7ecf8',w.x-10,w.y-8,6,1); F('#d7ecf8',w.x+8,w.y+6,5,1)}
   F('#9a9690',t.x-8,t.y-5,16,10); F('#b4b2ad',t.x-7,t.y-4,14,8);           // tee pad
   // the circle (putting range)
   g.strokeStyle='rgba(255,255,255,.35)'; g.setLineDash([3,3]); g.beginPath(); g.arc(b.x,b.y,GOLF.PUTT_RANGE,0,Math.PI*2); g.stroke(); g.setLineDash([]);
   if(i===0){ // the creamery
-    const r=CREAMERY; F('#b7412e',r.x,r.y+6,r.w,r.h-6); F('#7a2a22',r.x-2,r.y,r.w+4,8); F('#f1e3c9',r.x+16,r.y+14,12,16);
-    F('#fffaf0',r.x+4,r.y+12,8,6); F('#3d8ad6',r.x+5,r.y+14,6,1);
+    const r=CREAMERY; F('rgba(0,0,0,.15)',r.x,r.y+r.h,r.w,3);
+    F('#b7412e',r.x,r.y+6,r.w,r.h-6); for(let x=r.x+2;x<r.x+r.w;x+=4)F('#a5392a',x,r.y+8,1,r.h-8);
+    F('#7a2a22',r.x-2,r.y,r.w+4,8); for(let y=r.y+1;y<r.y+8;y+=2)F('#6a2219',r.x-2,y,r.w+4,1); F('#f1e3c9',r.x-2,r.y+7,r.w+4,1);
+    F('#f1e3c9',r.x+16,r.y+14,12,16); F('#5a2a20',r.x+17,r.y+15,10,15); F('#f1e3c9',r.x+21,r.y+15,2,15);
+    F('#fffaf0',r.x+3,r.y+10,10,8); F('#3d8ad6',r.x+4,r.y+12,8,1); F('#3d8ad6',r.x+4,r.y+15,8,1); F('#2b2b2b',r.x+5,r.y+13,1,1);   // a MILK sign, sort of
+    F('#c9ced4',r.x+r.w+2,r.y-2,8,22); F('#e8eef0',r.x+r.w+3,r.y-2,3,22); F('#8a8f9a',r.x+r.w+2,r.y-4,8,3); F('#8a8f9a',r.x+r.w+2,r.y+19,8,1);   // silo
   }
   return c;
 });
