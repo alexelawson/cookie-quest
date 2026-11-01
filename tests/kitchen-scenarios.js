@@ -21,8 +21,11 @@ ok('A missing ingredients: the card lists them, nobody is over yet',r.msg.includ
 await fresh(ALL);
 r=await p.evaluate(()=>{goTo('kitchen','fromDoor'); T.run(40); P.x=30;P.y=94; update(16.7); const lbl=prompt.textContent; action(); const sp=$('dspeaker').textContent; T.through(); return {lbl,sp,n:CROWD.length}});
 ok('B everyone came over (and you can talk to them)',r.lbl==='Talk to Keelan'&&r.sp==='Keelan'&&r.n>=10,r.lbl);
-r=await p.evaluate(()=>{P.x=64;P.y=60; update(16.7); action(); const pages=[]; while(T.btns().includes('Next')){pages.push($('dtext').textContent);T.click('Next')} T.click("Let's bake"); return {pages,open:!$('bake').hidden,step:$('bakeStep').textContent}});
-ok('B Start baking opens the baking card at step 1 (butter)',r.open&&r.step.includes('Butter'),r.step);
+r=await p.evaluate(()=>{P.x=64;P.y=60; update(16.7); action(); const pages=[]; while(T.btns().includes('Next')){pages.push($('dtext').textContent);T.click('Next')} T.click("Let's bake"); const xwOpen=!$('xword').hidden, bakeFirst=!$('bake').hidden;
+  const ins=xwInputs(); xw.L.cells.forEach((c,k)=>{if(c)ins[k].value=c.ch}); xwCheck(); const solvedMsg=$('xwMsg').textContent, btn=$('xwCheck').textContent; $('xwCheck').click();
+  return {pages,xwOpen,bakeFirst,solvedMsg,btn,crossword:have.crossword,open:!$('bake').hidden,step:$('bakeStep').textContent}});
+ok('B Let\'s bake opens the smudged-recipe crossword first',r.xwOpen&&!r.bakeFirst,r.solvedMsg);
+ok('B solving it goes straight on to the baking card at step 1 (butter)',r.crossword&&r.btn==="Let's bake"&&r.open&&r.step.includes('Butter'),r.step);
 // C. pouring: too little, too much, spill, then right on the line
 r=await p.evaluate(()=>{const s=stepNow(), out={}; T.pour(.6); out.little=$('bakeMsg').textContent; T.tick(700);
   T.pour(2.4); out.much=$('bakeMsg').textContent; T.tick(700); bakePress(); T.tick(4000); out.spill=$('bakeMsg').textContent; bakeRelease(); T.tick(800);
@@ -86,4 +89,24 @@ r=await p.evaluate(()=>{const before=WARDROBE.outfits.filter(o=>!o.unlock||have[
   return {before,pages,ids,title,look:have.look,paused,avant:ids.includes('avant')}});
 ok('J Avant Guard is there; Cupcake is locked until you find the cupcake',r.avant&&!r.before.includes('cupcake')&&r.pages.join(' ').includes('unlocked'),r.pages.slice(-1)[0]);
 ok('J Settings > Change outfit: pick the Cupcake costume any time',r.ids.includes('cupcake')&&r.look==='cupcake'&&!r.paused&&r.title.includes('look'),r.ids.join(','));
+// K. the crossword: every word fits, typing moves along the word, wrong letters go red, hints, Later keeps your letters
+await fresh(ALL);
+r=await p.evaluate(()=>{const L=xwLayout(CROSSWORD.words); goTo('kitchen','fromDoor'); T.run(40); openCrossword(openBake); return {missing:L.missing,n:L.words.length,want:CROSSWORD.words.length,open:!$('xword').hidden}});
+ok('K all the crossword words fit in the grid',r.missing.length===0&&r.n===r.want&&r.open,r.n+' words');
+await p.keyboard.type('ZZ'); await p.keyboard.press('Backspace');
+r=await p.evaluate(()=>{const ins=xwInputs(), cs=xwCellsOf(xw.word); const typed=cs.map(k=>ins[k].value).join(''); xwCheck(); const bad=document.querySelectorAll('.xcell.bad').length, msg=$('xwMsg').textContent;
+  xwHint(); const hinted=document.querySelectorAll('.xcell.hint').length; const saved=have.xw; $('xwLater').click(); return {typed,bad,msg,hinted,saved,closed:$('xword').hidden,paused,wasd:dirs.up||dirs.left||dirs.down||dirs.right}});
+ok('K typing fills along the word; Backspace clears; wrong letters go red',r.typed.startsWith('Z')&&r.bad===1&&r.msg.includes('off'),r.typed+' / '+r.msg);
+ok('K Hint fills in a letter; Later closes it and keeps your letters',r.hinted===1&&r.closed&&!r.paused&&r.saved.replace(/\./g,'')==='C',r.saved.replace(/\./g,''));
+await p.reload(); await p.click('#startBtn'); await p.evaluate(helpers);
+r=await p.evaluate(()=>{goTo('kitchen','fromDoor'); T.run(40); openCrossword(openBake); const letters=xwInputs().filter(Boolean).map(n=>n.value).join(''); return {letters}});
+ok('K your letters are still there after a reload',r.letters==='C',r.letters);
+await p.keyboard.press('Escape');
+// L. background music: each place has its own song; the Cookie Dance has Jingle Bells; Settings can turn music off
+r=await p.evaluate(async()=>{const out={}; for(const [s,e] of [['world','start'],['golf','fromRoad'],['birkie','start'],['fargo','fromHighway'],['city','start'],['kitchen','fromDoor']]){goTo(s,e); for(let i=0;i<60;i++)update(16.7); out[s]=song}
+  kit.dance=true; sceneMusic(); out.dance=song; kit.dance=false; sceneMusic();
+  $('settingsBtn').click(); const box=!!$('musicToggle'); $('musicToggle').checked=false; $('musicToggle').onchange(); const off=song; $('musicToggle').checked=true; $('musicToggle').onchange(); const on=song; $('settingsClose').click();
+  return {...out,box,off,on}});
+ok('L each place plays its own song',r.world==='farm'&&r.golf==='golf'&&r.birkie==='birkie'&&r.fargo==='fargo'&&r.city==='heist'&&r.kitchen==='kitchen',JSON.stringify(r));
+ok('L the Cookie Dance switches to Jingle Bells; Settings > Music turns it off and on',r.dance==='jingle'&&r.box&&r.off===null&&r.on==='kitchen');
 console.log(R.join('\n')); console.log('page errors:',errs.length?errs:'none'); await b.close()})();

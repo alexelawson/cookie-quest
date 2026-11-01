@@ -107,11 +107,22 @@
         <div class="brow"><button class="pbtn" id="bakeBtn"></button><button class="btn ghost" id="bakeAlt" hidden></button></div>
       </div>
     </div>
+    <div class="bake" id="xword" hidden role="dialog" aria-labelledby="xwTitle">
+      <div class="pcard bcard xcard">
+        <small id="xwTitle"></small>
+        <div class="bsay"><canvas id="xwFace" width="40" height="40" aria-hidden="true"></canvas><p id="xwMsg" aria-live="polite"></p></div>
+        <div class="xclue" id="xwClue"></div>
+        <div class="xgrid" id="xwGrid"></div>
+        <div class="brow"><button class="btn" id="xwCheck"></button><button class="btn ghost" id="xwHint"></button><button class="btn ghost" id="xwLater"></button></div>
+        <div class="xlists" id="xwLists"></div>
+      </div>
+    </div>
     <div class="wardrobe" id="settings" hidden role="dialog" aria-labelledby="setTitle">
       <div class="vcard">
         <small id="setTitle">Settings</small>
         <button class="btn" id="setOutfit"></button>
         <label class="srow"><input type="checkbox" id="soundToggle"> Sound</label>
+        <label class="srow"><input type="checkbox" id="musicToggle"> Music</label>
         <button class="btn ghost" id="settingsClose">Close</button>
       </div>
     </div>
@@ -151,6 +162,7 @@
 <script src="js/ui.js"></script>
 <script src="js/farm.js"></script>
 <script src="js/kitchen.js"></script>
+<script src="js/crossword.js"></script>
 <script src="js/city.js"></script>
 <script src="js/fargo.js"></script>
 <script src="js/portraits.js"></script>

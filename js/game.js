@@ -10,7 +10,7 @@ function goTo(name,entry){
 function finishSwap(){
   const {name,entry}=fade.next; scene.leave&&scene.leave(); scene=SCENES[name];
   const e=scene.entries[entry]||scene.entries.start; P.x=e.x; P.y=e.y; P.dir=e.dir||'down'; P.moving=false;
-  scene.enter&&scene.enter();
+  scene.enter&&scene.enter(); sceneMusic();
 }
 
 function blocked(nx,ny,sc=scene){

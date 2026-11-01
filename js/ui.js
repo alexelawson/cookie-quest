@@ -33,22 +33,23 @@ function openLand(key){
 }
 function action(){
   if(!$('titlecard').hidden){start();return}
-  if(!$('pump').hidden||!$('shop').hidden||!$('vault').hidden||!$('anagram').hidden||!$('howto').hidden||!$('wardrobe').hidden||!$('bake').hidden||!$('settings').hidden)return;   // the pump and shop have their own buttons
+  if(!$('pump').hidden||!$('shop').hidden||!$('vault').hidden||!$('anagram').hidden||!$('howto').hidden||!$('wardrobe').hidden||!$('bake').hidden||!$('xword').hidden||!$('settings').hidden)return;   // the pump and shop have their own buttons
   if(!$('reward').hidden){collectReward();return}
   if(!dlg.hidden){const f=document.activeElement, b=$('dbtns').contains(f)?f:$('dbtns').querySelector('button'); b&&b.click(); return}
   if(near)near.act(); else if(scene.ability)scene.ability();
 }
 // ---------- settings ----------
 function openSettings(){
-  $('soundToggle').checked=!muted;
+  $('soundToggle').checked=!muted; $('musicToggle').checked=musicOn; $('musicToggle').disabled=muted;
   $('settings').hidden=false; paused=true; prompt.hidden=true; setTimeout(()=>$('settingsClose').focus({preventScroll:true}),0) }
 function closeSettings(){ $('settings').hidden=true; paused=!dlg.hidden||!$('titlecard').hidden; $('settingsBtn').blur() }
-$('soundToggle').onchange=()=>setSound($('soundToggle').checked);
+$('soundToggle').onchange=()=>{setSound($('soundToggle').checked); $('musicToggle').disabled=muted};
+$('musicToggle').onchange=()=>setMusic($('musicToggle').checked);
 $('settingsBtn').onclick=openSettings; $('settingsClose').onclick=closeSettings;
 // change outfit any time: on the rooftops it's the stealth outfit, everywhere else it's Joe's everyday look
 $('setOutfit').textContent=WARDROBE.changeOutfit;
 $('setOutfit').onclick=()=>{ $('settings').hidden=true; openWardrobe(()=>{ paused=!dlg.hidden||!$('titlecard').hidden },scene===SCENES.city?'heist':'look',true) };
-function start(){$('titlecard').hidden=true; paused=false; if(!have.welcomed)welcome()}
+function start(){$('titlecard').hidden=true; paused=false; audioInit(); sceneMusic(); if(!have.welcomed)welcome()}
 // the first time you press Start: Alex explains everything, then you pick Joe's look
 function welcome(){
   showDialog({place:ALEX_WELCOME.place,speaker:ALEX_WELCOME.speaker,pages:ALEX_WELCOME.pages,actions:[{label:ALEX_WELCOME.go,fn:()=>{closeDialog(); openWardrobe(()=>{have.welcomed=true; save()},'look')}}]});

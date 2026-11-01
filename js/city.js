@@ -490,7 +490,7 @@ function buildCrewBar(){
 
 // ---------- scene ----------
 const darkMask=document.createElement('canvas'); darkMask.width=VW; darkMask.height=VH;
-SCENES.city={
+SCENES.city={ music:'heist',
   w:CW, h:CH, bounds:R(0,0,CW,CH), bg:cityBg, triggers:[],
   get walk(){ return [ROOF_A,ROOF_B,ROOF_C,PLANK_BC,LADDER,...(heistStage()>=1?[BEAM_SLOT]:[])] },
   get solids(){ return [R(24,40,16,10),R(230,160,16,10),R(170,32,10,10),R(FUSE.x-14,FUSE.y-20,28,6),SKYLIGHT,R(STRANGER.x-4,STRANGER.y-3,8,4),

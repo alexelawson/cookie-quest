@@ -175,7 +175,7 @@ function drawTrailJohn(cx,cy,dir){
 function talkJohn(){
   const T=BIRKIE;
   if(have.mill)return showDialog({place:T.place,speaker:T.john,face:'Trail John',pages:[T.johnAfter],actions:[CLOSE]});
-  if(have.birkie)return showDialog({place:T.place,speaker:T.john,face:'Trail John',pages:[T.johnDone,T.crosswordSoon],actions:[{label:T.takeFlour,fn:()=>{closeDialog();showReward('mill')}}]});
+  if(have.birkie)return showDialog({place:T.place,speaker:T.john,face:'Trail John',pages:[T.johnDone],actions:[{label:T.takeFlour,fn:()=>{closeDialog();showReward('mill')}}]});
   showDialog({place:T.place,speaker:T.john,face:'Trail John',pages:T.johnHello,actions:[{label:T.go,fn:()=>{closeDialog();goTo('birkie','start')}},{label:T.later,ghost:true,fn:closeDialog}]});
 }
 
@@ -184,7 +184,7 @@ setTimeout(()=>{const g=johnFace.getContext('2d'); const pt=PORTRAITS['Trail Joh
 const birkStartArch=archSprite(60,24,g=>{const F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};
   F('#8a8f9a',0,0,3,24); F('#8a8f9a',57,0,3,24); F('#1d3f73',0,0,60,16); F('#c8322b',0,0,60,2); F('#c8322b',0,14,60,2);
   pixText(g,'AMERICAN',13,3,'#ffffff'); pixText(g,'BIRKEBEINER',8,9,'#ffffff')});
-SCENES.birkie={ place:BIRKIE.place,
+SCENES.birkie={ place:BIRKIE.place, music:'birkie',
   w:BIRK.W, h:BIRK.L, bounds:R(0,0,BIRK.W,BIRK.L), bg:birkBg, solids:[], triggers:[],
   entries:{start:{x:112,y:30,dir:'down'}},
   enter(){ birk.running=false; P.x=trailX(30); P.y=30; birk.vikings=[0,1,2,3].map(i=>({x:P.x,y:16-i*14})); birk.introPending=true },

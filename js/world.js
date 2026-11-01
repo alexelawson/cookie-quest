@@ -269,7 +269,7 @@ const yurt=archSprite(36,32,g=>{const F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x
 // Each place you can be is a scene: its size, background, what blocks you, its doors,
 // and hooks for animating/drawing. game.js runs whichever scene you're in.
 const SCENES={};
-SCENES.world={
+SCENES.world={ music:'farm',
   w:WW, h:WH, bounds:R(2,10,WW-4,WH-12), bg, solids, triggers,
   entries:{start:{x:192,y:156,dir:'down'}, fromKitchen:{x:192,y:157,dir:'down'}, fromCity:{x:134,y:256,dir:'down'}, fromFargo:{x:340,y:238,dir:'down'}, fromGolf:{x:192,y:266,dir:'up'}, fromMill:{x:316,y:92,dir:'down'}},
   hud:()=>farmHud(),

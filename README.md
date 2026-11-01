@@ -20,7 +20,8 @@ For live reload while editing: `python3 -m http.server` and visit http://localho
 | `js/golf.js` | Wylee Woods Disc Golf: 5 holes vs Jack and Margie (incl. a platform tee and a hike-it-through-your-legs hole) for the milk. Holes in `HOLES`, difficulty in `GOLF` |
 | `js/birkie.js` | The Birkie: John (brown hair, reading glasses) at the trailhead sends you off; guide the Vikings from Cable to Main Street, Hayward (pole in rhythm, tuck, snowplow, feed stations) for the flour. Course in `BIRK_SECTIONS`, difficulty in `BIRK` |
 | `js/fargo.js` | Fargo: drive the CR-V, find the cheapest gas, Bob's $30.00 pump, then the snack stop for Alex. Car color in `CAR_COLOR`, fuel/speeds in `FUEL` |
-| `js/sound.js` | All the sounds (made with Web Audio, no files): `sfx('name')` plays one from `SFX`; Jingle Bells plays during the Cookie Dance. Volume in `SOUND`, on/off in ⚙ Settings |
+| `js/sound.js` | All the sounds (made with Web Audio, no files): `sfx('name')` plays one from `SFX`. Background music in `SONGS`: one little loop per place (farm hoedown, breezy Wylee Woods, Hall of the Mountain King for the Birkie, sneaky heist, Fargo road trip, Deck the Halls at home, Jingle Bells for the Cookie Dance). Loudness in `SOUND` (`MUSIC` for the music); Sound and Music on/off in ⚙ Settings |
+| `js/crossword.js` + `CROSSWORD` in story.js | The smudged recipe card: a crossword you solve before the baking. Change the words and clues in `CROSSWORD`; the grid arranges itself |
 | `js/state.js` | Player, basket save (localStorage), particles |
 | `js/input.js` | Keyboard + touch d-pad |
 | `js/ui.js` | Dialog system (pages + button menus), land/kitchen interactions |
@@ -53,7 +54,7 @@ Add an object to `SCENES` with `w`, `h`, `bounds`, `bg` (a canvas), `solids`, `t
 - [x] Farm: Keelan Q&A, hen chase, hidden cupcake (Keelan helps if you give it to him)
 - [ ] Farm: butter churning
 - [x] Birkie trailhead (flour): parking lot, yurt, American Birkebeiner arch, the race with the Vikings
-- [ ] Birkie trailhead: crossword (Alex's words and clues)
+- [x] Crossword: the smudged recipe card, solved in the kitchen before baking (`CROSSWORD` in story.js)
 - [x] Night city: rooftop chocolate heist with John and Lars
 - [x] Fargo: cheapest-gas hunt, stop the pump on $30.00, pick Alex's drink + snack
 - [x] Disc golf (milk): 5 holes vs Jack and Margie

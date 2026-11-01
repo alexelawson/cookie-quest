@@ -187,8 +187,7 @@ const BIRKIE = {
     "They're strong. They are NOT good skiers. Guide them, would you?"],
   go:"Head to the start line",
   later:"Later",
-  johnDone:"The flour made it! Now, the crossword...",
-  crosswordSoon:"(The crossword is coming soon. For now, take the flour.)",
+  johnDone:"The flour made it! Go bake something good with it.",
   takeFlour:"Take the flour",
   johnAfter:"Come back anytime. Bring a pencil.",
   howToTitle:"The Birkie",
@@ -329,6 +328,32 @@ const FARGO = {
   alexWaiting:"Snacks. Please. I've been in this car for nine hours.",
 };
 
+// ---------- The smudged recipe card: a crossword before the baking ----------
+// Change, add or remove words freely: the grid fits them together by itself (letters only; spaces are ignored).
+// Each answer needs to share a letter with at least one other answer so it can cross it.
+const CROSSWORD = {
+  title:"The smudged recipe card",
+  intro:"Oh no. I spilled vanilla on the recipe card and smudged the ingredients. Help me figure out what goes in!",
+  words:[
+    {answer:'CHOCOLATE', clue:"Lars wanted to keep the whole crate"},
+    {answer:'BUTTER',    clue:"Keelan's farm sent this. One cup, goes in first"},
+    {answer:'FLOUR',     clue:"The Vikings skied it all the way to Main Street, Hayward"},
+    {answer:'SUGAR',     clue:"Picked up in Fargo, after exactly $30.00 of gas"},
+    {answer:'EGGS',      clue:"The hens did NOT want to give these up"},
+    {answer:'MILK',      clue:"Margie says bringing this makes her the main character"},
+    {answer:'OVEN',      clue:"375 degrees, ten minutes, don't walk away"},
+    {answer:'COOKIE',    clue:"The whole point of this quest"},
+  ],
+  across:'Across', down:'Down',
+  check:'Check', hint:'Hint', later:'Later',
+  empty:"Some boxes are still empty. Keep going!",
+  wrong:n=>n===1?"One letter's off. It's the red one.":`${n} letters are off. They're the red ones.`,
+  hintSay:"Here, I'll fill one in for you.",
+  wordDone:"That one's already right! Tap another clue.",
+  solved:"You cracked it! The card's readable again. Let's bake.",
+  solvedClue:"All the ingredients, figured out.",
+  go:"Let's bake",
+};
 const KITCHEN = {place:'Home', speaker:'Your kitchen',
   recipeTitle:"Chocolate Chip Cookies",
   recipeFooter:"Bake at 375° for 10 minutes. Do not eat all the dough first.",

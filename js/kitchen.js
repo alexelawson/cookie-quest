@@ -16,7 +16,7 @@ function startBaking(){
   const missing=ITEMS.filter(i=>!have[i.key]).map(i=>i.label);
   if(missing.length) return say1(KITCHEN.missing+' '+missing.join(', ')+'.');
   if(have.baked) return finalNote();
-  showDialog({place:KITCHEN.place,speaker:KITCHEN.speaker,pages:KITCHEN.ready,actions:[{label:"Let's bake",fn:()=>{closeDialog(); openBake()}}]});
+  showDialog({place:KITCHEN.place,speaker:KITCHEN.speaker,pages:KITCHEN.ready,actions:[{label:"Let's bake",fn:()=>{closeDialog(); if(have.crossword)openBake(); else openCrossword(openBake)}}]});   // the smudged recipe card (crossword.js) comes first
 }
 function finalNote(){
   showDialog({place:KITCHEN.place,speaker:'',pages:[KITCHEN.note],noteLast:true,actions:[
@@ -285,7 +285,7 @@ function drawXmasTree(){
   F('#c8322b',190,110,10,8); F('#f4d35e',194,110,2,8); F('#3d6fb0',212,111,9,7); F('#efe2c4',216,111,1,7);
 }
 
-SCENES.kitchen={ place:KITCHEN.place,
+SCENES.kitchen={ place:KITCHEN.place, music:()=>kit.dance?'jingle':'kitchen',
   w:224, h:168, bounds:R(6,52,212,116), bg:kitBg, triggers:KIT_TRIGGERS,
   dynTrigger(){ const c=crowdNear(); if(!c)return null; const f=crowdFace(c.name); return {label:'Talk to '+f.speaker, btn:'Talk', act:()=>showDialog({place:KITCHEN.place,speaker:f.speaker,face:f.face,pages:[KITCHEN.crowd[c.name]],actions:[CLOSE]})} },
   ambient(dt){ bakeTick(dt); partyTick(dt);
