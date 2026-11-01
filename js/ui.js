@@ -1,11 +1,24 @@
 // Basket strip, dialog boxes, and what happens at each land.
 const $=id=>document.getElementById(id);
 const dlg=$('dialog'), prompt=$('prompt');
+// The basket: a little picture of each ingredient. Ones you don't have yet are dark shadows of themselves.
+// Bonus things (the cupcake, Bryan's sprinkles, Lars's ice cream) show up after a divider once you find them.
+function itemIcon(key,got){
+  const c=document.createElement('canvas'); c.width=40; c.height=30; const g=c.getContext('2d');
+  ART[key](g); if(!got){g.globalCompositeOperation='source-in'; g.fillStyle='#3a4058'; g.fillRect(0,0,40,30)}
+  return c;
+}
+function basketSlot(key,label,got,cls=''){
+  const s=document.createElement('span'); s.className=`slot ${got?'got':''} ${cls}`; s.dataset.key=key; s.title=label;
+  s.append(itemIcon(key,got)); const l=document.createElement('b'); l.innerHTML=got?'<i>✓ </i>':''; l.append(label); s.append(l);
+  return s;
+}
 function renderBasket(){
-  $('basket').innerHTML=ITEMS.map(i=>`<span class="slot ${have[i.key]?'got':''}">${have[i.key]?'✓ ':''}${i.label}</span>`).join('')
-    +(have.cupcake&&!have.gaveCupcake?'<span class="slot extra">Cupcake</span>':'')
-    +(have.sprinkles?'<span class="slot got">✓ Sprinkles</span>':'')   // a bonus from Bryan
-    +(have.icecream?'<span class="slot got">✓ Ice cream</span>':'');   // a bonus from Lars's long jump
+  const b=$('basket'); b.replaceChildren(...ITEMS.map(i=>basketSlot(i.key,i.label,!!have[i.key])));
+  const extras=[]; if(have.cupcake&&!have.gaveCupcake)extras.push(basketSlot('cupcake','Cupcake',true,'extra'));
+  if(have.sprinkles)extras.push(basketSlot('sprinkles','Sprinkles',true,'bonus'));   // a bonus from Bryan
+  if(have.icecream)extras.push(basketSlot('icecream','Ice cream',true,'bonus'));    // a bonus from Lars's long jump
+  if(extras.length){const d=document.createElement('span'); d.className='bdiv'; b.append(d,...extras)}
 }
 // pages: strings shown one at a time. actions: buttons on the last page.
 // menu:true lays the buttons out as a grid of choices (used for asking questions).
@@ -61,6 +74,12 @@ $('startBtn').onclick=start;
 // ---------- reward pop-up ----------
 // showReward('farm') shows the item art; tapping it flies it into the basket and marks it collected.
 const ART={
+  cupcake(g){ const F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};
+    // the hidden cupcake: striped pink wrapper, chocolate frosting swirl, a cherry
+    F('#e9a6c0',12,17,16,10); F('#c77a9a',14,17,2,10); F('#c77a9a',19,17,2,10); F('#c77a9a',24,17,2,10); F('#d88fae',13,26,14,1);
+    F('#5a3220',11,11,18,7); F('#6e3f28',13,8,14,4); F('#7a4a2c',16,5,8,4); F('#8a5a38',14,9,4,1);
+    F('#e54b7a',13,13,1,1); F('#f4d35e',18,10,1,1); F('#5fa8e8',23,13,1,1); F('#ffffff',20,14,1,1);
+    F('#c8322b',18,2,4,4); F('#e8584c',18,2,2,1); F('#3f7a45',21,0,1,3) },
   icecream(g){ const F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};
     // a pint of Maple Rosemary: cream-colored tub, maple-brown label, a rosemary sprig, a little frost
     F('#d9d3c4',7,4,18,4); F('#efe9dc',8,3,16,2); F('#f7f2e6',8,8,16,20); F('#e0d8c6',22,8,2,20); F('#e0d8c6',8,27,16,1);
@@ -133,8 +152,8 @@ function collectReward(){
   if(!rewardKey)return; const key=rewardKey; rewardKey=null;
   have[key]=true; save(); sfx('pop');
   const art=$('rewardArt'), i=ITEMS.findIndex(it=>it.key===key);
-  const slot=$('basket').children[i], a=art.getBoundingClientRect(), b=slot?slot.getBoundingClientRect():a;
-  const done=()=>{$('reward').hidden=true; renderBasket(); const sl=$('basket').children[i]; sl&&sl.classList.add('pop'); paused=false; if(rewardThen){const f=rewardThen; rewardThen=null; f()}};
+  const slot=$('basket').querySelector(`[data-key="${key}"]`), a=art.getBoundingClientRect(), b=slot?slot.getBoundingClientRect():a;
+  const done=()=>{$('reward').hidden=true; renderBasket(); const sl=$('basket').querySelector(`[data-key="${key}"]`); sl&&sl.classList.add('pop'); paused=false; if(rewardThen){const f=rewardThen; rewardThen=null; f()}};
   const still=matchMedia('(prefers-reduced-motion: reduce)').matches;
   if(still||!art.animate)return done();
   art.style.animation='none';
