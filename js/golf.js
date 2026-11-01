@@ -1,4 +1,4 @@
-// Creamery Hills Disc Golf: a three-hole round against Jack and Margie. Win it and the creamery hands over the milk.
+// Creamery Hills Disc Golf: a five-hole round against Jack and Margie. Win it and the creamery hands over the milk.
 // Throwing: tap once to lock your aim (the arrow sweeps), tap again to lock your power (the meter pulses).
 // Inside the circle around the basket it's a putt: slower sweep, shorter throw, easier to sink.
 const GOLF={
@@ -7,16 +7,23 @@ const GOLF={
   PUTT_SPAN:.32, PUTT_PERIOD:2100,                   // putt aim sweeps slower and narrower
   POWER_PERIOD:1300, PUTT_POWER_PERIOD:1700,
   CHAINS:6, PUTT_CHAINS:7.5, TREE_R:6, FADE:.35, SPEED:.22, MAX_STROKES:7,
+  PLATFORM:1.3, HIKE:.75, HIKE_WILD:.22,            // platform throws go 30% farther; hikes go 75% as far, +-0.11 rad wild
   // opponents' score on each hole relative to par (chances). Margie's the better player.
-  MARGIE:{'-1':.42,'0':.50,'1':.08},     // simulated: a careful player with average timing wins ~45%
+  MARGIE:{'-1':.50,'0':.45,'1':.05},     // simulated over 5 holes: careful + average timing wins ~47%, sloppy ~24%
   JACK:{'-1':.10,'0':.45,'1':.35,'2':.10},
 };
 const GW=224, GH=168, GOLF_OB=R(4,8,216,156);
 const HOLES=[
   {tee:{x:24,y:138}, basket:{x:192,y:36}, par:3, water:[],
    trees:[[70,112],[100,84],[132,124],[152,62],[176,98],[62,52],[122,30],[40,96]]},
+  // The Lookout: you throw from a raised platform. From up there the disc flies farther and clears the trees near the tee.
+  {tee:{x:28,y:138}, basket:{x:198,y:30}, par:3, water:[], platform:true,
+   trees:[[56,118],[70,104],[84,92],[50,96],[96,124],[66,82],[140,52],[176,70],[150,108]]},
   {tee:{x:20,y:90}, basket:{x:204,y:88}, par:3, water:[{x:110,y:90,rx:40,ry:32}],
    trees:[[182,58],[186,122],[162,96],[60,40],[60,140],[140,30],[140,150]]},
+  // Hut! Hut!: face away from the basket and hike it through your legs (shorter, a little wild, no fade)
+  {tee:{x:40,y:86}, basket:{x:190,y:86}, par:3, water:[], hike:true,
+   trees:[[116,50],[120,124],[154,64],[154,108],[80,30],[80,142],[200,40],[200,132]]},
   {tee:{x:112,y:146}, basket:{x:112,y:24}, par:3, water:[],
    trees:[...[30,48,66,84,102,120,138].flatMap(y=>[[82,y],[142,y]]),[112,92]]},
 ];
@@ -85,14 +92,17 @@ function aimNow(){const span=isPutt()?GOLF.PUTT_SPAN:GOLF.AIM_SPAN, per=isPutt()
 function powerNow(){const per=isPutt()?GOLF.PUTT_POWER_PERIOD:GOLF.POWER_PERIOD, ph=(golf.t%per)/per; return ph<.5?ph*2:2-ph*2}
 const inWater=(h,x,y)=>h.water.some(w=>((x-w.x)/w.rx)**2+((y-w.y)/w.ry)**2<=1);
 // where a throw goes: returns {path, end, result:'in'|'tree'|'water'|'ob'|'land'}
-function golfFlight(h,lie,angle,power,putt){
-  const D=Math.max(8,power*(putt?GOLF.PUTT_MAX:GOLF.MAX)), path=[]; let x=lie.x,y=lie.y,a=angle;
+// special first throws: 'platform' (farther, sails over the trees early on) or 'hike' (through the legs: shorter, no fade)
+function throwMode(){const h=golfHole(); if(golf.strokes>0||golf.lie.x!==h.tee.x||golf.lie.y!==h.tee.y)return ''; return h.platform?'platform':h.hike?'hike':''}
+function golfFlight(h,lie,angle,power,putt,mode=''){
+  const mult=mode==='platform'?GOLF.PLATFORM:mode==='hike'?GOLF.HIKE:1;
+  const D=Math.max(8,power*(putt?GOLF.PUTT_MAX:GOLF.MAX)*mult), path=[]; let x=lie.x,y=lie.y,a=angle;
   for(let s=0;s<=D;s+=1){
-    if(!putt){const f=s/D; if(f>.72)a-=GOLF.FADE/(D*.28)}    // backhand fade at the end
+    if(!putt&&mode!=='hike'){const f=s/D; if(f>.72)a-=GOLF.FADE/(D*.28)}    // backhand fade at the end
     x+=Math.cos(a); y+=Math.sin(a); path.push({x,y});
     const db=Math.hypot(x-h.basket.x,y-h.basket.y);
     if(db<(putt?GOLF.PUTT_CHAINS:GOLF.CHAINS)&&(putt||s>D*.55))return {path,end:{x:h.basket.x,y:h.basket.y},result:'in'};
-    for(const [tx,ty] of h.trees)if(Math.hypot(x-tx,y-ty+3)<GOLF.TREE_R){
+    if(!(mode==='platform'&&s<D*.5))for(const [tx,ty] of h.trees)if(Math.hypot(x-tx,y-ty+3)<GOLF.TREE_R){
       const bx=x-Math.cos(a)*4, by=y-Math.sin(a)*4; path.push({x:bx,y:by}); return {path,end:{x:bx,y:by},result:'tree'}}
     if(x<GOLF_OB.x||y<GOLF_OB.y||x>GOLF_OB.x+GOLF_OB.w||y>GOLF_OB.y+GOLF_OB.h)return {path,end:{x,y},result:'ob'};
   }
@@ -102,8 +112,9 @@ function golfTap(){
   if(!golf.active)return;
   if(golf.state==='aim'){golf.angle=aimNow(); golf.state='power'; golf.t=Math.random()*400; return}
   if(golf.state==='power'){
-    golf.power=powerNow(); const putt=isPutt();
-    golf.flight=golfFlight(golfHole(),golf.lie,golf.angle,golf.power,putt); golf.flight.i=0; golf.flight.putt=putt;
+    golf.power=powerNow(); const putt=isPutt(), mode=throwMode();
+    if(mode==='hike')golf.angle+=(Math.random()-.5)*GOLF.HIKE_WILD;      // you can't really see where it's going
+    golf.flight=golfFlight(golfHole(),golf.lie,golf.angle,golf.power,putt,mode); golf.flight.i=0; golf.flight.putt=putt; golf.flight.mode=mode;
     golf.strokes++; golf.state='flight'; golf.msg='';
   }
 }
@@ -130,7 +141,10 @@ function golfStartHole(){
   const h=golfHole(); golf.lie={...h.tee}; golf.prevLie={...h.tee}; golf.strokes=0; golf.state='aim'; golf.t=Math.random()*1000; golf.msg='';
   P.x=h.tee.x; P.y=h.tee.y+4; P.dir='right';
   flashGolf(GOLF_TEXT.holeNames[golf.hole]);
+  if(h.platform)say([['Margie',GOLF_TEXT.platformHint]]);
+  if(h.hike){P.dir='left'; say([['Jack',GOLF_TEXT.hikeHint]])}
 }
+const onPlatform=()=>golf.active&&golfHole().platform&&golf.lie&&golf.lie.x===golfHole().tee.x&&golf.lie.y===golfHole().tee.y&&golf.state!=='between';
 function flashGolf(t){prompt.textContent=t; prompt.hidden=false; golf.promptT=1800}
 function golfRoundOver(){
   golf.active=false; golf.state='idle';
@@ -166,16 +180,26 @@ SCENES.golf={
     return null;
   },
   ability:()=>golfTap(),
-  abilityLabel:()=>golf.active?(golf.state==='aim'?'Aim':golf.state==='power'?'Throw':''):'',
+  abilityLabel:()=>golf.active?(golf.state==='aim'?'Aim':golf.state==='power'?(throwMode()==='hike'?'Hike!':'Throw'):''):'',
   ambient(dt){ if(golf.promptT>0){golf.promptT-=dt; if(golf.promptT<=0&&!near)prompt.hidden=true} },
   update(dt){
     if(!golf.active)return;
     if(golf.state==='aim'||golf.state==='power')golf.t+=dt;
     if(golf.state==='flight'){const f=golf.flight; f.i=Math.min(f.path.length-1,f.i+dt*GOLF.SPEED*(f.putt?.8:1)); if(f.i>=f.path.length-1)golfLand()}
   },
-  drawPlayer:(x,y)=>drawPlayer(x,y),
+  drawPlayer:(x,y)=>{
+    if(golf.active&&throwMode()==='hike'&&golf.state!=='flight')P.dir='left';   // facing away from the basket
+    drawPlayer(x,y-(onPlatform()?7:0));
+    if(golf.active&&throwMode()==='hike'&&(golf.state==='aim'||golf.state==='power')){ // HUT! HUT!
+      const bx=Math.round(x)-22, by=Math.round(y)-34; ctx.fillStyle='#ffffff'; ctx.fillRect(bx,by,24,9); ctx.fillRect(bx+18,by+9,2,2);
+      ctx.fillStyle='#2b2236'; ctx.font='7px monospace'; ctx.fillText('HUT!',bx+3,by+7)}
+  },
   under(){
     const h=golf.active||golf.state==='between'?golfHole():HOLES[0]; drawBasket(h.basket.x,h.basket.y);
+    if(h.platform){const t=h.tee, F=(c,x,y,w,hh)=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,hh)};   // the lookout platform
+      F('rgba(0,0,0,.22)',t.x-9,t.y+1,22,6); F('#6b4a2f',t.x-10,t.y-4,2,8); F('#6b4a2f',t.x+8,t.y-4,2,8);
+      F('#a26c40',t.x-11,t.y-8,22,6); for(let xx=t.x-11;xx<t.x+11;xx+=4)F('#8a5a34',xx,t.y-8,1,6); F('#5a3a22',t.x-11,t.y-10,22,1);
+      F('#6b4a2f',t.x+11,t.y-7,2,12); for(let yy=t.y-5;yy<t.y+5;yy+=3)F('#8a5a34',t.x+11,yy,4,1)}
     if(!golf.active&&golf.state!=='between'){drawCow(18,46); drawCow(60,20)}
   },
   ents(list){

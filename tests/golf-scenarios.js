@@ -5,12 +5,12 @@ const URL='file://'+path.resolve(__dirname,'../index.html');
 const helpers=()=>{window.T={
   btns:()=>[...$('dbtns').querySelectorAll('button')].map(b=>b.textContent),
   click:t=>[...$('dbtns').querySelectorAll('button')].find(b=>b.textContent===t).click(),
-  through:()=>{const seen=[]; for(let i=0;i<40&&!dlg.hidden;i++){seen.push($('dspeaker').textContent+': '+$('dtext').textContent); [...$('dbtns').querySelectorAll('button')][0].click()} return seen},
+  through:()=>{const seen=[]; for(let i=0;i<40&&!dlg.hidden&&!T.btns().includes('Play again');i++){seen.push($('dspeaker').textContent+': '+$('dtext').textContent); [...$('dbtns').querySelectorAll('button')][0].click()} return seen},
   run:n=>{for(let i=0;i<n;i++)update(16.7)},
   // throw with an exact angle offset + power (bypassing the sweeps)
-  throwAt:(off,pw)=>{golfTap(); golf.angle=aimBase()+off; golfTap(); golf.flight=golfFlight(golfHole(),golf.lie,golf.angle,pw,isPutt()); golf.flight.i=0; golf.flight.putt=isPutt(); for(let i=0;i<200&&golf.state==='flight';i++)update(16.7)},
+  throwAt:(off,pw)=>{const mode=throwMode(); golfTap(); golf.angle=aimBase()+off; golfTap(); golf.flight=golfFlight(golfHole(),golf.lie,golf.angle,pw,isPutt(),mode); golf.flight.i=0; golf.flight.putt=isPutt(); for(let i=0;i<200&&golf.state==='flight';i++)update(16.7)},
   bestThrow:()=>{const h=golfHole(),b=h.basket,putt=isPutt(),span=putt?GOLF.PUTT_SPAN:GOLF.AIM_SPAN; let best=null;
-    for(let o=-span;o<=span;o+=span/20)for(let pw=.1;pw<=1.001;pw+=.025){const f=golfFlight(h,golf.lie,aimBase()+o,pw,putt); const sc=f.result==='in'?-1:(f.result==='water'||f.result==='ob')?999:Math.hypot(f.end.x-b.x,f.end.y-b.y)+(f.result==='tree'?30:0); if(!best||sc<best.sc)best={o,pw,sc}} return best},
+    const mode=throwMode(); for(let o=-span;o<=span;o+=span/20)for(let pw=.1;pw<=1.001;pw+=.025){const f=golfFlight(h,golf.lie,aimBase()+o,pw,putt,mode); const sc=f.result==='in'?-1:(f.result==='water'||f.result==='ob')?999:Math.hypot(f.end.x-b.x,f.end.y-b.y)+(f.result==='tree'?30:0); if(!best||sc<best.sc)best={o,pw,sc}} return best},
 }};
 const fresh=async()=>{await p.goto(URL);await p.evaluate(()=>localStorage.clear());await p.reload();await p.click('#startBtn');await p.evaluate(helpers)};
 const R=[];const ok=(n,c,x='')=>R.push((c?'PASS ':'FAIL ')+n+(x?'  ('+x+')':''));
@@ -24,16 +24,23 @@ r=await p.evaluate(()=>{const a1=aimNow(); T.run(20); const a2=aimNow(); golfTap
 ok('B aim sweeps, power pulses, A says Throw',r.aim&&r.pow&&r.label==='Throw');
 r=await p.evaluate(()=>{golf.state='aim'; return 1});
 // hazards: tree, water, out of bounds
-r=await p.evaluate(()=>{const h=HOLES[1]; const water=golfFlight(h,h.tee,0,.6,false); const ob=golfFlight(h,h.tee,Math.PI/2,1,false); const h1=HOLES[0]; const t=h1.trees[0]; const toTree=golfFlight(h1,h1.tee,Math.atan2(t[1]-3-h1.tee.y,t[0]-h1.tee.x),1,false); return {water:water.result,ob:ob.result,tree:toTree.result}});
+r=await p.evaluate(()=>{const h=HOLES[2]; const water=golfFlight(h,h.tee,0,.6,false); const ob=golfFlight(h,h.tee,Math.PI/2,1,false); const h1=HOLES[0]; const t=h1.trees[0]; const toTree=golfFlight(h1,h1.tee,Math.atan2(t[1]-3-h1.tee.y,t[0]-h1.tee.x),1,false); return {water:water.result,ob:ob.result,tree:toTree.result}});
 ok('C water, out of bounds and trees all do their thing',r.water==='water'&&r.ob==='ob'&&r.tree==='tree',JSON.stringify(r));
 // water costs a stroke and you throw again from the same spot
-r=await p.evaluate(()=>{golf.hole=1; golfStartHole(); const before={...golf.lie}; golfTap(); golf.angle=0; golfTap(); golf.flight=golfFlight(HOLES[1],golf.lie,0,.6,false); golf.flight.i=0; for(let i=0;i<200&&golf.state==='flight';i++)update(16.7);
+r=await p.evaluate(()=>{golf.hole=2; golfStartHole(); T.through(); const before={...golf.lie}; golfTap(); golf.angle=0; golfTap(); golf.flight=golfFlight(HOLES[2],golf.lie,0,.6,false); golf.flight.i=0; for(let i=0;i<200&&golf.state==='flight';i++)update(16.7);
   return {strokes:golf.strokes, same:golf.lie.x===before.x&&golf.lie.y===before.y, msg:golf.msg}});
-ok('C landing in the pond: penalty stroke, rethrow from the same spot',r.strokes===2&&r.same&&r.msg.includes('Splash'),r.msg);
+ok('C landing in the pond: penalty stroke, rethrow from the same spot',r.strokes===2&&r.same&&r.msg.includes('Splash'),JSON.stringify(r));
+r=await p.evaluate(()=>{const L=HOLES[1], hk=HOLES[3]; const a=Math.atan2(L.basket.y-L.tee.y,L.basket.x-L.tee.x);
+  const plat=golfFlight(L,L.tee,a,1,false,'platform'), flat=golfFlight(L,L.tee,a,1,false,'');
+  const ha=Math.atan2(hk.basket.y-hk.tee.y,hk.basket.x-hk.tee.x), hike=golfFlight(hk,hk.tee,ha,1,false,'hike'), norm=golfFlight(hk,hk.tee,ha,1,false,'');
+  golf.hole=3; golfStartHole(); const hint=T.through(); update(16.7); golfTap(); update(16.7); const lab=$('alabel').textContent, facing=P.dir; golf.state='aim';
+  return {plat:plat.result+' '+plat.path.length, flat:flat.result+' '+flat.path.length, hike:hike.path.length, norm:norm.path.length, hint:hint.join(), lab, facing}});
+ok('C the platform drive clears the trees by the tee and goes farther',r.plat.split(' ')[0]!=='tree'&&r.flat.split(' ')[0]==='tree',`${r.plat} vs ${r.flat}`);
+ok('C the hike hole: shorter throw, Jack explains, you face away, button says Hike!',r.hike<r.norm&&r.hint.includes('HUT')&&r.lab==='Hike!'&&r.facing==='left',`${r.hike} vs ${r.norm}, ${r.lab}, ${r.facing}`);
 // a perfect round wins the milk (Margie forced to an average round so the test is deterministic)
 r=await p.evaluate(async()=>{const wait=ms=>new Promise(r=>setTimeout(r,ms)); const keepM=GOLF.MARGIE, keepJ=GOLF.JACK; GOLF.MARGIE={'0':1}; GOLF.JACK={'0':1};
   golfStartRound(); const lines=[]; let guard=0;
-  while((golf.active||golf.state==='between')&&guard++<80){ if(!dlg.hidden){lines.push(...T.through()); continue} if(golf.state!=='aim'){T.run(3); await wait(60); continue} const bt=T.bestThrow(); T.throwAt(bt.o,bt.pw); T.run(10) }
+  while((golf.active||golf.state==='between')&&guard++<160){ if(!dlg.hidden){lines.push(...T.through()); continue} if(golf.state!=='aim'){T.run(3); await wait(60); continue} const bt=T.bestThrow(); T.throwAt(bt.o,bt.pw); T.run(10) }
   for(let i=0;i<60&&$('reward').hidden;i++){T.run(10); await wait(30); if(!dlg.hidden)lines.push(...T.through())}
   GOLF.MARGIE=keepM; GOLF.JACK=keepJ; return {lines,you:golf.you,reward:!$('reward').hidden,name:$('rewardName').textContent}});
 ok('D a sharp round beats them and wins the milk',r.reward&&r.name==='Milk',`you ${r.you.join(',')} | ${r.lines.filter(l=>l.startsWith(': Final')).join('')}`);
@@ -42,10 +49,11 @@ await p.click('#rewardArt',{force:true}); await p.waitForTimeout(900);
 r=await p.evaluate(()=>({golf:!!have.golf,basket:$('basket').textContent})); ok('D milk goes in the basket',r.golf&&r.basket.includes('✓ Milk'),r.basket);
 // a bad round loses and offers another go
 await fresh(); r=await p.evaluate(async()=>{const wait=ms=>new Promise(r=>setTimeout(r,ms)); P.x=192;P.y=281;update(16.7);action();T.run(40); GOLF.MARGIE={'-1':1}; golfStartRound(); let guard=0, lines=[];
-  while((golf.active||golf.state==='between')&&guard++<120){ if(!dlg.hidden){ if(T.btns().includes('Play again'))break; lines.push(...T.through()); continue} if(golf.state!=='aim'){T.run(3); await wait(60); continue} T.throwAt(0,.12); }
-  T.run(10); await wait(100); const last=[]; while(T.btns().includes('Next')||T.btns().includes('OK')){last.push($('dtext').textContent); [...$('dbtns').querySelectorAll('button')][0].click(); T.run(1)}
+  while((golf.active||golf.state==='between')&&guard++<200){ if(!dlg.hidden){ if(T.btns().includes('Play again'))break; lines.push(...T.through()); continue} if(golf.state!=='aim'){T.run(3); await wait(60); continue} T.throwAt(0,.12); }
+  T.run(10); await wait(100); const last=[]; while(!dlg.hidden&&(T.btns().includes('Next')||T.btns().includes('OK'))){last.push($('dtext').textContent); [...$('dbtns').querySelectorAll('button')][0].click(); T.run(1)}
   return {last,btns:T.btns(),golf:!!have.golf}});
 ok('E a weak round loses and Margie offers another',r.btns.includes('Play again')&&!r.golf,r.last.join(' | '));
+if(!r.btns.includes('Play again')){console.log(R.join('\n'));console.log('weak round ended with',JSON.stringify(r).slice(0,600));process.exit(1)}
 // leaving the course
 r=await p.evaluate(()=>{T.click('Maybe later'); P.x=112;P.y=164;update(16.7); const lbl=prompt.textContent; action(); T.run(40); return {lbl,world:scene===SCENES.world}});
 ok('F walk back out to the road',r.lbl==='Head back to the road'&&r.world,r.lbl);

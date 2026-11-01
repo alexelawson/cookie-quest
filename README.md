@@ -16,7 +16,7 @@ For live reload while editing: `python3 -m http.server` and visit http://localho
 | `js/portraits.js` | Faces shown beside dialog text, one painter per speaker name |
 | `js/larsgames.js` | Pick-a-game menu at the end of the heist, quick draw, darts, and the how-to-play card. Difficulty in `QUICKDRAW` and `DARTS` |
 | `js/anagrams.js` | Anagrams vs. Lars: letter sets + accepted words, scoring, Lars's difficulty in `ANAGRAM.LARS` |
-| `js/golf.js` | Creamery Hills Disc Golf: 3 holes vs Jack and Margie for the milk. Holes in `HOLES`, difficulty in `GOLF` |
+| `js/golf.js` | Creamery Hills Disc Golf: 5 holes vs Jack and Margie (incl. a platform tee and a hike-it-through-your-legs hole) for the milk. Holes in `HOLES`, difficulty in `GOLF` |
 | `js/fargo.js` | Fargo: drive the CR-V, find the cheapest gas, Bob's $30.00 pump, then the snack stop for Alex. Car color in `CAR_COLOR`, fuel/speeds in `FUEL` |
 | `js/state.js` | Player, basket save (localStorage), particles |
 | `js/input.js` | Keyboard + touch d-pad |
@@ -45,7 +45,7 @@ Add an object to `SCENES` with `w`, `h`, `bounds`, `bg` (a canvas), `solids`, `t
 - [ ] Mill: wheat harvest + crossword + millstone timing
 - [x] Night city: rooftop chocolate heist with John and Lars
 - [x] Fargo: cheapest-gas hunt, stop the pump on $30.00, pick Alex's drink + snack
-- [x] Disc golf (milk): 3 holes vs Jack and Margie
+- [x] Disc golf (milk): 5 holes vs Jack and Margie
 - [ ] Kitchen: mix, bake, decorate, final note
 
 ## Spoilers

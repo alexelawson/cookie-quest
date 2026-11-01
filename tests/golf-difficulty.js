@@ -8,11 +8,11 @@ const out=await p.evaluate((OV)=>{Object.assign(GOLF,OV);
     while(strokes<GOLF.MAX_STROKES){const b=h.basket, d=Math.hypot(b.x-lie.x,b.y-lie.y), putt=d<=GOLF.PUTT_RANGE, base=Math.atan2(b.y-lie.y,b.x-lie.x);
       const span=putt?GOLF.PUTT_SPAN:GOLF.AIM_SPAN, per=putt?GOLF.PUTT_PERIOD:GOLF.AIM_PERIOD, pper=putt?GOLF.PUTT_POWER_PERIOD:GOLF.POWER_PERIOD;
       // plan: best (offset, power) on the deterministic flight
-      let best=null; for(let o=-span*.9;o<=span*.9;o+=span/6)for(let pw=.15;pw<=1.001;pw+=.1){const f=golfFlight(h,lie,base+o,pw,putt);
+      const mode=strokes===0?(h.platform?'platform':h.hike?'hike':''):''; let best=null; for(let o=-span*.9;o<=span*.9;o+=span/6)for(let pw=.15;pw<=1.001;pw+=.1){const f=golfFlight(h,lie,base+o,pw,putt,mode);
         const sc=f.result==='in'?-100:(f.result==='water'||f.result==='ob')?999:Math.hypot(f.end.x-b.x,f.end.y-b.y)+(f.result==='tree'?20:0); if(!best||sc<best.sc)best={o,pw,sc}}
       // execute with timing error
       const ph=Math.asin(Math.max(-1,Math.min(1,best.o/span))), aErr=span*2*Math.PI/per*Math.cos(ph)*g()*sigma, pErr=2/pper*g()*sigma;
-      const f=golfFlight(h,lie,base+best.o+aErr,Math.max(.05,Math.min(1,best.pw+pErr)),putt); strokes++;
+      const f=golfFlight(h,lie,base+best.o+aErr+(mode==='hike'?(Math.random()-.5)*GOLF.HIKE_WILD:0),Math.max(.05,Math.min(1,best.pw+pErr)),putt,mode); strokes++;
       if(f.result==='in')return strokes; if(f.result==='water'||f.result==='ob'){strokes++; continue} lie={...f.end}}
     return strokes}
   const res={}; for(const sigma of [20,35,50]){let w=0,tot=0,n=200;
