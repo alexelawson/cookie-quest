@@ -7,9 +7,9 @@ function renderBasket(){
 }
 // pages: strings shown one at a time. actions: buttons on the last page.
 // menu:true lays the buttons out as a grid of choices (used for asking questions).
-function showDialog({place,speaker,pages,actions,noteLast,menu}){
+function showDialog({place,speaker,face,pages,actions,noteLast,menu}){
   paused=true; prompt.hidden=true; let i=0;
-  $('dplace').textContent=place||''; $('dspeaker').textContent=speaker||''; showPortrait(speaker);
+  $('dplace').textContent=place||''; $('dspeaker').textContent=speaker||''; showPortrait(face||speaker);
   const draw=()=>{
     const t=$('dtext'); t.textContent=pages[i]; t.className=(noteLast&&i===pages.length-1)?'note':'';
     const box=$('dbtns'); box.innerHTML=''; const last=i===pages.length-1; box.classList.toggle('menu',!!menu&&last); dlg.classList.toggle('tall',!!menu&&last);
@@ -85,7 +85,7 @@ const REWARDS={
   fargo:{from:'From Bob', name:'Sugar', hint:'Tap it to put it in your basket.'},
   city:{from:'From a grateful city', name:'Chocolate', hint:'Tap it to put it in your basket.'},
   golf:{from:'From Margie, Jack and the creamery', name:'Milk', hint:'Tap it to put it in your basket.'},
-  mill:{from:'From the Miller (and the Vikings)', name:'Flour', hint:'Tap it to put it in your basket.'},
+  mill:{from:'From John (and the Vikings)', name:'Flour', hint:'Tap it to put it in your basket.'},
 };
 let rewardKey=null;
 function showReward(key){

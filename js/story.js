@@ -118,19 +118,19 @@ const HEIST = {
   climbDown:"Climb down the ladder",
 };
 
-// ---------- The mill: the Vikings ski the Birkie with the Miller's flour, then the crossword ----------
+// ---------- The Birkie trailhead: John sends the Vikings off with the flour, then the crossword ----------
 const BIRKIE = {
-  place:'The Old Mill', miller:'The Miller',
-  millerHello:["You're here for flour? Great. Problem.",
-    "My flour's in Cable. The bakery's in Hayward. Fifty kilometers of hills in between.",
+  place:'Birkie Trailhead', john:'John',
+  johnHello:["You're here for flour? Great. Problem.",
+    "The flour's at the start in Cable. The bakery's in Hayward. Fifty kilometers of hills in between.",
     "The Vikings offered to ski it over, Birkebeiner-style. Like the old legend, but the baby prince is a sack of flour.",
     "They're strong. They are NOT good skiers. Guide them, would you?"],
   go:"Head to the start line",
   later:"Later",
-  millerDone:"My flour made it! Now, the crossword...",
+  johnDone:"The flour made it! Now, the crossword...",
   crosswordSoon:"(The crossword is coming soon. For now, take the flour.)",
   takeFlour:"Take the flour",
-  millerAfter:"Come back anytime. Bring a pencil.",
+  johnAfter:"Come back anytime. Bring a pencil.",
   howToTitle:"The Birkie",
   howToSteps:["Steer with left and right. The Vikings follow your tracks exactly.",
     "Uphill: tap A (or Space) in rhythm, right when the ring closes in. Good timing pushes you up. Mashing tires you out.",
@@ -148,12 +148,12 @@ const BIRKIE = {
   elite:"Under 2:30?! Elite wave next year. The flour made it, the crowd is losing it.",
   vikingsWin:[['Viking',"SKOL!!!"],['Viking',"We carried the prince! I mean the flour!"]],
   again:"Try again",
-  leave:"Back to the mill",
+  leave:"Back to the trailhead",
 };
 
 // ---------- The disc golf course: Jack and Margie (milk for the cookies) ----------
 const GOLF_TEXT = {
-  place:'Creamery Hills Disc Golf',
+  place:'Wylee Woods Disc Golf',
   jack:'Jack', margie:'Margie',
   margieHello:["Oh hey! You here for the milk?","The creamery only gives the good stuff to whoever wins the round. House rules.","Five holes. Beat Jack, and at least keep up with me."],
   jackHello:"Margie's been on fire all week. I'm just here for the vibes.",

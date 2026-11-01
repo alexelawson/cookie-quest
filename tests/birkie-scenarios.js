@@ -16,10 +16,10 @@ const helpers=()=>{window.T={
 const fresh=async()=>{await p.goto(URL);await p.evaluate(()=>localStorage.clear());await p.reload();await p.click('#startBtn');await p.evaluate(helpers)};
 const R=[];const ok=(n,c,x='')=>R.push((c?'PASS ':'FAIL ')+n+(x?'  ('+x+')':''));
 await fresh();
-let r=await p.evaluate(()=>{P.x=316;P.y=80;update(16.7); const lbl=prompt.textContent; action(); const sp=$('dspeaker').textContent; const pages=[]; while(T.btns().includes('Next')){pages.push($('dtext').textContent);T.click('Next')} pages.push($('dtext').textContent);
+let r=await p.evaluate(()=>{P.x=320;P.y=84;update(16.7); const lbl=prompt.textContent; action(); const sp=$('dspeaker').textContent; const pages=[]; while(T.btns().includes('Next')){pages.push($('dtext').textContent);T.click('Next')} pages.push($('dtext').textContent);
   const btns=T.btns(); T.click('Head to the start line'); T.run(45); const card=!$('howto').hidden&&$('howTitle').textContent; $('howOk').click(); const hello=T.through(); T.run(2);
   return {lbl,sp,pages,btns,card,hello,running:birk.running,scene:scene===SCENES.birkie,label:$('alabel').textContent,hud:$('hud').textContent}});
-ok('A the Miller explains: Vikings carry the flour, Birkie-style',r.lbl==='Talk to the Miller'&&r.sp==='The Miller'&&r.pages.join(' ').includes('Vikings'),r.pages[2]);
+ok('A John explains: Vikings carry the flour, Birkie-style',r.lbl==='Talk to John'&&r.sp==='John'&&r.pages.join(' ').includes('Vikings'),r.pages[2]);
 ok('A how-to card, then the Vikings, then the race starts',r.scene&&r.card==='The Birkie'&&r.hello.join().includes('SKOL')&&r.running,r.hud);
 ok('A the A button says Pole',r.label.startsWith('Pole'),r.label);
 // mechanics
@@ -32,14 +32,14 @@ ok('B a feed station fills your energy back up',r.st===100&&r.msg.includes('cook
 r=await p.evaluate(()=>{const y=1265; P.x=trailX(y)+60; P.y=y; birk.v=.06; birk.q=1; T.run(60); const offV=birk.v; P.x=trailX(P.y); T.run(60); return {offV,onV:birk.v}});
 ok('B deep snow off the trail is slow',r.offV<.03&&r.onV>r.offV,`${r.offV.toFixed(3)} vs ${r.onV.toFixed(3)}`);
 // lose: never poling, the sweep catches you
-await fresh(); r=await p.evaluate(()=>{P.x=316;P.y=80;update(16.7);action(); while(T.btns().includes('Next'))T.click('Next'); T.click('Head to the start line'); T.run(45); $('howOk').click(); T.through();
+await fresh(); r=await p.evaluate(()=>{P.x=320;P.y=84;update(16.7);action(); while(T.btns().includes('Next'))T.click('Next'); T.click('Head to the start line'); T.run(45); $('howOk').click(); T.through();
   T.ski(30000,false); const lines=T.through(); return {lines,btns:T.btns(),done:!!have.birkie}});
 ok('C no poling: the sweep snowmobile catches you, try again offered',r.lines.join().includes('sweep')&&r.btns.includes('Try again')&&!r.done,r.lines[0]);
-// win: decent rhythm finishes, back at the mill, flour from the Miller
+// win: decent rhythm finishes, back at the trailhead, flour from John
 r=await p.evaluate(()=>{T.click('Try again'); T.ski(); const lines=T.through(); T.run(45); return {lines,world:scene===SCENES.world,done:!!have.birkie,time:have.birkieTime}});
-ok('D good rhythm makes the cutoff; Vikings celebrate; back at the mill',r.done&&r.world&&r.lines.join().includes('SKOL'),r.time+' | '+r.lines[0]);
-r=await p.evaluate(()=>{P.x=316;P.y=80;update(16.7);action(); const pages=[]; while(T.btns().includes('Next')){pages.push($('dtext').textContent);T.click('Next')} T.click('Take the flour'); return {pages,reward:!$('reward').hidden,name:$('rewardName').textContent}});
-ok('D the Miller hands over the flour',r.reward&&r.name==='Flour',r.pages[0]);
+ok('D good rhythm makes the cutoff; Vikings celebrate; back at the trailhead',r.done&&r.world&&r.lines.join().includes('SKOL'),r.time+' | '+r.lines[0]);
+r=await p.evaluate(()=>{P.x=320;P.y=84;update(16.7);action(); const pages=[]; while(T.btns().includes('Next')){pages.push($('dtext').textContent);T.click('Next')} T.click('Take the flour'); return {pages,reward:!$('reward').hidden,name:$('rewardName').textContent}});
+ok('D John hands over the flour',r.reward&&r.name==='Flour',r.pages[0]);
 await p.click('#rewardArt',{force:true}); await p.waitForTimeout(900);
 r=await p.evaluate(()=>({mill:!!have.mill,basket:$('basket').textContent})); ok('D flour in the basket',r.mill&&r.basket.includes('✓ Flour'),r.basket);
 // the course: you can't fall off the edge of the world; the bridge is narrow; Main Street is wide

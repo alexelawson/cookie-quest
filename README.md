@@ -16,8 +16,8 @@ For live reload while editing: `python3 -m http.server` and visit http://localho
 | `js/portraits.js` | Faces shown beside dialog text, one painter per speaker name |
 | `js/larsgames.js` | Pick-a-game menu at the end of the heist, quick draw, darts, and the how-to-play card. Difficulty in `QUICKDRAW` and `DARTS` |
 | `js/anagrams.js` | Anagrams vs. Lars: letter sets + accepted words, scoring, Lars's difficulty in `ANAGRAM.LARS` |
-| `js/golf.js` | Creamery Hills Disc Golf: 5 holes vs Jack and Margie (incl. a platform tee and a hike-it-through-your-legs hole) for the milk. Holes in `HOLES`, difficulty in `GOLF` |
-| `js/birkie.js` | The Birkie at the mill: guide the Vikings from Cable to Main Street, Hayward (pole in rhythm, tuck, snowplow, feed stations) for the flour. Course in `BIRK_SECTIONS`, difficulty in `BIRK` |
+| `js/golf.js` | Wylee Woods Disc Golf: 5 holes vs Jack and Margie (incl. a platform tee and a hike-it-through-your-legs hole) for the milk. Holes in `HOLES`, difficulty in `GOLF` |
+| `js/birkie.js` | The Birkie: John (brown hair, reading glasses) at the trailhead sends you off; guide the Vikings from Cable to Main Street, Hayward (pole in rhythm, tuck, snowplow, feed stations) for the flour. Course in `BIRK_SECTIONS`, difficulty in `BIRK` |
 | `js/fargo.js` | Fargo: drive the CR-V, find the cheapest gas, Bob's $30.00 pump, then the snack stop for Alex. Car color in `CAR_COLOR`, fuel/speeds in `FUEL` |
 | `js/state.js` | Player, basket save (localStorage), particles |
 | `js/input.js` | Keyboard + touch d-pad |
@@ -45,8 +45,8 @@ Add an object to `SCENES` with `w`, `h`, `bounds`, `bg` (a canvas), `solids`, `t
 ## Roadmap
 - [x] Farm: Keelan Q&A, hen chase, hidden cupcake (Keelan helps if you give it to him)
 - [ ] Farm: butter churning
-- [x] Mill: the Birkie with the Vikings
-- [ ] Mill: crossword (Alex's words and clues)
+- [x] Birkie trailhead (flour): parking lot, yurt, American Birkebeiner arch, the race with the Vikings
+- [ ] Birkie trailhead: crossword (Alex's words and clues)
 - [x] Night city: rooftop chocolate heist with John and Lars
 - [x] Fargo: cheapest-gas hunt, stop the pump on $30.00, pick Alex's drink + snack
 - [x] Disc golf (milk): 5 holes vs Jack and Margie

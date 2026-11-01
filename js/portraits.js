@@ -69,6 +69,18 @@ PORTRAITS['Margie']={size:32, bg:'#ffe0ef', draw(g){ const F=px(g);
   F('#ff4fa3',10,11,5,4); F('#ff4fa3',17,11,5,4); F('#ff4fa3',15,12,2,1); F('#ffffff',11,12,1,1); F('#ffffff',18,12,1,1);   // heart shades
   F('#e0aa88',15,15,2,2); F('#c9576a',13,18,6,1); F('#ffffff',14,18,4,1); F('#f2a7a0',10,16,2,1); F('#f2a7a0',20,16,2,1);
 }};
+// Trail John (the Birkie one, not heist John): brown hair, reading glasses low on his nose, volunteer jacket
+PORTRAITS['Trail John']={size:32, bg:'#dbe8f4', draw(g){ const F=px(g);
+  F('#1d3f73',5,24,22,8); F('#c8322b',5,28,22,2); F('#ffffff',13,24,6,3); F('#f2f2f2',14,25,4,2);
+  F('#eab896',13,20,6,4); F('#eab896',10,6,12,15); F('#d9a37f',10,17,1,3); F('#d9a37f',21,17,1,3);
+  F('#6b4429',9,3,14,5); F('#7d5233',12,3,6,1); F('#6b4429',9,7,2,6); F('#6b4429',21,7,2,5);
+  F('#5a3a22',12,10,3,1); F('#5a3a22',17,10,3,1);                                     // brows
+  F('#2b2b2b',13,12,2,1); F('#2b2b2b',18,12,2,1);                                     // eyes peeking over...
+  F('#c9a24a',11,13,5,1); F('#c9a24a',17,13,5,1); F('#c9a24a',11,16,5,1); F('#c9a24a',17,16,5,1);   // ...reading glasses
+  F('#c9a24a',11,13,1,4); F('#c9a24a',15,13,1,4); F('#c9a24a',17,13,1,4); F('#c9a24a',21,13,1,4); F('#c9a24a',16,14,1,1);
+  F('rgba(220,235,250,.6)',12,14,3,2); F('rgba(220,235,250,.6)',18,14,3,2);
+  F('#d9a37f',15,15,2,2); F('#b5735a',14,18,4,1);
+}};
 // Alex: same face as the shop
 PORTRAITS['Alex']={size:40, bg:'#e3d6bd', draw(g){ drawAlexFace(g,'ok') }};
 

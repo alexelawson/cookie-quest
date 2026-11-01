@@ -1,4 +1,4 @@
-// The Vikings ski the Birkie: guide a pack of Vikings (and the Miller's flour) from Cable to Main Street, Hayward.
+// The Vikings ski the Birkie: guide a pack of Vikings (and the flour) from Cable to Main Street, Hayward.
 // You lead; they follow your exact tracks. Steer left/right, tap A in rhythm on climbs, tuck (Down) on descents.
 const BIRK={
   W:224, L:2700,                         // course size (px)
@@ -140,14 +140,34 @@ function birkHowTo(then){
   $('howOk').textContent=T.howToOk; $('howOk').onclick=()=>{ $('howto').hidden=true; paused=false; then&&then() };
   paused=true; prompt.hidden=true; $('howto').hidden=false; setTimeout(()=>$('howOk').focus({preventScroll:true}),0);
 }
-function talkMiller(){
+// John at the trailhead (not heist John): brown hair, reading glasses, Birkie volunteer jacket, clipboard
+function trailJohnDir(){ const dx=P.x-331, dy=P.y-81; return scene!==SCENES.world||Math.hypot(dx,dy)>60?'down':Math.abs(dx)>Math.abs(dy)?(dx<0?'left':'right'):(dy<0?'up':'down') }
+function drawTrailJohn(cx,cy,dir){
+  const x=cx-5, y=cy-20, F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x+dx,y+dy,w,h)};
+  const skin='#eab896', hair='#6b4429', coat='#1d3f73', pants='#b59a6e', glass='#c9a24a';
+  F('rgba(0,0,0,.25)',1,19,9,2);
+  F(pants,2,13,3,6); F(pants,6,13,3,6); F('#2b2b2b',2,18,3,2); F('#2b2b2b',6,18,3,2);
+  F(coat,1,6,9,8); F('#c8322b',1,9,9,1); F('#ffffff',4,6,3,1);                     // jacket with a red stripe
+  F(coat,0,7,1,6); F(coat,10,7,1,6); F(skin,0,13,1,1); F(skin,10,13,1,1);
+  F(skin,3,1,5,5); F(skin,4,5,3,1);
+  F(hair,3,0,5,2); F(hair,2,1,1,3); F(hair,8,1,1,3);
+  if(dir==='up')F(hair,3,0,5,5);
+  else if(dir==='left'){F('#2b2b2b',3,3,1,1); F(glass,3,3,2,1); F(hair,7,1,1,3)}
+  else if(dir==='right'){F('#2b2b2b',7,3,1,1); F(glass,6,3,2,1); F(hair,3,1,1,3)}
+  else {F(glass,3,3,2,2); F(glass,6,3,2,2); F(glass,5,3,1,1); F('#2b2b2b',4,4,1,1); F('#2b2b2b',6,4,1,1); F('#b5735a',4,5,3,1)}   // reading glasses
+  if(dir!=='up'){F('#8a5a34',8,9,3,5); F('#ffffff',8,10,3,3)}                       // clipboard
+}
+function talkJohn(){
   const T=BIRKIE;
-  if(have.mill)return say([[T.miller,T.millerAfter]]);
-  if(have.birkie)return showDialog({place:T.place,speaker:T.miller,pages:[T.millerDone,T.crosswordSoon],actions:[{label:T.takeFlour,fn:()=>{closeDialog();showReward('mill')}}]});
-  showDialog({place:T.place,speaker:T.miller,pages:T.millerHello,actions:[{label:T.go,fn:()=>{closeDialog();goTo('birkie','start')}},{label:T.later,ghost:true,fn:closeDialog}]});
+  if(have.mill)return showDialog({place:T.place,speaker:T.john,face:'Trail John',pages:[T.johnAfter],actions:[CLOSE]});
+  if(have.birkie)return showDialog({place:T.place,speaker:T.john,face:'Trail John',pages:[T.johnDone,T.crosswordSoon],actions:[{label:T.takeFlour,fn:()=>{closeDialog();showReward('mill')}}]});
+  showDialog({place:T.place,speaker:T.john,face:'Trail John',pages:T.johnHello,actions:[{label:T.go,fn:()=>{closeDialog();goTo('birkie','start')}},{label:T.later,ghost:true,fn:closeDialog}]});
 }
 
-SCENES.birkie={
+const birkStartArch=archSprite(60,24,g=>{const F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};
+  F('#8a8f9a',0,0,3,24); F('#8a8f9a',57,0,3,24); F('#1d3f73',0,0,60,16); F('#c8322b',0,0,60,2); F('#c8322b',0,14,60,2);
+  pixText(g,'AMERICAN',13,3,'#ffffff'); pixText(g,'BIRKEBEINER',8,9,'#ffffff')});
+SCENES.birkie={ place:BIRKIE.place,
   w:BIRK.W, h:BIRK.L, bounds:R(0,0,BIRK.W,BIRK.L), bg:birkBg, solids:[], triggers:[],
   entries:{start:{x:112,y:30,dir:'down'}},
   enter(){ birk.running=false; P.x=trailX(30); P.y=30; birk.vikings=[0,1,2,3].map(i=>({x:P.x,y:16-i*14})); birk.introPending=true },
@@ -161,6 +181,8 @@ SCENES.birkie={
   drawPlayer:(x,y)=>{ if(birk.crashT>0)drawSkier(x,y,{down:true,jersey:'#fbfbf7'}); else drawSkier(x,y,{jersey:'#fbfbf7',trim:'#c8322b',hair:'#b08355'}) },
   under(){
     for(const f of FALLEN)drawSkier(f.x,f.y,{down:true,jersey:['#2f6db0','#e8742a','#2f8a4a','#c8322b'][Math.floor(f.y)%4]});
+    // start arch: the American Birkebeiner banner over the start line
+    ctx.drawImage(birkStartArch,trailX(46)-30,24);
     // section signs
     ctx.font='7px monospace'; for(const s of BIRK_SECTIONS){ if(!s.name)continue; const sx=Math.round(trailX(s.y+10)+BIRK.HALF+4), w=Math.ceil(ctx.measureText(s.name).width)+6, x=Math.max(2,Math.min(sx,BIRK.W-w-2));
       ctx.fillStyle='#8a5a34'; ctx.fillRect(x+4,s.y+10,2,8); ctx.fillStyle='#1d3f73'; ctx.fillRect(x,s.y,w,10); ctx.fillStyle='#ffffff'; ctx.fillText(s.name,x+3,s.y+7) }

@@ -1,4 +1,4 @@
-// Creamery Hills Disc Golf: a five-hole round against Jack and Margie. Win it and the creamery hands over the milk.
+// Wylee Woods Disc Golf: a five-hole round against Jack and Margie. Win it and the creamery hands over the milk.
 // Throwing: tap once to lock your aim (the arrow sweeps), tap again to lock your power (the meter pulses).
 // Inside the circle around the basket it's a putt: slower sweep, shorter throw, easier to sink.
 const GOLF={
@@ -193,7 +193,7 @@ function golfPracticeResult(){
     {label:T.practiceAgain,fn:()=>{closeDialog();golfPractice()}},{label:T.startRound,fn:()=>{closeDialog();golf.practice=false;golfStartRound()}}]}),400);
 }
 const MARGIE_SPOT={x:46,y:118}, JACK_SPOT={x:62,y:128};
-SCENES.golf={
+SCENES.golf={ place:GOLF_TEXT.place,
   w:GW, h:GH, bounds:R(4,30,216,136),
   get bg(){ return golfBgs[golf.active||golf.state==='between'?golf.hole:0] },
   get solids(){ return golf.active?[]:[CREAMERY,...HOLES[0].trees.map(([x,y])=>R(x-3,y-3,6,4)),R(MARGIE_SPOT.x-4,MARGIE_SPOT.y-3,8,4),R(JACK_SPOT.x-4,JACK_SPOT.y-3,8,4),R(188,30,8,8)] },

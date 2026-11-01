@@ -42,18 +42,7 @@ function fargoNewRun(){
   let k=0; STATIONS.forEach((s,i)=>{s.seen=false; s.price=i===fargo.bob?CHEAPEST:others[k]; s.name=i===fargo.bob?FARGO.bob:names[k]; if(i!==fargo.bob)k++});
 }
 
-// ---------- tiny pixel font ----------
-const GLYPH={'0':'111101101101111','1':'010110010010111','2':'111001111100111','3':'111001111001111','4':'101101111001001',
-  '5':'111100111001111','6':'111100111101111','7':'111001010010010','8':'111101111101111','9':'111101111001111',
-  '?':'111001011000010','F':'111100110100100','A':'010101111101101','R':'110101110101101','G':'011100101101011','O':'010101101101010'};
-function pixText(g,str,x,y,color){
-  g.fillStyle=color;
-  for(const ch of str){
-    if(ch==='.'){g.fillRect(x,y+4,1,1); x+=2; continue}
-    const m=GLYPH[ch]; if(m)for(let i=0;i<15;i++)if(m[i]==='1')g.fillRect(x+i%3,y+(i/3|0),1,1);
-    x+=4;
-  }
-}
+// (the tiny pixel font, GLYPH and pixText, lives in world.js)
 
 // ---------- the town, painted once ----------
 const fargoBg=document.createElement('canvas'); fargoBg.width=FW; fargoBg.height=FH;

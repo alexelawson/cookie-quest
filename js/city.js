@@ -225,9 +225,9 @@ function caught(hz){
 }
 
 // ---------- story beats ----------
-const say=(lines,done)=>{ // lines: [[speaker,text],...]
+const say=(lines,done)=>{ // lines: [[speaker,text],...] (or [speaker,text,face] to use another portrait)
   let i=0; const next=()=>{ if(i>=lines.length){closeDialog(); done&&done(); return}
-    const [sp,tx]=lines[i++]; showDialog({place:HEIST.place,speaker:sp,pages:[tx],actions:[{label:i>=lines.length?'OK':'Next',fn:next}]}) };
+    const [sp,tx,face]=lines[i++]; showDialog({place:scene.place||HEIST.place,speaker:sp,face,pages:[tx],actions:[{label:i>=lines.length?'OK':'Next',fn:next}]}) };
   next();
 };
 function briefing(){
