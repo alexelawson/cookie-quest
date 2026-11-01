@@ -10,7 +10,7 @@ const GOLF={
   FADE:.35, SPEED:.22, MAX_STROKES:7,
   PLATFORM:1.3, HIKE:.75, HIKE_WILD:.22,            // platform throws go 30% farther; hikes go 75% as far, +-0.11 rad wild
   // opponents' score on each hole relative to par (chances). Margie's the better player.
-  MARGIE:{'-1':.45,'0':.48,'1':.07},     // simulated: sharp timing wins ~95%, average ~81%, sloppy ~56%
+  MARGIE:{'-1':.1,'0':.1,'1':.8},     // simulated: sharp timing wins ~95%, average ~81%, sloppy ~56%
   JACK:{'-1':.10,'0':.45,'1':.35,'2':.10},
 };
 const GW=224, GH=168, GOLF_OB=R(4,8,216,156);
