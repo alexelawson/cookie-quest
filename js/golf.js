@@ -10,7 +10,7 @@ const GOLF={
   FADE:.35, SPEED:.22, MAX_STROKES:7,
   PLATFORM:1.3, HIKE:.75, HIKE_WILD:.22,            // platform throws go 30% farther; hikes go 75% as far, +-0.11 rad wild
   // opponents' score on each hole relative to par (chances). Margie's the better player.
-  MARGIE:{'-1':.60,'0':.37,'1':.03},     // simulated: sharp timing wins ~84%, average ~59%, sloppy ~36%
+  MARGIE:{'-1':.45,'0':.48,'1':.07},     // simulated: sharp timing wins ~95%, average ~81%, sloppy ~56%
   JACK:{'-1':.10,'0':.45,'1':.35,'2':.10},
 };
 const GW=224, GH=168, GOLF_OB=R(4,8,216,156);
@@ -161,6 +161,11 @@ function golfRoundOver(){
   if(won){ have.golfWon=true; save(); say([['',card],...GOLF_TEXT.win.map(t=>['Margie',t]),['Jack',GOLF_TEXT.jackWin]],()=>showReward('golf')) }
   else say([['',card],['Margie',GOLF_TEXT.lose[0]]],()=>{ showDialog({place:GOLF_TEXT.place,speaker:'Margie',pages:['Another round?'],actions:[{label:GOLF_TEXT.again,fn:()=>{closeDialog();golfStartRound()}},{label:GOLF_TEXT.notYet,ghost:true,fn:closeDialog}]}) });
 }
+function golfRestart(){
+  if(!golf.active)return; const T=GOLF_TEXT;
+  showDialog({place:T.place,speaker:'Margie',pages:[T.restartAsk],actions:[{label:T.restartYes,fn:()=>{closeDialog(); golf.flight=null; golfStartRound()}},{label:T.restartNo,ghost:true,fn:closeDialog}]});
+}
+$('golfRestart').onclick=()=>{ $('golfRestart').blur(); golfRestart() };
 function golfStartRound(){ Object.assign(golf,{active:true,practice:false,hole:0,you:[],margie:[],jack:[]}); golfStartHole() }
 
 function talkMargie(){

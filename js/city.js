@@ -290,8 +290,34 @@ function beamChoice(){
   const H=HEIST;
   showDialog({place:H.place,speaker:'',pages:[H.beamLook],menu:true,actions:[
     {label:H.beamBridge,fn:()=>{ if(lead().id!=='john')return say(H.beamTooHeavy); closeDialog(); liftBeam() }},
-    {label:H.beamJump,fn:()=>{ closeDialog(); say(H.beamJumpReply) }},
+    {label:H.beamJump,fn:()=>{ closeDialog(); say(H.beamJumpBefore,larsJump) }},
     {label:H.beamLeave,ghost:true,fn:closeDialog}]});
+}
+// Lars's long jump: walk back for a run-up, sprint at the gap, leap... and boing right back. John is not amused.
+const JUMP={WALK:700, RUN:450, AIR:650, DAZE:1400, Y:104, START:62, EDGE:112};
+function larsJump(){
+  const L=heist.crew.find(c=>c.id==='lars'); syncLeadFromP();
+  heist.jump={t:0, from:{x:L.x,y:L.y}}; paused=true; prompt.hidden=true;
+}
+function jumpTick(dt){
+  const j=heist.jump; if(!j)return; j.t+=dt; const L=heist.crew.find(c=>c.id==='lars'), J=heist.crew.find(c=>c.id==='john'), t=j.t, set=(x,y)=>{L.x=x; L.y=y; if(lead()===L){P.x=x;P.y=y;P.dir=L.dir}};
+  const lerp=(a,b,u)=>a+(b-a)*Math.max(0,Math.min(1,u));
+  L.moving=true; L.t=(L.t||0)+dt; if(L.t>90){L.t=0; L.step++}
+  if(t<JUMP.WALK){ L.dir='left'; set(lerp(j.from.x,JUMP.START,t/JUMP.WALK),lerp(j.from.y,JUMP.Y,t/JUMP.WALK)) }
+  else if(t<JUMP.WALK+JUMP.RUN){ L.dir='right'; set(lerp(JUMP.START,JUMP.EDGE,(t-JUMP.WALK)/JUMP.RUN),JUMP.Y) }
+  else if(t<JUMP.WALK+JUMP.RUN+JUMP.AIR){ const u=(t-JUMP.WALK-JUMP.RUN)/JUMP.AIR; L.moving=false; j.air=Math.sin(Math.PI*u)*18; set(JUMP.EDGE+Math.sin(Math.PI*u)*14,JUMP.Y-j.air) }
+  else { j.air=0; L.moving=false; L.dir='down'; set(JUMP.EDGE,JUMP.Y); j.dazed=true;
+    if(J){J.dir=J.x<L.x?'right':'left'}
+    if(t>JUMP.WALK+JUMP.RUN+JUMP.AIR+JUMP.DAZE){ heist.jump=null; heist.annoyT=9000; heist.dazeT=2500; say(HEIST.beamJumpAfter) } }
+  if(t>JUMP.WALK+JUMP.RUN+JUMP.AIR*.8)heist.annoyT=Math.max(heist.annoyT||0,1);
+}
+function drawJumpEmotes(){
+  const L=heist.crew.find(c=>c.id==='lars'), J=heist.crew.find(c=>c.id==='john'), F=(c,x,y,w,h)=>{ctx.fillStyle=c;ctx.fillRect(Math.round(x),Math.round(y),w,h)};
+  if(heist.jump&&heist.jump.air>0){ctx.fillStyle='rgba(0,0,0,.3)'; ctx.fillRect(Math.round(L.x)-4,JUMP.Y-1,9,2)}           // his shadow stays on the roof
+  if((heist.jump&&heist.jump.dazed)||heist.dazeT>0){ for(let k=0;k<3;k++){const a=time/180+k*2.1; F(k%2?'#ffe14a':'#ffffff',L.x+Math.cos(a)*6-1,L.y-27+Math.sin(a)*2,2,2)} }   // seeing stars
+  if(heist.annoyT>0&&J){ const x=J.x+5, y=J.y-24, c='#ff4a3a', on=Math.floor(time/300)%2;                                   // John's anger mark
+    F(c,x,y,2,1); F(c,x,y,1,2); F(c,x+4,y,2,1); F(c,x+5,y,1,2); F(c,x,y+5,2,1); F(c,x,y+4,1,2); F(c,x+4,y+5,2,1); F(c,x+5,y+4,1,2);
+    if(on){F('#9fd2f0',J.x-8,J.y-20,2,3); F('#9fd2f0',J.x-7,J.y-21,1,1)} }                                                  // and a sweat drop
 }
 function liftBeam(){
   have.heistStage=1; save(); heist.beamAnim=600; say([['John',HEIST.beamDone]]);
@@ -392,7 +418,7 @@ SCENES.city={
   key(code){ const i={Digit1:0,Digit2:1,Digit3:2}[code]; if(i!=null){switchTo(i);return true} if(code==='KeyF'){toggleFollow();return true} return false },
   abilityLabel:()=>HEIST.skills[lead().id],
   ambient(dt){
-    anaTick(dt);
+    anaTick(dt); jumpTick(dt); if(heist.annoyT>0&&!heist.jump)heist.annoyT-=dt; if(heist.dazeT>0)heist.dazeT-=dt;
     for(const r of cityRain){r.y+=dt*.32;r.x-=dt*.08;if(r.y>CH){r.y=-4;r.x=Math.random()*(CW+40)}}
     for(const c of cars){c.y+=c.v*dt; if(c.y>CH+6)c.y=-6; if(c.y<-6)c.y=CH+6}
     nextFlash-=dt; if(nextFlash<=0){flashT=140; nextFlash=8000+Math.random()*9000} if(flashT>0)flashT-=dt;
@@ -430,7 +456,7 @@ SCENES.city={
     list.push({y:STRANGER.y,draw:drawStranger});
     if(heistStage()<4)list.push({y:heist.guardY,draw:drawGuard});
   },
-  over(){
+  over(){ drawJumpEmotes();
     const st=heistStage();
     // searchlights on roof B
     if(st<2)for(const L of LIGHTS){const l=lightPos(L); ctx.fillStyle='rgba(255,244,190,.35)'; ctx.beginPath(); ctx.ellipse(l.x,l.y,LIGHT_R,LIGHT_R,0,0,Math.PI*2); ctx.fill();

@@ -213,3 +213,6 @@ canvas{border-radius:6px}
 .bcard .pbtn{padding:7px 14px}
 .bstep{font-size:.85rem}
 .brow .pbtn{flex:1;width:auto}
+
+.minibtn{position:absolute;top:6px;right:6px;z-index:3;font-size:.72rem;padding:2px 8px;border-width:2px;background:var(--shade);color:var(--paper);border-color:var(--line)}
+.minibtn:hover{border-color:var(--gold)}

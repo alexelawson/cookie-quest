@@ -58,7 +58,9 @@ const HEIST = {
   beamLook:"A huge tree trunk. Somebody's been hauling firewood up here. It's just about as long as the gap to the next roof.",
   beamBridge:"Use it as a bridge",
   beamJump:"Have Lars long-jump the gap",
-  beamJumpReply:[['Lars',"Finally. Stand back."],['Lars',"Personal best, 2019. This is nothing."],['','(Lars sprints, leaps... and lands right back where he started.)'],['John',"Lars."],['Lars',"Headwind."],['John',"It's a rooftop. Use the log."]],
+  // Lars tries the long jump: these lines, then he actually runs and jumps (and boings right back), then the after lines
+  beamJumpBefore:[['Lars',"Finally. Stand back."],['Lars',"Personal best, 2019. This is nothing."],['John',"Lars, no."]],
+  beamJumpAfter:[['Lars',"..."],['Lars',"Headwind."],['John',"There is NO wind. It's a rooftop."],['John',"I'm lifting the log. Nobody talk to me."],['Lars',"I was SO close."]],
   beamLeave:"Leave it",
   beamTooHeavy:[['You',"Hnnngh. Nope."],['John',"Step aside. Switch to me."]],
   onlyJohn:"Only John can lift that.",
@@ -212,6 +214,7 @@ const GOLF_TEXT = {
   practiceWater:"Splash. Good thing it doesn't count.",
   practiceOb:"Out of bounds. Good thing it doesn't count.",
   practiceTree:"Off a tree.",
+  restartAsk:"Start the round over from hole 1? Your scores so far get wiped.", restartYes:"Start over", restartNo:"Keep playing",
   holeNames:["Hole 1: The Opener","Hole 2: The Lookout","Hole 3: Cow Pond","Hole 4: Hut! Hut!","Hole 5: The Tunnel"],
   platformHint:"You throw this one from the platform. Up there your drive sails right over those trees. Don't look down.",
   hikeHint:"House rule on this one: face away from the basket and hike it through your legs. HUT! HUT! I always wanted to play for the Vikings.",

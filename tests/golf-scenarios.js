@@ -31,6 +31,9 @@ ok('B practice shows how close you got; throw again resets to the tee; nothing c
 await p.waitForFunction(()=>!dlg.hidden&&T.btns().includes('Start the round'),null,{timeout:5000});
 r=await p.evaluate(()=>{T.click('Start the round'); update(16.7); return {active:golf.active,practice:golf.practice,label:$('alabel').textContent,hud:$('hud').textContent}});
 ok('B the round starts: A says Aim, HUD shows hole 1',r.active&&!r.practice&&r.label==='Aim'&&r.hud.includes('H1'),r.hud);
+r=await p.evaluate(()=>{const btn=!$('golfRestart').hidden; golf.hole=2; golf.you=[1,0]; golf.strokes=3; $('golfRestart').click(); const ask=$('dtext').textContent; T.click('Start over'); for(let i=0;i<5&&!dlg.hidden;i++)[...$('dbtns').querySelectorAll('button')][0].click(); update(16.7);
+  return {btn,ask,hole:golf.hole,you:golf.you.length,strokes:golf.strokes,active:golf.active}});
+ok('B the Restart round button asks, then starts over from hole 1',r.btn&&r.ask.includes('over')&&r.hole===0&&r.you===0&&r.strokes===0&&r.active,JSON.stringify(r));
 // the sweep and meter actually move
 r=await p.evaluate(()=>{const a1=aimNow(); T.run(20); const a2=aimNow(); golfTap(); const p1=powerNow(); T.run(15); const p2=powerNow(); update(16.7); return {aim:Math.abs(a2-a1)>.01, pow:Math.abs(p2-p1)>.01, label:$('alabel').textContent}});
 ok('B aim sweeps, power pulses, A says Throw',r.aim&&r.pow&&r.label==='Throw');

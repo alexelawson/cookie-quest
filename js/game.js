@@ -55,6 +55,7 @@ function update(dt){
 // the little status bar in the corner of the screen (hen counts, fuel...), per scene
 let lastHud=null;
 function updateHud(){
+  $('golfRestart').hidden=!(scene===SCENES.golf&&golf.active&&!golf.practice);
   const h=scene.hud?scene.hud():''; const el=$('hud'); el.hidden=!h;
   if(h!==lastHud){el.innerHTML=h; lastHud=h}
 }
