@@ -1,7 +1,7 @@
 // ============ TESTING TOOLS ============
 // "Win everything" lives in Settings (the ⚙ button under the game), behind the "Testing tools" switch.
 // The switch is OFF by default and remembered per browser, so on Joe's computer it's off unless someone turns it on.
-// To remove it completely: delete the line  <script src="js/devtools.js"></script>  near the bottom of index.html.
+// To remove it completely: delete the devtools.js script line near the bottom of index.html.
 function devWinEverything(){
   // clean up anything in progress, wherever you are
   for(const id of ['reward','pump','shop','vault','anagram','howto','wardrobe','bake','settings'])$(id).hidden=true;
