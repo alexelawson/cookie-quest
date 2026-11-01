@@ -30,8 +30,8 @@ PORTRAITS['John']={size:32, bg:'#f2d9c4', draw(g){ const F=px(g);
   F('#3b2a1e',11,10,4,1); F('#3b2a1e',17,10,4,1); F('#2b2b2b',12,12,2,2); F('#2b2b2b',18,12,2,2);
   F('#c98f66',15,13,2,3); F('#a86a50',13,17,6,1);
 }};
-// You / Joe (in the heist): follows the outfit from the wardrobe
-PORTRAITS['You']={size:32, bg:'#2a3044', draw(g){ const F=px(g), L=(typeof heroLook==='function')?heroLook():{top:'#34405c',head:'hair',mask:'#0b0c12',cape:1};
+// Joe: follows the outfit from the wardrobe
+PORTRAITS['Joe']={size:32, bg:'#2a3044', draw(g){ const F=px(g), L=(typeof heroLook==='function')?heroLook():{top:'#34405c',head:'hair',mask:'#0b0c12',cape:1};
   const skin='#f0c6a0', hair='#b08355', eye='#3d8ad6';
   // shoulders
   if(L.top==='stripes'){F('#f2f2ee',5,22,22,10); for(let y=23;y<32;y+=3)F('#1d1d22',5,y,22,1)}
@@ -114,6 +114,7 @@ PORTRAITS['Bryan']={size:32, bg:'#cfe6f2', draw(g){ const F=px(g);
   F('#d9a37f',15,15,2,2); F('#b5654f',14,18,4,1); F('#b5654f',18,17,1,1);                          // lopsided chill smile
   F('#c9876f',11,16,1,1); F('#c9876f',20,16,1,1);
 }};
+PORTRAITS['You']=PORTRAITS['Joe'];   // old name, just in case
 // Alex: same face as the shop
 PORTRAITS['Alex']={size:40, bg:'#e3d6bd', draw(g){ drawAlexFace(g,'ok') }};
 

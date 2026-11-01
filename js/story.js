@@ -46,7 +46,7 @@ const KEELAN = {
 // You, Lars and John vs. The Confectioner. Change any of these lines.
 const HEIST = {
   place:'The City at Night', stranger:'The Stranger', villain:'The Confectioner',
-  crew:{hero:'You', lars:'Lars', john:'John'},
+  crew:{hero:'Joe', lars:'Lars', john:'John'},
   briefing:["The chocolate's gone. Every last bar in the city.",
             "Someone calling himself The Confectioner. He's holed up in the old candy works, three rooftops east.",
             "Searchlights. Guards. Tripwires you can't see."],
@@ -61,8 +61,10 @@ const HEIST = {
   // Lars tries the long jump: these lines, then he actually runs and jumps (and boings right back), then the after lines
   beamJumpBefore:[['Lars',"Finally. Stand back."],['Lars',"Personal best, 2019. This is nothing."],['John',"Lars, no."]],
   beamJumpAfter:[['Lars',"..."],['Lars',"Headwind."],['John',"There is NO wind. "],['John',"I'm lifting the log. Nobody talk to me."],['Lars',"I was SO close."]],
+  // ...and where he lands, he finds something (only the first time): a bonus for the cookies
+  jumpIceCream:[['Lars',"Wait. What's this?"],['Lars',"A pint of Maple Rosemary ice cream. In the gutter. Still frozen."],['John',"...Why is that up here."],['Lars',"Don't question the rooftops, John."]],
   beamLeave:"Leave it",
-  beamTooHeavy:[['You',"Hnnngh. Nope."],['John',"Step aside. Switch to me."]],
+  beamTooHeavy:[['Joe',"Hnnngh. Nope."],['John',"Step aside. Switch to me."]],
   onlyJohn:"Only John can lift that.",
   beamDone:"Log bridge is up. Watch your step, it's a little rolly.",
   larsLights:"Searchlights. Tell these guys to hold up, and let me run it.",
@@ -365,5 +367,6 @@ const KITCHEN = {place:'Home', speaker:'Your kitchen',
     ['Lars',"Okay. These beat my PR."],['John',"Can I have six? I'm having six."],['The Stranger',"The city finally has the cookies it deserves."],
     ['Margie',"Milk for dunking. My idea. All my ideas are great."],['Jack',"Ten out of ten. Cookie rating logged. Margin of error: zero."],['Bryan',"Nice."],['John',"SKOL!!! (the Vikings taught me that)",'Trail John'],
     ['','Everyone agrees. There is only one Cookie King.'],['','Joe gets a crown.'],['Alex',"And now... THE COOKIE DANCE. Everybody!"]],
+  icecreamLine:"Cookie ice cream sandwiches. Maple rosemary. I found it on a roof. You're welcome.",   // only if Lars found the ice cream
   playAgain:"Play again", keepExploring:"Keep exploring",
   note:"Merry Christmas! Love, Alex"};

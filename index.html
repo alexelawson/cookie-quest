@@ -70,7 +70,7 @@
     <div class="anagram" id="anagram" hidden role="dialog" aria-labelledby="anaTitle">
       <div class="acard">
         <div class="ahead"><h3 id="anaTitle"></h3><span class="atime" id="anaTime">60</span></div>
-        <div class="ascores"><span>You <b id="anaYou">0</b></span><span>Lars <b id="anaLars">0</b></span></div>
+        <div class="ascores"><span>Joe <b id="anaYou">0</b></span><span>Lars <b id="anaLars">0</b></span></div>
         <p id="anaMsg" aria-live="polite"></p>
         <button class="btn" id="anaStart"></button>
         <div id="anaPlay" hidden>
@@ -111,11 +111,7 @@
       <div class="vcard">
         <small id="setTitle">Settings</small>
         <button class="btn" id="setOutfit"></button>
-        <label class="srow" id="devRow"><input type="checkbox" id="devToggle"> Testing tools (for Alex 👀)</label>
-        <div class="devarea" id="devArea" hidden>
-          <button class="btn" id="devWin">Win everything → jump to the ending</button>
-          <p class="shint">Fills the basket and takes you to the kitchen. Testing tools stay off on any other computer unless you turn them on here.</p>
-        </div>
+        <label class="srow"><input type="checkbox" id="soundToggle"> Sound</label>
         <button class="btn ghost" id="settingsClose">Close</button>
       </div>
     </div>
@@ -124,7 +120,6 @@
       <h2>The Great<br>Cookie Quest</h2>
       <p>Five stops. One basket. The best chocolate chip cookies (and a glass of milk) ever made.</p>
       <button class="btn" id="startBtn">Start</button>
-      <small>Work in progress</small>
     </div>
   </div>
   <div class="crewbar" id="crewbar" hidden>
@@ -151,6 +146,7 @@
 <script src="js/story.js"></script>
 <script src="js/world.js"></script>
 <script src="js/state.js"></script>
+<script src="js/sound.js"></script>
 <script src="js/input.js"></script>
 <script src="js/ui.js"></script>
 <script src="js/farm.js"></script>
@@ -163,7 +159,5 @@
 <script src="js/golf.js"></script>
 <script src="js/birkie.js"></script>
 <script src="js/game.js"></script>
-<!-- Testing tools (off unless turned on in Settings). Delete the next line to remove them completely. -->
-<script src="js/devtools.js"></script>
 </body>
 </html>

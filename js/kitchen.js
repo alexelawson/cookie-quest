@@ -20,7 +20,7 @@ function startBaking(){
 }
 function finalNote(){
   showDialog({place:KITCHEN.place,speaker:'',pages:[KITCHEN.note],noteLast:true,actions:[
-    {label:KITCHEN.playAgain,fn:()=>{have={};save();renderBasket();farmReset();fargo.won=false;Object.assign(kit,{party:false,dance:false,alex:null,hugged:false});closeDialog();goTo('world','start')}},
+    {label:KITCHEN.playAgain,fn:()=>{have={};save();renderBasket();farmReset();fargo.won=false;Object.assign(kit,{party:false,dance:false,alex:null,hugged:false,hugSound:false});stopMusic();closeDialog();goTo('world','start')}},
     {label:KITCHEN.keepExploring,ghost:true,fn:closeDialog}]});
 }
 
@@ -68,20 +68,20 @@ function bakeSetup(){
   $('bakeBtn').textContent=s.kind==='pour'?K.pourHold:s.kind==='count'?K.eggTap:s.shake?'Shake!':K.stirTap;
   $('bakeAlt').hidden=s.kind!=='count'; $('bakeAlt').textContent=K.eggDone;
 }
-function bakeGood(){ const s=stepNow(); bake.state='good'; bakeMsg(s.good,'happy'); $('bakeBtn').textContent=KITCHEN.next; $('bakeAlt').hidden=true }
+function bakeGood(){ sfx('good'); const s=stepNow(); bake.state='good'; bakeMsg(s.good,'happy'); $('bakeBtn').textContent=KITCHEN.next; $('bakeAlt').hidden=true }
 function ovenSetup(){ bake.state='oven'; bake.t=0; $('bakeStep').className='bstep timer'; $('bakeStep').textContent='00:00'; bakeMsg(KITCHEN.bakeHint); $('bakeBtn').textContent=KITCHEN.bakeStart; $('bakeAlt').hidden=true }
 const ovenMin=()=>bake.t/1000*BAKE.RATE;
 const ovenClock=m=>`${String(Math.floor(m)).padStart(2,'0')}:${String(Math.floor(m%1*60)).padStart(2,'0')}`;
 function bakePress(){
   if(!bake.open||bake.lock>0)return; const s=stepNow(), K=KITCHEN;
   if(bake.state==='pour'){ bake.holding=true; $('bakeBtn').classList.add('on'); return }
-  if(bake.state==='count'){ bake.eggs++; if(bake.eggs>s.target){bakeMsg(K.eggMany,'frown'); bake.eggs=0; bake.lock=500} return }
-  if(bake.state==='stir'){ bake.stirs++; if(bake.stirs>=s.taps)bakeGood(); return }
+  if(bake.state==='count'){ sfx('crack'); bake.eggs++; if(bake.eggs>s.target){bakeMsg(K.eggMany,'frown'); bake.eggs=0; bake.lock=500} return }
+  if(bake.state==='stir'){ sfx(s.shake?'shake':'stir'); bake.stirs++; if(bake.stirs>=s.taps)bakeGood(); return }
   if(bake.state==='good'){ bake.i++; if(bake.i<bakeSteps().length)bakeSetup(); else ovenSetup(); return }
-  if(bake.state==='oven'){ bake.state='baking'; bake.t=0; $('bakeBtn').textContent=K.bakeOut; bakeMsg('Okay, they\'re in. Watch the timer...'); return }
+  if(bake.state==='oven'){ sfx('click'); bake.state='baking'; bake.t=0; $('bakeBtn').textContent=K.bakeOut; bakeMsg('Okay, they\'re in. Watch the timer...'); return }
   if(bake.state==='baking'){ const m=ovenMin();
-    if(Math.abs(m-BAKE.TARGET)<=BAKE.WINDOW){ bake.state='done'; bakeMsg(K.perfect,'happy'); $('bakeBtn').textContent='🍪 '+K.next }
-    else { bake.state='oven'; bake.lock=600; bakeMsg(m<BAKE.TARGET?K.raw:K.burnt,'frown'); $('bakeBtn').textContent=K.bakeStart; bake.burntAt=m }
+    if(Math.abs(m-BAKE.TARGET)<=BAKE.WINDOW){ sfx('ding'); bake.state='done'; bakeMsg(K.perfect,'happy'); $('bakeBtn').textContent='🍪 '+K.next }
+    else { sfx('bad'); bake.state='oven'; bake.lock=600; bakeMsg(m<BAKE.TARGET?K.raw:K.burnt,'frown'); $('bakeBtn').textContent=K.bakeStart; bake.burntAt=m }
     return }
   if(bake.state==='done'){ closeBake(); startParty() }
 }
@@ -89,14 +89,14 @@ function bakeRelease(){
   if(!bake.holding)return; bake.holding=false; $('bakeBtn').classList.remove('on');
   const s=stepNow(), K=KITCHEN, d=bake.amt-s.target;
   if(Math.abs(d)<=s.tol)return bakeGood();
-  bakeMsg(d>0?K.tooMuch:K.tooLittle,'frown'); bake.lastAmt=bake.amt; bake.amt=0; bake.lock=600;
+  bakeMsg(d>0?K.tooMuch:K.tooLittle,'frown'); sfx('bad'); bake.lastAmt=bake.amt; bake.amt=0; bake.lock=600;
 }
 function eggsDone(){ const s=stepNow(); if(bake.state!=='count')return; if(bake.eggs===s.target)bakeGood(); else bakeMsg(KITCHEN.eggFew,'frown') }
 function closeBake(){ bake.open=false; $('bake').hidden=true; paused=false }
 function bakeTick(dt){
   if(!bake.open)return; if(bake.lock>0)bake.lock-=dt;
   const s=stepNow();
-  if(bake.state==='pour'&&bake.holding){ bake.amt+=s.rate*dt/1000; if(bake.amt>=s.max){ bake.holding=false; $('bakeBtn').classList.remove('on'); bake.amt=0; bake.lock=700; bakeMsg(KITCHEN.spilled,'frown') } }
+  if(bake.state==='pour'&&bake.holding){ if((bake.glugT=(bake.glugT||0)+dt)>140){bake.glugT=0; sfx('glug')} bake.amt+=s.rate*dt/1000; if(bake.amt>=s.max){ bake.holding=false; $('bakeBtn').classList.remove('on'); bake.amt=0; bake.lock=700; bakeMsg(KITCHEN.spilled,'frown') } }
   if(bake.state==='baking'){ bake.t+=dt; const m=ovenMin(); $('bakeStep').textContent=ovenClock(Math.min(m,99));
     if(m>=BAKE.MAX){ bake.state='oven'; bake.lock=600; bakeMsg(KITCHEN.burnt,'frown'); $('bakeBtn').textContent=KITCHEN.bakeStart } }
   drawBakeArt();
@@ -148,14 +148,16 @@ addEventListener('keyup',e=>{ if(bake.open&&['Space','Enter'].includes(e.code))b
 // ---------- the party: Alex hugs Joe, everyone talks, the crown, then THE COOKIE DANCE ----------
 const PARTY={WALK:1300, HUG:2600, BEAT:420};
 function startParty(){
-  have.baked=true; save(); kit.party=true; kit.dance=false; P.x=112; P.y=134; P.dir='down';
+  have.baked=true; save(); kit.party=true; kit.dance=false; sfx('fanfare'); P.x=112; P.y=134; P.dir='down';
   const A=CROWD.find(c=>c.name==='Alex'); kit.alex={x:A.x,y:A.y}; kit.hugT=0; kit.hugging=true; paused=true; prompt.hidden=true;
   for(let k=0;k<70;k++)kit.confetti.push({x:Math.random()*224,y:-Math.random()*120,v:.02+Math.random()*.04,c:['#e54b4b','#f4d35e','#4fbf73','#5fa8e8','#e54b7a','#ffffff'][k%6]});
 }
 function partyTick(dt){
   if(!kit.hugging)return; kit.hugT+=dt; const A=CROWD.find(c=>c.name==='Alex'), u=Math.min(1,kit.hugT/PARTY.WALK), tx=104, ty=135;
   kit.alex={x:A.x+(tx-A.x)*u, y:A.y+(ty-A.y)*u};
-  if(kit.hugT>PARTY.WALK+PARTY.HUG){ kit.hugging=false; kit.hugged=true; say(KITCHEN.party.map(([sp,t,face])=>[sp,t,face]),()=>{ kit.crownT=1600 }) }
+  if(kit.hugT>PARTY.WALK&&!kit.hugSound){kit.hugSound=true; sfx('hug')}
+  if(kit.hugT>PARTY.WALK+PARTY.HUG){ kit.hugging=false; kit.hugged=true; const lines=KITCHEN.party.map(([sp,t,face])=>[sp,t,face]); if(have.icecream)lines.splice(4,0,['Lars',KITCHEN.icecreamLine]);   // the ice cream Lars found on the roof
+    say(lines,()=>{ kit.crownT=1600 }) }
 }
 // the dance: an 8-beat loop everyone does together. step left, step right, hop hop, cookies up, spin
 function danceMove(i){
@@ -232,6 +234,7 @@ function drawTable(){
   F('#6a4224',80,100,8,4); F('#6a4224',136,100,8,4);
   F('#8a5a34',86,100,52,16); F('#a26c40',86,100,52,3); F('#6a4224',88,116,3,4); F('#6a4224',133,116,3,4);
   F('#fffdf6',104,103,14,8); F('#c98a5a',107,105,3,3); F('#c98a5a',112,106,3,3);   // a plate of (empty) promise
+  if(have.icecream){F('#f7f2e6',122,100,6,7); F('#9a5a2a',122,103,6,2); F('#3f7a45',124,99,1,2)}   // the Maple Rosemary pint
 }
 function drawXmasTree(){
   const F=(c,x,y,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,h)};
@@ -250,13 +253,14 @@ SCENES.kitchen={ place:KITCHEN.place,
   ambient(dt){ bakeTick(dt); partyTick(dt);
     for(const p of kit.confetti){p.y+=p.v*dt; p.x+=Math.sin((time+p.y*30)/400)*.2; if(p.y>170){ if(kit.party&&kit.confetti.length<140){p.y=-4;p.x=Math.random()*224} else p.dead=true }}
     kit.confetti=kit.confetti.filter(p=>!p.dead);
-    if(kit.crownT>0){ kit.crownT-=dt; if(kit.crownT<=0){ have.crown=true; save(); kit.dance=true; kit.danceAt=time; setTimeout(finalNote,PARTY.BEAT*16) } } },
+    if(kit.crownT>0){ kit.crownT-=dt; if(kit.crownT<=0){ have.crown=true; save(); sfx('crown'); kit.dance=true; kit.danceAt=time; playMusic(); setTimeout(finalNote,PARTY.BEAT*16) } } },
   drawPlayer(x,y){ const m=danceMove(-1); if(kit.dance&&m.dir)P.dir=m.dir; const X=x+m.dx, Y=y+m.dy; drawPlayer(X,Y);
     if(kit.crownT>0){const t=Math.min(1,(1-kit.crownT/1600)*1.4); drawCrown(X,Y-23-(1-t)*60)} else if(have.crown)drawCrown(X,Y-23);
     if(m.cookie)drawCookie(X+7,Y-20) },
   solids:[R(78,104,68,14), R(194,104,24,10), R(6,52,16,6)],
   entries:{start:{x:112,y:152,dir:'up'}, fromDoor:{x:112,y:154,dir:'up'}},
-  enter(){ kit.party=!!have.baked; kit.dance=!!have.crown; kit.danceAt=time; if(have.baked){const A=CROWD.find(c=>c.name==='Alex'); kit.alex={x:104,y:135}} },
+  leave(){ stopMusic() },
+  enter(){ kit.party=!!have.baked; kit.dance=!!have.crown; kit.danceAt=time; if(kit.dance)playMusic(); if(have.baked){const A=CROWD.find(c=>c.name==='Alex'); kit.alex={x:104,y:135}} },
   ents(list){list.push({y:118,draw:drawTable},{y:114,draw:drawXmasTree});
     if(allIn()||have.baked)CROWD.forEach((c,i)=>{ const pos=(c.name==='Alex'&&kit.alex)?kit.alex:c;
       list.push({y:pos.y,draw:()=>{const m=danceMove(i); c.draw(pos.x+m.dx,pos.y+m.dy,m.dir); if(m.cookie)drawCookie(pos.x+m.dx+7,pos.y+m.dy-21)}}) })},

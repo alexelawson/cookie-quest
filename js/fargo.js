@@ -217,9 +217,9 @@ function pumpPress(){ if(!pump.open||pump.lock>0||pump.holding)return; pump.hold
 function pumpRelease(){
   if(!pump.holding)return; pump.holding=false; $('pumpBtn').classList.remove('on');
   if(pump.cents>3000){
-    $('pumpMsg').textContent=FARGO.bust[pump.tries++%FARGO.bust.length]; pump.lock=1300;
+    $('pumpMsg').textContent=FARGO.bust[pump.tries++%FARGO.bust.length]; pump.lock=1300; sfx('buzz');
   } else if(pump.cents===3000){
-    pump.lock=99999; $('pumpMsg').textContent='$30.00 on the nose!';
+    pump.lock=99999; $('pumpMsg').textContent='$30.00 on the nose!'; sfx('ding');
     setTimeout(()=>{ $('pump').hidden=true; pump.open=false; have.fargoStage='store'; have.fargoBob=fargo.bob; save();
       showDialog({place:FARGO.place,speaker:FARGO.bob,pages:FARGO.pumpWin,actions:[{label:FARGO.goInside,fn:()=>{closeDialog();parkAndGetOut()}}]}) },700);
   }
@@ -229,7 +229,7 @@ function pumpTick(dt){
   if(pump.lock>0&&pump.lock<99999){pump.lock-=dt; if(pump.lock<=0){pump.cents=0; pump.frac=0; $('pumpMsg').textContent=FARGO.pumpHint; renderPump()}}
   if(pump.holding){
     pump.heldMs+=dt; const rate=Math.min(650,12+pump.heldMs*.9);     // cents per second, speeds up the longer you hold
-    pump.frac+=rate*dt/1000; const add=Math.floor(pump.frac); if(add){pump.frac-=add; pump.cents+=add; renderPump()}
+    pump.frac+=rate*dt/1000; const add=Math.floor(pump.frac); if(add){pump.frac-=add; pump.cents+=add; renderPump(); if((pump.clickT=(pump.clickT||0)+dt)>70){pump.clickT=0; sfx('click')}}
   }
 }
 $('pumpBtn').addEventListener('pointerdown',e=>{e.preventDefault();pumpPress()});
@@ -374,14 +374,14 @@ function giveToAlex(){
   if(!shop.open||!(shop.drink&&shop.snack))return;
   const C=FARGO.correct, d=FARGO.drinks.find(x=>x.id===shop.drink), k=FARGO.snacks.find(x=>x.id===shop.snack);
   if(shop.drink===C.drink&&shop.snack===C.snack){
-    alexSays(FARGO.alexWin,'happy'); $('giveBtn').disabled=true;
+    alexSays(FARGO.alexWin,'happy'); $('giveBtn').disabled=true; sfx('fanfare');
     setTimeout(()=>{ closeShop(); fargo.alexMood='happy'; fargo.moodT=4000; have.fargoStage='reward'; save();
       showDialog({place:FARGO.place,speaker:FARGO.bob,pages:FARGO.win,actions:[{label:FARGO.thanks,fn:()=>{closeDialog();backInTheCar();showReward('fargo')}}]}) },1400);
     return;
   }
   const lines=[]; if(shop.drink!==C.drink)lines.push(d.react); if(shop.snack!==C.snack)lines.push(k.react);
   fargo.strikes++; fargo.wallet=Math.max(0,fargo.wallet-FARGO.wrongCost);
-  alexSays(lines.join(' ')+` (-$${FARGO.wrongCost})`,'frown'); updateShop();
+  alexSays(lines.join(' ')+` (-$${FARGO.wrongCost})`,'frown'); updateShop(); sfx('bad');
   if(fargo.strikes>=FARGO.strikesOut){
     $('giveBtn').disabled=true;
     setTimeout(()=>{ alexSays(FARGO.kickedOut,'frown'); setTimeout(()=>{

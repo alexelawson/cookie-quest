@@ -29,12 +29,15 @@ ok('A crew bar + objective + skill label',r.bar&&r.hud.includes('Bridge')&&r.lab
 r=await p.evaluate(()=>{T.hints=[]; const w=T.walkTo(88,140); const hint=T.hints; update(16.7); const lbl=prompt.textContent; action();
   const menu=T.btns(); [...$('dbtns').querySelectorAll('button')].find(b=>b.textContent==='Use it as a bridge').click(); const msg=T.clickThrough().join(' / '); const st1=have.heistStage||0;
   update(16.7); action(); [...$('dbtns').querySelectorAll('button')].find(b=>b.textContent==='Have Lars try to long-jump the gap').click(); const cut1=T.clickThrough(); const L=heist.crew.find(c=>c.id==='lars'); let maxX=0, air=0, annoyed=false;
-  for(let i=0;i<260;i++){SCENES.city.ambient(16.7); maxX=Math.max(maxX,L.x); air=Math.max(air,(heist.jump&&heist.jump.air)||0); annoyed=annoyed||heist.annoyT>0} const landed=Math.round(L.x); const cut=[...cut1,'JUMP '+Math.round(maxX)+' air '+Math.round(air)+' land '+landed+' annoyed '+annoyed,...T.clickThrough()].join(' / ');
+  for(let i=0;i<260;i++){SCENES.city.ambient(16.7); maxX=Math.max(maxX,L.x); air=Math.max(air,(heist.jump&&heist.jump.air)||0); annoyed=annoyed||heist.annoyT>0} const landed=Math.round(L.x); const cut=[...cut1,'JUMP '+Math.round(maxX)+' air '+Math.round(air)+' land '+landed+' annoyed '+annoyed,...T.clickThrough()].join(' / '); const ice=!$('reward').hidden&&$('rewardName').textContent; if(ice)collectReward(); window._B={w,hint,lbl,menu,msg,cut,ice,st1}; return 1});
+await p.waitForTimeout(1000);
+r=await p.evaluate(()=>{const {w,hint,lbl,menu,msg,cut,ice,st1}=window._B;
   switchTo(2); T.walkTo(86,136); update(16.7); action(); [...$('dbtns').querySelectorAll('button')].find(b=>b.textContent==='Use it as a bridge').click(); const said=T.clickThrough();
-  return {w,hint,lbl,menu,msg,cut,st1,st2:have.heistStage,said}});
+  return {w,hint,lbl,menu,msg,cut,ice,st1,st2:have.heistStage,said}});
 ok('B John hints at the gap',r.hint.join().includes('log'),r.hint[0]); ok('B the log offers bridge / Lars long jump / leave',r.lbl==='Look at the log'&&r.menu.join()==='Use it as a bridge,Have Lars try to long-jump the gap,Leave it',r.menu.join(' | '));
 ok('B you can\'t lift it; John says switch to him',r.msg.includes('Switch to me')&&!r.st1,r.msg); ok('B Lars really runs and jumps, boings back, John is annoyed',r.cut.includes('Headwind')&&/JUMP 12\d air 1\d land 112 annoyed true/.test(r.cut)&&!r.st1,r.cut);
 ok('B John lifts the beam',r.st2===1,r.said[0]);
+ok('B ...and Lars lands next to a pint of Maple Rosemary ice cream',r.ice==='Maple Rosemary ice cream'&&r.cut.includes('Maple Rosemary'),r.ice);
 r=await p.evaluate(()=>{T.hints=[]; const w=T.path([[110,102],[170,102]]); return {w,hint:T.hints,x:P.x}});
 ok('B the crew crosses the beam to roof B',r.w==='ok',r.w); ok('B Lars calls the searchlights',r.hint.join().includes('Searchlights'),r.hint[0]);
 // C. searchlights: walking through gets you caught; a followed crew too
@@ -103,7 +106,7 @@ r=await p.evaluate(()=>{openAnagrams(); anaGo(); const type=w=>{for(const ch of 
   for(let i=0;i<60*62;i++)update(16.7); const res=$('anaResult').textContent; $('anaNext').click(); const lines=T.clickThrough();
   return {msgs,dup,res,lines,reward:!$('reward').hidden,name:$('rewardName').textContent,st:have.heistStage,lars:ana.lars,you:ana.you}});
 ok('G real words score, repeats don\'t',r.msgs.slice(1).every(m=>m.includes('+'))&&r.dup.includes('Already'),r.msgs.slice(0,3).join(' | '));
-ok('G beat Lars -> chocolate',r.res.startsWith('You win')&&r.lines.join().includes('two out of three')&&r.reward&&r.name==='Chocolate'&&r.st===5,`${r.you} vs ${r.lars}: ${r.res}`);
+ok('G beat Lars -> chocolate',r.res.startsWith('Joe wins')&&r.lines.join().includes('two out of three')&&r.reward&&r.name==='Chocolate'&&r.st===5,`${r.you} vs ${r.lars}: ${r.res}`);
 if(await p.evaluate(()=>$('reward').hidden)){console.log(R.join('\n'));console.log('stopped before reward', errs);process.exit(1)}
 await p.click('#rewardArt',{force:true}); await p.waitForTimeout(900);
 r=await p.evaluate(()=>({city:!!have.city,basket:$('basket').textContent,exit:!!heist.exit})); ok('G chocolate in the basket, then the walk home starts',r.city&&r.basket.includes('✓ Chocolate')&&r.exit,r.basket);

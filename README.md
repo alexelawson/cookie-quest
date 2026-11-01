@@ -20,6 +20,7 @@ For live reload while editing: `python3 -m http.server` and visit http://localho
 | `js/golf.js` | Wylee Woods Disc Golf: 5 holes vs Jack and Margie (incl. a platform tee and a hike-it-through-your-legs hole) for the milk. Holes in `HOLES`, difficulty in `GOLF` |
 | `js/birkie.js` | The Birkie: John (brown hair, reading glasses) at the trailhead sends you off; guide the Vikings from Cable to Main Street, Hayward (pole in rhythm, tuck, snowplow, feed stations) for the flour. Course in `BIRK_SECTIONS`, difficulty in `BIRK` |
 | `js/fargo.js` | Fargo: drive the CR-V, find the cheapest gas, Bob's $30.00 pump, then the snack stop for Alex. Car color in `CAR_COLOR`, fuel/speeds in `FUEL` |
+| `js/sound.js` | All the sounds (made with Web Audio, no files): `sfx('name')` plays one from `SFX`; Jingle Bells plays during the Cookie Dance. Volume in `SOUND`, on/off in ⚙ Settings |
 | `js/state.js` | Player, basket save (localStorage), particles |
 | `js/input.js` | Keyboard + touch d-pad |
 | `js/ui.js` | Dialog system (pages + button menus), land/kitchen interactions |
@@ -30,10 +31,8 @@ For live reload while editing: `python3 -m http.server` and visit http://localho
 
 Everything is drawn with `fillRect` on a 224×168 canvas scaled up with `image-rendering: pixelated`.
 
-## Testing the ending
-Click **⚙ Settings** under the game, turn on **Testing tools**, then **Win everything → jump to the ending**. It fills the basket and drops you in the kitchen.
-The switch is off by default and remembered per browser, so Joe won't see it unless someone turns it on on his computer. To remove it completely, delete `<script src="js/devtools.js"></script>` near the bottom of `index.html`.
-Before handing it over, press **Start over** so the game starts fresh with Alex's welcome.
+## Before giving it to Joe
+Press **Start over** so the game starts fresh with Alex's welcome.
 
 ## Tests
 Needs Node and Playwright (`npm i -D playwright && npx playwright install chromium`).
@@ -64,6 +63,7 @@ Add an object to `SCENES` with `w`, `h`, `bounds`, `bg` (a canvas), `solids`, `t
 - [x] Finale: Alex hugs Joe, crown, THE COOKIE DANCE
 
 ## Spoilers
+If Lars tries to long-jump the gap in the heist, he lands next to a pint of Maple Rosemary ice cream (a bonus; it shows up at the party).
 Bryan is fishing by the pond in the top corner of the farm. Talk to him for sprinkles: a bonus that adds a shake-the-sprinkles step to the baking.
 The cupcake is behind the barn, in the middle. Its frosting peeks up over the roof, and a sparkle flashes beside it every few seconds. Walk behind the barn to grab it.
 

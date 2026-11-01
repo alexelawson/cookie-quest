@@ -4,7 +4,7 @@
 // ---------- how to play ----------
 function openHowTo(){
   const H=HEIST, rows=['hero','lars','john'].map(id=>{
-    const name=id==='hero'?'You':H.crew[id], c=document.createElement('canvas'), p=PORTRAITS[name];
+    const name=H.crew[id], c=document.createElement('canvas'), p=PORTRAITS[name];
     c.width=c.height=p.size; const g=c.getContext('2d'); g.fillStyle=p.bg; g.fillRect(0,0,p.size,p.size); p.draw(g);
     const row=document.createElement('div'); row.className='hrow';
     const txt=document.createElement('div'); txt.innerHTML=`<b>${H.crew[id]} · ${H.skills[id]}</b><span></span>`; txt.querySelector('span').textContent=H.howToSkills[id];

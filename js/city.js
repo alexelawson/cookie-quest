@@ -283,8 +283,8 @@ function moveFollowers(dt){
 // ---------- skills ----------
 function useSkill(){
   const id=lead().id;
-  if(id==='hero'&&heist.sonarCd<=0){heist.sonarT=4200; heist.sonarCd=1600; heist.sonarAt={x:P.x,y:P.y}}
-  if(id==='lars'&&heist.sprintCd<=0){heist.sprintT=800; heist.sprintCd=1100}
+  if(id==='hero'&&heist.sonarCd<=0){sfx('ping'); heist.sonarT=4200; heist.sonarCd=1600; heist.sonarAt={x:P.x,y:P.y}}
+  if(id==='lars'&&heist.sprintCd<=0){sfx('whoosh'); heist.sprintT=800; heist.sprintCd=1100}
   if(id==='john')flashPrompt('Nothing heavy here.');
 }
 function flashPrompt(text){prompt.textContent=text; prompt.hidden=false; heist.promptT=1400}
@@ -309,10 +309,11 @@ function checkHazards(){
   return null;
 }
 function caught(hz){
+  sfx('alarm');
   heist.flashT=500; heist.caughtWho=hz.who; for(const k in dirs)dirs[k]=false;
   const name=HEIST.crew[hz.who], you=hz.who===lead().id;
   const pages=[hz.msg.replace('{who}',you?'you':name).replace('{Who}',you?'You':name)];
-  if(!you&&heist.follow)pages.push(hz.who==='hero'?HEIST.followTipYou.replace('{lead}',HEIST.crew[lead().id]):HEIST.followTip.replace('{who}',name));
+  if(!you&&heist.follow)pages.push(HEIST.followTip.replace('{who}',name));
   pages.push(HEIST.backToCheckpoint);
   showDialog({place:HEIST.place,speaker:'Spotted!',pages,actions:[{label:'OK',fn:()=>{closeDialog();heist.caughtWho=null;placeAtCheckpoint()}}]});
 }
@@ -348,10 +349,10 @@ function jumpTick(dt){
   L.moving=true; L.t=(L.t||0)+dt; if(L.t>90){L.t=0; L.step++}
   if(t<JUMP.WALK){ L.dir='left'; set(lerp(j.from.x,JUMP.START,t/JUMP.WALK),lerp(j.from.y,JUMP.Y,t/JUMP.WALK)) }
   else if(t<JUMP.WALK+JUMP.RUN){ L.dir='right'; set(lerp(JUMP.START,JUMP.EDGE,(t-JUMP.WALK)/JUMP.RUN),JUMP.Y) }
-  else if(t<JUMP.WALK+JUMP.RUN+JUMP.AIR){ const u=(t-JUMP.WALK-JUMP.RUN)/JUMP.AIR; L.moving=false; j.air=Math.sin(Math.PI*u)*18; set(JUMP.EDGE+Math.sin(Math.PI*u)*14,JUMP.Y-j.air) }
-  else { j.air=0; L.moving=false; L.dir='down'; set(JUMP.EDGE,JUMP.Y); j.dazed=true;
+  else if(t<JUMP.WALK+JUMP.RUN+JUMP.AIR){ if(!j.jumped){j.jumped=true; sfx('jump')} const u=(t-JUMP.WALK-JUMP.RUN)/JUMP.AIR; L.moving=false; j.air=Math.sin(Math.PI*u)*18; set(JUMP.EDGE+Math.sin(Math.PI*u)*14,JUMP.Y-j.air) }
+  else { if(!j.landed){j.landed=true; sfx('boing')} j.air=0; L.moving=false; L.dir='down'; set(JUMP.EDGE,JUMP.Y); j.dazed=true;
     if(J){J.dir=J.x<L.x?'right':'left'}
-    if(t>JUMP.WALK+JUMP.RUN+JUMP.AIR+JUMP.DAZE){ heist.jump=null; heist.annoyT=9000; heist.dazeT=2500; say(HEIST.beamJumpAfter) } }
+    if(t>JUMP.WALK+JUMP.RUN+JUMP.AIR+JUMP.DAZE){ heist.jump=null; heist.annoyT=9000; heist.dazeT=2500; say(HEIST.beamJumpAfter,()=>{ if(!have.icecream)say(HEIST.jumpIceCream,()=>showReward('icecream')) }) } }
   if(t>JUMP.WALK+JUMP.RUN+JUMP.AIR*.8)heist.annoyT=Math.max(heist.annoyT||0,1);
 }
 function drawJumpEmotes(){
@@ -376,7 +377,7 @@ function exitTick(dt){
   L.moving=u<1; L.t=(L.t||0)+dt; if(L.t>220){L.t=0; L.step++}
   if(J){J.x=496+(L.x-496)*.2; J.y=EXIT.FROM.y-20+(EXIT.TO.y-EXIT.FROM.y)*u*.6; J.dir='left'}
   if(e.t>=EXIT.WALK&&!e.talked){ e.talked=true; L.moving=false; say(HEIST.exitLines,()=>{ e.down=true; e.downT=0 }) }
-  if(e.down){ e.downT+=dt; if(e.downT>500){ heist.exit=null; goTo('world','fromCity') } }
+  if(e.down){ if(!e.chunked){e.chunked=true; sfx('thud')} e.downT+=dt; if(e.downT>500){ heist.exit=null; goTo('world','fromCity') } }
 }
 function drawExit(){
   const e=heist.exit; if(!e)return; const L=heist.crew.find(c=>c.id==='lars'), J=heist.crew.find(c=>c.id==='john'), F=(c,x,y,w,h)=>{ctx.fillStyle=c;ctx.fillRect(Math.round(x),Math.round(y),w,h)};
@@ -404,11 +405,11 @@ function drawPowerSwitch(){
   F('#1d1d22',28,10,12,2); F('#1d1d22',38,10,2,26);                                                                     // the cable to the lights
 }
 function liftBeam(){
-  have.heistStage=1; save(); heist.beamAnim=600; say([['John',HEIST.beamDone]]);
+  have.heistStage=1; save(); heist.beamAnim=600; sfx('thud'); say([['John',HEIST.beamDone]]);
 }
 function cutFuse(){
   if(lead().id!=='lars')return flashPrompt(HEIST.onlyLars);
-  have.heistStage=2; save(); say([['Lars',HEIST.fuseDone]]);
+  have.heistStage=2; save(); sfx('chunk'); say([['Lars',HEIST.fuseDone]]);
 }
 function ripGrate(){
   if(lead().id!=='john')return flashPrompt(HEIST.onlyJohn);
@@ -438,8 +439,8 @@ function drawCrates(){
 function vaultHint(){ $('vaultHint').hidden=true; $('vaultHintText').hidden=false }
 function pickCrate(i){
   if(!vault.open)return;
-  if(i!==vault.choc){ $('vault').hidden=true; say(HEIST.raisins,()=>{ $('vault').hidden=false; paused=true }); return }
-  vault.open=false; $('vault').hidden=true; have.heistStage=4; save();
+  if(i!==vault.choc){ sfx('bad'); $('vault').hidden=true; say(HEIST.raisins,()=>{ $('vault').hidden=false; paused=true }); return }
+  vault.open=false; $('vault').hidden=true; have.heistStage=4; save(); sfx('fanfare');
   say([['',HEIST.gotIt],['',HEIST.villainNote],...HEIST.finale,...HEIST.larsChallenge],()=>openLarsMenu());
 }
 $('vaultHint').onclick=vaultHint; [0,1,2].forEach(i=>$('crate'+i).onclick=()=>pickCrate(i));
@@ -523,7 +524,7 @@ SCENES.city={
     const st=heistStage();
     if(st<1&&P.x>80&&P.y>80)hintOnce('gap','John',HEIST.johnGap);
     else if(st===1&&P.x>160)hintOnce('lights','Lars',HEIST.larsLights);
-    else if(st>=2&&st<3&&P.x>356)hintOnce('lasers','You',HEIST.heroLasers);
+    else if(st>=2&&st<3&&P.x>356)hintOnce('lasers',HEIST.crew.hero,HEIST.heroLasers);
   },
   drawPlayer:(x,y)=>{syncLeadFromP(); crewSprite(lead())},
   under(){

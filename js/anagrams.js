@@ -125,7 +125,7 @@ function anaSubmit(){
   else if(ana.found.includes(w))msg=`Already got ${w}.`;
   else if(!anaWords(ana.set).includes(w))msg=`${w}? Not a word. (Lars is smirking.)`;
   else {const pts=ANAGRAM.POINTS[w.length]; ana.found.push(w); ana.you+=pts; msg=`${w} +${pts}`}
-  $('anaMsg').textContent=msg; renderAna();
+  $('anaMsg').textContent=msg; renderAna(); sfx(msg.includes('+')?'good':'bad');
 }
 // Lars plays too: he "finds" words on a timer
 function larsTurn(){
@@ -146,7 +146,7 @@ function anaTick(dt){
 function anaEnd(){
   ana.running=false; $('anaPlay').hidden=true; $('anaEnd').hidden=false;
   const won=ana.you>ana.lars, best=anaWords(ana.set).filter(w=>w.length===6);
-  $('anaResult').textContent=won?`You win, ${ana.you} to ${ana.lars}!`:ana.you===ana.lars?`A tie at ${ana.you}. Tie goes to Lars, apparently.`:`Lars wins, ${ana.lars} to ${ana.you}.`;
+  $('anaResult').textContent=won?`Joe wins, ${ana.you} to ${ana.lars}!`:ana.you===ana.lars?`A tie at ${ana.you}. Tie goes to Lars, apparently.`:`Lars wins, ${ana.lars} to ${ana.you}.`;
   $('anaMissed').textContent=`The six-letter word${best.length>1?'s were':' was'}: ${best.join(', ')}.`;
   $('anaNext').textContent=won?HEIST.anagramDone:HEIST.anagramRematch;
   $('anaNext').onclick=()=>{ $('anagram').hidden=true; ana.open=false; larsGameOver(won) };

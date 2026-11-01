@@ -119,12 +119,13 @@ function golfTap(){
     golf.power=powerNow(); const putt=isPutt(), mode=throwMode();
     if(mode==='hike')golf.angle+=(Math.random()-.5)*GOLF.HIKE_WILD;      // you can't really see where it's going
     golf.flight=golfFlight(golfHole(),golf.lie,golf.angle,golf.power,putt,mode); golf.flight.i=0; golf.flight.putt=putt; golf.flight.mode=mode;
-    golf.strokes++; golf.state='flight'; golf.msg='';
+    golf.strokes++; golf.state='flight'; golf.msg=''; sfx('whoosh');
   }
 }
 function golfLand(){
   const f=golf.flight, h=golfHole(), T=GOLF_TEXT;
-  if(golf.practice){ if(f.result!=='water'&&f.result!=='ob')golf.lie={...f.end}; P.x=golf.lie.x; P.y=golf.lie.y+4; return golfPracticeResult() }
+  if(golf.practice){ sfx(f.result==='in'?'chains':f.result==='water'?'splash':f.result==='tree'?'thud':'click'); if(f.result!=='water'&&f.result!=='ob')golf.lie={...f.end}; P.x=golf.lie.x; P.y=golf.lie.y+4; return golfPracticeResult() }
+  sfx(f.result==='in'?'chains':f.result==='water'?'splash':f.result==='ob'?'buzz':f.result==='tree'?'thud':'click');
   if(f.result==='in'){ golf.msg=golf.strokes===1?T.ace:T.chains; return golfHoleDone() }
   if(f.result==='water'||f.result==='ob'){ golf.strokes++; golf.msg=f.result==='water'?T.water:T.ob; P.x=golf.lie.x; P.y=golf.lie.y+4;
     // pop-up: what happened and the penalty
@@ -159,7 +160,7 @@ function golfRoundOver(){
   golf.active=false; golf.state='idle';
   const sum=a=>a.reduce((x,y)=>x+y,0), you=sum(golf.you), m=sum(golf.margie), j=sum(golf.jack);
   const fmt=v=>v===0?'E':v>0?`+${v}`:`${v}`;
-  const card=`Final: You ${fmt(you)} · Margie ${fmt(m)} · Jack ${fmt(j)}`;
+  const card=`Final: Joe ${fmt(you)} · Margie ${fmt(m)} · Jack ${fmt(j)}`;
   const won=you<j&&you<=m;
   const h=HOLES[0]; P.x=h.tee.x+30; P.y=h.tee.y-10;
   if(won){ have.golfWon=true; save(); say([['',card],...GOLF_TEXT.win.map(t=>['Margie',t]),['Jack',GOLF_TEXT.jackWin]],()=>showReward('golf')) }
@@ -268,6 +269,6 @@ SCENES.golf={ place:GOLF_TEXT.place,
     if(!golf.active)return '';
     if(golf.practice)return `<span>Practice throw: doesn't count</span>`;
     const sum=a=>a.reduce((x,y)=>x+y,0), fmt=v=>v===0?'E':v>0?`+${v}`:`${v}`;
-    return `<span>H${golf.hole+1} · ${isPutt()?'Putt':'Throw '+(golf.strokes+1)}</span><span>You ${fmt(sum(golf.you))}</span><span>M ${fmt(sum(golf.margie))}</span><span>J ${fmt(sum(golf.jack))}</span>`;
+    return `<span>H${golf.hole+1} · ${isPutt()?'Putt':'Throw '+(golf.strokes+1)}</span><span>Joe ${fmt(sum(golf.you))}</span><span>M ${fmt(sum(golf.margie))}</span><span>J ${fmt(sum(golf.jack))}</span>`;
   },
 };

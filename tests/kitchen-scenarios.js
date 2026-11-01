@@ -68,11 +68,6 @@ r=await p.evaluate(()=>{const sp=$('dspeaker').textContent, pages=[]; while(T.bt
 ok('G Alex welcomes Joe and explains the game',r.sp==='Alex'&&r.pages.join(' ').includes('Merry Christmas')&&r.pages.join(' ').includes('kitchen'),r.pages.length+' pages');
 ok('G then Joe picks his look (jersey first), and it sticks',r.open&&r.n===9&&r.first==='jersey'&&r.look==='vikings'&&r.welcomed,r.title);
 await p.reload(); await p.click('#startBtn'); r=await p.evaluate(()=>({dlg:!dlg.hidden,ward:!$('wardrobe').hidden})); ok('G no welcome the second time',!r.dlg&&!r.ward);
-// H. the dev button jumps to the ending (remove js/devtools.js before giving it to Joe)
-r=await p.evaluate(()=>{const hiddenWin=$('devArea').hidden; $('settingsBtn').click(); const offByDefault=!$('devToggle').checked&&$('devArea').hidden; $('devToggle').click(); const shows=!$('devArea').hidden;
-  startParty(); for(let t=0;t<1500;t+=16.7)SCENES.kitchen.ambient(16.7); $('devWin').click(); for(let i=0;i<40;i++)update(16.7);
-  return {offByDefault,shows,kitchen:scene===SCENES.kitchen,all:allIn(),hugging:!!kit.hugging,baked:!!have.baked,settings:$('settings').hidden,slots:$('basket').textContent}});
-ok('H Settings: testing tools are off by default; turn on, Win everything works even mid-ending',r.offByDefault&&r.shows&&r.kitchen&&r.all&&!r.hugging&&!r.baked&&r.settings&&!r.slots.includes('Cupcake'),JSON.stringify(r));
 // I. Bryan by the pond gives sprinkles; they show up in the basket and add a step to the baking
 await fresh({farm:1,mill:1,city:1,fargo:1,golf:1});
 r=await p.evaluate(()=>{P.x=96;P.y=48; update(16.7); const lbl=prompt.textContent; action(); const pages=[]; while(T.btns().includes('Next')){pages.push($('dtext').textContent);T.click('Next')} pages.push($('dtext').textContent); T.click('Take the sprinkles');

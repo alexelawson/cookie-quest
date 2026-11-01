@@ -145,7 +145,7 @@ function farmUpdate(dt){
   // the cupcake
   if(!have.cupcake&&!have.gaveCupcake&&Math.abs(P.x-CUPCAKE.x)<16&&P.y<=CUPCAKE.y+7){
     have.cupcake=true; save(); renderBasket();
-    have.cupcakeCostume=true; save();
+    have.cupcakeCostume=true; save(); sfx('pickup');
     showDialog({place:'Behind the barn',speaker:'Ooh',pages:[KEELAN.foundCupcake,KEELAN.cupcakeUnlock],actions:[CLOSE]}); return;
   }
   const k=farm.keelan, helping=have.gaveCupcake&&farm.active;
@@ -190,10 +190,10 @@ function farmUpdate(dt){
 
   // catching and dropping
   const grab=(who,set)=>{const b=bodyBox(who.x,who.y); const i=farm.loose.findIndex(h=>hit(b,henBox(h))); if(i>=0)set(farm.loose.splice(i,1)[0])};
-  if(!farm.carrying)grab(P,h=>farm.carrying=h);
+  if(!farm.carrying)grab(P,h=>{farm.carrying=h; sfx('cluck')});
   if(helping&&!k.carrying)grab(k,h=>k.carrying=h);
   const putBack=()=>{const h=penHen(); h.x=GATE.x+rand(-4,4); h.y=PEN.y+PEN.h-2; farm.penned.push(h); farm.popT=500};
-  if(farm.carrying&&hit(R(P.x-4,P.y-3,8,4),DROP)){farm.carrying=null; putBack()}
+  if(farm.carrying&&hit(R(P.x-4,P.y-3,8,4),DROP)){farm.carrying=null; putBack(); sfx('drop')}
   if(k.carrying&&hit(R(k.x-4,k.y-3,8,4),DROP)){k.carrying=null; putBack()}
 
   // win / lose

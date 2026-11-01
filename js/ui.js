@@ -4,7 +4,8 @@ const dlg=$('dialog'), prompt=$('prompt');
 function renderBasket(){
   $('basket').innerHTML=ITEMS.map(i=>`<span class="slot ${have[i.key]?'got':''}">${have[i.key]?'✓ ':''}${i.label}</span>`).join('')
     +(have.cupcake&&!have.gaveCupcake?'<span class="slot extra">Cupcake</span>':'')
-    +(have.sprinkles?'<span class="slot got">✓ Sprinkles</span>':'');   // a bonus from Bryan
+    +(have.sprinkles?'<span class="slot got">✓ Sprinkles</span>':'')   // a bonus from Bryan
+    +(have.icecream?'<span class="slot got">✓ Ice cream</span>':'');   // a bonus from Lars's long jump
 }
 // pages: strings shown one at a time. actions: buttons on the last page.
 // menu:true lays the buttons out as a grid of choices (used for asking questions).
@@ -14,10 +15,10 @@ function showDialog({place,speaker,face,pages,actions,noteLast,menu}){
   const draw=()=>{
     const t=$('dtext'); t.textContent=pages[i]; t.className=(noteLast&&i===pages.length-1)?'note':'';
     const box=$('dbtns'); box.innerHTML=''; const last=i===pages.length-1; box.classList.toggle('menu',!!menu&&last); dlg.classList.toggle('tall',!!menu&&last);
-    const list=i<pages.length-1?[{label:'Next',fn:()=>{i++;draw()}}]:actions;
+    const list=i<pages.length-1?[{label:'Next',fn:()=>{i++;draw();sfx('next')}}]:actions;
     list.forEach((a,n)=>{const b=document.createElement('button');b.className='btn'+(a.ghost?' ghost':'');b.textContent=a.label;b.onclick=a.fn;box.appendChild(b); if(n===0)setTimeout(()=>b.focus({preventScroll:true}),0)});
   };
-  dlg.hidden=false; draw();
+  dlg.hidden=false; draw(); sfx('blip');
 }
 function closeDialog(){dlg.hidden=true; paused=false; cv.focus?.()}
 const CLOSE={label:'Close',fn:closeDialog};
@@ -38,15 +39,15 @@ function action(){
   if(near)near.act(); else if(scene.ability)scene.ability();
 }
 // ---------- settings ----------
-function openSettings(){ $('devRow').hidden=typeof devWinEverything!=='function'; $('devToggle').checked=devOn(); $('devArea').hidden=!devOn();
+function openSettings(){
+  $('soundToggle').checked=!muted;
   $('settings').hidden=false; paused=true; prompt.hidden=true; setTimeout(()=>$('settingsClose').focus({preventScroll:true}),0) }
 function closeSettings(){ $('settings').hidden=true; paused=!dlg.hidden||!$('titlecard').hidden; $('settingsBtn').blur() }
-const devOn=()=>{ try{return localStorage.getItem('cookie-quest-dev')==='1'}catch(e){return false} };
+$('soundToggle').onchange=()=>setSound($('soundToggle').checked);
 $('settingsBtn').onclick=openSettings; $('settingsClose').onclick=closeSettings;
 // change outfit any time: on the rooftops it's the stealth outfit, everywhere else it's Joe's everyday look
 $('setOutfit').textContent=WARDROBE.changeOutfit;
 $('setOutfit').onclick=()=>{ $('settings').hidden=true; openWardrobe(()=>{ paused=!dlg.hidden||!$('titlecard').hidden },scene===SCENES.city?'heist':'look',true) };
-$('devToggle').onchange=()=>{ try{localStorage.setItem('cookie-quest-dev',$('devToggle').checked?'1':'0')}catch(e){} $('devArea').hidden=!$('devToggle').checked };
 function start(){$('titlecard').hidden=true; paused=false; if(!have.welcomed)welcome()}
 // the first time you press Start: Alex explains everything, then you pick Joe's look
 function welcome(){
@@ -58,6 +59,12 @@ $('startBtn').onclick=start;
 // ---------- reward pop-up ----------
 // showReward('farm') shows the item art; tapping it flies it into the basket and marks it collected.
 const ART={
+  icecream(g){ const F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};
+    // a pint of Maple Rosemary: cream-colored tub, maple-brown label, a rosemary sprig, a little frost
+    F('#d9d3c4',7,4,18,4); F('#efe9dc',8,3,16,2); F('#f7f2e6',8,8,16,20); F('#e0d8c6',22,8,2,20); F('#e0d8c6',8,27,16,1);
+    F('#9a5a2a',8,13,16,8); F('#b8743a',8,13,16,1); F('#f2d49a',10,15,12,1); F('#f2d49a',10,18,8,1);
+    F('#3f7a45',12,9,1,4); F('#5a9a50',11,10,1,1); F('#5a9a50',13,10,1,1); F('#5a9a50',11,12,1,1); F('#5a9a50',13,11,1,1);   // rosemary
+    F('#ffffff',9,9,2,1); F('#ffffff',20,24,2,1); F('#cfe6f2',23,6,1,1); F('#cfe6f2',5,20,1,1) },
   sprinkles(g){ const F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};
     // a shaker of rainbow sprinkles
     F('#f2efe6',9,10,14,18); F('#d9d3c4',21,10,2,18); F('#c8322b',9,6,14,5); F('#a02a22',9,10,14,1); for(let x=11;x<22;x+=3)F('#ffffff',x,7,1,1);
@@ -108,6 +115,7 @@ const REWARDS={
   city:{from:'From a grateful city', name:'Chocolate', hint:'Tap it to put it in your basket.'},
   golf:{from:'From Margie, Jack and the creamery', name:'Milk', hint:'Tap it to put it in your basket.'},
   mill:{from:'From John (and the Vikings)', name:'Flour', hint:'Tap it to put it in your basket.'},
+  icecream:{from:'From Lars (and a rooftop gutter)', name:'Maple Rosemary ice cream', hint:'A bonus! Tap it to put it in your basket.'},
   sprinkles:{from:'From Bryan', name:'Sprinkles', hint:'A bonus! Tap them to put them in your basket.'},
 };
 let rewardKey=null, rewardThen=null;
@@ -116,12 +124,12 @@ function showReward(key,then){   // then: runs after the item lands in the baske
   const r=REWARDS[key], c=$('rewardCanvas'), g=c.getContext('2d');
   g.clearRect(0,0,c.width,c.height); ART[key](g);
   $('rewardFrom').textContent=r.from; $('rewardName').textContent=r.name; $('rewardHint').textContent=r.hint;
-  rewardKey=key; paused=true; prompt.hidden=true; $('reward').hidden=false;
+  rewardKey=key; paused=true; prompt.hidden=true; $('reward').hidden=false; sfx('reward');
   setTimeout(()=>$('rewardArt').focus({preventScroll:true}),0);
 }
 function collectReward(){
   if(!rewardKey)return; const key=rewardKey; rewardKey=null;
-  have[key]=true; save();
+  have[key]=true; save(); sfx('pop');
   const art=$('rewardArt'), i=ITEMS.findIndex(it=>it.key===key);
   const slot=$('basket').children[i], a=art.getBoundingClientRect(), b=slot?slot.getBoundingClientRect():a;
   const done=()=>{$('reward').hidden=true; renderBasket(); const sl=$('basket').children[i]; sl&&sl.classList.add('pop'); paused=false; if(rewardThen){const f=rewardThen; rewardThen=null; f()}};

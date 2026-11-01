@@ -94,8 +94,8 @@ function birkStart(){
 function birkTap(){
   if(!birk.running||birk.crashT>0)return;
   const terr=terrainAt(P.y), phase=birk.beatT%BIRK.BEAT, off=Math.min(phase,BIRK.BEAT-phase);
-  if(off<=BIRK.WINDOW){ birk.q=birk.q+(1-birk.q)*BIRK.GAIN; birk.stamina=Math.max(0,birk.stamina-BIRK.PUSH_COST); birk.flash='good' }
-  else { birk.q*=BIRK.MISS_KEEP; birk.stamina=Math.max(0,birk.stamina-BIRK.MISS_COST); birk.flash='miss' }   // off beat: you lose your rhythm
+  if(off<=BIRK.WINDOW){ sfx('pole'); birk.q=birk.q+(1-birk.q)*BIRK.GAIN; birk.stamina=Math.max(0,birk.stamina-BIRK.PUSH_COST); birk.flash='good' }
+  else { sfx('bad'); birk.q*=BIRK.MISS_KEEP; birk.stamina=Math.max(0,birk.stamina-BIRK.MISS_COST); birk.flash='miss' }   // off beat: you lose your rhythm
   birk.flashT=220;
 }
 function birkSay(m){birk.msg=m; birk.msgT=1800+m.length*35}
@@ -105,7 +105,7 @@ const sweepY=()=>{const c=birk.t*BIRK.CLOCK/1000; return Math.max(0,Math.min(1,(
 const clockStr=ms=>{const s=Math.floor(ms*BIRK.CLOCK/1000), h=Math.floor(s/3600), m=Math.floor(s%3600/60), x=s%60; return `${h}:${String(m).padStart(2,'0')}:${String(x).padStart(2,'0')}`};
 function birkUpdate(dt){
   if(!birk.running)return;
-  birk.t+=dt; birk.beatT+=dt; if(birk.flashT>0)birk.flashT-=dt; if(birk.msgT>0)birk.msgT-=dt;
+  birk.t+=dt; const lastBeat=Math.floor(birk.beatT/BIRK.BEAT); birk.beatT+=dt; if(Math.floor(birk.beatT/BIRK.BEAT)!==lastBeat&&terrainAt(P.y)==='up')sfx('beat');   // a soft tick on climbs if(birk.flashT>0)birk.flashT-=dt; if(birk.msgT>0)birk.msgT-=dt;
   if(sweepY()>=P.y)return birkFinish(false);                       // the sweep caught you
   if(P.y-sweepY()<160)birkOnce('sweep'+Math.floor(P.y/400),BIRKIE.sweepClose);
   if(birk.crashT>0){birk.crashT-=dt; return}
@@ -126,16 +126,17 @@ function birkUpdate(dt){
   const t=birk.trail; t.push({x:P.x,y:P.y}); if(t.length>600)t.shift();
   birk.vikings.forEach((v,i)=>{let need=(i+1)*14, k=t.length-1, acc=0; while(k>0&&acc<need){acc+=Math.hypot(t[k].x-t[k-1].x,t[k].y-t[k-1].y);k--} const g=t[Math.max(0,k)]; v.x=g.x; v.y=g.y});
   // crashes into people who fell
-  for(const f of FALLEN)if(Math.abs(P.y-f.y)<6&&Math.abs(P.x-f.x)<9){birk.crashT=BIRK.CRASH_MS; birk.v=0; birkSay(BIRKIE.crash[Math.floor(Math.random()*BIRKIE.crash.length)]); P.y+=10; break}
+  for(const f of FALLEN)if(Math.abs(P.y-f.y)<6&&Math.abs(P.x-f.x)<9){birk.crashT=BIRK.CRASH_MS; birk.v=0; sfx('crash'); birkSay(BIRKIE.crash[Math.floor(Math.random()*BIRKIE.crash.length)]); P.y+=10; break}
   // feed stations
   for(const f of FEEDS){ if(!f.used&&f.y-P.y<120&&f.y>P.y)birkOnce('feedAhead'+f.y,BIRKIE.feedAhead);
-    if(!f.used&&Math.abs(P.y-f.y)<14){f.used=true; birk.stamina=100; birkSay(BIRKIE.feed)} }
+    if(!f.used&&Math.abs(P.y-f.y)<14){f.used=true; birk.stamina=100; birkSay(BIRKIE.feed); sfx('glug'); setTimeout(()=>sfx('glug'),120); setTimeout(()=>sfx('glug'),240)} }
   if(P.y>440&&P.y<480)birkOnce('climb1',BIRKIE.climb); if(P.y>1720&&P.y<1760)birkOnce('climb2',BIRKIE.climb);
   if(P.y>1260&&P.y<1300)birkOnce('half',BIRKIE.halfway); if(P.y>2240&&P.y<2280)birkOnce('lake',BIRKIE.lake);
   if(P.y>=FINISH_Y)birkFinish(true);
 }
 const J=t=>[BIRKIE.john,t,'Trail John'];   // a line from John, with his face
 function birkFinish(made){
+  sfx(made?'fanfare':'buzz');
   birk.running=false; const tm=clockStr(birk.t); FEEDS.forEach(f=>f.used=false);
   if(made){ have.birkie=true; have.birkieTime=tm; save(); const elite=birk.t*BIRK.CLOCK/1000<BIRK.ELITE;
     say([J(BIRKIE.finishWin(tm)[0]),J(elite?BIRKIE.elite:BIRKIE.finishWin(tm)[1]),J(BIRKIE.vikingsWin)],()=>goTo('world','fromMill')) }
