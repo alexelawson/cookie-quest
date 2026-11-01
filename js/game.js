@@ -55,15 +55,21 @@ function update(dt){
 // the little status bar in the corner of the screen (hen counts, fuel...), per scene
 let lastHud=null;
 function updateHud(){
-  $('golfRestart').hidden=!(scene===SCENES.golf&&golf.active&&!golf.practice);
+  $('golfRestart').hidden=!(scene===SCENES.golf&&golf.active&&!golf.practice&&(golf.state==='aim'||golf.state==='power'));
   const h=scene.hud?scene.hud():''; const el=$('hud'); el.hidden=!h;
   if(h!==lastHud){el.innerHTML=h; lastHud=h}
 }
 
 // ===================== DRAW =====================
+// Joe's look on the map: the white jersey, or whatever he picked at the start (have.look)
 function drawPlayer(x0,y0){
-  const x=Math.round(x0)-6, y=Math.round(y0)-18;
-  const F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x+dx,y+dy,w,h)};
+  const c={x:x0,y:y0,dir:P.dir,moving:P.moving,step:P.step};
+  if(have.look&&have.look!=='jersey'&&OUTFIT_LOOK[have.look])drawHero(c,ctx,OUTFIT_LOOK[have.look]); else drawJoeJersey(c,ctx);
+  if(have.crown&&scene!==SCENES.kitchen)drawCrown(x0,y0-23);   // the Cookie King
+}
+function drawJoeJersey(P,g=ctx){
+  const x=Math.round(P.x)-6, y=Math.round(P.y)-18;
+  const F=(c,dx,dy,w,h)=>{g.fillStyle=c;g.fillRect(x+dx,y+dy,w,h)};
   const skin='#f0c6a0',hair='#b08355',hairD='#8d6440',shirt='#fbfbf7',red='#c8322b',blk='#1d1d22',eye='#3d8ad6';
   F('rgba(0,0,0,.25)',2,17,8,2);
   const a=P.moving&&P.step%2?1:0, b=P.moving&&!(P.step%2)?1:0;
@@ -80,7 +86,6 @@ function drawPlayer(x0,y0){
     if(P.dir==='left'){F(hair,7,2,3,4);F(hairD,3,2,3,1);F(eye,3,4,1,1);F(red,3,7,2,1)}
     if(P.dir==='right'){F(hair,2,2,3,4);F(hairD,6,2,3,1);F(eye,8,4,1,1);F(red,7,7,2,1)}
   }
-  if(have.crown&&scene!==SCENES.kitchen)drawCrown(x0,y0-23);   // the Cookie King
 }
 
 function draw(){

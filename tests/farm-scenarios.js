@@ -1,6 +1,6 @@
 const {chromium}=require('playwright');(async()=>{const b=await chromium.launch();const p=await b.newPage();const errs=[];p.on('pageerror',e=>errs.push(e.message));
 let installT;
-const fresh=async()=>{await p.goto('file://'+require('path').resolve(__dirname,'../index.html')+'');await p.evaluate(()=>localStorage.clear());await p.reload();await p.click('#startBtn');await p.evaluate(installT)};
+const fresh=async()=>{await p.goto('file://'+require('path').resolve(__dirname,'../index.html')+'');await p.evaluate(()=>localStorage.clear());await p.reload();await p.click('#startBtn'); await p.evaluate(()=>skipWelcome());await p.evaluate(installT)};
 installT=()=>{
   window.T={
     btns:()=>[...$('dbtns').querySelectorAll('button')].map(b=>b.textContent),
@@ -76,7 +76,7 @@ ok('6 can give cupcake after winning',r.m.includes('Give Keelan the cupcake'),r.
 
 // 7. reload while the reward is showing: reward comes back
 await fresh(); await p.evaluate(()=>{T.start(); T.runToEnd(); T.pages(); T.click('Thanks, Keelan!')});
-await p.reload(); await p.click('#startBtn'); await p.evaluate(installT);
+await p.reload(); await p.click('#startBtn'); await p.evaluate(()=>skipWelcome()); await p.evaluate(installT);
 await p.evaluate(()=>{window.T2={}; P.x=farm.keelan.x-10;P.y=farm.keelan.y;update(16.7);action()});
 r=await p.evaluate(()=>({reward:!$('reward').hidden,farm:!!have.farm})); ok('7 reward survives a reload',r.reward&&!r.farm);
 

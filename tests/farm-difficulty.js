@@ -3,7 +3,7 @@ const OVERRIDE=JSON.parse(process.argv[2]||'{}');
 (async()=>{
   const b=await chromium.launch(); const p=await b.newPage(); const errs=[];
   p.on('pageerror',e=>errs.push(e.message));
-  await p.goto('file://'+require('path').resolve(__dirname,'../index.html')+''); await p.click('#startBtn');
+  await p.goto('file://'+require('path').resolve(__dirname,'../index.html')+''); await p.click('#startBtn'); await p.evaluate(()=>skipWelcome());
   const res=await p.evaluate((OV)=>{
     Object.assign(FARM,OV);
     const run=(eff,help)=>{

@@ -36,7 +36,12 @@ function action(){
   if(!dlg.hidden){const f=document.activeElement, b=$('dbtns').contains(f)?f:$('dbtns').querySelector('button'); b&&b.click(); return}
   if(near)near.act(); else if(scene.ability)scene.ability();
 }
-function start(){$('titlecard').hidden=true; paused=false}
+function start(){$('titlecard').hidden=true; paused=false; if(!have.welcomed)welcome()}
+// the first time you press Start: Alex explains everything, then you pick Joe's look
+function welcome(){
+  showDialog({place:ALEX_WELCOME.place,speaker:ALEX_WELCOME.speaker,pages:ALEX_WELCOME.pages,actions:[{label:ALEX_WELCOME.go,fn:()=>{closeDialog(); openWardrobe(()=>{have.welcomed=true; save()},'look')}}]});
+}
+function skipWelcome(){ if(!dlg.hidden)closeDialog(); $('wardrobe').hidden=true; have.welcomed=true; save(); paused=false }   // used by the tests
 $('startBtn').onclick=start;
 
 // ---------- reward pop-up ----------
@@ -82,7 +87,7 @@ const ART={
 };
 const REWARDS={
   farm:{from:'From Keelan', name:'Eggs & butter', hint:'Tap them to put them in your basket.'},
-  fargo:{from:'From Bob', name:'Sugar', hint:'Tap it to put it in your basket.'},
+  fargo:{from:'From Lil Q', name:'Sugar', hint:'Tap it to put it in your basket.'},
   city:{from:'From a grateful city', name:'Chocolate', hint:'Tap it to put it in your basket.'},
   golf:{from:'From Margie, Jack and the creamery', name:'Milk', hint:'Tap it to put it in your basket.'},
   mill:{from:'From John (and the Vikings)', name:'Flour', hint:'Tap it to put it in your basket.'},

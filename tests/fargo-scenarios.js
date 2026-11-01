@@ -13,7 +13,7 @@ const helpers=()=>{window.T={
      if(dx>1)dirs.right=true;if(dx<-1)dirs.left=true;if(dy>1)dirs.down=true;if(dy<-1)dirs.up=true; update(16.7)} for(const k in dirs)dirs[k]=false},
   pick:(d,s)=>{$('fridge').querySelector(`[data-id="${d}"]`).click();$('shelf').querySelector(`[data-id="${s}"]`).click();$('giveBtn').click()},
 }};
-const fresh=async()=>{await p.goto(URL);await p.evaluate(()=>localStorage.clear());await p.reload();await p.click('#startBtn');await p.evaluate(helpers)};
+const fresh=async()=>{await p.goto(URL);await p.evaluate(()=>localStorage.clear());await p.reload();await p.click('#startBtn'); await p.evaluate(()=>skipWelcome());await p.evaluate(helpers)};
 const R=[];const ok=(n,c,x='')=>R.push((c?'PASS ':'FAIL ')+n+(x?'  ('+x+')':''));
 await fresh();
 
@@ -40,7 +40,7 @@ ok('D going over busts and resets',r.over>3000&&r.reset===0,'$'+(r.over/100).toF
 r=await p.evaluate(()=>{const t0=performance.now(); pump.cents=0; pumpPress(); let n=0; while(pump.cents<2950&&n<2000){T.run(1);n++} pumpRelease(); const fast=n*16.7/1000;
   let taps=0; while(pump.cents<3000&&taps<200){pumpPress(); T.run(1); pumpRelease(); taps++} return {fast,taps,cents:pump.cents}});
 ok('D a full hold reaches ~$29.50 in a few seconds',r.fast>2&&r.fast<9,r.fast.toFixed(1)+'s'); ok('D single-frame taps land exactly on $30.00',r.cents===3000,r.taps+' taps');
-await p.waitForFunction(()=>!dlg.hidden&&$('dspeaker').textContent==='Bob',null,{timeout:8000});
+await p.waitForFunction(()=>!dlg.hidden&&$('dspeaker').textContent==='Lil Q',null,{timeout:8000});
 r=await p.evaluate(()=>{const ps=[]; while(true){ps.push($('dtext').textContent); if(!T.btns().includes('Next'))break; T.click('Next')} const line=ps.join(' '); T.click('Go inside'); return {line,onFoot:fargo.onFoot,car:!!fargo.car,alex:!!fargo.alex,stage:have.fargoStage,hud:$('hud').textContent,free:!blocked(P.x,P.y)}});
 ok('D exact $30 -> go inside',r.line.includes('co-pilot')&&r.stage==='store'); ok('D you and Alex get out, car parked',r.onFoot&&r.car&&r.alex&&r.free,r.hud);
 // E. shop: two wrong picks -> kicked out
@@ -57,14 +57,14 @@ ok('E two strikes: sent back outside',r.shop&&!r.paused&&r.inLot,r.hud); ok('E A
 r=await p.evaluate(()=>{const g=STATIONS[fargo.bob]; T.walkTo(g.door.x+8,g.door.y+4); const lbl=prompt.textContent; action(); if($('shop').hidden)return {strikes:'shop not opened ('+lbl+')'}; const strikes=fargo.strikes; T.pick('gingerale','motts'); return {strikes,line:$('alexLine').textContent,mood:fargo.alexMood}});
 ok('F walking back in resets strikes',r.strikes===0,String(r.strikes)); ok('F ginger ale + Motts makes Alex happy',r.mood==='happy'&&r.line.includes('know me'),r.line);
 await p.waitForFunction(()=>!dlg.hidden&&T.btns().join().includes('Next'),null,{timeout:8000});
-r=await p.evaluate(()=>{const line=$('dtext').textContent; T.pages(); T.click('Thanks, Bob!'); return {line,reward:!$('reward').hidden,name:$('rewardName').textContent,onFoot:fargo.onFoot,stage:have.fargoStage}});
+r=await p.evaluate(()=>{const line=$('dtext').textContent; T.pages(); T.click('Thanks, Lil Q!'); return {line,reward:!$('reward').hidden,name:$('rewardName').textContent,onFoot:fargo.onFoot,stage:have.fargoStage}});
 ok('F Bob hands over the sugar',r.reward&&r.name==='Sugar'&&r.stage==='reward',r.line); ok('F back in the car',!r.onFoot);
 await p.click('#rewardArt',{force:true}); await p.waitForTimeout(900);
 r=await p.evaluate(()=>({fargo:!!have.fargo,basket:$('basket').textContent,paused}));
 ok('F sugar goes in the basket',r.fargo&&r.basket.includes('✓ Sugar')&&!r.paused,r.basket);
 r=await p.evaluate(()=>{T.toLot(fargo.bob); action(); return $('dtext').textContent}); ok('F Bob after: goodbye line',r.includes('Ride safe'),r);
 // G. reload in the middle of the shop errand
-await fresh(); await p.evaluate(()=>{have.fargoStage='store'; have.fargoBob=3; save()}); await p.reload(); await p.click('#startBtn'); await p.evaluate(helpers);
+await fresh(); await p.evaluate(()=>{have.fargoStage='store'; have.fargoBob=3; save()}); await p.reload(); await p.click('#startBtn'); await p.evaluate(()=>skipWelcome()); await p.evaluate(helpers);
 r=await p.evaluate(()=>{T.enter(); return {intro:!dlg.hidden,onFoot:fargo.onFoot,bob:fargo.bob,car:fargo.car&&hit(R(fargo.car.x-1,fargo.car.y-1,2,2),STATIONS[3].lot),free:!blocked(P.x,P.y)}});
 ok('G reload mid-errand: parked at Bob\'s, on foot, no intro',!r.intro&&r.onFoot&&r.bob===3&&r.car&&r.free);
 // H. keyboard at the pump doesn't move you or open dialogs
@@ -89,5 +89,5 @@ ok('I door reachable on foot at every station (get out / kicked out / from road)
 r=await p.evaluate(()=>{const c={}; for(let i=0;i<300;i++){fargoNewRun(); c[fargo.bob]=(c[fargo.bob]||0)+1} return c});
 ok('J Bob is never at the station right by the start, and moves around',!r[2]&&Object.keys(r).length===5,JSON.stringify(r));
 r=await p.evaluate(()=>({n:EXIT_SIGNS.length, onRoad:EXIT_SIGNS.some(e=>ROADS.some(rd=>hit(R(e.x,e.y,26,18),rd))), signs:STATIONS.map(s=>s.signText), bob:STATIONS[fargo.bob].signText}));
-ok('K EXIT signs point the way out (none on the road), and every shop has a name sign',r.n>=3&&!r.onRoad&&r.signs.every(Boolean)&&r.bob==="BOB'S GAS",JSON.stringify(r));
+ok('K EXIT signs point the way out (none on the road), and every shop has a name sign',r.n>=3&&!r.onRoad&&r.signs.every(Boolean)&&r.bob==="LIL Q'S",JSON.stringify(r));
 console.log(R.join('\n')); console.log('page errors:',errs.length?errs:'none'); await b.close()})();

@@ -9,7 +9,7 @@ For live reload while editing: `python3 -m http.server` and visit http://localho
 ## Layout
 | File | What's in it |
 |---|---|
-| `js/story.js` | All dialogue, character names, the ending note. Keelan is in `KEELAN`; Jack + Margie in `GOLF_TEXT`; the heist crew + The Confectioner in `HEIST`; Bob, Alex's snack reactions and the correct drink/snack are in `FARGO` |
+| `js/story.js` | All dialogue, character names, the ending note. Keelan is in `KEELAN`; Jack + Margie in `GOLF_TEXT`; the heist crew + The Confectioner in `HEIST`; Lil Q (the gas station owner), Alex's snack reactions and the correct drink/snack are in `FARGO` |
 | `js/world.js` | Overworld map: collision rects (`solids`), doors (`triggers`), painting. Also defines the scene system (`SCENES`) |
 | `js/kitchen.js` | Kitchen interior scene; baking starts at the counter, recipe card on the fridge |
 | `js/city.js` | The chocolate heist: crew switching (you/Lars/John), sonar, sprint, lift, searchlights, guard, lasers, vault, cookie signal |
@@ -29,6 +29,13 @@ For live reload while editing: `python3 -m http.server` and visit http://localho
 | `css/style.css` | Page and UI styling |
 
 Everything is drawn with `fillRect` on a 224×168 canvas scaled up with `image-rendering: pixelated`.
+
+## Before giving the game to Joe
+There's a **🛠 Dev: win everything** button under the game for testing the ending. To remove it, delete this line near the bottom of `index.html`:
+```html
+<script src="js/devtools.js"></script>
+```
+(or set `DEV_TOOLS = false` at the top of `js/devtools.js`). Nothing else depends on it. Then hit **Start over** so the game starts fresh with Alex's welcome.
 
 ## Tests
 Needs Node and Playwright (`npm i -D playwright && npx playwright install chromium`).
@@ -54,7 +61,9 @@ Add an object to `SCENES` with `w`, `h`, `bounds`, `bg` (a canvas), `solids`, `t
 - [x] Fargo: cheapest-gas hunt, stop the pump on $30.00, pick Alex's drink + snack
 - [x] Disc golf (milk): 5 holes vs Jack and Margie
 - [x] Kitchen: everyone comes over, mix, bake, party, Joe's crown, final note
-- [x] Wardrobe: Joe picks a stealth outfit before the city (`WARDROBE` in story.js)
+- [x] Wardrobe: Joe picks his look at the start and a stealth outfit before the city (`WARDROBE` in story.js), incl. Vikings gameday + 70s disco
+- [x] Welcome from Alex when you first press Start (`ALEX_WELCOME` in story.js)
+- [x] Finale: Alex hugs Joe, crown, THE COOKIE DANCE
 
 ## Spoilers
 The cupcake is behind the barn, in the middle. Its frosting peeks up over the roof, and a sparkle flashes beside it every few seconds. Walk behind the barn to grab it.

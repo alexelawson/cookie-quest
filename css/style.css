@@ -194,9 +194,9 @@ canvas{border-radius:6px}
 
 /* the wardrobe (before the city) */
 .wardrobe{position:absolute;inset:0;z-index:6;display:flex;align-items:safe center;justify-content:center;overflow-y:auto;background:rgba(8,9,16,.6);padding:4px;border-radius:6px}
-.outfits{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;width:100%}
+.outfits{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;width:100%}
 .outfit{display:flex;flex-direction:column;align-items:center;gap:2px;background:#2a3044;border:2px solid #4d5a78;border-radius:6px;padding:4px 2px;cursor:pointer;color:var(--paper);font-family:var(--pixel);font-size:.62rem;line-height:1.1;min-width:0}
-.outfit canvas{width:42px;height:60px;image-rendering:pixelated;image-rendering:crisp-edges}
+.outfit canvas{width:28px;height:48px;image-rendering:pixelated;image-rendering:crisp-edges}
 .outfit.on{border-color:var(--gold);background:#3a3550}
 .outfit:focus-visible{outline:2px solid var(--gold)}
 .wline{min-height:2.4em;font-size:.82rem!important}
@@ -216,3 +216,7 @@ canvas{border-radius:6px}
 
 .minibtn{position:absolute;top:6px;right:6px;z-index:3;font-size:.72rem;padding:2px 8px;border-width:2px;background:var(--shade);color:var(--paper);border-color:var(--line)}
 .minibtn:hover{border-color:var(--gold)}
+.bsay{display:flex;gap:8px;align-items:center;text-align:left;width:100%}
+.bsay canvas{width:40px;height:40px;flex:none;image-rendering:pixelated;border-radius:6px;border:2px solid var(--ink)}
+.bsay p{margin:0}
+.devbtn{border-style:dashed!important;color:#ffb3a8!important;margin-left:8px}

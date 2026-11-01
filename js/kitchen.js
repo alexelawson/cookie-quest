@@ -20,22 +20,22 @@ function startBaking(){
 }
 function finalNote(){
   showDialog({place:KITCHEN.place,speaker:'',pages:[KITCHEN.note],noteLast:true,actions:[
-    {label:KITCHEN.playAgain,fn:()=>{have={};save();renderBasket();farmReset();fargo.won=false;kit.party=false;closeDialog();goTo('world','start')}},
+    {label:KITCHEN.playAgain,fn:()=>{have={};save();renderBasket();farmReset();fargo.won=false;Object.assign(kit,{party:false,dance:false,alex:null,hugged:false});closeDialog();goTo('world','start')}},
     {label:KITCHEN.keepExploring,ghost:true,fn:closeDialog}]});
 }
 
 // ---------- everyone came over ----------
 // where they stand in the kitchen (feet position). Drawn with each place's own sprite.
 const CROWD=[
-  {name:'Keelan',x:30,y:86, draw:(x,y)=>drawKeelan({x,y,dir:'down',moving:false,step:0})},
-  {name:'Alex',x:46,y:94,  draw:(x,y)=>drawAlex(x,y,kit.party?'happy':'ok')},
-  {name:'Lars',x:58,y:128, draw:(x,y)=>drawLars({x,y,dir:'right',moving:false,step:0})},
+  {name:'Keelan',x:30,y:86, draw:(x,y,d)=>drawKeelan({x,y,dir:d||'down',moving:false,step:0})},
+  {name:'Alex',x:84,y:68,  draw:(x,y)=>drawAlex(x,y,kit.party?'happy':'ok')},   // she walks over to hug Joe at the end (kit.alex)
+  {name:'Lars',x:58,y:128, draw:(x,y,d)=>drawLars({x,y,dir:d||'right',moving:false,step:0})},
   {name:'The Stranger',x:22,y:132, draw:(x,y)=>drawStranger(x,y)},
   {name:'Jack',x:150,y:86, draw:(x,y)=>drawJack(x,y)},
   {name:'Margie',x:168,y:92, draw:(x,y)=>drawMargie(x,y)},
-  {name:'John',x:166,y:130, draw:(x,y)=>drawJohn({x,y,dir:'left',moving:false,step:0})},
-  {name:'Bob',x:184,y:146, draw:(x,y)=>drawBob(x,y)},
-  {name:'Trail John',x:140,y:150, draw:(x,y)=>drawTrailJohn(x,y,'down')},
+  {name:'John',x:166,y:130, draw:(x,y,d)=>drawJohn({x,y,dir:d||'left',moving:false,step:0})},
+  {name:'Lil Q',x:184,y:146, draw:(x,y)=>drawBob(x,y)},
+  {name:'Trail John',x:140,y:150, draw:(x,y,d)=>drawTrailJohn(x,y,d||'down')},
   {name:'Viking',x:204,y:136, draw:(x,y)=>drawVikingStanding(x,y)},
   {name:'Viking',x:212,y:152, draw:(x,y)=>drawVikingStanding(x,y)},
 ];
@@ -57,29 +57,29 @@ const BAKE={RATE:1.25, TARGET:10, WINDOW:.5, MAX:15};   // oven runs 1.25 minute
 const bake={open:false, i:0, state:'', amt:0, holding:false, eggs:0, stirs:0, t:0, lock:0};
 const kit={party:false, crownT:0, confetti:[]};
 const stepNow=()=>KITCHEN.steps[bake.i];
-function bakeMsg(t,who){ $('bakeMsg').textContent=(who?who+': ':'')+t }
+function bakeMsg(t,mood='ok'){ $('bakeMsg').textContent=t; const g=$('bakeFace').getContext('2d'); g.fillStyle='#e3d6bd'; g.fillRect(0,0,40,40); drawAlexFace(g,mood) }   // Alex says it, with her face
 function openBake(){ Object.assign(bake,{open:true,i:0}); bakeSetup(); paused=true; prompt.hidden=true; $('bake').hidden=false; setTimeout(()=>$('bakeBtn').focus({preventScroll:true}),0) }
 function bakeSetup(){
   const s=stepNow(), K=KITCHEN; Object.assign(bake,{state:s.kind, amt:0, holding:false, eggs:0, stirs:0, lock:0});
   $('bakeTitle').textContent=K.bakeTitle; $('bakeStep').className='bstep'; $('bakeStep').textContent=`${bake.i+1}/${K.steps.length+1} · ${s.name}${s.label?' · '+s.label:''}`;
-  bakeMsg(s.kind==='pour'?K.pourHint(s.label):s.kind==='count'?K.eggHint:K.stirHint);
+  bakeMsg(s.hint);
   $('bakeBtn').textContent=s.kind==='pour'?K.pourHold:s.kind==='count'?K.eggTap:K.stirTap;
   $('bakeAlt').hidden=s.kind!=='count'; $('bakeAlt').textContent=K.eggDone;
 }
-function bakeGood(){ const s=stepNow(); bake.state='good'; bakeMsg(s.good,crowdFace(s.who).speaker); $('bakeBtn').textContent=KITCHEN.next; $('bakeAlt').hidden=true }
+function bakeGood(){ const s=stepNow(); bake.state='good'; bakeMsg(s.good,'happy'); $('bakeBtn').textContent=KITCHEN.next; $('bakeAlt').hidden=true }
 function ovenSetup(){ bake.state='oven'; bake.t=0; $('bakeStep').className='bstep timer'; $('bakeStep').textContent='00:00'; bakeMsg(KITCHEN.bakeHint); $('bakeBtn').textContent=KITCHEN.bakeStart; $('bakeAlt').hidden=true }
 const ovenMin=()=>bake.t/1000*BAKE.RATE;
 const ovenClock=m=>`${String(Math.floor(m)).padStart(2,'0')}:${String(Math.floor(m%1*60)).padStart(2,'0')}`;
 function bakePress(){
   if(!bake.open||bake.lock>0)return; const s=stepNow(), K=KITCHEN;
   if(bake.state==='pour'){ bake.holding=true; $('bakeBtn').classList.add('on'); return }
-  if(bake.state==='count'){ bake.eggs++; if(bake.eggs>s.target){bakeMsg(K.eggMany,'Keelan'); bake.eggs=0; bake.lock=500} return }
+  if(bake.state==='count'){ bake.eggs++; if(bake.eggs>s.target){bakeMsg(K.eggMany,'frown'); bake.eggs=0; bake.lock=500} return }
   if(bake.state==='stir'){ bake.stirs++; if(bake.stirs>=s.taps)bakeGood(); return }
   if(bake.state==='good'){ bake.i++; if(bake.i<K.steps.length)bakeSetup(); else ovenSetup(); return }
-  if(bake.state==='oven'){ bake.state='baking'; bake.t=0; $('bakeBtn').textContent=K.bakeOut; bakeMsg(''); return }
+  if(bake.state==='oven'){ bake.state='baking'; bake.t=0; $('bakeBtn').textContent=K.bakeOut; bakeMsg('Okay, they\'re in. Watch the timer...'); return }
   if(bake.state==='baking'){ const m=ovenMin();
-    if(Math.abs(m-BAKE.TARGET)<=BAKE.WINDOW){ bake.state='done'; bakeMsg(K.perfect); $('bakeBtn').textContent='🍪 '+K.next }
-    else { bake.state='oven'; bake.lock=600; bakeMsg(m<BAKE.TARGET?K.raw:K.burnt, m<BAKE.TARGET?'Lars':'John'); $('bakeBtn').textContent=K.bakeStart; bake.burntAt=m }
+    if(Math.abs(m-BAKE.TARGET)<=BAKE.WINDOW){ bake.state='done'; bakeMsg(K.perfect,'happy'); $('bakeBtn').textContent='🍪 '+K.next }
+    else { bake.state='oven'; bake.lock=600; bakeMsg(m<BAKE.TARGET?K.raw:K.burnt,'frown'); $('bakeBtn').textContent=K.bakeStart; bake.burntAt=m }
     return }
   if(bake.state==='done'){ closeBake(); startParty() }
 }
@@ -87,16 +87,16 @@ function bakeRelease(){
   if(!bake.holding)return; bake.holding=false; $('bakeBtn').classList.remove('on');
   const s=stepNow(), K=KITCHEN, d=bake.amt-s.target;
   if(Math.abs(d)<=s.tol)return bakeGood();
-  bakeMsg(d>0?K.tooMuch:K.tooLittle, crowdFace(s.who).speaker); bake.lastAmt=bake.amt; bake.amt=0; bake.lock=600;
+  bakeMsg(d>0?K.tooMuch:K.tooLittle,'frown'); bake.lastAmt=bake.amt; bake.amt=0; bake.lock=600;
 }
-function eggsDone(){ const s=stepNow(); if(bake.state!=='count')return; if(bake.eggs===s.target)bakeGood(); else bakeMsg(KITCHEN.eggFew,'Keelan') }
+function eggsDone(){ const s=stepNow(); if(bake.state!=='count')return; if(bake.eggs===s.target)bakeGood(); else bakeMsg(KITCHEN.eggFew,'frown') }
 function closeBake(){ bake.open=false; $('bake').hidden=true; paused=false }
 function bakeTick(dt){
   if(!bake.open)return; if(bake.lock>0)bake.lock-=dt;
   const s=stepNow();
-  if(bake.state==='pour'&&bake.holding){ bake.amt+=s.rate*dt/1000; if(bake.amt>=s.max){ bake.holding=false; $('bakeBtn').classList.remove('on'); bake.amt=0; bake.lock=700; bakeMsg(KITCHEN.spilled,crowdFace(s.who).speaker) } }
+  if(bake.state==='pour'&&bake.holding){ bake.amt+=s.rate*dt/1000; if(bake.amt>=s.max){ bake.holding=false; $('bakeBtn').classList.remove('on'); bake.amt=0; bake.lock=700; bakeMsg(KITCHEN.spilled,'frown') } }
   if(bake.state==='baking'){ bake.t+=dt; const m=ovenMin(); $('bakeStep').textContent=ovenClock(Math.min(m,99));
-    if(m>=BAKE.MAX){ bake.state='oven'; bake.lock=600; bakeMsg(KITCHEN.burnt,'John'); $('bakeBtn').textContent=KITCHEN.bakeStart } }
+    if(m>=BAKE.MAX){ bake.state='oven'; bake.lock=600; bakeMsg(KITCHEN.burnt,'frown'); $('bakeBtn').textContent=KITCHEN.bakeStart } }
   drawBakeArt();
 }
 function drawBakeArt(){
@@ -138,12 +138,44 @@ addEventListener('keydown',e=>{ if(!bake.open)return;
   else if(e.code!=='Tab'){ e.preventDefault(); e.stopImmediatePropagation() } },true);
 addEventListener('keyup',e=>{ if(bake.open&&['Space','Enter'].includes(e.code))bakeRelease() },true);
 
-// ---------- the party ----------
+// ---------- the party: Alex hugs Joe, everyone talks, the crown, then THE COOKIE DANCE ----------
+const PARTY={WALK:1300, HUG:2600, BEAT:420};
 function startParty(){
-  have.baked=true; save(); kit.party=true; P.x=112; P.y=134; P.dir='down';
+  have.baked=true; save(); kit.party=true; kit.dance=false; P.x=112; P.y=134; P.dir='down';
+  const A=CROWD.find(c=>c.name==='Alex'); kit.alex={x:A.x,y:A.y}; kit.hugT=0; kit.hugging=true; paused=true; prompt.hidden=true;
   for(let k=0;k<70;k++)kit.confetti.push({x:Math.random()*224,y:-Math.random()*120,v:.02+Math.random()*.04,c:['#e54b4b','#f4d35e','#4fbf73','#5fa8e8','#e54b7a','#ffffff'][k%6]});
-  const lines=KITCHEN.party.map(([sp,t,face])=>[sp,t,face]);
-  say(lines,()=>{ kit.crownT=1600 });   // after the last line, the crown drops onto Joe's head, then the note
+}
+function partyTick(dt){
+  if(!kit.hugging)return; kit.hugT+=dt; const A=CROWD.find(c=>c.name==='Alex'), u=Math.min(1,kit.hugT/PARTY.WALK), tx=104, ty=135;
+  kit.alex={x:A.x+(tx-A.x)*u, y:A.y+(ty-A.y)*u};
+  if(kit.hugT>PARTY.WALK+PARTY.HUG){ kit.hugging=false; kit.hugged=true; say(KITCHEN.party.map(([sp,t,face])=>[sp,t,face]),()=>{ kit.crownT=1600 }) }
+}
+// the dance: an 8-beat loop everyone does together. step left, step right, hop hop, cookies up, spin
+function danceMove(i){
+  if(!kit.dance)return {dx:0,dy:kit.party&&!kit.hugging?-Math.abs(Math.sin(time/170+i*.8))*4:0,cookie:false,dir:null};
+  const t=(time-kit.danceAt)/PARTY.BEAT, beat=Math.floor(t)%8, f=t%1, hop=-Math.sin(f*Math.PI)*6;
+  if(beat<2)return {dx:-3,dy:0,cookie:false,dir:'left'};
+  if(beat<4)return {dx:3,dy:0,cookie:false,dir:'right'};
+  if(beat<6)return {dx:0,dy:hop,cookie:false,dir:'down'};
+  if(beat===6)return {dx:0,dy:-2,cookie:true,dir:'down'};
+  return {dx:0,dy:-2,cookie:true,dir:['left','up','right','down'][Math.floor(f*4)]};   // spin!
+}
+function drawCookie(x,y){ const F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(Math.round(x)+dx,Math.round(y)+dy,w,h)};
+  F('#c98a3a',-3,-2,6,4); F('#c98a3a',-2,-3,4,6); F('#5a3220',-1,-2,1,1); F('#5a3220',1,0,1,1); F('#5a3220',-2,1,1,1); F('#e0a85a',-2,-2,2,1) }
+let danceBanner=null;
+function drawDanceBanner(){
+  if(!danceBanner){ const t=KITCHEN.danceTitle, w=textW(t)+6; danceBanner=document.createElement('canvas'); danceBanner.width=w; danceBanner.height=9;
+    const g=danceBanner.getContext('2d'); g.fillStyle='#d4473c'; g.fillRect(0,0,w,9); g.fillStyle='#f4d35e'; g.fillRect(0,0,w,1); g.fillRect(0,8,w,1); pixText(g,t,3,2,'#ffffff') }
+  const s=2, w=danceBanner.width*s, x=Math.round((224-w)/2), y=4+Math.round(Math.sin(time/200)*2);
+  ctx.imageSmoothingEnabled=false; ctx.drawImage(danceBanner,x,y,w,danceBanner.height*s);
+  for(let k=0;k<2;k++)drawCookie(x-8+k*(w+16),y+9+Math.sin(time/150+k)*3);
+}
+function drawHug(){
+  if(!(kit.hugging&&kit.hugT>PARTY.WALK))return; const t=kit.hugT-PARTY.WALK, x=108, y=104-Math.min(10,t/60), s=1+Math.sin(t/120)*.15;
+  const F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(Math.round(x+dx*s),Math.round(y+dy*s),Math.ceil(w*s),Math.ceil(h*s))};   // a big pink heart over the hug
+  F('#e54b7a',-6,-4,5,4); F('#e54b7a',1,-4,5,4); F('#e54b7a',-7,-2,14,4); F('#e54b7a',-5,2,10,2); F('#e54b7a',-3,4,6,2); F('#e54b7a',-1,6,2,1); F('#ffb3c9',-5,-3,2,2);
+  for(let k=0;k<5;k++){const ph=((t/900)+k*.2)%1; ctx.fillStyle=`rgba(229,75,122,${1-ph})`; const hx=x-20+k*10, hy=y+20-ph*30; ctx.fillRect(hx,hy,2,2); ctx.fillRect(hx+3,hy,2,2); ctx.fillRect(hx,hy+1,5,2); ctx.fillRect(hx+1,hy+3,3,1)}
+  ctx.fillStyle='rgba(29,33,48,.85)'; ctx.font='8px monospace'; const msg=KITCHEN.hug, w=ctx.measureText(msg).width+10; ctx.fillRect((224-w)/2,150,w,12); ctx.fillStyle='#ffffff'; ctx.fillText(msg,(224-w)/2+5,159);
 }
 
 const kitBg=document.createElement('canvas'); kitBg.width=224; kitBg.height=168;
@@ -207,22 +239,25 @@ function drawXmasTree(){
 SCENES.kitchen={ place:KITCHEN.place,
   w:224, h:168, bounds:R(6,52,212,116), bg:kitBg, triggers:KIT_TRIGGERS,
   dynTrigger(){ const c=crowdNear(); if(!c)return null; const f=crowdFace(c.name); return {label:'Talk to '+f.speaker, btn:'Talk', act:()=>showDialog({place:KITCHEN.place,speaker:f.speaker,face:f.face,pages:[KITCHEN.crowd[c.name]],actions:[CLOSE]})} },
-  ambient(dt){ bakeTick(dt);
+  ambient(dt){ bakeTick(dt); partyTick(dt);
     for(const p of kit.confetti){p.y+=p.v*dt; p.x+=Math.sin((time+p.y*30)/400)*.2; if(p.y>170){ if(kit.party&&kit.confetti.length<140){p.y=-4;p.x=Math.random()*224} else p.dead=true }}
     kit.confetti=kit.confetti.filter(p=>!p.dead);
-    if(kit.crownT>0){ kit.crownT-=dt; if(kit.crownT<=0){ have.crown=true; save(); setTimeout(finalNote,700) } } },
-  drawPlayer(x,y){ const j=kit.party?Math.abs(Math.sin(time/170))*4:0; drawPlayer(x,y-j);
-    if(kit.crownT>0){const t=Math.min(1,(1-kit.crownT/1600)*1.4); drawCrown(x,y-j-23-(1-t)*60)} else if(have.crown)drawCrown(x,y-j-23) },
+    if(kit.crownT>0){ kit.crownT-=dt; if(kit.crownT<=0){ have.crown=true; save(); kit.dance=true; kit.danceAt=time; setTimeout(finalNote,PARTY.BEAT*16) } } },
+  drawPlayer(x,y){ const m=danceMove(-1); if(kit.dance&&m.dir)P.dir=m.dir; const X=x+m.dx, Y=y+m.dy; drawPlayer(X,Y);
+    if(kit.crownT>0){const t=Math.min(1,(1-kit.crownT/1600)*1.4); drawCrown(X,Y-23-(1-t)*60)} else if(have.crown)drawCrown(X,Y-23);
+    if(m.cookie)drawCookie(X+7,Y-20) },
   solids:[R(78,104,68,14), R(194,104,24,10), R(6,52,16,6)],
   entries:{start:{x:112,y:152,dir:'up'}, fromDoor:{x:112,y:154,dir:'up'}},
-  enter(){ kit.party=!!have.baked },
+  enter(){ kit.party=!!have.baked; kit.dance=!!have.crown; kit.danceAt=time; if(have.baked){const A=CROWD.find(c=>c.name==='Alex'); kit.alex={x:104,y:135}} },
   ents(list){list.push({y:118,draw:drawTable},{y:114,draw:drawXmasTree});
-    if(allIn()||have.baked)CROWD.forEach((c,i)=>list.push({y:c.y,draw:()=>c.draw(c.x,c.y-(kit.party?Math.abs(Math.sin(time/170+i*.8))*5:0))}))},
+    if(allIn()||have.baked)CROWD.forEach((c,i)=>{ const pos=(c.name==='Alex'&&kit.alex)?kit.alex:c;
+      list.push({y:pos.y,draw:()=>{const m=danceMove(i); c.draw(pos.x+m.dx,pos.y+m.dy,m.dir); if(m.cookie)drawCookie(pos.x+m.dx+7,pos.y+m.dy-21)}}) })},
   under(){ // oven glow
     const f=.55+.15*Math.sin(time/300)+.08*Math.sin(time/77);
     ctx.fillStyle=`rgba(255,140,40,${f})`; ctx.fillRect(127,38,20,12);
     ctx.fillStyle=`rgba(255,200,90,${f*.6})`; ctx.fillRect(129,41,16,6);
   },
   over(){ctx.fillStyle='rgba(255,190,110,.06)'; ctx.fillRect(0,0,224,168);   // warm light
-    for(const p of kit.confetti){ctx.fillStyle=p.c; ctx.fillRect(p.x|0,p.y|0,2,2)} },
+    for(const p of kit.confetti){ctx.fillStyle=p.c; ctx.fillRect(p.x|0,p.y|0,2,2)}
+    drawHug(); if(kit.dance)drawDanceBanner() },
 };

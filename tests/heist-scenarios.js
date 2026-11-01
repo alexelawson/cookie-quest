@@ -14,7 +14,7 @@ const helpers=()=>{window.T={
   hints:[],
   enter:()=>{P.x=134;P.y=244;update(16.7);action(); if(!$('wardrobe').hidden)$('wardGo').click(); T.run(40)},
 }};
-const fresh=async()=>{await p.goto(URL);await p.evaluate(()=>localStorage.clear());await p.reload();await p.click('#startBtn');await p.evaluate(helpers)};
+const fresh=async()=>{await p.goto(URL);await p.evaluate(()=>localStorage.clear());await p.reload();await p.click('#startBtn'); await p.evaluate(()=>skipWelcome());await p.evaluate(helpers)};
 const R=[];const ok=(n,c,x='')=>R.push((c?'PASS ':'FAIL ')+n+(x?'  ('+x+')':''));
 await fresh();
 
@@ -111,7 +111,7 @@ r=await p.evaluate(()=>({city:!!have.city,basket:$('basket').textContent,hud:$('
 r=await p.evaluate(()=>{const w=T.path([[455,180],[360,180],[360,146],[200,146],[200,102],[100,102],[40,160],[20,172]]); update(16.7); const lbl=prompt.textContent; action(); T.run(40); return {w,lbl,world:scene===SCENES.world,bar:$('crewbar').hidden}});
 ok('H walk back and climb down; crew bar hides',r.lbl==='Climb down the ladder'&&r.world&&r.bar,r.w+' '+r.lbl);
 // I. reload mid-heist resumes at the right checkpoint
-await fresh(); await p.evaluate(()=>{have.heistStage=2; have.heistBriefed=true; save()}); await p.reload(); await p.click('#startBtn'); await p.evaluate(helpers);
+await fresh(); await p.evaluate(()=>{have.heistStage=2; have.heistBriefed=true; save()}); await p.reload(); await p.click('#startBtn'); await p.evaluate(()=>skipWelcome()); await p.evaluate(helpers);
 r=await p.evaluate(()=>{T.enter(); const sp=dlg.hidden?'':$('dspeaker').textContent; return {sp,pos:(P.x|0)+','+(P.y|0),onC:hit(R(P.x-1,P.y-1,2,2),ROOF_C)}}); ok('I reload at stage 2 starts on roof C, no briefing',r.sp!=='The Stranger'&&r.onC,r.pos+' '+r.sp);
 // J. checkpoints are safe to stand on
 r=await p.evaluate(()=>{const bad=[]; for(let st=0;st<3;st++){have.heistStage=st; placeAtCheckpoint(); T.clickThrough(); for(let i=0;i<600;i++){update(16.7); if(!dlg.hidden){if($('dspeaker').textContent==='Spotted!'){bad.push(st+': '+$('dtext').textContent); T.clickThrough(); break} T.clickThrough()}}} return bad});

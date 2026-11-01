@@ -111,18 +111,34 @@ const HEIST = {
   stairsDown:"Take the stairs down to the street",
 };
 
+// ---------- The welcome: Alex explains the game when you press Start the first time ----------
+const ALEX_WELCOME = {speaker:'Alex', place:'Home',
+  pages:["Joe! Merry Christmas!",
+    "Okay. We're making the best chocolate chip cookies ever made. And I need your help.",
+    "Five stops: Keelan's farm for eggs and butter, the Birkie trailhead for flour, the city rooftops for chocolate, Fargo for sugar, and Wylee Woods for milk.",
+    "Walk with the arrow keys (or the pad under the screen). Press Space or A to talk to people and do things.",
+    "Everything you get goes in the basket up top. When it's full, meet me in the kitchen. Everyone's coming over.",
+    "Oh, and look around. Some people might need a little favor..."],
+  go:"Let's go!",
+  lookTitle:"Pick Joe's look", lookIntro:"First things first. What's Joe wearing today?", lookGo:"Looks good"};
+
 // ---------- Joe's stealth wardrobe (picked before the city) ----------
 const WARDROBE = {title:"Suit up, Joe", intro:"It's a stealth mission. What are you wearing?", go:"Suit up",
+  jersey:{id:'jersey', name:"Joe's Jersey", line:"White jersey, red trim. The classic Joe."},   // only offered at the start
   outfits:[
     {id:'cape',    name:"The Classic",      line:"Dark suit, mask, dramatic cape. Very brooding."},
     {id:'ninja',   name:"All-Black Ninja",  line:"Head to toe in black. Only your eyes show."},
     {id:'burglar', name:"Cat Burglar",      line:"Striped shirt, beanie, eye mask, and a sack for the loot."},
     {id:'hoodie',  name:"Hoodie & Sweats",  line:"Hood up. Mysterious. Mostly just comfy."},
     {id:'sweater', name:"Ugly Xmas Sweater",line:"Stealth: zero. Festive: maximum."},
+    {id:'vikings', name:"Vikings Gameday",  line:"Purple jersey, gold pants, horned helmet. SKOL."},
+    {id:'disco',   name:"70s Disco",        line:"White suit, gold chain, big hair. Stayin' alive."},
   ],
   react:{cape:[['Lars',"Very dramatic. The cape is a lot."],['John',"I love the cape."]], ninja:[['John',"I can't see you. That's the point, right?"]],
          burglar:[['Lars',"You look like a cartoon robber."],['John',"It's perfect."]], hoodie:[['John',"Respect. Comfort first."]],
-         sweater:[['Lars',"They're going to see you from space."],['John',"Festive though."]]}};
+         sweater:[['Lars',"They're going to see you from space."],['John',"Festive though."]],
+         vikings:[['John',"SKOL!!!"],['Lars',"We're breaking into a vault, not tailgating."],['John',"Why not both."]],
+         disco:[['John',"Bro."],['John',"BRO. It's a heist, not a roller rink."],['Lars',"Is that a gold chain?"],['John',"The searchlights are gonna think you're a disco ball. Do NOT do the Hustle up there."]]}};
 
 // ---------- The vault puzzles (the heist's last lock) ----------
 // One is picked at random each time, and the crates are shuffled, so the right one moves around.
@@ -202,8 +218,9 @@ const GOLF_TEXT = {
               "Tap again to stop the power meter. A fuller bar throws farther.",
               "Long throws curve a little to the left at the end.",
               "Inside the dotted circle around the basket it's a putt: slower arrow, shorter throw.",
-              "Trees stop your disc. Water and out of bounds cost you a stroke.",
-              "Five holes. Fewest throws wins."],
+              "Hit a tree dead center and it stops your disc. Clip one and it glances off.",
+              "Out of bounds (past the white stakes) or in the water: +1 penalty stroke, and you rethrow from the same spot.",
+              "Five holes. Fewest throws wins: beat Jack, and tie or beat Margie."],
   howToOk:"Got it",
   practiceAsk:"Want a practice throw first? It doesn't count.",
   practice:"Practice throw",
@@ -220,6 +237,10 @@ const GOLF_TEXT = {
   hikeHint:"House rule on this one: face away from the basket and hike it through your legs. HUT! HUT! I always wanted to play for the Vikings.",
   water:"Splash. That's a penalty stroke, back to where you threw from.",
   ob:"Out of bounds. Penalty stroke, back to where you threw from.",
+  // the pop-up when you go out of bounds or in the water. n = the throw you're on next
+  obTitle:"OUT OF BOUNDS!", waterTitle:"SPLASH!",
+  penalty:n=>`+1 penalty stroke. You throw again from the same spot. Next up: throw ${n}.`,
+  penaltyOk:"Ugh. Okay.",
   tree:"*THWACK* Right off a tree.",
   chains:"Chains!",
   ace:"ACE!!! In one throw!",
@@ -234,29 +255,29 @@ const GOLF_TEXT = {
   leave:"Head back to the road",
 };
 
-// ---------- Fargo: Bob (runs the cheapest gas station in the country) and Alex, your passenger ----------
+// ---------- Fargo: Lil Q (runs the cheapest gas station in the country) and Alex, your passenger ----------
 const FARGO = {
-  place:'Fargo, ND', bob:'Bob',
+  place:'Fargo, ND', bob:'Lil Q',   // the gas station owner's name (the code calls her "bob")
   intro:["We're running on fumes.","Somewhere in this town is the cheapest gas in the whole country. Find it. I believe in you."],
   introSpeaker:'Alex',
   attendants:['Deb','Lars','Shelly','Ole','Marv'],
-  // the signs on the gas station shops (keep them short: about 9 letters fits). Bob's always says BOB'S GAS.
+  // the signs on the gas station shops (keep them short: about 9 letters fits). Lil Q's always says LIL Q'S.
   stationSigns:['GAS N GO','PRAIRIE','RED RIVER','BISON','STAR GAS'],
-  bobSign:"BOB'S GAS",
+  bobSign:"LIL Q'S",
   ask:p=>`$${p} a gallon. Fill 'er up?`,
   fill:"Fill up", keep:"Keep looking",
   wrong:p=>[`Tank's full. At $${p} a gallon.`,"On your way out of town you pass a sign that says $2.79.","Oof."],
   retry:"Try again",
   bobHello:["Well, look at that. You found it. Cheapest gas in the whole country.","Two seventy-nine. Rode my bike from Sturgis to Florida and back and never saw cheaper."],
   bobBet:["Here's the deal. Stop that pump on exactly thirty bucks and I'll throw in some sugar.","My cousin grows the beets out back. Best sugar there is."],
-  pumpTitle:"Bob's bet: stop on exactly $30.00",
+  pumpTitle:"Lil Q's bet: stop on exactly $30.00",
   pumpHint:"Hold to pump. Let go to stop. Quick taps for the last few cents.",
-  bust:["Ohhh, a penny over. So close.","Over again. Go ahead, I'll reset it.","Thirty and what now? Again!","Steady hands, friend. One more try."],
+  bust:["Ohhh, a penny over. So close.","Over again. Go ahead, I'll reset it.","Thirty and what now? Again!","Steady hands, rookie. One more try."],
   pumpWin:["Thirty dollars even. Respect.","Now go on inside and grab something for your co-pilot. She's been real patient."],
   goInside:"Go inside",
-  bobWaiting:"Go on in, she's waiting. Don't come back with the wrong snack, man.",
+  bobWaiting:"Go on in, she's waiting. Don't come back with the wrong snack, rookie.",
   win:["Now that's a good road-trip partner.","Here ya go. Sugar, fresh from the Red River Valley."],
-  thanks:"Thanks, Bob!",
+  thanks:"Thanks, Lil Q!",
   after:"Ride safe. It's not this cheap anywhere else, you know.",
   empty:"Out of gas! You're pushing the CR-V now.",
   emptyAlex:"I'll steer.",
@@ -264,7 +285,7 @@ const FARGO = {
 
   // ---- the snack stop: Alex (the passenger) ----
   // Change her lines here. `correct` says which drink + snack she wants.
-  shop:"Bob's Gas & Go",
+  shop:"Lil Q's Gas & Go",
   wallet:20,          // dollars left after $30 of gas
   wrongCost:3,        // each wrong pick costs this much
   strikesOut:2,       // this many wrong picks and you get sent back outside
@@ -302,30 +323,33 @@ const KITCHEN = {place:'Home', speaker:'Your kitchen',
   missing:"The recipe card says you still need:",
   ready:["Everything's in the basket.","And... everyone came over? Everyone came over.","Time to bake."],
   // what everyone says if you talk to them in the kitchen before baking
-  crowd:{Keelan:"Those are my eggs. Treat them with respect.", Alex:"I'm on dough-tasting duty.", Bob:"Thirty bucks of gas for this. Better be good, ya know.",
+  crowd:{Keelan:"Those are my eggs. Treat them with respect.", Alex:"I'm on dough-tasting duty.", 'Lil Q':"Thirty bucks of gas for this. Better be good, rookie.",
          Lars:"I'll time the oven. I have a watch with splits.", John:"I'll carry the tray. Or the whole oven.", 'The Stranger':"The city sleeps soundly tonight. Because of cookies.",
          Jack:"Big cookie vibes in here.", Margie:"I brought the milk. You're welcome.", 'Trail John':"Flour made it all fifty kilometers.", Viking:"SKOL! When do we eat?"},
   // the baking card: one step per ingredient, in recipe order. target and tol are in cups.
   bakeTitle:"Bake the cookies",
+  // Alex is your baking helper: she talks you through every step (her lines are the hint, good, and the oops lines below)
   steps:[
-    {key:'butter',   name:'Butter',          kind:'pour', target:1,    label:'1 cup',   max:1.5, rate:.5,  tol:.08, color:'#f4e3a1', who:'Keelan', good:"That's a cup. Perfect."},
-    {key:'sugar',    name:'Sugar',           kind:'pour', target:.75,  label:'¾ cup',   max:1.5, rate:.45, tol:.07, color:'#fbfbf7', who:'Bob',    good:"Three quarters. Sweet, ya know."},
-    {key:'eggs',     name:'Eggs',            kind:'count',target:2,    label:'2 eggs',                                   who:'Keelan', good:"Two eggs. My girls are proud."},
-    {key:'flour',    name:'Flour',           kind:'pour', target:2.25, label:'2¼ cups', max:3,   rate:.9,  tol:.12, color:'#f3eadb', who:'Trail John', face:'Trail John', good:"Two and a quarter. Fifty K well spent."},
-    {key:'chocolate',name:'Chocolate chips', kind:'pour', target:2,    label:'2 cups',  max:3,   rate:.8,  tol:.12, color:'#5a3220', who:'Lars',   good:"Two cups. Heist: worth it."},
-    {key:'stir',     name:'Stir it up',      kind:'stir', taps:12,                                                       who:'John',   good:"Now THAT is dough."},
+    {key:'butter',   name:'Butter',          kind:'pour', target:1,    label:'1 cup',   max:1.5, rate:.5,  tol:.08, color:'#f4e3a1', hint:"Butter first. One cup. Let go right on the gold line.", good:"One cup of Keelan's butter. Perfect."},
+    {key:'sugar',    name:'Sugar',           kind:'pour', target:.75,  label:'¾ cup',   max:1.5, rate:.45, tol:.07, color:'#fbfbf7', hint:"Now the sugar from Fargo. Three quarters of a cup.", good:"Three quarters. Lil Q would be proud."},
+    {key:'eggs',     name:'Eggs',            kind:'count',target:2,    label:'2 eggs',                                   hint:"Two eggs. Crack them in, then tell me when you're done.", good:"Two eggs, no shells. Look at you."},
+    {key:'flour',    name:'Flour',           kind:'pour', target:2.25, label:'2¼ cups', max:3,   rate:.9,  tol:.12, color:'#f3eadb', hint:"Flour. Two and a quarter cups. It pours fast, careful.", good:"Two and a quarter. The Vikings' flour made it."},
+    {key:'chocolate',name:'Chocolate chips', kind:'pour', target:2,    label:'2 cups',  max:3,   rate:.8,  tol:.12, color:'#5a3220', hint:"The good part. Two cups of heist chocolate.", good:"Two cups. Worth every searchlight."},
+    {key:'stir',     name:'Stir it up',      kind:'stir', taps:12,                                                       hint:"Now stir! Fast!", good:"Now THAT is cookie dough. Don't eat it all."},
   ],
-  pourHold:"Hold to pour", pourHint:t=>`Pour ${t}. Let go right on the gold line.`,
-  tooMuch:"Whoa, way too much. Scoop it out and try again.", tooLittle:"Not quite enough. Dump it back and try again.", spilled:"It's everywhere. Again!",
-  eggTap:"Crack an egg", eggDone:"That's enough", eggHint:"Crack 2 eggs.", eggMany:"That's a lot of eggs. Start the eggs over.", eggFew:"Need one more.",
-  stirTap:"Stir!", stirHint:"Tap fast to stir it all together.",
+  pourHold:"Hold to pour",
+  tooMuch:"Whoa, way too much. Scoop it out and try again.", tooLittle:"Not quite enough. Dump it back and try again.", spilled:"Joe. It's everywhere. Again!",
+  eggTap:"Crack an egg", eggDone:"That's enough", eggMany:"That's a lot of eggs. Keelan is crying. Start the eggs over.", eggFew:"We need one more.",
+  stirTap:"Stir!",
   next:"Next",
-  bakeHint:"Bake 10 minutes. Take them out when the timer hits 10:00. Golden, not burnt.", bakeStart:"Put them in", bakeOut:"Take them out",
-  raw:"Still raw in the middle! New tray, try again.", burnt:"Burnt. Lars is already opening a window. New tray!", perfect:"Golden brown. PERFECT.",
+  bakeHint:"Into the oven. Ten minutes. Pull them right at 10:00, golden, not burnt.", bakeStart:"Put them in", bakeOut:"Take them out",
+  raw:"Still raw in the middle! New tray, try again.", burnt:"Burnt. Lars is already opening a window. New tray!", perfect:"Golden brown. PERFECT. Come here, you.",
   // the party, in order. [speaker, line] (or [speaker, line, portrait] to borrow someone's face)
-  party:[['Alex',"THEY'RE PERFECT."],['Keelan',"Best eggs in the county. Best cookies in the world."],['Bob',"Worth every penny of thirty bucks."],
+  hug:"Alex gives Joe a big hug.",
+  danceTitle:"THE COOKIE DANCE",
+  party:[['Alex',"THEY'RE PERFECT. You're perfect. Okay, everybody's turn."],['Keelan',"Best eggs in the county. Best cookies in the world."],['Lil Q',"Worth every penny of thirty bucks."],
     ['Lars',"Okay. These beat my PR."],['John',"Can I have six? I'm having six."],['The Stranger',"The city finally has the cookies it deserves."],
     ['Margie',"Milk for dunking. Obviously."],['Jack',"Vibes: immaculate."],['John',"SKOL!!! (the Vikings taught me that)",'Trail John'],
-    ['','Everyone agrees. There is only one Cookie King.'],['','Joe gets a crown.']],
+    ['','Everyone agrees. There is only one Cookie King.'],['','Joe gets a crown.'],['Alex',"And now... THE COOKIE DANCE. Everybody!"]],
   playAgain:"Play again", keepExploring:"Keep exploring",
   note:"Merry Christmas! Love, Alex"};

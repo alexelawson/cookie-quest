@@ -1,6 +1,6 @@
 // Simulates skiers of different rhythm accuracy on the Birkie. Usage: node tests/birkie-difficulty.js '{"CUTOFF":12000}'
 const {chromium}=require('playwright');const path=require('path');const OV=JSON.parse(process.argv[2]||'{}');(async()=>{
-const b=await chromium.launch();const p=await b.newPage();await p.goto('file://'+path.resolve(__dirname,'../index.html'));await p.click('#startBtn');
+const b=await chromium.launch();const p=await b.newPage();await p.goto('file://'+path.resolve(__dirname,'../index.html'));await p.click('#startBtn'); await p.evaluate(()=>skipWelcome());
 const out=await p.evaluate((OV)=>{Object.assign(BIRK,OV); have.miller=true; scene=SCENES.birkie; paused=false;
   const g=()=>{let u=0,v=0;while(!u)u=Math.random();while(!v)v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)};
   function run(sigma,pole,steerErr){birkStart(); let next=null, guard=0;

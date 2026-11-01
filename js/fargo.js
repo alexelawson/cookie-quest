@@ -126,22 +126,22 @@ function drawCar(x,y,dir=P.dir,parked=false){
 }
 
 // ---------- people ----------
-// Bob: biker. Bandana, shades, big gray beard, black moto tee under a leather vest, jeans, boots.
+// Lil Q (the code still calls her "bob"): biker. Short red hair, shades, black moto tee under a leather vest, jeans, boots.
 function drawBob(x,y){
   const F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(Math.round(x)-6+dx,Math.round(y)-20+dy,w,h)};
-  const skin='#e2a97f', beard='#b9b4ad', tee='#1c1c20', vest='#4a2e1c', vestL='#6b4428', jean='#3a5f9e', boot='#1d1d22';
+  const skin='#f0c3a0', hair='#c8402a', hairL='#e0603a', tee='#1c1c20', vest='#4a2e1c', vestL='#6b4428', jean='#2c3e5a', boot='#1d1d22';
   F('rgba(0,0,0,.2)',1,19,10,2);
   F(jean,3,13,3,6); F(jean,6,13,3,6); F(boot,2,18,4,2); F(boot,6,18,4,2);
   F(tee,1,7,10,7); F(vest,1,7,3,7); F(vest,8,7,3,7); F(vestL,3,8,1,5); F(vestL,8,8,1,5);   // leather vest open over the tee
   F('#e8742a',5,9,2,1); F('#e8742a',4,10,4,1); F('#ffffff',5,11,2,1);                      // orange wing graphic on the shirt
   F('#c9ced4',4,13,4,1);                                                                    // belt buckle chain
-  F(skin,0,8,1,5); F(skin,11,8,1,5); F('#2b3a4f',0,10,1,1);                                 // big arms, a tattoo
-  F(skin,3,1,6,5);
-  F('#e8742a',2,0,8,2); F('#1c1c20',3,1,1,1); F('#1c1c20',7,0,1,1); F('#e8742a',10,1,1,2);  // bandana
+  F(skin,0,8,1,5); F(skin,11,8,1,5); F('#2b3a4f',0,10,1,1); F('#2b3a4f',11,9,1,2);       // arms, tattoos
+  F(skin,3,1,6,6); F(skin,5,7,2,1);
+  F(hair,2,0,8,2); F(hair,2,2,1,3); F(hair,9,2,1,2); F(hairL,4,0,3,1); F(hair,8,-1,2,2);    // short spiky red hair
   F('#1c1c20',3,3,6,1); F('#3a4a60',4,3,1,1); F('#3a4a60',7,3,1,1);                         // sunglasses
-  F(beard,3,5,6,3); F(beard,4,8,4,1); F('#d8d4cd',5,6,2,1);                                 // beard
+  F('#c0303a',5,5,2,1); F('#f4d35e',2,4,1,1); F('#f4d35e',9,4,1,1);                         // red lips, gold earrings
 }
-// Bob's motorcycle, parked by his shop
+// Lil Q's motorcycle, parked by her shop
 function drawBike(x,y){
   const F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(Math.round(x)+dx,Math.round(y)+dy,w,h)};
   F('rgba(0,0,0,.18)',-1,12,8,2);
@@ -250,7 +250,7 @@ function pullIn(i){
   if(fargo.onFoot) return;
   showDialog({place:FARGO.place,speaker:s.name,pages:[FARGO.ask(s.price)],actions:[
     {label:FARGO.fill,fn:()=>{
-      if(have.fargo) return showDialog({place:FARGO.place,speaker:s.name,pages:[`Tank's full. At $${s.price} a gallon. Bob's is cheaper, ya know.`],actions:[CLOSE]});
+      if(have.fargo) return showDialog({place:FARGO.place,speaker:s.name,pages:[`Tank's full. At $${s.price} a gallon. Lil Q's is cheaper, ya know.`],actions:[CLOSE]});
       showDialog({place:FARGO.place,speaker:s.name,pages:FARGO.wrong(s.price),actions:[{label:FARGO.retry,fn:()=>{closeDialog();goTo('fargo','fromHighway')}}]})}},
     {label:FARGO.keep,ghost:true,fn:closeDialog}]});
 }
@@ -325,7 +325,7 @@ fargoNewRun();
 // ---------- on foot + the shop ----------
 const SHOP_TRIGGER={label:'Go inside', act:()=>openShop()};
 const ALEX_TRIGGER={label:'Talk to Alex', btn:'Talk', act:()=>showDialog({place:FARGO.place,speaker:'Alex',pages:[fargo.alexMood==='frown'?FARGO.alexOutside:FARGO.alexWaiting],actions:[CLOSE]})};
-const BOB_TRIGGER={label:'Talk to Bob', btn:'Talk', act:()=>showDialog({place:FARGO.place,speaker:FARGO.bob,pages:[FARGO.bobWaiting],actions:[CLOSE]})};
+const BOB_TRIGGER={label:'Talk to '+FARGO.bob, btn:'Talk', act:()=>showDialog({place:FARGO.place,speaker:FARGO.bob,pages:[FARGO.bobWaiting],actions:[CLOSE]})};
 function parkAndGetOut(){
   // the car pulls up to the pump on the side away from the shop, so the door is always clear
   const g=STATIONS[fargo.bob];

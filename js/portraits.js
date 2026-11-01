@@ -36,11 +36,17 @@ PORTRAITS['You']={size:32, bg:'#2a3044', draw(g){ const F=px(g), L=(typeof heroL
   // shoulders
   if(L.top==='stripes'){F('#f2f2ee',5,22,22,10); for(let y=23;y<32;y+=3)F('#1d1d22',5,y,22,1)}
   else if(L.top==='sweater'){F('#c8322b',4,22,24,10); F('#2f8a4a',4,25,24,1); for(let x=6;x<26;x+=4)F('#ffffff',x,28,1,1)}
+  else if(L.top==='jersey'){F('#4f2683',4,22,24,10); F('#ffc62f',4,22,6,4); F('#ffc62f',22,22,6,4); F('#ffffff',14,25,4,6)}
+  else if(L.top==='disco'){F('#f2efe6',4,22,24,10); F('#e8742a',11,22,10,6); F('#f2efe6',14,23,4,6); F('#ffd84d',13,27,6,1)}
   else F(L.top,6,22,20,10);
   if(L.cape){F('#0e1017',3,22,4,10); F('#0e1017',25,22,4,10); F('#1d2130',5,20,4,6); F('#1d2130',23,20,4,6)}
   if(L.sack){F('#c9b07a',24,18,7,12); F('#a8905a',25,18,4,2)}
   F(skin,13,19,6,4); F(skin,10,6,12,15);
   if(L.head==='wrap'){F(L.top,9,3,14,18); F(skin,11,10,10,4); F(eye,12,11,2,2); F(eye,18,11,2,2); return}
+  if(L.head==='helmet'){F('#4f2683',8,2,16,12); F('#ffc62f',15,2,2,10); F('#f2f2ee',6,6,4,5); F('#f2f2ee',22,6,4,5); F(eye,12,11,2,2); F(eye,18,11,2,2);
+    F('#8a8f9a',10,15,12,1); F('#8a8f9a',12,13,1,5); F('#8a8f9a',19,13,1,5); F('#b5654f',14,18,4,1); return}
+  if(L.head==='afro'){F('#4a2e1c',5,0,22,12); F('#4a2e1c',5,10,4,8); F('#4a2e1c',23,10,4,8); F('#5a3a22',8,0,16,2);
+    F('#e8b04a',10,10,5,3); F('#e8b04a',17,10,5,3); F('#5a3a22',15,11,2,1); F('#5a3a22',13,16,6,1); F('#b5654f',14,18,4,1); return}
   if(L.head==='hood'){F(L.hat,7,3,18,7); F(L.hat,7,9,4,14); F(L.hat,21,9,4,14); F('#d9ad88',11,9,10,2); F(eye,12,11,2,2); F(eye,18,11,2,2); F('#b5654f',14,17,4,1); F('#e8e8e0',12,22,1,4); F('#e8e8e0',19,22,1,4); return}
   F(hair,9,3,14,6); F('#8d6440',11,4,8,1); F(hair,9,8,2,6); F(hair,21,8,2,5);
   if(L.mask)F(L.mask,9,10,14,4);
@@ -55,14 +61,14 @@ PORTRAITS['Keelan']={size:32, bg:'#d8ecc6', draw(g){ const F=px(g);
   F('#5a3b24',10,2,12,4); F('#5a3b24',10,5,2,3); F('#5a3b24',20,5,2,2);
   F('#2b2b2b',13,10,2,2); F('#2b2b2b',17,10,2,2); F('#d9a37f',15,12,2,3); F('#b5735a',14,16,4,1);
 }};
-// Bob: biker, orange bandana, shades, big gray beard, leather vest over a black tee
-PORTRAITS['Bob']={size:32, bg:'#f2dcc0', draw(g){ const F=px(g);
+// Lil Q: biker, short spiky red hair, shades, leather vest over a black tee, gold hoops
+PORTRAITS['Lil Q']={size:32, bg:'#f2dcc0', draw(g){ const F=px(g);
   F('#1c1c20',6,24,20,8); F('#4a2e1c',4,24,6,8); F('#4a2e1c',22,24,6,8); F('#e8742a',14,27,4,1); F('#e8742a',13,28,6,1);
-  F('#e2a97f',10,5,12,13);
-  F('#b9b4ad',9,14,14,9); F('#d8d4cd',11,16,10,5); F('#b9b4ad',11,23,10,2);       // beard
-  F('#1c1c20',10,9,12,3); F('#3a4a60',11,10,4,1); F('#3a4a60',17,10,4,1);          // shades
-  F('#c98f66',15,12,2,2); F('#a86a50',14,15,4,1);
-  F('#e8742a',9,2,14,5); F('#1c1c20',12,3,1,1); F('#1c1c20',17,4,1,1); F('#1c1c20',20,2,1,1); F('#e8742a',23,4,3,2);
+  F('#f0c3a0',13,20,6,4); F('#f0c3a0',10,6,12,15);
+  F('#c8402a',9,3,14,6); F('#c8402a',9,8,2,6); F('#c8402a',21,8,2,4); F('#e0603a',12,3,6,1); F('#c8402a',19,1,3,3); F('#c8402a',14,1,2,2);   // short spiky red hair
+  F('#1c1c20',10,11,12,3); F('#3a4a60',11,12,4,1); F('#3a4a60',17,12,4,1);          // shades
+  F('#d9a37f',15,14,2,2); F('#c0303a',14,17,4,1); F('#a0202a',15,18,2,1);           // red lips
+  F('#f4d35e',9,15,1,3); F('#f4d35e',22,15,1,3);                                     // gold hoops
 }};
 // Jack: short blond hair, teal polo
 PORTRAITS['Jack']={size:32, bg:'#cdeee8', draw(g){ const F=px(g);

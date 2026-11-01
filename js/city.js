@@ -81,6 +81,8 @@ const OUTFIT_LOOK={
   burglar:{top:'stripes', pants:'#1d1d22', boots:'#0b0c12', head:'beanie', hat:'#1d1d22', mask:'#0b0c12', sack:true},
   hoodie: {top:'#6b707c', pants:'#3a3f4a', boots:'#e8e8e0', head:'hood', hat:'#6b707c'},
   sweater:{top:'sweater', pants:'#3a5f9e', boots:'#3b2a1e', head:'santa'},
+  vikings:{top:'jersey', pants:'#ffc62f', boots:'#f2f2ee', head:'helmet'},
+  disco:  {top:'disco', pants:'#f2efe6', boots:'#e8b04a', head:'afro', flare:true},
 };
 const heroLook=()=>OUTFIT_LOOK[have.outfit]||OUTFIT_LOOK.cape;
 function drawHero(c,g=ctx,look=heroLook()){
@@ -91,9 +93,12 @@ function drawHero(c,g=ctx,look=heroLook()){
   if(L.cape&&c.dir!=='up'){F(L.cape[0],0+sway,7,12,10); F(L.cape[1],1+sway,8,1,8)}            // cape behind you
   if(L.sack&&c.dir!=='right'){F('#c9b07a',9,6,4,7); F('#a8905a',10,6,2,1); F('#8a7448',9,12,4,1)}   // loot sack over the shoulder
   F(L.pants,3,13,2,4-a); F(L.pants,7,13,2,4-b); F(L.boots,2,17-a,3,1); F(L.boots,7,17-b,3,1);
+  if(L.flare){F(L.pants,2,16-a,4,1); F(L.pants,6,16-b,4,1); F(L.boots,2,17-a,4,1); F(L.boots,6,17-b,4,1)}   // bell-bottoms + platforms
   // body
   if(L.top==='stripes'){F('#f2f2ee',2,7,8,6); F('#f2f2ee',1,8,1,4); F('#f2f2ee',10,8,1,4); for(let yy=8;yy<13;yy+=2){F('#1d1d22',1,yy,10,1)}}
   else if(L.top==='sweater'){F('#c8322b',1,7,10,6); F('#2f8a4a',1,9,10,1); F('#2f8a4a',1,12,10,1); F('#ffffff',3,8,1,1); F('#ffffff',6,8,1,1); F('#ffffff',9,8,1,1); F('#ffffff',4,10,1,1); F('#ffffff',8,10,1,1); F('#f4d35e',6,10,1,2)}
+  else if(L.top==='jersey'){F('#4f2683',1,7,10,6); F('#ffc62f',1,7,2,2); F('#ffc62f',9,7,2,2); F('#ffffff',5,9,2,3); F('#ffc62f',1,12,10,1)}   // purple jersey, gold shoulders, a white number
+  else if(L.top==='disco'){F('#f2efe6',1,7,10,6); F('#e8742a',4,7,4,4); F('#f2efe6',5,8,2,3); F('#ffd84d',5,10,2,1); F('#d9d3c4',1,9,1,4); F('#d9d3c4',10,9,1,4)}   // white suit, orange wide collar, gold chain
   else {F(L.top,2,7,8,7); F(L.top,1,8,1,4); F(L.top,10,8,1,4)}
   if(L.belt)F(L.belt,2,12,8,1);
   if(L.sack&&c.dir==='right'){F('#c9b07a',-1,6,4,7); F('#a8905a',0,6,2,1)}
@@ -103,6 +108,18 @@ function drawHero(c,g=ctx,look=heroLook()){
     if(c.dir==='down'){F(skin,3,3,6,2); F(eye,4,3,1,1); F(eye,7,3,1,1)}
     if(c.dir==='left'){F(skin,2,3,3,2); F(eye,3,3,1,1)}
     if(c.dir==='right'){F(skin,7,3,3,2); F(eye,8,3,1,1)}
+    return }
+  if(L.head==='helmet'){ F('#4f2683',2,-1,8,7); F('#3d1d66',2,5,8,1); F('#ffc62f',5,-1,2,7);                                // helmet with a gold stripe
+    if(c.dir==='up')return;
+    if(c.dir==='down'){F(skin,3,3,6,3); F(eye,4,4,1,1); F(eye,7,4,1,1); F('#8a8f9a',3,5,6,1); F('#8a8f9a',4,4,1,2); F('#8a8f9a',7,4,1,2); F('#f2f2ee',1,1,2,2); F('#f2f2ee',9,1,2,2)}
+    if(c.dir==='left'){F(skin,2,3,4,3); F(eye,3,4,1,1); F('#8a8f9a',2,5,4,1); F('#f2f2ee',7,1,3,2)}
+    if(c.dir==='right'){F(skin,6,3,4,3); F(eye,8,4,1,1); F('#8a8f9a',6,5,4,1); F('#f2f2ee',2,1,3,2)}
+    return }
+  if(L.head==='afro'){ F('#4a2e1c',0,-3,12,7); F('#5a3a22',1,-4,10,2); F('#4a2e1c',0,3,2,3); F('#4a2e1c',10,3,2,3);               // big 70s hair
+    if(c.dir==='up'){F('#4a2e1c',1,0,10,7); return}
+    if(c.dir==='down'){F('#e8b04a',3,3,6,2); F('#5a3a22',4,3,1,1); F('#5a3a22',7,3,1,1); F('#b5654f',5,6,2,1); F('#5a3a22',4,5,4,1)}   // gold aviators, a mustache
+    if(c.dir==='left'){F('#e8b04a',2,3,3,2)}
+    if(c.dir==='right'){F('#e8b04a',7,3,3,2)}
     return }
   if(L.head==='hood'){ F(L.hat,1,0,10,4); F(L.hat,1,3,2,5); F(L.hat,9,3,2,5); F('#4f535c',2,4,1,3); F('#4f535c',9,4,1,3);
     if(c.dir==='up'){F(L.hat,1,0,10,8); return}
@@ -123,14 +140,16 @@ function drawHero(c,g=ctx,look=heroLook()){
   if(L.head==='santa'){F('#c8322b',3,-3,6,3); F('#c8322b',8,-4,2,2); F('#ffffff',11,-5,2,2); F('#c8322b',10,-5,1,2); F('#ffffff',2,0,8,1)}
 }
 // ---------- the wardrobe: pick Joe's stealth outfit before going up ----------
-function openWardrobe(then){
-  const W=WARDROBE; let pick=have.outfit||'cape';
-  $('wardTitle').textContent=W.title; $('wardIntro').textContent=W.intro; $('wardGo').textContent=W.go;
-  const render=()=>{ $('outfits').querySelectorAll('.outfit').forEach(b=>b.classList.toggle('on',b.dataset.id===pick)); $('wardLine').textContent=W.outfits.find(o=>o.id===pick).line };
-  $('outfits').replaceChildren(...W.outfits.map(o=>{const b=document.createElement('button'); b.className='outfit'; b.dataset.id=o.id;
-    const c=document.createElement('canvas'); c.width=14; c.height=20; drawHero({x:7,y:19,dir:'down',moving:false,step:0},c.getContext('2d'),OUTFIT_LOOK[o.id]);
-    const sp=document.createElement('span'); sp.textContent=o.name; b.append(c,sp); b.onclick=()=>{pick=o.id; render()}; return b}));
-  $('wardGo').onclick=()=>{ $('wardrobe').hidden=true; have.outfit=pick; save(); paused=false; then&&then() };
+function openWardrobe(then,mode='heist'){   // mode 'look' = Joe's everyday look at the start (adds the jersey)
+  const W=WARDROBE, look=mode==='look', list=look?[W.jersey,...W.outfits]:W.outfits, key=look?'look':'outfit';
+  let pick=have[key]||(look?'jersey':'cape');
+  $('wardTitle').textContent=look?ALEX_WELCOME.lookTitle:W.title; $('wardIntro').textContent=look?ALEX_WELCOME.lookIntro:W.intro; $('wardGo').textContent=look?ALEX_WELCOME.lookGo:W.go;
+  const render=()=>{ $('outfits').querySelectorAll('.outfit').forEach(b=>b.classList.toggle('on',b.dataset.id===pick)); $('wardLine').textContent=list.find(o=>o.id===pick).line };
+  $('outfits').replaceChildren(...list.map(o=>{const b=document.createElement('button'); b.className='outfit'; b.dataset.id=o.id;
+    const cv=document.createElement('canvas'); cv.width=14; cv.height=24; const who={x:7,y:23,dir:'down',moving:false,step:0};
+    if(o.id==='jersey')drawJoeJersey(who,cv.getContext('2d')); else drawHero(who,cv.getContext('2d'),OUTFIT_LOOK[o.id]);
+    const sp=document.createElement('span'); sp.textContent=o.name; b.append(cv,sp); b.onclick=()=>{pick=o.id; render()}; return b}));
+  $('wardGo').onclick=()=>{ $('wardrobe').hidden=true; have[key]=pick; save(); paused=false; then&&then() };
   render(); paused=true; prompt.hidden=true; $('wardrobe').hidden=false; setTimeout(()=>$('wardGo').focus({preventScroll:true}),0);
 }
 // Lars: tall runner, short blond hair, singlet with a race bib, split shorts, neon shoes

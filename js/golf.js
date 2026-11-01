@@ -94,7 +94,7 @@ function powerNow(){const per=isPutt()?GOLF.PUTT_POWER_PERIOD:GOLF.POWER_PERIOD,
 const inWater=(h,x,y)=>h.water.some(w=>((x-w.x)/w.rx)**2+((y-w.y)/w.ry)**2<=1);
 // where a throw goes: returns {path, end, result:'in'|'tree'|'water'|'ob'|'land'}
 // special first throws: 'platform' (farther, sails over the trees early on) or 'hike' (through the legs: shorter, no fade)
-function throwMode(){const h=golfHole(); if(golf.strokes>0||golf.lie.x!==h.tee.x||golf.lie.y!==h.tee.y)return ''; return h.platform?'platform':h.hike?'hike':''}
+function throwMode(){const h=golfHole(); if(golf.lie.x!==h.tee.x||golf.lie.y!==h.tee.y)return ''; return h.platform?'platform':h.hike?'hike':''}   // a rethrow from the tee is still special
 function golfFlight(h,lie,angle,power,putt,mode=''){
   const mult=mode==='platform'?GOLF.PLATFORM:mode==='hike'?GOLF.HIKE:1;
   const D=Math.max(8,power*(putt?GOLF.PUTT_MAX:GOLF.MAX)*mult), path=[], passed=new Set(); let x=lie.x,y=lie.y,a=angle;
@@ -126,8 +126,12 @@ function golfLand(){
   const f=golf.flight, h=golfHole(), T=GOLF_TEXT;
   if(golf.practice){ if(f.result!=='water'&&f.result!=='ob')golf.lie={...f.end}; P.x=golf.lie.x; P.y=golf.lie.y+4; return golfPracticeResult() }
   if(f.result==='in'){ golf.msg=golf.strokes===1?T.ace:T.chains; return golfHoleDone() }
-  if(f.result==='water'||f.result==='ob'){ golf.strokes++; golf.msg=f.result==='water'?T.water:T.ob }
-  else { golf.prevLie={...golf.lie}; golf.lie={...f.end}; if(f.result==='tree')golf.msg=T.tree }
+  if(f.result==='water'||f.result==='ob'){ golf.strokes++; golf.msg=f.result==='water'?T.water:T.ob; P.x=golf.lie.x; P.y=golf.lie.y+4;
+    // pop-up: what happened and the penalty
+    golf.state='penalty';
+    return showDialog({place:T.place,speaker:f.result==='water'?T.waterTitle:T.obTitle,pages:[T.penalty(golf.strokes+1)],actions:[{label:T.penaltyOk,fn:()=>{closeDialog();
+      if(golf.strokes>=GOLF.MAX_STROKES)return golfHoleDone(true); golf.state='aim'; golf.t=Math.random()*1000}}]}) }
+  else { golf.prevLie={...golf.lie}; golf.lie={...f.end}; if(f.result==='tree'){golf.msg=T.tree; flashGolf(T.tree)} }
   P.x=golf.lie.x; P.y=golf.lie.y+4;
   if(golf.strokes>=GOLF.MAX_STROKES)return golfHoleDone(true);
   golf.state='aim'; golf.t=Math.random()*1000;
@@ -140,7 +144,7 @@ function golfHoleDone(pickedUp){
   const word=r=>r<=-2?'Eagle':r===-1?'Birdie':r===0?'Par':r===1?'Bogey':r===2?'Double bogey':`+${r}`;
   const lines=[['',`${golf.msg?golf.msg+' ':''}${pickedUp?'You pick up.':''} ${word(rel)} (${golf.strokes} throws).`.trim()],
     ['Margie',T.margieHole[String(m)]],['Jack',T.jackHole[String(j)]]];
-  setTimeout(()=>say(lines,()=>{ if(golf.hole<HOLES.length-1){golf.hole++; golfStartHole()} else golfRoundOver() }),500);
+  golf.timer=setTimeout(()=>say(lines,()=>{ if(golf.hole<HOLES.length-1){golf.hole++; golfStartHole()} else golfRoundOver() }),500);
 }
 function golfStartHole(){
   const h=golfHole(); golf.lie={...h.tee}; golf.prevLie={...h.tee}; golf.strokes=0; golf.state='aim'; golf.t=Math.random()*1000; golf.msg='';
@@ -163,7 +167,7 @@ function golfRoundOver(){
 }
 function golfRestart(){
   if(!golf.active)return; const T=GOLF_TEXT;
-  showDialog({place:T.place,speaker:'Margie',pages:[T.restartAsk],actions:[{label:T.restartYes,fn:()=>{closeDialog(); golf.flight=null; golfStartRound()}},{label:T.restartNo,ghost:true,fn:closeDialog}]});
+  showDialog({place:T.place,speaker:'Margie',pages:[T.restartAsk],actions:[{label:T.restartYes,fn:()=>{closeDialog(); clearTimeout(golf.timer); golf.flight=null; golfStartRound()}},{label:T.restartNo,ghost:true,fn:closeDialog}]});
 }
 $('golfRestart').onclick=()=>{ $('golfRestart').blur(); golfRestart() };
 function golfStartRound(){ Object.assign(golf,{active:true,practice:false,hole:0,you:[],margie:[],jack:[]}); golfStartHole() }

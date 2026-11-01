@@ -12,7 +12,7 @@ const helpers=()=>{window.T={
   bestThrow:()=>{const h=golfHole(),b=h.basket,putt=isPutt(),span=putt?GOLF.PUTT_SPAN:GOLF.AIM_SPAN; let best=null;
     const mode=throwMode(); for(let o=-span;o<=span;o+=span/20)for(let pw=.1;pw<=1.001;pw+=.025){const f=golfFlight(h,golf.lie,aimBase()+o,pw,putt,mode); const sc=f.result==='in'?-1:(f.result==='water'||f.result==='ob')?999:Math.hypot(f.end.x-b.x,f.end.y-b.y)+(f.result==='tree'?30:0); if(!best||sc<best.sc)best={o,pw,sc}} return best},
 }};
-const fresh=async()=>{await p.goto(URL);await p.evaluate(()=>localStorage.clear());await p.reload();await p.click('#startBtn');await p.evaluate(helpers)};
+const fresh=async()=>{await p.goto(URL);await p.evaluate(()=>localStorage.clear());await p.reload();await p.click('#startBtn'); await p.evaluate(()=>skipWelcome());await p.evaluate(helpers)};
 const R=[];const ok=(n,c,x='')=>R.push((c?'PASS ':'FAIL ')+n+(x?'  ('+x+')':''));
 await fresh();
 let r=await p.evaluate(()=>{P.x=192;P.y=281;update(16.7); const lbl=prompt.textContent; action(); T.run(40); return {lbl,scene:scene===SCENES.golf,slot:$('basket').textContent}});
@@ -47,8 +47,12 @@ r=await p.evaluate(()=>{const h=HOLES[0], t=h.trees[0], tee=h.tee, d=Math.hypot(
 ok('C trees: dead center stops the disc, close passes glance around it',r.center.startsWith('tree')&&r.slight.startsWith('tree')&&!r.close.startsWith('tree')&&!r.closeOther.includes('tree at 6')&&!r.edge.startsWith('tree'),JSON.stringify(r));
 // water costs a stroke and you throw again from the same spot
 r=await p.evaluate(()=>{golf.hole=2; golfStartHole(); T.through(); const before={...golf.lie}; golfTap(); golf.angle=0; golfTap(); golf.flight=golfFlight(HOLES[2],golf.lie,0,.6,false); golf.flight.i=0; for(let i=0;i<200&&golf.state==='flight';i++)update(16.7);
-  return {strokes:golf.strokes, same:golf.lie.x===before.x&&golf.lie.y===before.y, msg:golf.msg}});
-ok('C landing in the pond: penalty stroke, rethrow from the same spot',r.strokes===2&&r.same&&r.msg.includes('Splash'),JSON.stringify(r));
+  const pop=!dlg.hidden&&$('dspeaker').textContent+' | '+$('dtext').textContent; [...$('dbtns').querySelectorAll('button')][0].click(); update(16.7);
+  return {strokes:golf.strokes, same:golf.lie.x===before.x&&golf.lie.y===before.y, msg:golf.msg, pop, state:golf.state}});
+ok('C landing in the pond: a pop-up shows the penalty, rethrow from the same spot',r.strokes===2&&r.same&&r.pop&&r.pop.startsWith('SPLASH')&&r.pop.includes('+1 penalty')&&r.pop.includes('throw 3')&&r.state==='aim',r.pop);
+r=await p.evaluate(()=>{const before={...golf.lie}; golfTap(); golf.angle=Math.PI/2; golfTap(); golf.flight=golfFlight(HOLES[2],golf.lie,Math.PI/2,1,false); golf.flight.i=0; for(let i=0;i<300&&golf.state==='flight';i++)update(16.7);
+  const pop=!dlg.hidden&&$('dspeaker').textContent+' | '+$('dtext').textContent; [...$('dbtns').querySelectorAll('button')][0].click(); update(16.7); return {pop,strokes:golf.strokes,same:golf.lie.x===before.x&&golf.lie.y===before.y}});
+ok('C out of bounds: OUT OF BOUNDS pop-up with the penalty',r.pop&&r.pop.startsWith('OUT OF BOUNDS')&&r.strokes===4&&r.same,r.pop);
 r=await p.evaluate(()=>{const L=HOLES[1], hk=HOLES[3]; const t=L.trees.find(([x,y])=>Math.hypot(x-L.tee.x,y-L.tee.y)<60); const a=Math.atan2(t[1]-3-L.tee.y,t[0]-L.tee.x);   // straight at a tree by the tee
   const plat=golfFlight(L,L.tee,a,1,false,'platform'), flat=golfFlight(L,L.tee,a,1,false,'');
   const ha=Math.atan2(hk.basket.y-hk.tee.y,hk.basket.x-hk.tee.x), hike=golfFlight(hk,hk.tee,ha,1,false,'hike'), norm=golfFlight(hk,hk.tee,ha,1,false,'');

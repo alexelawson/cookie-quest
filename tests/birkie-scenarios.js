@@ -13,7 +13,7 @@ const helpers=()=>{window.T={
       const can=pole&&terrainAt(P.y)!=='down'&&birk.stamina>12; if(can&&next===null){let tb=BIRK.BEAT-birk.beatT%BIRK.BEAT; if(tb<BIRK.BEAT*.25)tb+=BIRK.BEAT; next=birk.t+tb} if(next!==null&&birk.t>=next){if(can)birkTap(); next=null}
       update(16.7); if(!dlg.hidden&&birk.running)T.through() } for(const k in dirs)dirs[k]=false; return f},
 }};
-const fresh=async()=>{await p.goto(URL);await p.evaluate(()=>localStorage.clear());await p.reload();await p.click('#startBtn');await p.evaluate(helpers)};
+const fresh=async()=>{await p.goto(URL);await p.evaluate(()=>localStorage.clear());await p.reload();await p.click('#startBtn'); await p.evaluate(()=>skipWelcome());await p.evaluate(helpers)};
 const R=[];const ok=(n,c,x='')=>R.push((c?'PASS ':'FAIL ')+n+(x?'  ('+x+')':''));
 await fresh();
 let r=await p.evaluate(()=>{P.x=320;P.y=84;update(16.7); const lbl=prompt.textContent; action(); const sp=$('dspeaker').textContent; const pages=[]; while(T.btns().includes('Next')){pages.push($('dtext').textContent);T.click('Next')} pages.push($('dtext').textContent);
