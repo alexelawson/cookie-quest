@@ -106,6 +106,7 @@ const HEIST = {
   strangerRematch:"Your friend wants his rematch.",
   after:"The cookie signal's up. The city sleeps easy tonight.",
   climbDown:"Climb down the ladder",
+  stairsDown:"Take the stairs down to the street",
 };
 
 // ---------- The vault puzzles (the heist's last lock) ----------

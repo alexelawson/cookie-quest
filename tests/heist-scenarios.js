@@ -115,4 +115,7 @@ r=await p.evaluate(()=>{T.enter(); const sp=dlg.hidden?'':$('dspeaker').textCont
 // J. checkpoints are safe to stand on
 r=await p.evaluate(()=>{const bad=[]; for(let st=0;st<3;st++){have.heistStage=st; placeAtCheckpoint(); T.clickThrough(); for(let i=0;i<600;i++){update(16.7); if(!dlg.hidden){if($('dspeaker').textContent==='Spotted!'){bad.push(st+': '+$('dtext').textContent); T.clickThrough(); break} T.clickThrough()}}} return bad});
 ok('J standing still at each checkpoint never gets you caught',r.length===0,r.join('; '));
+// K. there's a way out at the far end: the stairwell on the last roof
+r=await p.evaluate(()=>{T.clickThrough(); P.x=STAIRS.x+STAIRS.w/2; P.y=STAIRS.y+STAIRS.h+5; update(16.7); const lbl=prompt.textContent; action(); T.run(40); return {lbl,world:scene===SCENES.world,bar:$('crewbar').hidden}});
+ok('K the stairwell on the last roof takes you back down to the street',r.lbl.includes('stairs')&&r.world&&r.bar,r.lbl);
 console.log(R.join('\n')); console.log('page errors:',errs.length?errs:'none'); await b.close()})();

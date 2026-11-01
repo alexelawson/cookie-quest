@@ -26,6 +26,8 @@ const HOUSES=[R(70,124,24,20),R(110,132,26,20),R(244,74,26,20),R(244,118,26,20),
   R(8,86,24,18),R(412,80,28,20),R(412,210,28,20),R(80,8,26,20),R(260,10,26,20),R(412,250,28,20)];
 const TOWER={x:186,y:142};
 const WELCOME=R(12,196,24,12);
+// green EXIT signs pointing back to the highway (the way out is the left end of the middle road)
+const EXIT_SIGNS=[{x:146,y:146,dir:'<'},{x:346,y:146,dir:'<'},{x:66,y:68,dir:'v'},{x:66,y:266,dir:'^'}];
 const NEAR_START=[2];   // the station straight ahead when you arrive is never Bob's
 
 const fargo={fuel:FUEL.START, bob:0, introPending:false, warned:false, won:false,
@@ -73,7 +75,7 @@ const fargoBg=document.createElement('canvas'); fargoBg.width=FW; fargoBg.height
 })();
 // pine trees scattered where nothing else is
 (function(){
-  const blocked=r=>[...ROADS,...HOUSES,...STATIONS.flatMap(s=>[s.lot,s.store,R(s.sign.x-2,s.sign.y-2,22,24)]),R(TOWER.x-18,TOWER.y-40,36,46),R(0,160,40,60),WELCOME]
+  const blocked=r=>[...ROADS,...HOUSES,...STATIONS.flatMap(s=>[s.lot,s.store,R(s.sign.x-2,s.sign.y-2,22,24)]),R(TOWER.x-18,TOWER.y-40,36,46),R(0,160,40,60),WELCOME,...EXIT_SIGNS.map(s=>R(s.x,s.y,26,18))]
     .some(o=>hit(R(r.x-3,r.y-3,r.w+6,r.h+6),o));
   for(let n=0;n<400&&fargoTrees.length<16;n++){const x=8+rnd()*(FW-16)|0, y=16+rnd()*(FH-20)|0; const box=R(x-6,y-16,12,17);
     if(!blocked(box)&&!fargoTrees.some(([tx,ty])=>Math.abs(tx-x)<12&&Math.abs(ty-y)<14))fargoTrees.push([x,y])}
@@ -81,7 +83,7 @@ const fargoBg=document.createElement('canvas'); fargoBg.width=FW; fargoBg.height
 // wheat and sunflower fields on the open land (painted onto the town background)
 (function(){
   const g=fargoBg.getContext('2d'), F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};
-  const blocked=r=>[...ROADS,...HOUSES,...STATIONS.flatMap(s=>[s.lot,s.store,R(s.sign.x-2,s.sign.y-2,22,24)]),R(TOWER.x-18,TOWER.y-40,36,46),R(0,160,40,60),WELCOME,...fargoTrees.map(([x,y])=>R(x-6,y-16,12,17))]
+  const blocked=r=>[...ROADS,...HOUSES,...STATIONS.flatMap(s=>[s.lot,s.store,R(s.sign.x-2,s.sign.y-2,22,24)]),R(TOWER.x-18,TOWER.y-40,36,46),R(0,160,40,60),WELCOME,...EXIT_SIGNS.map(s=>R(s.x,s.y,26,18)),...fargoTrees.map(([x,y])=>R(x-6,y-16,12,17))]
     .some(o=>hit(R(r.x-4,r.y-4,r.w+8,r.h+8),o));
   let n=0; for(let k=0;k<300&&n<6;k++){const f=R(8+rnd()*(FW-60)|0,12+rnd()*(FH-40)|0,44,26); if(blocked(f))continue; n++;
     if(n%2){F('#d9b24a',f.x,f.y,f.w,f.h); for(let y=f.y+2;y<f.y+f.h;y+=4){F('#c09634',f.x,y,f.w,1); for(let x=f.x+1;x<f.x+f.w;x+=3)F('#ecd06a',x,y-2,1,2)}}   // wheat
@@ -180,6 +182,15 @@ function drawWaterTower(){
 }
 // the name board on each shop (Bob's moves around, so it's drawn live)
 function textW(t){let w=0; for(const ch of t){const m=GLYPH[ch]; w+=(ch==='.'?2:(m?m.length/5:3)+1)} return w-1}
+function drawExitSign(e){
+  const F=(c,x,y,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,h)}, x=e.x, y=e.y;
+  F('#8a8f9a',x+12,y+10,2,8); F('#1d6b3a',x,y,26,11); F('#ffffff',x,y,26,1); F('#ffffff',x,y+10,26,1);
+  pixText(ctx,'EXIT',x+2,y+3,'#ffffff');
+  const ax=x+19, ay=y+3, W=c=>(dx,dy,w=1,h=1)=>F(c,ax+dx,ay+dy,w,h), A=W('#ffffff');   // the arrow, 5x5
+  if(e.dir==='<'){A(0,2,6,1); A(1,1,1,3); A(2,0,1,5)}
+  else if(e.dir==='v'){A(2,0,1,5); A(1,3,3,1); A(0,2,5,1)}
+  else {A(2,0,1,5); A(1,1,3,1); A(0,2,5,1)}
+}
 function drawShopSign(s){
   if(!s.signText)return; const st=s.store, w=textW(s.signText)+4, x=Math.round(st.x+(st.w-w)/2), y=s.face==='up'?st.y+st.h-8:st.y;
   ctx.fillStyle=s.brand; ctx.fillRect(x,y,w,8); ctx.fillStyle='rgba(255,255,255,.35)'; ctx.fillRect(x,y,w,1); pixText(ctx,s.signText,x+2,y+2,'#ffffff');
@@ -286,6 +297,7 @@ SCENES.fargo={
   ents(list){
     fargoTrees.forEach(([x,y])=>list.push({y,draw:()=>ctx.drawImage(pineSprite,x-6,y-17)}));
     list.push({y:TOWER.y,draw:drawWaterTower});
+    EXIT_SIGNS.forEach(e=>list.push({y:e.y+18,draw:()=>drawExitSign(e)}));
     STATIONS.forEach((s,i)=>list.push({y:s.person.y,draw:()=>i===fargo.bob?drawBob(s.person.x,s.person.y):drawAttendant(s.person.x,s.person.y,i)}));
     const b=STATIONS[fargo.bob]; list.push({y:b.y+26,draw:()=>drawBike(b.x+43,b.y+12)});
     if(fargo.onFoot&&fargo.car){const c=fargo.car, a=fargo.alex; list.push({y:c.y+5,draw:()=>drawCar(c.x,c.y,c.dir,true)});

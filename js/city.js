@@ -13,6 +13,7 @@ const LOOSE_BEAM=R(96,128,8,34);          // the beam lying on roof A before Joh
 const FUSE={x:312,y:100};   // just past the last searchlight column
 const SKYLIGHT=R(462,40,24,16);
 const LADDER=R(10,166,22,14);
+const STAIRS=R(488,148,20,16);              // a rooftop stairwell on the last roof: the way out at the end
 const STRANGER={x:44,y:62};
 // tripwires (invisible unless you ping the sonar): [x1,y1,x2,y2]
 const LASERS=[
@@ -297,6 +298,7 @@ const nearCrew=(z,id)=>heist.crew.some(c=>(!id||c.id===id)&&hit(R(c.x-4,c.y-3,8,
 function heistTrigger(){
   const feet=R(P.x-4,P.y-3,8,4), st=heistStage();
   if(hit(feet,LADDER))return {label:HEIST.climbDown, act:()=>goTo('world','fromCity')};
+  if(hit(feet,R(STAIRS.x-2,STAIRS.y+STAIRS.h,STAIRS.w+4,9)))return {label:HEIST.stairsDown, act:()=>goTo('world','fromCity')};
   if(Math.hypot(P.x-STRANGER.x,P.y-STRANGER.y)<16)return {label:'Talk to the stranger', btn:'Talk', act:()=>{
     if(have.city)return say([[HEIST.stranger,HEIST.after]]);
     if(st>=5)return showReward('city');
@@ -334,7 +336,7 @@ const darkMask=document.createElement('canvas'); darkMask.width=VW; darkMask.hei
 SCENES.city={
   w:CW, h:CH, bounds:R(0,0,CW,CH), bg:cityBg, triggers:[],
   get walk(){ return [ROOF_A,ROOF_B,ROOF_C,PLANK_BC,LADDER,...(heistStage()>=1?[BEAM_SLOT]:[])] },
-  get solids(){ return [R(24,40,16,10),R(230,160,16,10),R(170,32,10,10),R(FUSE.x-6,FUSE.y-6,12,6),SKYLIGHT,R(STRANGER.x-4,STRANGER.y-3,8,4),
+  get solids(){ return [R(24,40,16,10),R(230,160,16,10),R(170,32,10,10),R(FUSE.x-6,FUSE.y-6,12,6),SKYLIGHT,STAIRS,R(STRANGER.x-4,STRANGER.y-3,8,4),
     ...(heistStage()<1?[LOOSE_BEAM]:[])] },
   entries:{start:{x:40,y:150,dir:'up'}, fromStreet:{x:40,y:150,dir:'up'}},
   enter(){
@@ -378,6 +380,10 @@ SCENES.city={
     drawBeam(); drawGrate();
   },
   ents(list){
+    list.push({y:STAIRS.y+STAIRS.h,draw:()=>{const s=STAIRS, F=(c,x,y,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,h)};   // stairwell hut with a lit door
+      F('#3a3f50',s.x-1,s.y-4,s.w+2,5); F('#5a5f72',s.x,s.y,s.w,s.h); F('#4a4f60',s.x,s.y+4,s.w,1); F('#ffe9a8',s.x+5,s.y+4,10,12); F('#c9b07a',s.x+10,s.y+4,1,12);
+      ctx.fillStyle='rgba(255,233,168,.15)'; ctx.fillRect(s.x-4,s.y+14,s.w+8,10);
+      F('#1d6b3a',s.x+3,s.y-3,14,7); pixText(ctx,'EXIT',s.x+3,s.y-2,Math.floor(time/600)%2?'#7dff8a':'#5fd070')}});
     heist.crew.forEach((c,i)=>{if(i!==heist.lead)list.push({y:c.y,draw:()=>crewSprite(c)})});
     list.push({y:STRANGER.y,draw:drawStranger});
     if(heistStage()<4)list.push({y:heist.guardY,draw:drawGuard});

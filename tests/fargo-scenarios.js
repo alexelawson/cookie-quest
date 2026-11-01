@@ -88,4 +88,6 @@ r=await p.evaluate(()=>{const sc=SCENES.fargo, bad=[];
 ok('I door reachable on foot at every station (get out / kicked out / from road)',r.length===0,r.join('; '));
 r=await p.evaluate(()=>{const c={}; for(let i=0;i<300;i++){fargoNewRun(); c[fargo.bob]=(c[fargo.bob]||0)+1} return c});
 ok('J Bob is never at the station right by the start, and moves around',!r[2]&&Object.keys(r).length===5,JSON.stringify(r));
+r=await p.evaluate(()=>({n:EXIT_SIGNS.length, onRoad:EXIT_SIGNS.some(e=>ROADS.some(rd=>hit(R(e.x,e.y,26,18),rd))), signs:STATIONS.map(s=>s.signText), bob:STATIONS[fargo.bob].signText}));
+ok('K EXIT signs point the way out (none on the road), and every shop has a name sign',r.n>=3&&!r.onRoad&&r.signs.every(Boolean)&&r.bob==="BOB'S GAS",JSON.stringify(r));
 console.log(R.join('\n')); console.log('page errors:',errs.length?errs:'none'); await b.close()})();
