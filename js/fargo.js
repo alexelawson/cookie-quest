@@ -1,8 +1,8 @@
-// Fargo: drive the CR-V around town on fumes, find the cheapest gas, stop Gary's pump on exactly $30.00,
+// Fargo: drive the CR-V around town on fumes, find the cheapest gas, stop Bob's pump on exactly $30.00,
 // then walk into his shop and pick the right drink + snack for Alex.
 const FW=448, FH=336;
 const FUEL = {START:30, DRAIN:.03, ROAD:.12, SNOW:.06, PUSH:.025};  // fuel 0-100, drain per px; speeds in px/ms
-const PRICES = ['2.99','3.09','3.15','3.19','3.29'];  // the others; Gary's is always 2.79
+const PRICES = ['2.99','3.09','3.15','3.19','3.29'];  // the others; Bob's is always 2.79
 const CHEAPEST = '2.79';
 const CAR_COLOR = {body:'#8fa3b8', dark:'#6c7f94', light:'#b9c8d6'};  // steel blue-gray; change to match his CR-V
 
@@ -26,8 +26,9 @@ const HOUSES=[R(70,124,24,20),R(110,132,26,20),R(244,74,26,20),R(244,118,26,20),
   R(8,86,24,18),R(412,80,28,20),R(412,210,28,20),R(80,8,26,20),R(260,10,26,20),R(412,250,28,20)];
 const TOWER={x:186,y:142};
 const WELCOME=R(12,196,24,12);
+const NEAR_START=[2];   // the station straight ahead when you arrive is never Bob's
 
-const fargo={fuel:FUEL.START, gary:0, introPending:false, warned:false, won:false,
+const fargo={fuel:FUEL.START, bob:0, introPending:false, warned:false, won:false,
   onFoot:false, car:null, alex:null, alexMood:'ok', moodT:0, wallet:0, strikes:0};
 // have.fargoStage remembers progress across reloads: 'store' (pump done, go shopping), 'reward' (sugar not yet taken)
 let fargoTrees=[];
@@ -35,9 +36,10 @@ let fargoTrees=[];
 function fargoNewRun(){
   fargo.fuel=FUEL.START; fargo.warned=false;
   const others=[...PRICES].sort(()=>Math.random()-.5), names=[...FARGO.attendants].sort(()=>Math.random()-.5);
-  fargo.gary=have.fargoGary!=null?have.fargoGary:Math.floor(Math.random()*STATIONS.length);
+  const pool=STATIONS.map((_,i)=>i).filter(i=>!NEAR_START.includes(i));
+  fargo.bob=(have.fargoStage&&!have.fargo&&have.fargoBob!=null)?have.fargoBob:pool[Math.floor(Math.random()*pool.length)];
   fargo.onFoot=false; fargo.car=null; fargo.alex=null; fargo.alexMood='ok'; fargo.strikes=0;
-  let k=0; STATIONS.forEach((s,i)=>{s.seen=false; s.price=i===fargo.gary?CHEAPEST:others[k]; s.name=i===fargo.gary?FARGO.gary:names[k]; if(i!==fargo.gary)k++});
+  let k=0; STATIONS.forEach((s,i)=>{s.seen=false; s.price=i===fargo.bob?CHEAPEST:others[k]; s.name=i===fargo.bob?FARGO.bob:names[k]; if(i!==fargo.bob)k++});
 }
 
 // ---------- tiny pixel font ----------
@@ -91,8 +93,8 @@ const pineSprite=document.createElement('canvas'); pineSprite.width=12; pineSpri
   F('#ffffff',1,10,4,1); F('#ffffff',7,10,3,1); F('#ffffff',2,6,3,1); F('#ffffff',6,6,3,1); F('#ffffff',4,2,4,1);})();
 
 // ---------- the CR-V ----------
-const carSprites={};
-(function(){
+const carSprites={}, carSpritesEmpty={};
+function buildCar(into,withPeople){
   const base=document.createElement('canvas'); base.width=24; base.height=14;
   const g=base.getContext('2d'), F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)}, C=CAR_COLOR;
   F('#1d1d22',4,0,5,2); F('#1d1d22',15,0,5,2); F('#1d1d22',4,12,5,2); F('#1d1d22',15,12,5,2);   // tires
@@ -102,28 +104,48 @@ const carSprites={};
   F(C.dark,4,3,9,8); F('#c9d1d8',5,4,7,1); F('#c9d1d8',5,9,7,1);            // roof + roof rails
   F('#ffffff',6,5,3,1); F('#ffffff',9,7,2,1);                               // a little snow on the roof
   F('#fff3c4',23,3,1,2); F('#fff3c4',23,9,1,2); F('#d33b2f',0,3,1,2); F('#d33b2f',0,9,1,2);   // lights
-  carSprites.right=base;
+  if(withPeople){   // seen through the glass roof: you driving (top), Alex riding shotgun (bottom)
+    F('#4a5a70',7,3,7,8);
+    F('#b08355',10,3,3,3); F('#8d6440',10,3,1,3); F('#f0c6a0',13,4,1,1);
+    F('#3b2416',10,8,3,3); F('#3b2416',8,8,2,3); F('#4e3020',8,9,1,1); F('#f2c9a5',13,9,1,1);
+  }
+  const carSprites=into; carSprites.right=base;
   const mk=(w,h,fn)=>{const c=document.createElement('canvas'); c.width=w; c.height=h; const x=c.getContext('2d'); fn(x); return c};
   carSprites.left=mk(24,14,x=>{x.translate(24,0);x.scale(-1,1);x.drawImage(base,0,0)});
   carSprites.down=mk(14,24,x=>{x.translate(14,0);x.rotate(Math.PI/2);x.drawImage(base,0,0)});
   carSprites.up=mk(14,24,x=>{x.translate(0,24);x.rotate(-Math.PI/2);x.drawImage(base,0,0)});
-})();
-function drawCar(x,y,dir=P.dir){
-  const s=carSprites[dir]||carSprites.right, ox=Math.round(x-s.width/2), oy=Math.round(y-s.height/2);
+}
+buildCar(carSprites,true); buildCar(carSpritesEmpty,false);
+function drawCar(x,y,dir=P.dir,parked=false){
+  const set=parked?carSpritesEmpty:carSprites, s=set[dir]||set.right, ox=Math.round(x-s.width/2), oy=Math.round(y-s.height/2);
   ctx.fillStyle='rgba(0,0,0,.18)'; ctx.fillRect(ox+1,oy+s.height-2,s.width-2,3);
   ctx.drawImage(s,ox,oy);
   if(fargo.fuel<=0&&P.moving&&!fargo.onFoot){ctx.fillStyle='#fff'; ctx.fillRect(ox-3+((time/120|0)%2),oy+s.height/2,2,2)}   // puffs while pushing
 }
 
 // ---------- people ----------
-function drawGary(x,y){
-  const F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(Math.round(x)-6+dx,Math.round(y)-19+dy,w,h)};
-  F('rgba(0,0,0,.2)',1,18,10,2);
-  F('#3a5f9e',3,12,3,6); F('#3a5f9e',6,12,3,6); F('#3b2a1e',2,17,4,2); F('#3b2a1e',6,17,4,2);
-  F('#c0392b',1,6,10,7); F('#a8302a',1,8,10,1); F('#a8302a',1,10,10,1); F('#c0392b',0,7,1,5); F('#c0392b',11,7,1,5);   // puffy coat
-  F('#e9b98f',3,2,6,5); F('#6b4a2f',4,5,4,1);                                 // face + mustache
-  F('#6b4a2f',2,0,8,3); F('#6b4a2f',1,2,2,4); F('#6b4a2f',9,2,2,4); F('#efe2c4',2,2,8,1);   // trapper hat with flaps
-  F('#2b2b2b',4,3,1,1); F('#2b2b2b',7,3,1,1);
+// Bob: biker. Bandana, shades, big gray beard, black moto tee under a leather vest, jeans, boots.
+function drawBob(x,y){
+  const F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(Math.round(x)-6+dx,Math.round(y)-20+dy,w,h)};
+  const skin='#e2a97f', beard='#b9b4ad', tee='#1c1c20', vest='#4a2e1c', vestL='#6b4428', jean='#3a5f9e', boot='#1d1d22';
+  F('rgba(0,0,0,.2)',1,19,10,2);
+  F(jean,3,13,3,6); F(jean,6,13,3,6); F(boot,2,18,4,2); F(boot,6,18,4,2);
+  F(tee,1,7,10,7); F(vest,1,7,3,7); F(vest,8,7,3,7); F(vestL,3,8,1,5); F(vestL,8,8,1,5);   // leather vest open over the tee
+  F('#e8742a',5,9,2,1); F('#e8742a',4,10,4,1); F('#ffffff',5,11,2,1);                      // orange wing graphic on the shirt
+  F('#c9ced4',4,13,4,1);                                                                    // belt buckle chain
+  F(skin,0,8,1,5); F(skin,11,8,1,5); F('#2b3a4f',0,10,1,1);                                 // big arms, a tattoo
+  F(skin,3,1,6,5);
+  F('#e8742a',2,0,8,2); F('#1c1c20',3,1,1,1); F('#1c1c20',7,0,1,1); F('#e8742a',10,1,1,2);  // bandana
+  F('#1c1c20',3,3,6,1); F('#3a4a60',4,3,1,1); F('#3a4a60',7,3,1,1);                         // sunglasses
+  F(beard,3,5,6,3); F(beard,4,8,4,1); F('#d8d4cd',5,6,2,1);                                 // beard
+}
+// Bob's motorcycle, parked by his shop
+function drawBike(x,y){
+  const F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(Math.round(x)+dx,Math.round(y)+dy,w,h)};
+  F('rgba(0,0,0,.18)',-1,12,8,2);
+  F('#1d1d22',1,0,4,3); F('#1d1d22',1,11,4,3);          // tires (it's parked nose-down)
+  F('#c9ced4',2,3,2,8); F('#1c1c20',0,4,6,5); F('#e8742a',1,5,4,2);   // tank in orange + black
+  F('#3b2416',1,8,4,3); F('#c9ced4',-1,2,8,1);           // seat, handlebars
 }
 function drawAttendant(x,y,i){
   const coats=['#2f6db0','#2f8a4a','#7a4fa0','#e08a2a','#555b66'], F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(Math.round(x)-5+dx,Math.round(y)-17+dy,w,h)};
@@ -181,8 +203,8 @@ function pumpRelease(){
     $('pumpMsg').textContent=FARGO.bust[pump.tries++%FARGO.bust.length]; pump.lock=1300;
   } else if(pump.cents===3000){
     pump.lock=99999; $('pumpMsg').textContent='$30.00 on the nose!';
-    setTimeout(()=>{ $('pump').hidden=true; pump.open=false; have.fargoStage='store'; have.fargoGary=fargo.gary; save();
-      showDialog({place:FARGO.place,speaker:FARGO.gary,pages:FARGO.pumpWin,actions:[{label:FARGO.goInside,fn:()=>{closeDialog();parkAndGetOut()}}]}) },700);
+    setTimeout(()=>{ $('pump').hidden=true; pump.open=false; have.fargoStage='store'; have.fargoBob=fargo.bob; save();
+      showDialog({place:FARGO.place,speaker:FARGO.bob,pages:FARGO.pumpWin,actions:[{label:FARGO.goInside,fn:()=>{closeDialog();parkAndGetOut()}}]}) },700);
   }
 }
 function pumpTick(dt){
@@ -202,16 +224,16 @@ addEventListener('keyup',e=>{if(pump.open&&['Space','Enter'].includes(e.code)){e
 // ---------- pulling into a station ----------
 function pullIn(i){
   const s=STATIONS[i]; s.seen=true;
-  if(i===fargo.gary){
-    if(have.fargo) return showDialog({place:FARGO.place,speaker:FARGO.gary,pages:[FARGO.after],actions:[CLOSE]});
+  if(i===fargo.bob){
+    if(have.fargo) return showDialog({place:FARGO.place,speaker:FARGO.bob,pages:[FARGO.after],actions:[CLOSE]});
     if(have.fargoStage==='reward') return showReward('fargo');
-    if(have.fargoStage==='store') return showDialog({place:FARGO.place,speaker:FARGO.gary,pages:[FARGO.garyWaiting],actions:[CLOSE]});
-    return showDialog({place:FARGO.place,speaker:FARGO.gary,pages:[...FARGO.garyHello,...FARGO.garyBet],actions:[{label:FARGO.fill,fn:()=>{closeDialog();openPump()}}]});
+    if(have.fargoStage==='store') return showDialog({place:FARGO.place,speaker:FARGO.bob,pages:[FARGO.bobWaiting],actions:[CLOSE]});
+    return showDialog({place:FARGO.place,speaker:FARGO.bob,pages:[...FARGO.bobHello,...FARGO.bobBet],actions:[{label:FARGO.fill,fn:()=>{closeDialog();openPump()}}]});
   }
   if(fargo.onFoot) return;
   showDialog({place:FARGO.place,speaker:s.name,pages:[FARGO.ask(s.price)],actions:[
     {label:FARGO.fill,fn:()=>{
-      if(have.fargo) return showDialog({place:FARGO.place,speaker:s.name,pages:[`Tank's full. At $${s.price} a gallon. Gary's is cheaper, ya know.`],actions:[CLOSE]});
+      if(have.fargo) return showDialog({place:FARGO.place,speaker:s.name,pages:[`Tank's full. At $${s.price} a gallon. Bob's is cheaper, ya know.`],actions:[CLOSE]});
       showDialog({place:FARGO.place,speaker:s.name,pages:FARGO.wrong(s.price),actions:[{label:FARGO.retry,fn:()=>{closeDialog();goTo('fargo','fromHighway')}}]})}},
     {label:FARGO.keep,ghost:true,fn:closeDialog}]});
 }
@@ -232,34 +254,35 @@ SCENES.fargo={
   feet:(x,y)=>fargo.onFoot?R(x-4,y-3,8,4):R(x-6,y-4,12,8),
   speed:()=>fargo.onFoot?.07:fargo.fuel<=0?FUEL.PUSH:(onRoad(P.x,P.y)?FUEL.ROAD:FUEL.SNOW),
   dynTrigger(){
-    const g=STATIONS[fargo.gary];
+    const g=STATIONS[fargo.bob];
     if(!fargo.onFoot)return null;
     if(have.fargoStage==='store'&&hit(R(P.x-4,P.y-3,8,4),g.door))return SHOP_TRIGGER;
     if(fargo.alex&&Math.hypot(P.x-fargo.alex.x,P.y-fargo.alex.y)<14)return ALEX_TRIGGER;
-    if(Math.hypot(P.x-g.person.x,P.y-g.person.y)<14)return GARY_TRIGGER;
+    if(Math.hypot(P.x-g.person.x,P.y-g.person.y)<14)return BOB_TRIGGER;
     return null;
   },
   moved(d){
     if(!fargo.onFoot&&fargo.fuel>0){fargo.fuel=Math.max(0,fargo.fuel-d*FUEL.DRAIN);
-      if(fargo.fuel<=0&&!fargo.warned){fargo.warned=true; showDialog({place:FARGO.place,speaker:'Uh oh',pages:[FARGO.empty],actions:[CLOSE]})}}
+      if(fargo.fuel<=0&&!fargo.warned){fargo.warned=true; showDialog({place:FARGO.place,speaker:'Uh oh',pages:[FARGO.empty],actions:[{label:'Next',fn:()=>showDialog({place:FARGO.place,speaker:'Alex',pages:[FARGO.emptyAlex],actions:[CLOSE]})}]})}}
   },
   enter(){
     fargoNewRun(); fargo.introPending=!have.fargo&&!have.fargoStage&&!have.fargoIntro;
-    if(have.fargoStage==='store'){   // came back mid-errand (e.g. after a reload): car's already parked at Gary's
-      const g=STATIONS[fargo.gary]; STATIONS.forEach(s=>s.seen=true); P.x=g.lot.x+10; P.y=g.lot.y+22; P.dir='right'; parkAndGetOut();
+    if(have.fargoStage==='store'){   // came back mid-errand (e.g. after a reload): car's already parked at Bob's
+      const g=STATIONS[fargo.bob]; STATIONS.forEach(s=>s.seen=true); P.x=g.lot.x+10; P.y=g.lot.y+22; P.dir='right'; parkAndGetOut();
     }
   },
   ambient(dt){ pumpTick(dt); if(fargo.moodT>0){fargo.moodT-=dt; if(fargo.moodT<=0)fargo.alexMood='ok'} },
   update(){
-    if(fargo.introPending){fargo.introPending=false; have.fargoIntro=true; save(); return showDialog({place:FARGO.place,speaker:'Welcome to Fargo',pages:FARGO.intro,actions:[CLOSE]})}
+    if(fargo.introPending){fargo.introPending=false; have.fargoIntro=true; save(); return showDialog({place:FARGO.place,speaker:FARGO.introSpeaker,pages:FARGO.intro,actions:[CLOSE]})}
     for(const s of STATIONS)if(!s.seen&&Math.hypot(P.x-(s.sign.x+9),P.y-(s.sign.y+5))<80)s.seen=true;
   },
   drawPlayer:(x,y)=>fargo.onFoot?drawPlayer(x,y):drawCar(x,y),
   ents(list){
     fargoTrees.forEach(([x,y])=>list.push({y,draw:()=>ctx.drawImage(pineSprite,x-6,y-17)}));
     list.push({y:TOWER.y,draw:drawWaterTower});
-    STATIONS.forEach((s,i)=>list.push({y:s.person.y,draw:()=>i===fargo.gary?drawGary(s.person.x,s.person.y):drawAttendant(s.person.x,s.person.y,i)}));
-    if(fargo.onFoot&&fargo.car){const c=fargo.car, a=fargo.alex; list.push({y:c.y+5,draw:()=>drawCar(c.x,c.y,c.dir)});
+    STATIONS.forEach((s,i)=>list.push({y:s.person.y,draw:()=>i===fargo.bob?drawBob(s.person.x,s.person.y):drawAttendant(s.person.x,s.person.y,i)}));
+    const b=STATIONS[fargo.bob]; list.push({y:b.y+26,draw:()=>drawBike(b.x+43,b.y+12)});
+    if(fargo.onFoot&&fargo.car){const c=fargo.car, a=fargo.alex; list.push({y:c.y+5,draw:()=>drawCar(c.x,c.y,c.dir,true)});
       if(a)list.push({y:a.y,draw:()=>drawAlex(a.x,a.y,fargo.alexMood)})}
   },
   under(){ STATIONS.forEach(drawSign) },
@@ -284,10 +307,10 @@ fargoNewRun();
 // ---------- on foot + the shop ----------
 const SHOP_TRIGGER={label:'Go inside', act:()=>openShop()};
 const ALEX_TRIGGER={label:'Talk to Alex', btn:'Talk', act:()=>showDialog({place:FARGO.place,speaker:'Alex',pages:[fargo.alexMood==='frown'?FARGO.alexOutside:FARGO.alexWaiting],actions:[CLOSE]})};
-const GARY_TRIGGER={label:'Talk to Gary', btn:'Talk', act:()=>showDialog({place:FARGO.place,speaker:FARGO.gary,pages:[FARGO.garyWaiting],actions:[CLOSE]})};
+const BOB_TRIGGER={label:'Talk to Bob', btn:'Talk', act:()=>showDialog({place:FARGO.place,speaker:FARGO.bob,pages:[FARGO.bobWaiting],actions:[CLOSE]})};
 function parkAndGetOut(){
   // the car pulls up to the pump on the side away from the shop, so the door is always clear
-  const g=STATIONS[fargo.gary];
+  const g=STATIONS[fargo.bob];
   const c={x:g.x+24, y:g.face==='up'?g.y+5:g.y+23, dir:'right'}; fargo.car=c; fargo.onFoot=true; fargo.wallet=FARGO.wallet; fargo.strikes=0;
   fargo.alex=null; const a=freeSpotNear(c.x-18, c.y); fargo.alex=a;        // Alex leans by the back of the car
   const me=freeSpotNear(g.x+9, g.face==='up'?g.y+22:g.y+6); P.x=me.x; P.y=me.y;   // you, on the shop side
@@ -295,7 +318,7 @@ function parkAndGetOut(){
 }
 // nearest place you can stand around (cx,cy), not on top of the car, Alex, or the door itself
 function freeSpotNear(cx,cy){
-  const sc=SCENES.fargo, door=STATIONS[fargo.gary].door;
+  const sc=SCENES.fargo, door=STATIONS[fargo.bob].door;
   for(let r=0;r<40;r+=2)for(let a=0;a<16;a++){const x=Math.round(cx+Math.cos(a/16*Math.PI*2)*r), y=Math.round(cy+Math.sin(a/16*Math.PI*2)*r);
     if(!blocked(x,y,sc)&&!hit(R(x-4,y-3,8,4),door))return {x,y}}
   return {x:cx,y:cy};
@@ -335,7 +358,7 @@ function giveToAlex(){
   if(shop.drink===C.drink&&shop.snack===C.snack){
     alexSays(FARGO.alexWin,'happy'); $('giveBtn').disabled=true;
     setTimeout(()=>{ closeShop(); fargo.alexMood='happy'; fargo.moodT=4000; have.fargoStage='reward'; save();
-      showDialog({place:FARGO.place,speaker:FARGO.gary,pages:FARGO.win,actions:[{label:FARGO.thanks,fn:()=>{closeDialog();backInTheCar();showReward('fargo')}}]}) },1400);
+      showDialog({place:FARGO.place,speaker:FARGO.bob,pages:FARGO.win,actions:[{label:FARGO.thanks,fn:()=>{closeDialog();backInTheCar();showReward('fargo')}}]}) },1400);
     return;
   }
   const lines=[]; if(shop.drink!==C.drink)lines.push(d.react); if(shop.snack!==C.snack)lines.push(k.react);
@@ -345,7 +368,7 @@ function giveToAlex(){
     $('giveBtn').disabled=true;
     setTimeout(()=>{ alexSays(FARGO.kickedOut,'frown'); setTimeout(()=>{
       closeShop(); fargo.alexMood='frown'; fargo.moodT=5000;
-      const g=STATIONS[fargo.gary], d=g.door, cx=g.x+9, cy=g.face==='up'?g.y+22:g.y+6;   // back outside, beside the door
+      const g=STATIONS[fargo.bob], d=g.door, cx=g.x+9, cy=g.face==='up'?g.y+22:g.y+6;   // back outside, beside the door
       const spot=freeSpotNear(cx,cy); P.x=spot.x; P.y=spot.y; P.dir=g.face==='up'?'down':'up';
     },1500) },1500);
   }

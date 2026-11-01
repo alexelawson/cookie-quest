@@ -62,7 +62,7 @@ const ART={
 };
 const REWARDS={
   farm:{from:'From Keelan', name:'Eggs & butter', hint:'Tap them to put them in your basket.'},
-  fargo:{from:'From Gas Station Gary', name:'Sugar', hint:'Tap it to put it in your basket.'},
+  fargo:{from:'From Bob', name:'Sugar', hint:'Tap it to put it in your basket.'},
 };
 let rewardKey=null;
 function showReward(key){

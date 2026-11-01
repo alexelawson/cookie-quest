@@ -22,7 +22,7 @@ const BARN = R(20,30,56,44);
 const DROP = R(108,118,24,14);              // stand here holding a hen to put it back
 const GATE = {x:120, y:124};
 const FARM_AREA = R(4,12,158,134);          // loose hens stay in here
-const CUPCAKE = {x:80, y:27};               // behind the barn; a corner of its wrapper peeks out past the roof
+const CUPCAKE = {x:48, y:22};               // behind the barn; its frosting peeks up over the roof
 const KEELAN_HOME = {x:142, y:134};
 
 const rand=(a,b)=>a+Math.random()*(b-a);
@@ -143,7 +143,7 @@ function farmAmbient(dt){
 
 function farmUpdate(dt){
   // the cupcake
-  if(!have.cupcake&&!have.gaveCupcake&&Math.abs(P.x-CUPCAKE.x)<9&&P.y>=CUPCAKE.y-8&&P.y<=CUPCAKE.y+3){
+  if(!have.cupcake&&!have.gaveCupcake&&Math.abs(P.x-CUPCAKE.x)<16&&P.y<=CUPCAKE.y+7){
     have.cupcake=true; save(); renderBasket();
     showDialog({place:'Under a tree',speaker:'Ooh',pages:[KEELAN.foundCupcake],actions:[CLOSE]}); return;
   }
@@ -228,24 +228,24 @@ function drawHen(x,y,f){
   ctx.fillStyle='#e8a33a';ctx.fillRect(x+(f>0?3:-4),y-5,1,1);ctx.fillRect(x-1,y+1,1,1);
 }
 function drawKeelan(k){
-  const x=Math.round(k.x)-6, y=Math.round(k.y)-19;
+  // tall and lanky: long legs, narrow shoulders, skinny arms
+  const x=Math.round(k.x)-5, y=Math.round(k.y)-23;
   const F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x+dx,y+dy,w,h)};
   const skin='#e9b98f', hair='#5a3b24', plaid='#c0392b', dark='#7a1f1a', light='#e0675b', jean='#3a5f9e', jeanD='#2c4a7c', boot='#5a3a22';
-  F('rgba(0,0,0,.25)',1,18,10,2);
+  F('rgba(0,0,0,.25)',1,22,8,2);
   const a=k.moving&&k.step%2?1:0, b=k.moving&&!(k.step%2)?1:0;
-  F(jean,2,12,4,6-a); F(jean,6,12,4,6-b); F(jeanD,5,13,2,4);
-  F(boot,2,17-a,4,2); F(boot,6,17-b,4,2);
-  F('#3b2a1e',2,12,8,1);                                       // belt
-  F(plaid,1,6,10,6); F(plaid,0,7,1,4); F(plaid,11,7,1,4);       // broad shirt
-  for(let i=1;i<11;i+=3)F(dark,i,6,1,6); F(dark,1,8,10,1); F(light,1,10,10,1);
-  F(skin,0,10,1,3); F(skin,11,10,1,3);                          // forearms
-  F(skin,3,1,6,5);
-  F(hair,3,0,6,2);                                               // short hair
-  if(k.dir==='up'){F(hair,3,0,6,4)}
-  else if(k.dir==='left'){F(hair,7,1,2,2);F('#2b2b2b',3,3,1,1)}
-  else if(k.dir==='right'){F(hair,3,1,2,2);F('#2b2b2b',8,3,1,1)}
-  else {F(hair,3,2,1,1);F(hair,8,2,1,1);F('#2b2b2b',4,3,1,1);F('#2b2b2b',7,3,1,1);F('#b5735a',5,5,2,1)}
-  if(k.carrying)drawHen(k.x,k.y-20,k.dir==='left'?-1:1);
+  F(jean,2,13,2,9-a); F(jean,6,13,2,9-b); F(jeanD,4,13,2,3);              // long skinny legs
+  F(boot,1,21-a,3,2); F(boot,6,21-b,3,2);
+  F('#3b2a1e',2,13,6,1);                                                 // belt
+  F(plaid,2,6,6,7); for(let i=2;i<8;i+=3)F(dark,i,6,1,7); F(dark,2,8,6,1); F(light,2,11,6,1);   // narrow plaid shirt
+  F(plaid,1,7,1,4); F(plaid,8,7,1,4); F(skin,1,11,1,3); F(skin,8,11,1,3); // thin arms, rolled sleeves
+  F(skin,3,1,4,5); F(skin,4,6,2,1);                                       // long face, neck
+  F(hair,3,0,4,2);                                                        // short hair
+  if(k.dir==='up'){F(hair,3,0,4,4)}
+  else if(k.dir==='left'){F(hair,6,1,1,2);F('#2b2b2b',3,3,1,1)}
+  else if(k.dir==='right'){F(hair,3,1,1,2);F('#2b2b2b',6,3,1,1)}
+  else {F('#2b2b2b',4,3,1,1);F('#2b2b2b',6,3,1,1);F('#b5735a',4,5,2,1)}
+  if(k.carrying)drawHen(k.x,k.y-24,k.dir==='left'?-1:1);
 }
 function drawCupcake(){
   if(have.cupcake||have.gaveCupcake)return;
@@ -256,7 +256,7 @@ function drawCupcake(){
 // a sparkle flashes beside the tree every few seconds
 function drawCupcakeGlint(){
   if(have.cupcake||have.gaveCupcake||(time%3000)>450)return;
-  const x=86,y=24; ctx.fillStyle='#fff3a8';
+  const x=55,y=16; ctx.fillStyle='#fff3a8';
   ctx.fillRect(x,y-2,1,5); ctx.fillRect(x-2,y,5,1); ctx.fillStyle='#ffffff'; ctx.fillRect(x,y,1,1);
 }
 // entities for depth sorting

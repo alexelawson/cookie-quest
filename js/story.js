@@ -51,32 +51,34 @@ const KEELAN = {
   bye:"Bye",
 };
 
-// ---------- Fargo: Gas Station Gary ----------
+// ---------- Fargo: Bob (runs the cheapest gas station in the country) and Alex, your passenger ----------
 const FARGO = {
-  place:'Fargo, ND', gary:'Gas Station Gary',
-  intro:["You roll into Fargo on fumes.","Somewhere in this town is the cheapest gas in the whole country. Find it."],
+  place:'Fargo, ND', bob:'Bob',
+  intro:["We're running on fumes.","Somewhere in this town is the cheapest gas in the whole country. Find it. I believe in you."],
+  introSpeaker:'Alex',
   attendants:['Deb','Lars','Shelly','Ole','Marv'],
   ask:p=>`$${p} a gallon. Fill 'er up?`,
   fill:"Fill up", keep:"Keep looking",
   wrong:p=>[`Tank's full. At $${p} a gallon.`,"On your way out of town you pass a sign that says $2.79.","Oof."],
   retry:"Try again",
-  garyHello:["Oh ya, you found it! Cheapest gas in the whole darn country.","Two seventy-nine. You drove across America for this, didn't ya?"],
-  garyBet:["Tell ya what. Stop the pump on exactly thirty bucks and I'll throw in some sugar.","My cousin grows the beets. Best sugar there is."],
-  pumpTitle:"Gary's bet: stop on exactly $30.00",
+  bobHello:["Well, look at that. You found it. Cheapest gas in the whole country.","Two seventy-nine. Rode my bike from Sturgis to Florida and back and never saw cheaper."],
+  bobBet:["Here's the deal. Stop that pump on exactly thirty bucks and I'll throw in some sugar.","My cousin grows the beets out back. Best sugar there is."],
+  pumpTitle:"Bob's bet: stop on exactly $30.00",
   pumpHint:"Hold to pump. Let go to stop. Quick taps for the last few cents.",
-  bust:["Ohhh, a penny over. So close.","Shoot. Over again. Go ahead, I'll reset it.","Thirty and what now? Again!","Uff da. One more try."],
-  pumpWin:["Thirty dollars even! Well, I'll be.","Now go on inside and grab something for your co-pilot. She's been real patient."],
+  bust:["Ohhh, a penny over. So close.","Over again. Go ahead, I'll reset it.","Thirty and what now? Again!","Steady hands, friend. One more try."],
+  pumpWin:["Thirty dollars even. Respect.","Now go on inside and grab something for your co-pilot. She's been real patient."],
   goInside:"Go inside",
-  garyWaiting:"Go on in, she's waiting. Don't come back with the wrong snack, now.",
+  bobWaiting:"Go on in, she's waiting. Don't come back with the wrong snack, man.",
   win:["Now that's a good road-trip partner.","Here ya go. Sugar, fresh from the Red River Valley."],
-  thanks:"Thanks, Gary!",
-  after:"Come back anytime. It's not this cheap anywhere else, ya know.",
+  thanks:"Thanks, Bob!",
+  after:"Ride safe. It's not this cheap anywhere else, you know.",
   empty:"Out of gas! You're pushing the CR-V now.",
+  emptyAlex:"I'll steer.",
   leave:"Head back to the highway",
 
   // ---- the snack stop: Alex (the passenger) ----
   // Change her lines here. `correct` says which drink + snack she wants.
-  shop:"Gary's Gas & Go",
+  shop:"Bob's Gas & Go",
   wallet:20,          // dollars left after $30 of gas
   wrongCost:3,        // each wrong pick costs this much
   strikesOut:2,       // this many wrong picks and you get sent back outside

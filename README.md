@@ -9,11 +9,11 @@ For live reload while editing: `python3 -m http.server` and visit http://localho
 ## Layout
 | File | What's in it |
 |---|---|
-| `js/story.js` | All dialogue, character names, the ending note. Keelan is in `KEELAN`; Gary, Alex's snack reactions and the correct drink/snack are in `FARGO` |
+| `js/story.js` | All dialogue, character names, the ending note. Keelan is in `KEELAN`; Bob, Alex's snack reactions and the correct drink/snack are in `FARGO` |
 | `js/world.js` | Overworld map: collision rects (`solids`), doors (`triggers`), painting. Also defines the scene system (`SCENES`) |
 | `js/kitchen.js` | Kitchen interior scene; baking starts at the counter, recipe card on the fridge |
 | `js/city.js` | Night-city rooftop scene (heist goes here): roofs, planks, the stranger |
-| `js/fargo.js` | Fargo: drive the CR-V, find the cheapest gas, Gary's $30.00 pump, then the snack stop for Alex. Car color in `CAR_COLOR`, fuel/speeds in `FUEL` |
+| `js/fargo.js` | Fargo: drive the CR-V, find the cheapest gas, Bob's $30.00 pump, then the snack stop for Alex. Car color in `CAR_COLOR`, fuel/speeds in `FUEL` |
 | `js/state.js` | Player, basket save (localStorage), particles |
 | `js/input.js` | Keyboard + touch d-pad |
 | `js/ui.js` | Dialog system (pages + button menus), land/kitchen interactions |
@@ -41,10 +41,10 @@ Add an object to `SCENES` with `w`, `h`, `bounds`, `bg` (a canvas), `solids`, `t
 - [ ] Kitchen: mix, bake, decorate, final note
 
 ## Spoilers
-The cupcake is behind the barn. A corner of it peeks out past the top-right of the roof, and a sparkle flashes beside it every few seconds. You can walk behind the barn to grab it.
+The cupcake is behind the barn, in the middle. Its frosting peeks up over the roof, and a sparkle flashes beside it every few seconds. Walk behind the barn to grab it.
 
 ## Spoilers: Fargo
-Gary's station (always $2.79) moves each attempt. Alex wants ginger ale + Mott's berry gummies. Two wrong picks and she sends you back outside.
+Bob's station (always $2.79) moves each attempt. Alex wants ginger ale + Mott's berry gummies. Two wrong picks and she sends you back outside.
 
 ## Rewards
 Finishing a land shows a pop-up with the item's pixel art; tapping it flies it into the basket. Add the art for a new item to `ART` and its text to `REWARDS` in `js/ui.js`, then call `showReward('key')`.
