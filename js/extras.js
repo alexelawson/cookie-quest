@@ -2,8 +2,8 @@
 //  - exits: walk into one and you leave (no button), with a bouncing EXIT arrow so you can see where it is
 //  - the "you can do something here" arrow over Joe's head
 //  - Joe's gear (Oakleys, a headband, carbon running shoes) hidden around the map, worn once found
-//  - the joke signpost across the road from the kitchen
-// Text for the gear and the signpost is in story.js (GEAR_TEXT, SIGNPOST).
+//  - a sign in front of each land on the main map
+// Text for the gear is in story.js (GEAR_TEXT).
 
 // ---------- exits ----------
 // z: walk into this box to leave. mark: where the arrow goes, pointing dir. when: only while this is true.
@@ -45,11 +45,12 @@ const GEAR={
   oakleys: {x:40, y:237},    // on the beach in Vancouver
   headband:{x:366,y:86},     // in the snow by the Birkie yurt
   shoes:   {x:228,y:232},    // out past the Fargo gas station
+  clover:  {give:true},      // Logan gives Joe this one (people.js)
 };
 const gearWorn=k=>have.gear&&have.gear[k]===1;
 function gearTick(){
   if(scene!==SCENES.world)return;
-  for(const k in GEAR){ const g=GEAR[k]; if(have.gear&&k in have.gear)continue;
+  for(const k in GEAR){ const g=GEAR[k]; if(g.give||(have.gear&&k in have.gear))continue;
     if(Math.hypot(P.x-g.x,P.y-g.y)<8){ have.gear=have.gear||{}; have.gear[k]=1; save(); sfx('pickup');
       const T=GEAR_TEXT[k]; showDialog({place:GEAR_TEXT.place,speaker:'',pages:[T.found,GEAR_TEXT.tip],actions:[{label:T.wear,fn:closeDialog}]}); return } }
 }
@@ -65,6 +66,7 @@ function drawGearItem(k,x,y){
 function drawGear(c,g=ctx,look=null){
   if(!have.gear)return; const x=Math.round(c.x)-6, y=Math.round(c.y)-18, F=(col,dx,dy,w,h)=>{g.fillStyle=col;g.fillRect(x+dx,y+dy,w,h)};
   const head=look?look.head:'hair', a=c.moving&&c.step%2?1:0, b=c.moving&&!(c.step%2)?1:0;
+  if(gearWorn('clover')&&c.dir!=='up'){F('#3d8443',c.dir==='left'?3:7,8,2,2); F('#5fb060',c.dir==='left'?3:7,8,1,1)}   // the lucky clover, pinned on
   if(gearWorn('shoes')){F('#ff5a1f',2,17-a,3,1); F('#ff5a1f',7,17-b,3,1); F('#f4d35e',4,17-a,1,1); F('#f4d35e',9,17-b,1,1)}   // bright carbon racers
   if(gearWorn('headband')&&(head==='hair'||!look)){F('#2fb3a0',2,1,8,1); if(c.dir==='down')F('#ffffff',5,1,2,1)}
   if(gearWorn('oakleys')&&head!=='wrap'){
@@ -75,18 +77,14 @@ function drawGear(c,g=ctx,look=null){
   }
 }
 
-// ---------- the signpost across the road from the kitchen ----------
-const SIGNPOST_AT={x:176,y:194};
-const signpostSprite=(()=>{const c=document.createElement('canvas'), boards=SIGNPOST.boards.filter(b=>b.short), W=64, H=boards.length*6+8; c.width=W; c.height=H;   // only boards with a `short` go on the post
-  const g=c.getContext('2d'), F=(col,x,y,w,h)=>{g.fillStyle=col;g.fillRect(x,y,w,h)}, cx=W/2|0;
-  F('rgba(0,0,0,.25)',cx-3,H-2,7,2); F('#6b4a2f',cx-1,1,2,H-2); F('#8a6a4a',cx-1,1,1,H-2); F('#4a321f',cx-1,0,2,1);
-  boards.forEach((bd,i)=>{const tw=textW(bd.short), w=tw+4, y=1+i*6, left=bd.dir==='left', x=left?cx-1-w+1:cx;
-    F(bd.color,x,y,w,6); F('rgba(255,255,255,.25)',x,y,w,1); F('rgba(0,0,0,.2)',x,y+5,w,1);
-    if(left){F(bd.color,x-1,y+1,1,4); F(bd.color,x-2,y+2,1,2)} else {F(bd.color,x+w,y+1,1,4); F(bd.color,x+w+1,y+2,1,2)}   // the point
-    pixText(g,bd.short,left?x+2:x+2,y+1,bd.ink||'#ffffff')});
-  return c})();
-triggers.push({z:R(SIGNPOST_AT.x-10,SIGNPOST_AT.y-4,20,10), label:SIGNPOST.read, act:()=>showDialog({place:SIGNPOST.place,speaker:SIGNPOST.title,pages:[SIGNPOST.boards.map(b=>b.line).join('\n'),SIGNPOST.footer],actions:[CLOSE]})});
-solids.push(R(SIGNPOST_AT.x-2,SIGNPOST_AT.y-2,4,3));
+// ---------- a clear sign in front of each land ----------
+// wooden boards on two posts: [text, x, y] (top-left of the board). Fargo has its own blue road sign below.
+const LAND_SIGNS=[['THE FARM',58,132],['VANCOUVER',104,166]];
+{const g=bg.getContext('2d'), F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};
+  for(const [t,x,y] of LAND_SIGNS){const w=textW(t)+8;
+    F('rgba(0,0,0,.25)',x+2,y+16,w-2,2); F('#5a3a22',x+3,y+9,2,8); F('#5a3a22',x+w-5,y+9,2,8);
+    F('#5a3a22',x,y,w,11); F('#f2e6c8',x+1,y+1,w-2,9); F('#d9c9a2',x+1,y+9,w-2,1); pixText(g,t,x+4,y+3,'#3b2a1e');
+    solids.push(R(x+3,y+14,2,3),R(x+w-5,y+14,2,3))}}
 // the welcome-to-Fargo sign on the main map
 solids.push(R(226,183,2,3),R(242,183,2,3));
 {const g=bg.getContext('2d'), F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};
@@ -95,12 +93,11 @@ solids.push(R(226,183,2,3),R(242,183,2,3));
 // hook into the main map
 {const ents=SCENES.world.ents;
   SCENES.world.ents=function(list){ ents.call(this,list);
-    list.push({y:SIGNPOST_AT.y,draw:()=>ctx.drawImage(signpostSprite,SIGNPOST_AT.x-(signpostSprite.width/2|0),SIGNPOST_AT.y-signpostSprite.height+1)});
-    for(const k in GEAR)if(!(have.gear&&k in have.gear))list.push({y:GEAR[k].y,draw:()=>drawGearItem(k,GEAR[k].x,GEAR[k].y)}) }}
+    for(const k in GEAR)if(!GEAR[k].give&&!(have.gear&&k in have.gear))list.push({y:GEAR[k].y,draw:()=>drawGearItem(k,GEAR[k].x,GEAR[k].y)}) }}
 
 // called from game.js every frame
 function extrasTick(){ sceneExitTick(); gearTick() }
-function extrasDraw(){ for(const e of exitsHere())drawExitMark(e.mark); drawNearMark() }
+function extrasDraw(){ for(const e of exitsHere())drawExitMark(e.mark); drawNearMark(); drawThink() }
 
 // ---------- settings: take gear off / put it back on ----------
 function renderGearSettings(){

@@ -145,6 +145,7 @@ function anaTick(dt){
 }
 function anaEnd(){
   ana.running=false; $('anaPlay').hidden=true; $('anaEnd').hidden=false;
+  if(ana.you>ana.lars){have.anaScore=`${ana.you.toLocaleString()} to ${ana.lars.toLocaleString()}`; save()}
   const won=ana.you>ana.lars, best=anaWords(ana.set).filter(w=>w.length===6);
   $('anaResult').textContent=won?`Joe wins, ${ana.you} to ${ana.lars}!`:ana.you===ana.lars?`A tie at ${ana.you}. Tie goes to Lars, apparently.`:`Lars wins, ${ana.lars} to ${ana.you}.`;
   $('anaMissed').textContent=`The six-letter word${best.length>1?'s were':' was'}: ${best.join(', ')}.`;

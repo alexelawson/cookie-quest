@@ -47,11 +47,17 @@ ok('D pull early: raw; late: burnt; forget them: burnt',r.raw.includes('raw')&&r
 ok('D 10:00 on the dot: golden brown',r.state==='done'&&r.good.includes('PERFECT'),r.good);
 // E. party: everyone talks, Joe gets the crown, the note
 r=await p.evaluate(()=>{bakePress(); const party=kit.party, closed=$('bake').hidden; const A=CROWD.find(c=>c.name==='Alex'); const start={...kit.alex}; T.tick(PARTY.WALK+400); const near=Math.hypot(kit.alex.x-P.x,kit.alex.y-P.y), hugging=kit.hugging, noDlg=dlg.hidden; T.tick(PARTY.HUG+200);
-  const lines=T.through(); T.tick(1700); const dance=kit.dance; return new Promise(res=>setTimeout(()=>res({party,closed,start,near,hugging,noDlg,lines,dance,crown:!!have.crown,baked:!!have.baked,note:$('dtext').textContent,btns:T.btns()}),PARTY.BEAT*16+300))});
+  const lines=T.through(); T.tick(1700); const dance=kit.dance; return new Promise(res=>setTimeout(()=>res({party,closed,start,near,hugging,noDlg,lines,dance,crown:!!have.crown,baked:!!have.baked,ending:!$('ending').hidden,credits:!$('credits').hidden}),PARTY.BEAT*16+300))});
 ok('E Alex walks over and hugs Joe first',r.hugging&&r.noDlg&&r.near<10&&Math.hypot(r.start.x-112,r.start.y-134)>30,'gap '+r.near.toFixed(1));
 ok('E party: everyone has a line, and they bounce',r.party&&r.closed&&['Alex','Keelan','Lil Q','Lars','John','The Stranger','Margie','Jack'].every(n=>r.lines.some(l=>l.startsWith(n+':'))),r.lines.length+' lines');
-ok('E Joe gets a crown, everyone does THE COOKIE DANCE, then the note',r.dance&&r.crown&&r.baked&&r.note.includes('Merry Christmas')&&r.btns.includes('Play again'),r.note);
-r=await p.evaluate(()=>{T.click('Keep exploring'); goTo('world','fromKitchen'); T.run(30); return {crown:!!have.crown,scene:scene===SCENES.world}});
+ok('E Joe gets a crown, everyone does THE COOKIE DANCE, then the credits roll',r.dance&&r.crown&&r.baked&&r.ending&&r.credits);
+r=await p.evaluate(()=>{const names=[...document.querySelectorAll('.crow b')].map(b=>b.textContent); $('endSkip').click(); const stats=$('ecard').textContent; $('endNext').click(); const album=$('ecard').querySelector('small').textContent, cv=!!$('ecard').querySelector('.polaroid canvas');
+  for(let i=0;i<5;i++)$('ecard').querySelectorAll('.pnav button')[1].click(); const last=$('ecard').querySelector('.polaroid p').textContent; $('endNext').click(); const note=$('ecard').textContent, again=[...$('ecard').querySelectorAll('button')].some(b=>b.textContent==='Play again'), keep=$('endNext').textContent;
+  return {names,stats,album,cv,last,note,again,keep,cap:ENDING.photos.kitchen}});
+ok('E credits list the whole cast (no Jackie if Joe never met her)',r.names.includes('Joe')&&r.names.includes('Logan')&&r.names.includes('Lil Q')&&!r.names.includes('Jackie'),r.names.length+' names');
+ok('E then Joe\'s stats, with secrets found',r.stats.includes('Birkie time')&&r.stats.includes('Secrets found'),r.stats.slice(0,80));
+ok('E then the photo album (six photos), then Alex\'s note with Play again',r.album.includes('album')&&r.cv&&r.last===r.cap&&r.note.includes('Merry Christmas')&&r.again&&r.keep==='Keep exploring',r.last);
+r=await p.evaluate(()=>{$('endNext').click(); goTo('world','fromKitchen'); T.run(30); return {crown:!!have.crown,scene:scene===SCENES.world}});
 ok('E the crown stays on outside',r.crown&&r.scene);
 r=await p.evaluate(()=>{const moves=new Set(); for(let k=0;k<16;k++){kit.danceAt=time-k*PARTY.BEAT-1; const m=danceMove(0); moves.add(m.dx+','+(m.dy<-1?'up':'0')+','+m.cookie)} return [...moves]});
 ok('E the Cookie Dance: step left, step right, hops, cookies up',r.length>=4,r.join(' | '));
@@ -117,11 +123,28 @@ r=await p.evaluate(()=>{const out={}; goTo('kitchen','fromDoor'); T.run(40); out
 ok('M exits: kitchen door, Fargo highway and the rooftop ladder all just take you out',r.stay&&r.kitchen&&r.fargo&&r.city,JSON.stringify(r));
 // N. gear: find it on the map, Joe wears it, Settings can take it off
 await fresh({});
-r=await p.evaluate(()=>{const got=[]; for(const k in GEAR){P.x=GEAR[k].x;P.y=GEAR[k].y; T.run(1); got.push(k+':'+(have.gear&&have.gear[k])+':'+$('dtext').textContent.slice(0,20)); closeDialog(); paused=false}
+r=await p.evaluate(()=>{const got=[]; for(const k in GEAR){if(GEAR[k].give)continue; P.x=GEAR[k].x;P.y=GEAR[k].y; T.run(1); got.push(k+':'+(have.gear&&have.gear[k])+':'+$('dtext').textContent.slice(0,20)); closeDialog(); paused=false}
   $('settingsBtn').click(); const rows=[...$('gearRows').querySelectorAll('input')]; rows[0].checked=false; rows[0].onchange(); const off=have.gear.oakleys; $('settingsClose').click(); return {got,rows:rows.length,off}});
 ok('N Oakleys, headband and carbon shoes can be found; Joe wears them',r.got.every(g=>g.split(':')[1]==='1'),r.got.join(' | '));
 ok('N Settings lists the gear and can take it off',r.rows===3&&r.off===0);
 // O. the signpost, the Fargo signs, and the ice cream served with the cookies
-r=await p.evaluate(()=>{P.x=SIGNPOST_AT.x;P.y=SIGNPOST_AT.y+3; T.run(1); const lbl=prompt.textContent; action(); const t=$('dtext').textContent; closeDialog(); return {lbl,t}});
-ok('O the signpost by the kitchen reads out the joke distances',r.lbl==='Read the signpost'&&r.t.includes('North Pole')&&r.t.includes('Fargo'),r.t.split('\n')[0]);
+// O. Logan: talk, help him look, and he gives Joe a lucky clover
+r=await p.evaluate(()=>{P.x=LOGAN.x+6;P.y=LOGAN.y+2; T.run(1); const lbl=prompt.textContent; action(); const pages=[]; while(T.btns().includes('Next')){pages.push($('dtext').textContent);T.click('Next')} T.click('Help him look'); T.run(130); const found=$('dspeaker').textContent+': '+$('dtext').textContent; while(T.btns().includes('Next'))T.click('Next'); T.click('Pin it on'); return {lbl,pages,found,clover:have.gear&&have.gear.clover}});
+ok('O Logan is looking for four-leaf clovers and gives Joe one',r.lbl==='Talk to Logan'&&r.pages[0].includes('four-leaf')&&r.found.startsWith('Logan')&&r.clover===1,r.found);
+// P. Alex's hint when Joe stands still, gone once he moves
+r=await p.evaluate(()=>{goTo('world','start'); T.run(40); closeDialog(); paused=false; P.x=60;P.y=150; T.run(Math.ceil(HINTS.AFTER_MS/16.7)+5); const shown=!$('hint').hidden, text=$('hintText').textContent; dirs.right=true; T.run(3); dirs.right=false; return {shown,text,gone:$('hint').hidden}});
+ok('P standing still: Alex says where to go next; moving hides it',r.shown&&r.text.includes('Keelan')&&r.gone,r.text);
+// Q. the photo album in Settings shows locked photos as ?
+r=await p.evaluate(()=>{$('settingsBtn').click(); $('setAlbum').click(); const locked=!!$('ecard').querySelector('.plocked'), btn=$('endNext').textContent; $('endNext').click(); return {locked,btn,closed:$('ending').hidden,paused}});
+ok('Q Settings > Photo album: locked photos until you finish that stop',r.locked&&r.btn==='Close'&&r.closed&&!r.paused);
+// R. Jackie: get kicked out of the Fargo shop and she shows up to tell Joe what to do
+await fresh({farm:1});
+await p.evaluate(()=>{goTo('fargo','fromHighway'); T.run(40); try{closeDialog()}catch(e){} have.fargoStage='store'; parkAndGetOut(); paused=false; openShop();
+  for(let k=0;k<2;k++){shop.drink='coke'; shop.snack='snickers'; giveToAlex()}});
+await p.waitForTimeout(5000);
+r=await p.evaluate(()=>{const sp=$('dspeaker').textContent, t=$('dtext').textContent; while(T.btns().includes('Next'))T.click('Next'); T.click('Okay, Jackie'); const j=fargo.jackie;
+  P.x=j.x+8;P.y=j.y; T.run(1); const lbl=prompt.textContent; action(); const h1=$('dtext').textContent; closeDialog(); action(); const h2=$('dtext').textContent; closeDialog();
+  const g=STATIONS[fargo.bob]; P.x=g.door.x+8; P.y=g.door.y+4; T.run(1); const door=prompt.textContent; return {sp,t,lbl,h1,h2,door,met:have.metJackie,tryAgain:JACKIE.tryAgain}});
+ok('R kicked out: Jackie comes over and says to think, then go back in',r.sp==='Jackie'&&r.t.includes('kicked out')&&r.met,r.t);
+ok('R talking to Jackie gives a hint each time; the door says try again',r.lbl==='Talk to Jackie'&&r.h1!==r.h2&&r.door===r.tryAgain,r.h1.slice(0,40)+' / '+r.door);
 console.log(R.join('\n')); console.log('page errors:',errs.length?errs:'none'); await b.close()})();

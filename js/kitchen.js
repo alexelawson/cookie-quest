@@ -17,11 +17,8 @@ function startBaking(){
   if(have.baked) return finalNote();
   showDialog({place:KITCHEN.place,speaker:KITCHEN.speaker,pages:KITCHEN.ready,actions:[{label:"Let's bake",fn:()=>{closeDialog(); if(have.crossword)openBake(); else openCrossword(openBake)}}]});   // the smudged recipe card (crossword.js) comes first
 }
-function finalNote(){
-  showDialog({place:KITCHEN.place,speaker:'',pages:[KITCHEN.note],noteLast:true,actions:[
-    {label:KITCHEN.playAgain,fn:()=>{have={};save();renderBasket();farmReset();fargo.won=false;Object.assign(kit,{party:false,dance:false,alex:null,hugged:false,hugSound:false});stopMusic();closeDialog();goTo('world','start')}},
-    {label:KITCHEN.keepExploring,ghost:true,fn:closeDialog}]});
-}
+function finalNote(){ openEnding() }   // credits, Joe's stats, the photo album, then Alex's note (ending.js)
+function playAgain(){ have={};save();renderBasket();farmReset();fargo.won=false;Object.assign(kit,{party:false,dance:false,alex:null,hugged:false,hugSound:false});stopMusic();closeDialog();goTo('world','start') }
 
 // ---------- everyone came over ----------
 // where they stand in the kitchen (feet position). Drawn with each place's own sprite.
@@ -38,6 +35,8 @@ const CROWD=[
   {name:'Bryan',x:72,y:150, draw:(x,y)=>drawBryan(x,y,'down')},
   {name:'Viking',x:204,y:136, draw:(x,y)=>drawVikingStanding(x,y)},
   {name:'Viking',x:212,y:152, draw:(x,y)=>drawVikingStanding(x,y)},
+  {name:'Logan',x:40,y:110, draw:(x,y)=>drawLogan(x,y,true)},
+  {name:'Jackie',x:120,y:72, draw:(x,y,d)=>drawJackie(x,y,d||'down'), needs:'metJackie'},
 ];
 function drawVikingStanding(x,y){
   const F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(Math.round(x)-6+dx,Math.round(y)-20+dy,w,h)};
@@ -48,8 +47,11 @@ function drawVikingStanding(x,y){
   F('#8a8f9a',2,0,8,3); F('#c9ced4',3,0,3,1); F('#f6f2e4',0,-2,2,3); F('#f6f2e4',10,-2,2,3);   // horned helmet
 }
 const crowdFace=n=>n==='Trail John'?{speaker:'John',face:'Trail John'}:{speaker:n};
-function crowdNear(){ if(!(allIn()||have.baked))return null; let best=null,bd=16; for(const c of CROWD){const d=Math.hypot(P.x-c.x,P.y-c.y); if(d<bd){bd=d;best=c}} return best }
+function crowdNear(){ if(!(allIn()||have.baked))return null; let best=null,bd=16; for(const c of CROWD){if(c.needs&&!have[c.needs])continue; const d=Math.hypot(P.x-c.x,P.y-c.y); if(d<bd){bd=d;best=c}} return best }
 function drawCrown(x,y){ const F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(Math.round(x)-5+dx,Math.round(y)+dy,w,h)};
+  if(typeof allSecrets==='function'&&allSecrets()){   // every secret found: the Cookie Legend crown, taller, with rainbow gems and a twinkle
+    F('#e8b04a',-1,3,12,3); F('#fff3b0',-1,0,2,3); F('#fff3b0',4,-3,2,6); F('#fff3b0',9,0,2,3); F('#ffffff',0,3,10,1);
+    ['#e54b4b','#f4a03a','#4fbf73','#3d8ad6','#a05fd6'].forEach((c,i)=>F(c,i*2,4,1,1)); if((time/250|0)%3===0){F('#ffffff',4,-6,1,3); F('#ffffff',3,-5,3,1)} return }
   F('#e8b04a',0,3,10,3); F('#f4d35e',0,0,2,3); F('#f4d35e',4,-1,2,4); F('#f4d35e',8,0,2,3); F('#fff3b0',1,3,8,1); F('#c8322b',4,4,2,1); F('#3d8ad6',1,4,1,1); F('#3d8ad6',8,4,1,1) }
 
 // ---------- the baking card ----------
@@ -303,7 +305,7 @@ SCENES.kitchen={ place:KITCHEN.place, music:()=>kit.dance?'jingle':'kitchen',
   leave(){ stopMusic() },
   enter(){ kit.party=!!have.baked; kit.dance=!!have.crown; kit.danceAt=time; if(kit.dance)playMusic(); if(have.baked){const A=CROWD.find(c=>c.name==='Alex'); kit.alex={x:104,y:135}} },
   ents(list){list.push({y:118,draw:drawTable},{y:114,draw:drawXmasTree});
-    if(allIn()||have.baked)CROWD.forEach((c,i)=>{ const pos=(c.name==='Alex'&&kit.alex)?kit.alex:c;
+    if(allIn()||have.baked)CROWD.forEach((c,i)=>{ if(c.needs&&!have[c.needs])return; const pos=(c.name==='Alex'&&kit.alex)?kit.alex:c;
       list.push({y:pos.y,draw:()=>{const m=danceMove(i); c.draw(pos.x+m.dx,pos.y+m.dy,m.dir); if(m.cookie)drawCookie(pos.x+m.dx+7,pos.y+m.dy-21)}}) })},
   under(){ // oven glow
     const f=.55+.15*Math.sin(time/300)+.08*Math.sin(time/77);

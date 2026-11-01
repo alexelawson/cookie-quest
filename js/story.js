@@ -360,21 +360,68 @@ const GEAR_TEXT = {
   oakleys: {name:"Oakleys", found:"Oakley sunglasses, half buried in the sand. Joe puts them on. Instantly 40% faster.", wear:"Put them on"},
   headband:{name:"Headband", found:"A ski headband in the snow! It smells faintly of klister. Perfect.", wear:"Put it on"},
   shoes:   {name:"Carbon racing shoes", found:"Carbon-plated racing shoes! Joe could run a marathon in these. Or at least to the mailbox.", wear:"Lace them up"},
+  clover:  {name:"Lucky clover"},
   tip:"(Take it off or put it back on any time in ⚙ Settings.)",
 };
-// ---------- The joke signpost across the road from the kitchen ----------
-// short: what's painted on the arrow (CAPITALS, keep it short; leave it '' to keep that one off the post and only in the list). dir: which way it points. line: what the sign says when you read it.
-const SIGNPOST = {
-  place:"Outside the kitchen", title:"The signpost", read:"Read the signpost",
-  boards:[
-    {short:'POLE',   dir:'left',  color:'#c8322b', line:"North Pole: 3,412 mi"},
-    {short:'FARGO',  dir:'right', color:'#2f5f9e', line:"Fargo: 1 tank of gas (exactly $30.00)"},
-    {short:'BIRKIE', dir:'right', color:'#2f8a4a', line:"Hayward, WI: 50 km, on skis"},
-    {short:'CANADA', dir:'left',  color:'#e8eef0', ink:'#c8322b', line:"Canada: 30 mi, eh"},
-    {short:'',       dir:'right', color:'#7a5232', line:"Wylee Woods: one big hyzer"},
-    {short:'',       dir:'left',  color:'#e8b04a', ink:'#3b2a1e', line:"Home: you're already here"},
+// ---------- Jackie (Fargo): shows up when Alex kicks Joe out of the shop. Very direct. ----------
+const JACKIE = {
+  kicked:["Hey. I'm Jackie. You just got kicked out of a gas station.","Here's what you do: stand here a second. Think about what she actually likes. Then go back in and try again. The door's right there."],
+  ok:"Okay, Jackie",
+  hints:["She's been in a car for nine hours. Her stomach is not happy. Think gentle. Bubbly, but gentle.",
+         "Snack: fruity. Chewy. Not chocolate, not chips. It comes in a little pouch.",
+         "Ginger ale. Mott's berry gummies. I can't make it more obvious than that. Go."],
+  tryAgain:"Go back inside (try again)",
+};
+// ---------- Logan (the clover field on the farm, by the barn path) ----------
+const LOGAN_TEXT = {
+  place:"The clover patch",
+  hello:["Shh. I'm looking for four-leaf clovers.","I've found three so far this year. Statistically, there's one right... somewhere."],
+  help:"Help him look", later:"Leave him to it",
+  found:["...","Wait. WAIT. Right by your foot. You found one!","Here. You keep it. Pin it on. You're gonna need the luck."],
+  wear:"Pin it on",
+  after:["Still looking. You're welcome to stay, but it's a quiet sport.","Found a three-leaf. Doesn't count.","Clovers are about patience. And crouching."],
+};
+// ---------- Alex's "where to next?" hints: shown if Joe stands still on the map for a bit ----------
+const HINTS = {
+  AFTER_MS:12000,   // how long Joe has to stand still before Alex chimes in
+  farm:"Eggs and butter: Keelan's at the farm, top left. His hens could use some help.",
+  mill:"Flour: John's at the Birkie trailhead, top right, under the big arch.",
+  city:"Chocolate: the rainy city, bottom left. Take the elevator up to the rooftops.",
+  fargo:"Sugar: Fargo, bottom right. Drive in and find the cheapest gas in town.",
+  golf:"Milk: Wylee Woods, straight down the road from the kitchen. Beat Margie and Jack.",
+  home:"That's everything! Head home to the kitchen and let's bake.",
+};
+// ---------- The ending: credits, Joe's stats, the photo album, then the note (KITCHEN.note) ----------
+const ENDING = {
+  creditsTitle:"THE GREAT COOKIE QUEST", creditsSub:"Starring",
+  // [portrait, name, role, (only if have[...])]
+  credits:[
+    ['Joe','Joe','The Cookie King'],['Alex','Alex','Head Baker, Snack Critic'],['Keelan','Keelan','Eggs, Butter, Hen Wrangling'],
+    ['Logan','Logan','Four-Leaf Clover Specialist'],['Bryan','Bryan','Sprinkles. Very Chill.'],['Trail John','John (the other one)','Flour, 50 km'],
+    ['Lars','Lars','Long Jump (Attempted)'],['John','John','Heavy Lifting, Eye Rolling'],['The Stranger','The Stranger','Mysterious Client'],
+    ['Lil Q','Lil Q','Exactly $30.00 of Gas'],['Jackie','Jackie','Straight Talk','metJackie'],['Margie','Margie','The Main Character (self-appointed)'],
+    ['Jack','Jack','2.1 Cookies Per Guest'],[null,'The Vikings','SKOL'],[null,'The Hens','Uncooperative'],
   ],
-  footer:"Someone has carved \"J + A\" into the post.",
+  thanks:["Made with love by Alex","For Joe · Christmas 2026"],
+  skip:"Skip", next:"Next", close:"Close", toNote:"One more thing...",
+  statsTitle:"Joe's stats",
+  stats:{birkie:"Birkie time", golf:"Wylee Woods", anagrams:"Anagrams vs Lars", spotted:"Spotted on the rooftops", snacks:"Wrong snacks for Alex", hints:"Crossword hints", steps:"Steps walked", look:"Look"},
+  secretsLine:(n,of)=>`Secrets found: ${n} of ${of}`,
+  secretNames:{cupcake:'Cupcake',sprinkles:'Sprinkles',icecream:'Ice cream',oakleys:'Oakleys',headband:'Headband',shoes:'Carbon shoes',clover:'Lucky clover'},
+  secretsTip:"Keep exploring to find the rest. Find them all for a surprise.",
+  legend:"COOKIE LEGEND! Every secret found. The crown has been upgraded.",
+  secretTitle:"For finding everything",
+  secretNote:"(Alex: write a secret extra note here. Joe only sees it if he finds every secret.)",
+  albumTitle:"The photo album", photoLocked:"(Finish this stop to unlock this photo.)",
+  photos:{
+    farm:"Keelan, Joe, and the world's least cooperative hens.",
+    mill:"50 km with the Vikings. Main Street, Hayward.",
+    city:"Lars and John, mid-heist. Nobody saw anything.",
+    fargo:"Ginger ale and Mott's. Nailed it. (Eventually.)",
+    golf:"Wylee Woods. Margie insisted on being in the photo.",
+    kitchen:"The Cookie King and his head baker.",
+  },
+  noteTitle:"A note from Alex",
 };
 const KITCHEN = {place:'Home', speaker:'Your kitchen',
   recipeTitle:"Chocolate Chip Cookies",
@@ -386,7 +433,7 @@ const KITCHEN = {place:'Home', speaker:'Your kitchen',
   // what everyone says if you talk to them in the kitchen before baking
   crowd:{Keelan:"Those are my eggs. Treat them with respect.", Alex:"I'm on dough-tasting duty.", 'Lil Q':"Scooted all the way over from Fargo for this. Rookie better deliver.", Jack:"Cookies per guest is 2.1 right now. I need it at 3.",
          Lars:"I'll time the oven. I have a watch with splits.", John:"I'll carry the tray. Or the whole oven.", 'The Stranger':"The city sleeps soundly tonight. Because of cookies.",
-         Margie:"I brought the milk. I'm basically the main character.", Bryan:"Nice kitchen. Very chill in here.", 'Trail John':"Flour made it all fifty kilometers.", Viking:"SKOL! When do we eat?"},
+         Margie:"I brought the milk. I'm basically the main character.", Bryan:"Nice kitchen. Very chill in here.", Logan:"I checked your yard. No clovers. Great cookies though.", Jackie:"You figured out the snacks. Proud of you. Don't make it weird.", 'Trail John':"Flour made it all fifty kilometers.", Viking:"SKOL! When do we eat?"},
   // the baking card: one step per ingredient, in recipe order. target and tol are in cups.
   bakeTitle:"Bake the cookies",
   // Alex is your baking helper: she talks you through every step (her lines are the hint, good, and the oops lines below)

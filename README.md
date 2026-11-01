@@ -22,7 +22,9 @@ For live reload while editing: `python3 -m http.server` and visit http://localho
 | `js/fargo.js` | Fargo: drive the CR-V, find the cheapest gas, Bob's $30.00 pump, then the snack stop for Alex. Car color in `CAR_COLOR`, fuel/speeds in `FUEL` |
 | `js/sound.js` | All the sounds (made with Web Audio, no files): `sfx('name')` plays one from `SFX`. Background music in `SONGS`: one little loop per place (farm hoedown, breezy Wylee Woods, Hall of the Mountain King for the Birkie, sneaky heist, Fargo road trip, Deck the Halls at home, Jingle Bells for the Cookie Dance). Loudness in `SOUND` (`MUSIC` for the music); Sound and Music on/off in ⚙ Settings |
 | `js/crossword.js` + `CROSSWORD` in story.js | The smudged recipe card: a crossword you solve before the baking. Change the words and clues in `CROSSWORD`; the grid arranges itself |
-| `js/extras.js` | Exits (walk into them to leave, with a bouncing EXIT arrow: `EXITS`), the arrow over Joe's head when he can do something, Joe's hidden gear (`GEAR`: where the Oakleys, headband and carbon shoes are), the joke signpost and the FARGO sign on the main map. Gear and signpost text: `GEAR_TEXT`, `SIGNPOST` in story.js |
+| `js/extras.js` | Exits (walk into them to leave, with a bouncing EXIT arrow: `EXITS`), the arrow over Joe's head when he can do something, Joe's hidden gear (`GEAR`: where the Oakleys, headband and carbon shoes are), and the sign in front of each land (`LAND_SIGNS`). Gear text: `GEAR_TEXT` in story.js |
+| `js/people.js` | Jackie (Fargo, after Alex kicks Joe out of the shop; `JACKIE`), Logan in the clover patch (`LOGAN_TEXT`), the Vikings and Lil Q passing on the road, and Alex's "where to next?" hints when Joe stands still (`HINTS`) |
+| `js/ending.js` | The ending: credits, Joe's stats, secrets found (find all 7 for the Cookie Legend crown + a secret note), the photo album, then the note. All its words are in `ENDING` in story.js; the note is `KITCHEN.note`. The album is also in ⚙ Settings |
 | `js/state.js` | Player, basket save (localStorage), particles |
 | `js/input.js` | Keyboard + touch d-pad |
 | `js/ui.js` | Dialog system (pages + button menus), land/kitchen interactions |
@@ -70,7 +72,7 @@ Bryan is fishing by the pond in the top corner of the farm. Talk to him for spri
 The cupcake is behind the barn, in the middle. Its frosting peeks up over the roof, and a sparkle flashes beside it every few seconds. Walk behind the barn to grab it.
 
 ## Spoilers: Joe's gear
-Oakleys on the Vancouver beach (bottom left), a headband in the snow by the Birkie yurt, carbon racing shoes past the Fargo gas station. Each one glints every few seconds.
+Oakleys on the Vancouver beach (bottom left), a headband in the snow by the Birkie yurt, carbon racing shoes past the Fargo gas station. Each one glints every few seconds. Logan (in the clover patch by the barn path) gives Joe a lucky clover if he helps him look.
 
 ## Spoilers: Fargo
 Bob's station (always $2.79) moves each attempt. Alex wants ginger ale + Mott's berry gummies. Two wrong picks and she sends you back outside.

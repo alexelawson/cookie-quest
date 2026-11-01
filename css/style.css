@@ -252,3 +252,46 @@ canvas{border-radius:6px}
 .xlists p{margin:0 0 3px;min-height:0;font-size:.72rem;cursor:pointer}
 .xlists p.cur{font-weight:700}
 .xlists p.done{opacity:.55}
+
+/* Alex's "where to next?" hint */
+.alexhint{position:absolute;left:50%;bottom:8px;transform:translateX(-50%);z-index:3;display:flex;gap:8px;align-items:center;background:var(--paper);color:var(--ink);border:3px solid var(--ink);border-radius:8px;padding:5px 10px 5px 5px;width:min(92%,340px);box-shadow:0 6px 16px rgba(0,0,0,.4);animation:rin .3s ease-out}
+.alexhint[hidden]{display:none}
+.alexhint canvas{width:40px;height:40px;image-rendering:pixelated;border-radius:4px;flex:none}
+.alexhint p{margin:0;font-size:.82rem;line-height:1.3}
+/* the ending */
+.ending{position:absolute;inset:0;z-index:7;background:#12141f;color:var(--paper);display:flex;flex-direction:column;border-radius:6px;overflow:hidden}
+.ending[hidden]{display:none}
+.credits{flex:1;overflow:hidden;position:relative}
+.credits[hidden]{display:none}
+.roll{position:absolute;left:0;right:0;top:0;display:flex;flex-direction:column;align-items:center;gap:10px;padding:0 12px 20px;text-align:center}
+.roll h2{font-family:var(--pixel);color:var(--gold);font-size:1.4rem;margin:0}
+.roll .csub{margin:0 0 10px;font-size:.85rem;opacity:.8}
+.crow{display:flex;align-items:center;gap:10px;width:min(100%,280px);text-align:left}
+.crow canvas,.crow .cblank{width:40px;height:40px;image-rendering:pixelated;border-radius:4px;flex:none}
+.crow b{display:block;font-family:var(--pixel);color:var(--gold);font-size:.95rem}
+.crow span{font-size:.8rem;opacity:.85}
+.roll .cthanks{font-family:var(--pixel);margin:14px 0 0;font-size:.9rem}
+.ecard{flex:1;overflow-y:auto;padding:10px 14px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center}
+.ecard[hidden]{display:none}
+.ecard small{font-family:var(--pixel);color:var(--gold);font-size:1rem;letter-spacing:.06em;text-transform:uppercase}
+.stats{display:grid;grid-template-columns:auto auto;gap:3px 14px;margin:0;font-size:.85rem;text-align:left}
+.stats dt{opacity:.75}.stats dd{margin:0;font-family:var(--pixel);color:var(--gold)}
+.secrets p{margin:4px 0;font-size:.85rem}
+.slist{display:flex;flex-wrap:wrap;gap:4px;justify-content:center}
+.slist span{border:2px solid #4d5a78;border-radius:4px;padding:1px 6px;font-size:.75rem;opacity:.6}
+.slist span.got{border-color:var(--gold);color:var(--gold);opacity:1}
+.secrets .legend{font-family:var(--pixel);color:var(--gold);font-size:.95rem}
+.secrets .tip{opacity:.7;font-size:.78rem}
+.polaroid{background:#f7f3ea;color:var(--ink);padding:8px 8px 4px;border-radius:2px;box-shadow:0 8px 20px rgba(0,0,0,.5);transform:rotate(-1.5deg);width:min(80%,220px)}
+.polaroid canvas,.plocked{width:100%;aspect-ratio:4/3;image-rendering:pixelated;display:block;background:#2a3044}
+.plocked{display:flex;align-items:center;justify-content:center;font-family:var(--pixel);font-size:2rem;color:#8a93a8}
+.polaroid p{margin:6px 0 2px;font-size:.8rem;min-height:2.4em}
+.pnav{display:flex;align-items:center;gap:12px}
+.pnav .btn{padding:2px 12px;font-size:1.1rem}
+.enote{white-space:pre-wrap;font-size:.95rem;line-height:1.5;text-align:left;background:var(--paper);color:var(--ink);padding:12px 14px;border-radius:6px;width:min(100%,360px);box-sizing:border-box;margin:0}
+.ebtns{display:flex;gap:8px;justify-content:center;padding:8px}
+.ebtns .btn[hidden]{display:none}
+.ecard>*{flex-shrink:0}
+.ending .btn.ghost{color:var(--paper);border-color:#4d5a78;background:transparent}
+.ending .btn:disabled{opacity:.35}
+.polaroid canvas{height:auto}

@@ -295,14 +295,15 @@ SCENES.fargo={ music:'fargo',
   baseSolids:[...HOUSES, ...STATIONS.flatMap(s=>[s.store,s.island,R(s.sign.x+7,s.sign.y+14,4,4),R(s.person.x-3,s.person.y-3,6,4)]),
     ...fargoTrees.map(([x,y])=>R(x-3,y-2,6,3)), R(TOWER.x-13,TOWER.y-4,26,5), R(WELCOME.x,WELCOME.y+10,24,6)],
   get solids(){ if(!fargo.onFoot||!fargo.car)return this.baseSolids; const c=fargo.car, a=fargo.alex;
-    return [...this.baseSolids, c.dir==='up'||c.dir==='down'?R(c.x-6,c.y-11,12,22):R(c.x-11,c.y-6,22,12), ...(a?[R(a.x-3,a.y-3,6,4)]:[])] },
+    return [...this.baseSolids, c.dir==='up'||c.dir==='down'?R(c.x-6,c.y-11,12,22):R(c.x-11,c.y-6,22,12), ...(a?[R(a.x-3,a.y-3,6,4)]:[]), ...(fargo.jackie?[R(fargo.jackie.x-3,fargo.jackie.y-3,6,4)]:[])] },
   entries:{start:{x:20,y:180,dir:'right'}, fromHighway:{x:20,y:180,dir:'right'}},
   feet:(x,y)=>fargo.onFoot?R(x-4,y-3,8,4):R(x-6,y-4,12,8),
   speed:()=>fargo.onFoot?.07:fargo.fuel<=0?FUEL.PUSH:(onRoad(P.x,P.y)?FUEL.ROAD:FUEL.SNOW),
   dynTrigger(){
     const g=STATIONS[fargo.bob];
     if(!fargo.onFoot)return null;
-    if(have.fargoStage==='store'&&hit(R(P.x-4,P.y-3,8,4),g.door))return SHOP_TRIGGER;
+    if(have.fargoStage==='store'&&hit(R(P.x-4,P.y-3,8,4),g.door))return fargo.jackie?{label:JACKIE.tryAgain,act:()=>openShop()}:SHOP_TRIGGER;
+    if(fargo.jackie&&Math.hypot(P.x-fargo.jackie.x,P.y-fargo.jackie.y)<14)return {label:'Talk to Jackie',btn:'Talk',act:talkJackie};
     if(fargo.alex&&Math.hypot(P.x-fargo.alex.x,P.y-fargo.alex.y)<14)return ALEX_TRIGGER;
     if(Math.hypot(P.x-g.person.x,P.y-g.person.y)<14)return BOB_TRIGGER;
     return null;
@@ -331,6 +332,7 @@ SCENES.fargo={ music:'fargo',
     const b=STATIONS[fargo.bob]; list.push({y:b.y+26,draw:()=>drawBike(b.x+43,b.y+12)});
     if(fargo.onFoot&&fargo.car){const c=fargo.car, a=fargo.alex; list.push({y:c.y+5,draw:()=>drawCar(c.x,c.y,c.dir,true)});
       if(a)list.push({y:a.y,draw:()=>drawAlex(a.x,a.y,fargo.alexMood)})}
+    if(fargo.onFoot&&fargo.jackie){const j=fargo.jackie; list.push({y:j.y,draw:()=>drawJackie(j.x,j.y,'down')})}
   },
   under(){ STATIONS.forEach(drawSign); STATIONS.forEach(drawShopSign) },
   over(){
@@ -370,7 +372,7 @@ function freeSpotNear(cx,cy){
     if(!blocked(x,y,sc)&&!hit(R(x-4,y-3,8,4),door))return {x,y}}
   return {x:cx,y:cy};
 }
-function backInTheCar(){ if(fargo.car){P.x=fargo.car.x;P.y=fargo.car.y;P.dir=fargo.car.dir} fargo.onFoot=false; fargo.car=null; fargo.alex=null; fargo.fuel=100 }
+function backInTheCar(){ fargo.jackie=null; fargo.jackieHint=0; if(fargo.car){P.x=fargo.car.x;P.y=fargo.car.y;P.dir=fargo.car.dir} fargo.onFoot=false; fargo.car=null; fargo.alex=null; fargo.fuel=100 }
 
 const shop={open:false, drink:null, snack:null};
 function itemButton(it,kind){
@@ -409,7 +411,7 @@ function giveToAlex(){
     return;
   }
   const lines=[]; if(shop.drink!==C.drink)lines.push(d.react); if(shop.snack!==C.snack)lines.push(k.react);
-  fargo.strikes++; fargo.wallet=Math.max(0,fargo.wallet-FARGO.wrongCost);
+  fargo.strikes++; fargo.wallet=Math.max(0,fargo.wallet-FARGO.wrongCost); have.fargoWrong=(have.fargoWrong||0)+1; save();
   alexSays(lines.join(' ')+` (-$${FARGO.wrongCost})`,'frown'); updateShop(); sfx('bad');
   if(fargo.strikes>=FARGO.strikesOut){
     $('giveBtn').disabled=true;
@@ -417,6 +419,7 @@ function giveToAlex(){
       closeShop(); fargo.alexMood='frown'; fargo.moodT=5000;
       const g=STATIONS[fargo.bob], d=g.door, cx=g.x+9, cy=g.face==='up'?g.y+22:g.y+6;   // back outside, beside the door
       const spot=freeSpotNear(cx,cy); P.x=spot.x; P.y=spot.y; P.dir=g.face==='up'?'down':'up';
+      jackieArrives();   // Jackie walks over and tells you what to do (people.js)
     },1500) },1500);
   }
 }

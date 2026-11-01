@@ -315,7 +315,7 @@ function checkHazards(){
   return null;
 }
 function caught(hz){
-  sfx('alarm');
+  sfx('alarm'); have.spotted=(have.spotted||0)+1; save();
   heist.flashT=500; heist.caughtWho=hz.who; for(const k in dirs)dirs[k]=false;
   const name=HEIST.crew[hz.who], you=hz.who===lead().id;
   const pages=[hz.msg.replace('{who}',you?'you':name).replace('{Who}',you?'You':name)];

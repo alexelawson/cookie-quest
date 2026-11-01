@@ -117,10 +117,17 @@
         <div class="xlists" id="xwLists"></div>
       </div>
     </div>
+    <div class="alexhint" id="hint" hidden><canvas id="hintFace" width="40" height="40" aria-hidden="true"></canvas><p id="hintText" aria-live="polite"></p></div>
+    <div class="ending" id="ending" hidden role="dialog" aria-label="The end">
+      <div class="credits" id="credits"><div class="roll" id="creditRoll"></div></div>
+      <div class="ecard" id="ecard" hidden></div>
+      <div class="ebtns"><button class="btn ghost" id="endSkip"></button><button class="btn" id="endNext"></button></div>
+    </div>
     <div class="wardrobe" id="settings" hidden role="dialog" aria-labelledby="setTitle">
       <div class="vcard">
         <small id="setTitle">Settings</small>
         <button class="btn" id="setOutfit"></button>
+        <button class="btn" id="setAlbum">Photo album</button>
         <label class="srow"><input type="checkbox" id="soundToggle"> Sound</label>
         <label class="srow"><input type="checkbox" id="musicToggle"> Music</label>
         <div id="gearRows" hidden></div>
@@ -171,6 +178,8 @@
 <script src="js/larsgames.js"></script>
 <script src="js/golf.js"></script>
 <script src="js/birkie.js"></script>
+<script src="js/people.js"></script>
+<script src="js/ending.js"></script>
 <script src="js/extras.js"></script>
 <script src="js/game.js"></script>
 </body>

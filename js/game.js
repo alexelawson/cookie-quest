@@ -31,7 +31,7 @@ function update(dt){
     if(fade.t>=fade.dur*2){fade.next=null; paused=!dlg.hidden||!$('reward').hidden}
     return;
   }
-  if(paused){updateHud();return}
+  if(paused){updateHud();peopleTick(dt);return}
   let dx=(dirs.right?1:0)-(dirs.left?1:0), dy=(dirs.down?1:0)-(dirs.up?1:0);
   P.moving=!!(dx||dy);
   if(P.moving){
@@ -39,11 +39,12 @@ function update(dt){
     const sp=(scene.speed?scene.speed():.07)*dt, x0=P.x, y0=P.y;
     if(!blocked(P.x+dx*sp,P.y))P.x+=dx*sp;
     if(!blocked(P.x,P.y+dy*sp))P.y+=dy*sp;
+    if(scene!==SCENES.fargo||fargo.onFoot)have.steps=(have.steps||0)+Math.hypot(P.x-x0,P.y-y0)/3;   // roughly one step every 3 pixels (saved with everything else)
     scene.moved&&scene.moved(Math.hypot(P.x-x0,P.y-y0));
     P.dir=Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up');
     P.t+=dt; if(P.t>140){P.t=0;P.step++}
   }
-  scene.update&&scene.update(dt); updateHud();
+  scene.update&&scene.update(dt); updateHud(); peopleTick(dt);
   if(paused)return;  // a mission may have opened a dialog
   extrasTick(); if(paused||fade.next)return;   // exits, picking up gear (extras.js)
   const feet=scene.feet?scene.feet(P.x,P.y):R(P.x-4,P.y-3,8,4);

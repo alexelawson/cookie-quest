@@ -33,7 +33,7 @@ function openLand(key){
 }
 function action(){
   if(!$('titlecard').hidden){start();return}
-  if(!$('pump').hidden||!$('shop').hidden||!$('vault').hidden||!$('anagram').hidden||!$('howto').hidden||!$('wardrobe').hidden||!$('bake').hidden||!$('xword').hidden||!$('settings').hidden)return;   // the pump and shop have their own buttons
+  if(!$('pump').hidden||!$('shop').hidden||!$('vault').hidden||!$('anagram').hidden||!$('howto').hidden||!$('wardrobe').hidden||!$('bake').hidden||!$('xword').hidden||!$('ending').hidden||!$('settings').hidden)return;   // the pump and shop have their own buttons
   if(!$('reward').hidden){collectReward();return}
   if(!dlg.hidden){const f=document.activeElement, b=$('dbtns').contains(f)?f:$('dbtns').querySelector('button'); b&&b.click(); return}
   if(near)near.act(); else if(scene.ability)scene.ability();
@@ -45,6 +45,7 @@ function openSettings(){
 function closeSettings(){ $('settings').hidden=true; paused=!dlg.hidden||!$('titlecard').hidden; $('settingsBtn').blur() }
 $('soundToggle').onchange=()=>{setSound($('soundToggle').checked); $('musicToggle').disabled=muted};
 $('musicToggle').onchange=()=>setMusic($('musicToggle').checked);
+$('setAlbum').onclick=()=>{ $('settings').hidden=true; openAlbum() };
 $('settingsBtn').onclick=openSettings; $('settingsClose').onclick=closeSettings;
 // change outfit any time: on the rooftops it's the stealth outfit, everywhere else it's Joe's everyday look
 $('setOutfit').textContent=WARDROBE.changeOutfit;

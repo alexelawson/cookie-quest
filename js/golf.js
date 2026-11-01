@@ -170,6 +170,7 @@ function golfRoundOver(){
   const card=`Final: Joe ${fmt(you)} · Margie ${fmt(m)} · Jack ${fmt(j)}`;
   const won=you<j&&you<=m;
   const h=HOLES[0]; P.x=h.tee.x+30; P.y=h.tee.y-10;
+  have.golfCard=`Joe ${fmt(you)} · Margie ${fmt(m)} · Jack ${fmt(j)}`;
   if(won){ have.golfWon=true; save(); say([['',card],...GOLF_TEXT.win.map(t=>['Margie',t]),['Jack',GOLF_TEXT.jackWin]],()=>showReward('golf')) }
   else say([['',card],['Margie',GOLF_TEXT.lose[0]]],()=>{ showDialog({place:GOLF_TEXT.place,speaker:'Margie',pages:['Another round?'],actions:[{label:GOLF_TEXT.again,fn:()=>{closeDialog();golfStartRound()}},{label:GOLF_TEXT.notYet,ghost:true,fn:closeDialog}]}) });
 }

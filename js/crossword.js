@@ -104,7 +104,7 @@ function xwCheck(){
 function xwHint(){
   if(xw.solved)return; const ins=xwInputs(), k=xwCellsOf(xw.word).find(k=>ins[k].value!==xw.L.cells[k].ch);
   if(k==null)return xwSay(CROSSWORD.wordDone,'happy');
-  ins[k].value=xw.L.cells[k].ch; ins[k].parentNode.classList.add('hint'); ins[k].parentNode.classList.remove('bad'); sfx('ding'); xwSay(CROSSWORD.hintSay,'happy'); xwSave(); xwFocus(k);
+  have.xwHints=(have.xwHints||0)+1; ins[k].value=xw.L.cells[k].ch; ins[k].parentNode.classList.add('hint'); ins[k].parentNode.classList.remove('bad'); sfx('ding'); xwSay(CROSSWORD.hintSay,'happy'); xwSave(); xwFocus(k);
   if(ins.every((n,j)=>!n||n.value===xw.L.cells[j].ch))xwSolved();
 }
 function xwSolved(){
