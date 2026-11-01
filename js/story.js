@@ -363,16 +363,16 @@ const GEAR_TEXT = {
   tip:"(Take it off or put it back on any time in ⚙ Settings.)",
 };
 // ---------- The joke signpost across the road from the kitchen ----------
-// short: what's painted on the arrow (CAPITALS, keep it short). dir: which way it points. line: what the sign says when you read it.
+// short: what's painted on the arrow (CAPITALS, keep it short; leave it '' to keep that one off the post and only in the list). dir: which way it points. line: what the sign says when you read it.
 const SIGNPOST = {
   place:"Outside the kitchen", title:"The signpost", read:"Read the signpost",
   boards:[
-    {short:'N.POLE', dir:'left',  color:'#c8322b', line:"North Pole: 3,412 mi"},
+    {short:'POLE',   dir:'left',  color:'#c8322b', line:"North Pole: 3,412 mi"},
     {short:'FARGO',  dir:'right', color:'#2f5f9e', line:"Fargo: 1 tank of gas (exactly $30.00)"},
     {short:'BIRKIE', dir:'right', color:'#2f8a4a', line:"Hayward, WI: 50 km, on skis"},
     {short:'CANADA', dir:'left',  color:'#e8eef0', ink:'#c8322b', line:"Canada: 30 mi, eh"},
-    {short:'WYLEE',  dir:'right', color:'#7a5232', line:"Wylee Woods: one big hyzer"},
-    {short:'HOME',   dir:'left',  color:'#e8b04a', ink:'#3b2a1e', line:"Home: you're already here"},
+    {short:'',       dir:'right', color:'#7a5232', line:"Wylee Woods: one big hyzer"},
+    {short:'',       dir:'left',  color:'#e8b04a', ink:'#3b2a1e', line:"Home: you're already here"},
   ],
   footer:"Someone has carved \"J + A\" into the post.",
 };

@@ -77,13 +77,13 @@ function drawGear(c,g=ctx,look=null){
 
 // ---------- the signpost across the road from the kitchen ----------
 const SIGNPOST_AT={x:176,y:194};
-const signpostSprite=(()=>{const c=document.createElement('canvas'), boards=SIGNPOST.boards, W=72, H=boards.length*7+14; c.width=W; c.height=H;
+const signpostSprite=(()=>{const c=document.createElement('canvas'), boards=SIGNPOST.boards.filter(b=>b.short), W=64, H=boards.length*6+8; c.width=W; c.height=H;   // only boards with a `short` go on the post
   const g=c.getContext('2d'), F=(col,x,y,w,h)=>{g.fillStyle=col;g.fillRect(x,y,w,h)}, cx=W/2|0;
-  F('rgba(0,0,0,.25)',cx-4,H-2,9,2); F('#6b4a2f',cx-1,2,3,H-3); F('#8a6a4a',cx-1,2,1,H-3); F('#4a321f',cx-2,0,5,2);
-  boards.forEach((bd,i)=>{const tw=textW(bd.short), w=tw+7, y=3+i*7, left=bd.dir==='left', x=left?cx+2-w:cx-1;
+  F('rgba(0,0,0,.25)',cx-3,H-2,7,2); F('#6b4a2f',cx-1,1,2,H-2); F('#8a6a4a',cx-1,1,1,H-2); F('#4a321f',cx-1,0,2,1);
+  boards.forEach((bd,i)=>{const tw=textW(bd.short), w=tw+4, y=1+i*6, left=bd.dir==='left', x=left?cx-1-w+1:cx;
     F(bd.color,x,y,w,6); F('rgba(255,255,255,.25)',x,y,w,1); F('rgba(0,0,0,.2)',x,y+5,w,1);
     if(left){F(bd.color,x-1,y+1,1,4); F(bd.color,x-2,y+2,1,2)} else {F(bd.color,x+w,y+1,1,4); F(bd.color,x+w+1,y+2,1,2)}   // the point
-    pixText(g,bd.short,left?x+2:x+4,y+1,bd.ink||'#ffffff')});
+    pixText(g,bd.short,left?x+2:x+2,y+1,bd.ink||'#ffffff')});
   return c})();
 triggers.push({z:R(SIGNPOST_AT.x-10,SIGNPOST_AT.y-4,20,10), label:SIGNPOST.read, act:()=>showDialog({place:SIGNPOST.place,speaker:SIGNPOST.title,pages:[SIGNPOST.boards.map(b=>b.line).join('\n'),SIGNPOST.footer],actions:[CLOSE]})});
 solids.push(R(SIGNPOST_AT.x-2,SIGNPOST_AT.y-2,4,3));
