@@ -61,7 +61,7 @@ const cityBg=document.createElement('canvas'); cityBg.width=CW; cityBg.height=CH
   F('#6b3b32',170,32,10,10); F('#4a2a24',172,34,6,6);                           // chimney
   F('#8b93a3',12,170,2,10); F('#8b93a3',28,170,2,10); for(let y=171;y<180;y+=2)F('#8b93a3',12,y,18,1);   // ladder top
   // fuse box
-  F('#5f6676',FUSE.x-6,FUSE.y-10,12,10); F('#3a3f52',FUSE.x-5,FUSE.y-9,10,8); F('#f4d35e',FUSE.x-1,FUSE.y-8,2,4); F('#f4d35e',FUSE.x-2,FUSE.y-6,4,1);
+  // (the big LIGHT POWER switch is drawn live in drawPowerSwitch, since it flips)
   // the old candy works: striped awning edge + the skylight frame
   for(let x=352;x<512;x+=8){F(x%16?'#e8e2d6':'#c8322b',x,ROOF_C.y-3,8,3)}
   F('#2a2e3e',SKYLIGHT.x-2,SKYLIGHT.y-2,SKYLIGHT.w+4,SKYLIGHT.h+4); F('#1a2338',SKYLIGHT.x,SKYLIGHT.y,SKYLIGHT.w,SKYLIGHT.h);
@@ -389,6 +389,20 @@ function drawExit(){
     const up=Math.floor(time/400)%2; F('#2b2b2b',bx+2+up,by+3,1,1); F('#2b2b2b',bx+8+up,by+3,1,1) }
   if(e.down){ ctx.fillStyle=`rgba(0,0,0,${Math.min(.8,e.downT/600)})`; ctx.fillRect(SKYLIGHT.x-30,SKYLIGHT.y-10,SKYLIGHT.w+60,90) }
 }
+// the big breaker that runs the searchlights: lever up = on, lever down = off (after Lars flips it)
+function drawPowerSwitch(){
+  const on=heistStage()<2, x=FUSE.x-14, y=FUSE.y-48, F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x+dx,y+dy,w,h)};
+  if(on){const gr=ctx.createRadialGradient(x+14,y+16,2,x+14,y+16,30); gr.addColorStop(0,'rgba(244,211,94,.22)'); gr.addColorStop(1,'rgba(244,211,94,0)'); ctx.fillStyle=gr; ctx.fillRect(x-16,y-14,60,60)}
+  F('rgba(0,0,0,.35)',2,33,26,3);
+  F('#6b7280',0,0,28,34); F('#8a92a0',0,0,28,1); F('#8a92a0',0,0,1,34); F('#3a3f52',0,33,28,1); F('#3a3f52',27,0,1,34);   // big metal cabinet
+  for(let i=0;i<28;i+=4){F('#f4d35e',i,2,2,4); F('#1d1d22',i+2,2,2,4)}                                                  // hazard stripes
+  F('#1d2130',3,8,22,13); pixText(ctx,'LIGHT',x+5,y+9,'#f4d35e'); pixText(ctx,'POWER',x+5,y+15,'#f4d35e');                     // the label
+  F('#2b2f3a',10,22,8,11); F('#1d1d22',13,23,2,9);                                                                     // the slot
+  if(on){F('#c9ced4',13,25,2,5); F('#e54b4b',9,22,10,3); F('#ff8a7a',9,22,10,1)} else {F('#c9ced4',13,27,2,4); F('#8a2a22',9,30,10,3)}   // the lever, up = on
+  F(on?(Math.floor(time/400)%2?'#7dff8a':'#3fbf5a'):'#2a3a2a',21,23,4,3); F(on?'#4a2020':(Math.floor(time/400)%2?'#ff4a3a':'#a02a22'),21,28,4,3);   // ON / OFF lights
+  if(on&&Math.floor(time/300)%2){F('#f4d35e',3,23,4,1); F('#f4d35e',4,24,3,1); F('#f4d35e',3,25,4,1); F('#f4d35e',4,26,2,2)}   // a little lightning bolt
+  F('#1d1d22',28,10,12,2); F('#1d1d22',38,10,2,26);                                                                     // the cable to the lights
+}
 function liftBeam(){
   have.heistStage=1; save(); heist.beamAnim=600; say([['John',HEIST.beamDone]]);
 }
@@ -442,7 +456,7 @@ function heistTrigger(){
     if(!have.heistBriefed)return briefing();
     say([[HEIST.stranger,HEIST.strangerAgain]])}};
   if(st<1&&hit(feet,R(LOOSE_BEAM.x-10,LOOSE_BEAM.y-6,LOOSE_BEAM.w+20,LOOSE_BEAM.h+12)))return {label:'Look at the log', act:beamChoice};
-  if(st<2&&hit(feet,R(FUSE.x-10,FUSE.y,20,14)))return {label:HEIST.fuse, act:cutFuse};
+  if(st<2&&hit(feet,R(FUSE.x-14,FUSE.y-14,28,28)))return {label:HEIST.fuse, act:cutFuse};
   if(st===2&&hit(feet,R(SKYLIGHT.x-4,SKYLIGHT.y+SKYLIGHT.h,SKYLIGHT.w+8,12)))return {label:HEIST.grate, act:ripGrate};
   if(st===3&&hit(feet,R(SKYLIGHT.x-4,SKYLIGHT.y+SKYLIGHT.h,SKYLIGHT.w+8,12)))return {label:HEIST.dropIn, act:openVault};
   return null;
@@ -472,7 +486,7 @@ const darkMask=document.createElement('canvas'); darkMask.width=VW; darkMask.hei
 SCENES.city={
   w:CW, h:CH, bounds:R(0,0,CW,CH), bg:cityBg, triggers:[],
   get walk(){ return [ROOF_A,ROOF_B,ROOF_C,PLANK_BC,LADDER,...(heistStage()>=1?[BEAM_SLOT]:[])] },
-  get solids(){ return [R(24,40,16,10),R(230,160,16,10),R(170,32,10,10),R(FUSE.x-6,FUSE.y-6,12,6),SKYLIGHT,R(STRANGER.x-4,STRANGER.y-3,8,4),
+  get solids(){ return [R(24,40,16,10),R(230,160,16,10),R(170,32,10,10),R(FUSE.x-14,FUSE.y-20,28,6),SKYLIGHT,R(STRANGER.x-4,STRANGER.y-3,8,4),
     ...(heistStage()<1?[LOOSE_BEAM]:[])] },
   entries:{start:{x:40,y:150,dir:'up'}, fromStreet:{x:40,y:150,dir:'up'}},
   enter(){
@@ -514,7 +528,7 @@ SCENES.city={
   drawPlayer:(x,y)=>{syncLeadFromP(); crewSprite(lead())},
   under(){
     for(const c of cars){const x=c.x+(c.lane?18:6); ctx.fillStyle=c.v>0?'#ffe9a0':'#ff4a3a'; ctx.fillRect(x,c.y|0,1,1); ctx.fillRect(x+3,c.y|0,1,1)}
-    drawBeam(); drawGrate();
+    drawBeam(); drawGrate(); drawPowerSwitch();
   },
   ents(list){
     heist.crew.forEach((c,i)=>{if(i!==heist.lead)list.push({y:c.y,draw:()=>crewSprite(c)})});

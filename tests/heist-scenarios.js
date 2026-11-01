@@ -57,7 +57,7 @@ r=await p.evaluate(()=>{toggleFollow(); switchTo(1); const w0=T.path([[170,104],
   useSkill(); const w=T.walkTo(310,104,60); const caughtMsg=dlg.hidden?'':$('dtext').textContent;
   update(16.7); const lbl=prompt.textContent; action(); const said=T.clickThrough();
   return {w0,waited,w,caughtMsg,lbl,said,st:have.heistStage,others:heist.crew.filter(c=>c.id!=='lars').map(c=>(c.x|0)+','+(c.y|0))}});
-ok('C crew holds while Lars sprints to the fuse box',r.w!=='dialog'&&r.lbl==='Cut the power',`${r.w} ${r.caughtMsg||''} waited ${r.waited} frames; others at ${r.others}`);
+ok('C crew holds while Lars sprints to the fuse box',r.w!=='dialog'&&r.lbl==='Flip the LIGHT POWER switch',`${r.w} ${r.caughtMsg||''} waited ${r.waited} frames; others at ${r.others}`);
 ok('C Lars cuts the power',r.st===2,r.said&&r.said[0]);
 // D. regroup, cross to roof C
 r=await p.evaluate(()=>{switchTo(0); toggleFollow(); T.hints=[]; const w=T.path([[200,146],[310,146],[356,146],[362,176]]); return {w,hint:T.hints,hud:$('hud').textContent}});
