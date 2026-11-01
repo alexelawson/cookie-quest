@@ -45,7 +45,7 @@ PORTRAITS['Logan']={size:32, bg:'#d6eec4', draw(g){ const F=px(g);
   F('#3d8443',24,2,3,3); F('#3d8443',27,2,3,3); F('#3d8443',24,5,3,3); F('#3d8443',27,5,3,3); F('#2f6b36',26,7,1,4);   // a four-leaf clover
 }};
 // the clover patch (painted onto the map once)
-{const g=bg.getContext('2d'); for(let i=0;i<70;i++){const a=rnd()*Math.PI*2, r=Math.sqrt(rnd())*16, x=LOGAN.x+Math.cos(a)*r*1.4|0, y=LOGAN.y-2+Math.sin(a)*r*.8|0;
+{const g=bg.getContext('2d'); for(let i=0;i<34;i++){const a=rnd()*Math.PI*2, r=Math.sqrt(rnd())*11, x=LOGAN.x+Math.cos(a)*r*1.4|0, y=LOGAN.y+1+Math.sin(a)*r*.6|0;
   g.fillStyle=i%3?'#3f8f45':'#5aa85a'; g.fillRect(x,y,2,1); g.fillRect(x,y+1,1,1); g.fillRect(x+1,y-1,1,1)}}
 function talkLogan(){
   const T=LOGAN_TEXT;

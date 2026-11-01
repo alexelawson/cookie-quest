@@ -58,13 +58,24 @@ const bg=document.createElement('canvas'); bg.width=WW; bg.height=WH;
 (function paint(){
   const g=bg.getContext('2d');
   const F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};
-  F('#6aa84a',0,0,WW,WH);
-  for(let i=0;i<900;i++)F(rnd()<.5?'#5e9a40':'#79b857',rnd()*WW|0,rnd()*WH|0,1,2);
-  // farm
-  F('#78b955',0,0,164,144);
-  for(let i=0;i<250;i++)F('#8cc866',rnd()*164|0,rnd()*144|0,1,1);
-  for(let i=0;i<420;i++){const x=rnd()*WW|0, y=rnd()*WH|0; F('#4f8a37',x,y,1,2); F('#4f8a37',x+2,y,1,2); F('#5e9a40',x+1,y-1,1,3)}   // grass tufts
-  for(let i=0;i<110;i++){const x=rnd()*WW|0, y=rnd()*WH|0, c=['#ffffff','#f4d35e','#f2a7c8','#c9b7f0'][i%4];   // wildflowers
+  // Each land has its own ground, with a soft ragged edge where it meets the meadow (no hard lines):
+  // the farm is lush green, the Birkie snowy, Fargo dry summer grass, Vancouver wet pavement, Wylee Woods forest floor.
+  const soft=(r,col,sides='tblr')=>{   // a few pixels of the land's color spilling over its edges
+    if(sides.includes('b'))for(let x=r.x;x<r.x+r.w;x++){const d=(rnd()<.5)+(rnd()<.25); if(d)F(col,x,r.y+r.h,1,d)}
+    if(sides.includes('t'))for(let x=r.x;x<r.x+r.w;x++){const d=(rnd()<.5)+(rnd()<.25); if(d)F(col,x,r.y-d,1,d)}
+    if(sides.includes('r'))for(let y=r.y;y<r.y+r.h;y++){const d=(rnd()<.5)+(rnd()<.25); if(d)F(col,r.x+r.w,y,d,1)}
+    if(sides.includes('l'))for(let y=r.y;y<r.y+r.h;y++){const d=(rnd()<.5)+(rnd()<.25); if(d)F(col,r.x-d,y,d,1)}};
+  F('#6fae4d',0,0,WW,WH);                                                                   // the meadow in between
+  for(let i=0;i<260;i++)F(rnd()<.5?'#67a446':'#78b755',rnd()*WW|0,rnd()*WH|0,1,1);
+  // farm: a slightly brighter, mown green
+  F('#79ba56',0,0,164,144); soft(R(0,0,164,144),'#79ba56','br');
+  for(let i=0;i<160;i++)F('#86c562',rnd()*164|0,rnd()*144|0,1,1);
+  for(let x=0;x<164;x+=12)F('rgba(255,255,255,.035)',x,0,6,144);                           // faint mowing stripes
+  const meadow=(x,y)=>!(x>=220&&y<150)&&!(y>=166&&(x<166||x>=218))&&!(y>=148&&y<166);       // grass, not snow/sand/city/road
+  for(let i=0;i<120;i++){const x=rnd()*WW|0, y=rnd()*WH|0; if(!meadow(x,y))continue; F('#5a9a3e',x,y,1,2); F('#5a9a3e',x+2,y,1,2); F('#62a245',x+1,y-1,1,3)}   // a few grass tufts
+  // wildflowers, in a few tidy patches instead of everywhere
+  for(const [cx,cy,n] of [[156,138,9],[94,132,8],[150,14,7],[10,140,6]])for(let i=0;i<n;i++){
+    const x=cx+(rnd()*16-8|0), y=cy+(rnd()*8-4|0), c=['#ffffff','#f4d35e','#f2a7c8','#c9b7f0'][i%4];
     F(c,x-1,y,1,1); F(c,x+1,y,1,1); F(c,x,y-1,1,1); F(c,x,y+1,1,1); F(i%4===1?'#e8742a':'#f4d35e',x,y,1,1)}
   F('#b9905c',93,63,54,54); for(let i=0;i<120;i++)F('#a67f4e',93+rnd()*54|0,63+rnd()*54|0,1,1);
   F('#f1e3c9',90,60,60,3);F('#f1e3c9',90,117,60,3);F('#f1e3c9',90,60,3,60);F('#f1e3c9',147,60,3,60);
@@ -79,17 +90,10 @@ const bg=document.createElement('canvas'); bg.width=WW; bg.height=WH;
   for(let y=18;y<44;y++){const t=(y-31)/13, hw=Math.sqrt(Math.max(0,1-t*t))*20; F('#4a8ec6',134-hw|0,y,hw*2|0,1)}
   F('#d7ecf8',124,22,6,1); F('#d7ecf8',140,38,5,1); F('#d7ecf8',118,34,4,1);
   for(let x=98;x<114;x+=3){F('#8a6a4a',x,30,2,6)} F('#6b4a2f',98,35,16,1); F('#6b4a2f',99,36,1,3); F('#6b4a2f',112,36,1,3);   // dock
-  // a worn footpath from the road up to the barn door...
-  for(let y=74;y<150;y++){const x=45+Math.round(Math.sin(y/9)*2); F('#c9ad74',x,y,8,1); if(y%5===0)F('#b39760',x+1+(y%3),y,2,1)}
-  for(let i=0;i<14;i++)F('#8cc866',44+rnd()*10|0,76+rnd()*72|0,1,2);
-  // ...and a fainter trodden trail that forks off and sneaks around the side of the barn (toward the cupcake)
-  for(let y=24;y<96;y++){const x=9+Math.round(Math.sin(y/7)); F('#a9c56f',x,y,3,1)}
-  for(let x=12;x<47;x++)F('#a9c56f',x,19+Math.round(Math.sin(x/6)),3,1);
-  for(let x=12;x<45;x++){const y=96+Math.round((x-12)*.12); F('#a9c56f',x,y,3,1)}
-  F('#e54b7a',10,30,1,1); F('#f4d35e',12,46,1,1); F('#5fa8e8',9,63,1,1); F('#ffffff',24,20,1,1);   // a few stray sprinkles
+  // (the paths are all drawn together further down, so they match)
   // Birkie trailhead: snow, a groomed trail heading north under the arch, a parking lot, the yurt
-  F('#eef3f7',220,0,164,144);
-  for(let i=0;i<260;i++)F(rnd()<.5?'#d6e0ea':'#ffffff',220+rnd()*164|0,rnd()*144|0,2,1);
+  F('#eef3f7',220,0,164,144); soft(R(220,0,164,144),'#eef3f7','lb'); soft(R(219,0,1,144),'#ffffff','l');
+  for(let i=0;i<90;i++)F(rnd()<.5?'#dfe7ef':'#ffffff',220+rnd()*164|0,rnd()*144|0,2,1);
   F('#f7fafc',300,0,32,76); for(let y=0;y<76;y+=2)F('#e1e9f0',302,y,28,1);       // corduroy
   F('#c4d0dc',304,0,1,76); F('#c4d0dc',308,0,1,76); F('#c4d0dc',324,0,1,76); F('#c4d0dc',328,0,1,76);   // classic tracks
   F('#5d636e',230,86,80,56); for(let i=0;i<120;i++)F('#555a64',230+rnd()*80|0,86+rnd()*56|0,2,1);    // parking lot
@@ -99,7 +103,7 @@ const bg=document.createElement('canvas'); bg.width=WW; bg.height=WH;
     if(rack){F('#2b2b2b',x+1,y+5,8,1); F('#2b2b2b',x+1,y+9,8,1); F('#c8322b',x+2,y+5,1,5); F('#ffc62f',x+5,y+5,1,5)} };
   car(237,90,'#2f6b36',true); car(261,90,'#2f6db0',false); car(273,124,'#8a8f9a',true);
   // city (Vancouver, in the rain): glass towers with rooftop gardens, a green bike lane, the Gastown steam clock, moss, the beach, freighters, mountains
-  F('#262a38',0,170,164,118);
+  F('#262a38',0,170,164,118); F('#4a5064',0,168,164,2); F('#4a5064',164,168,2,68); F('#5a6278',0,168,164,1);   // a curb all the way round
   for(let i=0;i<60;i++)F('#323a52',rnd()*164|0,170+rnd()*118|0,4,1);
   for(let x=0;x<164;x+=8)for(let y=172;y<288;y+=8)F('#2d3242',x,y,1,1);                         // sidewalk slabs
   const glass=(b,base,line,shine)=>{F(base,b.x,b.y,b.w,b.h);
@@ -128,8 +132,12 @@ const bg=document.createElement('canvas'); bg.width=WW; bg.height=WH;
   // the green bike lane next to the street
   F('#3f8a4a',86,170,4,74); for(let y=180;y<240;y+=22){F('#e8eef0',87,y,2,1); F('#e8eef0',86,y+2,1,2); F('#e8eef0',89,y+2,1,2)}
   // fargo
-  F('#cdb978',220,170,164,118);                                                                            // fargo: dry, flat, summer
-  for(let i=0;i<360;i++)F(['#bfa865','#d9c98e','#a9a35a'][i%3],220+rnd()*164|0,170+rnd()*118|0,2,1);
+  F('#cdb978',220,170,164,118); soft(R(220,170,164,118),'#cdb978','lt');                                 // fargo: dry, flat, summer
+  for(let i=0;i<150;i++)F(['#bfa865','#d9c98e','#c4b06c'][i%3],220+rnd()*164|0,170+rnd()*118|0,2,1);
+  // the gas station forecourt: one clean slab of asphalt from the road to the shop door
+  F('#9a9690',250,166,128,70); for(let i=0;i<160;i++)F(rnd()<.5?'#8f8b85':'#a5a19a',250+rnd()*128|0,166+rnd()*70|0,1,1);
+  F('#b5b1aa',250,166,128,1); F('#7f7b75',250,235,128,1); F('#7f7b75',250,166,1,70); F('#7f7b75',377,166,1,70);
+  for(let x=300;x<372;x+=12)F('#e2dfd8',x,224,1,10);                                       // parking spaces in front of the shop
   F('#d9d4c8',310,180,60,40); F('#2f6db0',310,180,60,8); F('#1d3f73',314,181,52,7); pixText(g,'FARGO GAS',322,182,'#ffffff');
   F('#6b6f7a',334,206,12,14); F('#9fd2f0',314,194,14,9); F('#9fd2f0',352,194,14,9);
   F('#c7372f',256,198,6,10); F('#c7372f',280,198,6,10); F('#f1f4f8',257,200,4,3); F('#f1f4f8',281,200,4,3);
@@ -142,8 +150,16 @@ const bg=document.createElement('canvas'); bg.width=WW; bg.height=WH;
     for(let i=0;i<w*h/140;i++)F(rnd()<.5?'#a9a39a':'#d8c49a',x+rnd()*w|0,y+rnd()*h|0,1,1);                                 // pebbles
     if(w>h){F('#b38c58',x,y,w,1); F('#b38c58',x,y+h-1,w,1); for(let k=0;k<w;k+=3)if(rnd()<.5)F('#8cc866',x+k,y-1,1,1)}   // edges, grass creeping in
     else {F('#b38c58',x,y,1,h); F('#b38c58',x+w-1,y,1,h)}};
-  road(0,150,WW,14); road(184,164,16,124); road(187,140,10,12);
-  road(310,74,12,76); road(298,164,10,66); road(298,222,48,10);
+  // one road across the middle, one down to Wylee Woods, and matching footpaths up to each place
+  road(0,150,WW,14); road(186,164,12,124);
+  const path=(x,y,w,h)=>{F('#c9a46b',x,y,w,h); for(let i=0;i<w*h/30;i++)F('#b8935b',x+rnd()*w|0,y+rnd()*h|0,1,1);
+    if(w<h){F('#b38c58',x,y,1,h); F('#b38c58',x+w-1,y,1,h)} else {F('#b38c58',x,y,w,1); F('#b38c58',x,y+h-1,w,1)}};
+  path(43,74,10,76);     // the farm: road to the barn doors
+  path(187,140,10,10);   // the kitchen: road to the porch steps
+  path(311,74,10,76);    // the Birkie: road to the arch
+  // the cupcake trail: a narrow trodden track that peels off the barn path and sneaks round behind the barn
+  const track=(x,y,w,h)=>F('#c2b07a',x,y,w,h);
+  track(12,98,31,3); track(10,22,3,79); track(10,20,34,3);
   // city streets: wet asphalt, dashed lines, puddles reflecting the lights, a manhole (it steams)
   F('#22252f',72,164,12,92); F('#22252f',72,244,72,12); F('#3a3f50',71,164,1,80); F('#3a3f50',84,164,1,80);
   for(let y=168;y<244;y+=8)F('#c9a640',77,y,2,4); for(let x=88;x<144;x+=8)F('#c9a640',x,249,4,2);
@@ -152,7 +168,8 @@ const bg=document.createElement('canvas'); bg.width=WW; bg.height=WH;
   // Wylee Woods: forest floor around the end of the south road (the arch itself is a sprite)
   F('#3f6b3a',164,236,56,52); for(let i=0;i<160;i++)F(rnd()<.5?'#355c31':'#4d7d45',164+rnd()*56|0,236+rnd()*52|0,1,1);
   for(let i=0;i<30;i++)F('#7a5a3a',164+rnd()*56|0,236+rnd()*52|0,1,1);
-  road(184,236,16,52); for(let i=0;i<16;i++)F('#5a7f3f',184+rnd()*16|0,240+rnd()*48|0,1,1);
+  soft(R(164,236,56,52),'#3f6b3a','t');
+  road(186,236,12,52); for(let i=0;i<12;i++)F('#5a7f3f',186+rnd()*12|0,240+rnd()*48|0,1,1);
   // your kitchen: an old white farmhouse with a gray shingle roof, a front gable, green shutters and a wraparound porch
   F('#8a3a2a',172,76,6,14); F('#6b2a1e',172,76,6,2); F('#a54a36',173,80,4,1); F('#a54a36',173,85,4,1);   // brick chimney
   F('#5f6470',164,86,56,20); F('#3f434c',164,86,56,2); for(let y=89;y<106;y+=3)F('#4f545e',164,y,56,1);   // shingle roof
@@ -294,14 +311,6 @@ SCENES.world={ music:'farm',
     list.push({y:124,draw:()=>ctx.drawImage(yurt,336,94)}); list.push({y:81,draw:()=>drawTrailJohn(331,81,trailJohnDir())}); list.push({y:74,draw:drawBarn}); farmEntities(list)},
   over(){
     farmOverlay();
-    // a little life: drifting cloud shadows, butterflies, the odd bird
-    ctx.fillStyle='rgba(20,40,30,.07)';
-    for(let k=0;k<3;k++){const cx=((time/90+k*170)%(WW+160))-80, cy=40+k*85; ctx.beginPath(); ctx.ellipse(cx,cy,46,20,0,0,Math.PI*2); ctx.ellipse(cx+30,cy+8,30,14,0,0,Math.PI*2); ctx.fill()}
-    for(const [bx,by,c] of [[70,110,'#f4d35e'],[180,40,'#ffffff'],[200,200,'#f2a7c8'],[20,120,'#9fd2f0']]){
-      const t=time/900+bx, x=Math.round(bx+Math.sin(t)*14), y=Math.round(by+Math.sin(t*1.7)*7), open=Math.floor(time/120+bx)%2;
-      ctx.fillStyle=c; ctx.fillRect(x-(open?2:1),y,open?2:1,2); ctx.fillRect(x+1,y,open?2:1,2); ctx.fillStyle='#3a3a3a'; ctx.fillRect(x,y,1,2)}
-    {const cyc=(time%14000)/14000; if(cyc<.5){const x=Math.round(-20+cyc*2*(WW+40)), y=Math.round(20+Math.sin(cyc*20)*4), f=Math.floor(time/200)%2;   // a bird crossing
-      ctx.fillStyle='#2b2b36'; ctx.fillRect(x,y,1,1); ctx.fillRect(x-1,y-f,1,1); ctx.fillRect(x+1,y-f,1,1); ctx.fillRect(x-2,y-1+f,1,1); ctx.fillRect(x+2,y-1+f,1,1)}}
     ctx.fillStyle='#c7372f';ctx.fillRect(244,184,52,6);ctx.fillStyle='#f1f4f8';ctx.fillRect(244,189,52,2);   // gas canopy
     ctx.fillStyle='#8a8f9a';ctx.fillRect(246,191,2,14);ctx.fillRect(292,191,2,14);
     ctx.save(); ctx.beginPath(); ctx.rect(0,170,164,118); ctx.clip();                                        // city: dark, rain, searchlight
