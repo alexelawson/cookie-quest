@@ -80,3 +80,8 @@ canvas{border-radius:6px}
 @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
 @keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.25);background:rgba(239,195,90,.45)}100%{transform:scale(1)}}
 @media (prefers-reduced-motion:reduce){.rart,.rcard,.slot.pop{animation:none}}
+
+/* start over (asks for a second tap) */
+.reset{align-self:center;background:none;border:1px solid var(--line);color:var(--muted);font-family:var(--pixel);font-size:.8rem;padding:4px 12px;border-radius:4px;cursor:pointer}
+.reset.armed{border-color:var(--berry);color:var(--paper);background:rgba(212,71,60,.3)}
+.reset:focus-visible{outline:3px solid var(--berry);outline-offset:2px}

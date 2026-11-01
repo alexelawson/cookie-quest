@@ -73,3 +73,17 @@ function collectReward(){
     {duration:550,easing:'cubic-bezier(.5,0,.75,0)'}).onfinish=()=>{art.style.animation='';done()};
 }
 $('rewardArt').onclick=collectReward;
+
+// ---------- start over ----------
+// First tap arms it; a second tap within 4 seconds erases saved progress and restarts.
+let resetTimer=null;
+$('resetBtn').onclick=()=>{
+  const b=$('resetBtn');
+  if(!b.classList.contains('armed')){
+    b.classList.add('armed'); b.textContent='Tap again to erase all progress';
+    resetTimer=setTimeout(()=>{b.classList.remove('armed'); b.textContent='Start over'},4000); return;
+  }
+  clearTimeout(resetTimer);
+  try{localStorage.removeItem(SAVE)}catch(e){}
+  location.reload();
+};
