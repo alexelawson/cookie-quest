@@ -22,6 +22,11 @@ For live reload while editing: `python3 -m http.server` and visit http://localho
 
 Everything is drawn with `fillRect` on a 224×168 canvas scaled up with `image-rendering: pixelated`.
 
+## Tests
+Needs Node and Playwright (`npm i -D playwright && npx playwright install chromium`).
+- `node tests/farm-scenarios.js` plays through every farm path (cupcake before/during/after, losing, reloads, kitchen detours).
+- `node tests/farm-difficulty.js '{}'` simulates players of different skill; pass JSON to try other `FARM` settings.
+
 ## Adding a new place
 Add an object to `SCENES` with `w`, `h`, `bounds`, `bg` (a canvas), `solids`, `triggers` and `entries`, plus optional `ambient/update/under/ents/over` hooks. Doors call `goTo('sceneName','entryName')`.
 

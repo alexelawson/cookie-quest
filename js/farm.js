@@ -2,19 +2,20 @@
 // All the difficulty knobs live in FARM.
 const FARM = {
   HENS: 20,            // hens in a full pen
-  ESCAPES: 18,         // how many escapes happen in one attempt (including the ones already out)
-  START_LOOSE: 2,      // already out when the chase starts
-  FIRST_GAP: 2300,     // ms between escapes at the start...
-  LAST_GAP: 5500,      // ...stretching to this by the last escape
-  LOSE_AT: 8,          // this many loose at once and they scatter
+  ESCAPES: 26,         // how many escapes happen in one attempt (including the ones already out)
+  START_LOOSE: 5,      // already out when the chase starts
+  FIRST_GAP: 1800,     // ms between escapes at the start...
+  LAST_GAP: 6000,      // ...stretching to this by the last escape
+  LOSE_AT: 9,          // this many loose at once and they scatter
   FLEE_RADIUS: 38,     // how close you get before a hen runs
   FLEE_SPEED: .054,    // px/ms (you walk at .07)
   WANDER_SPEED: .018,
   KEELAN_SPEED: .05,
 };
-// Tuned with a bot (30 runs each): a perfect or good player always wins,
-// a sloppy one ~60%. With Keelan helping, everyone wins. Lower FLEE_SPEED or raise
-// FIRST_GAP to make it easier.
+// Tuned with a bot (20 runs each). The chase ends the moment all 20 are home.
+// A good player always wins (~1.5 min), a sloppy one about half the time.
+// With Keelan helping, everyone wins in under a minute.
+// Lower FLEE_SPEED or raise FIRST_GAP to make it easier.
 const PEN = R(94,64,52,52);                 // inside of the fence, where penned hens wander
 const PEN_FENCE = R(90,60,60,60);
 const BARN = R(20,30,56,44);
@@ -34,7 +35,7 @@ const farm = {
 };
 
 function farmReset(){
-  farm.active=false; farm.loose=[]; farm.carrying=null; farm.keelan.carrying=null;
+  farm.active=false; farm.won=false; farm.loose=[]; farm.carrying=null; farm.keelan.carrying=null;
   farm.penned=[...Array(FARM.HENS)].map(penHen);
   Object.assign(farm.keelan,{x:KEELAN_HOME.x,y:KEELAN_HOME.y,dir:'down',moving:false});
 }
@@ -62,12 +63,17 @@ function escapeOne(){
 // ---------- talking to Keelan ----------
 function talkToKeelan(){
   const K=KEELAN, say=(pages,after)=>showDialog({place:K.place,speaker:K.name,pages,actions:[{label:'OK',fn:after||talkToKeelan}]});
-  if(have.farm) return showDialog({place:K.place,speaker:K.name,pages:[K.after],actions:[CLOSE]});
-  if(farm.won) return showReward('farm');   // won but didn't take them yet
+  if(have.farm){
+    if(have.cupcake&&!have.gaveCupcake) return showDialog({place:K.place,speaker:K.name,pages:[K.after],menu:true,actions:[
+      {label:K.cupcakeQ,fn:()=>{have.gaveCupcake=true;save();renderBasket();
+        showDialog({place:K.place,speaker:K.name,pages:K.cupcakeLate,actions:[CLOSE]})}},{label:K.bye,ghost:true,fn:closeDialog}]});
+    return showDialog({place:K.place,speaker:K.name,pages:[K.after],actions:[CLOSE]});
+  }
+  if(farm.won||have.farmWon) return showReward('farm');   // won but didn't take them yet (even after a reload)
   const opts=[];
   if(farm.active){
     opts.push({label:K.midQ,fn:()=>say([`${farm.penned.length} of ${FARM.HENS} in the pen. ${farm.loose.length} running around.`,
-      farm.escapesLeft>0?"They're still sneaking out. Hang in there.":"That's the last of the escapes. Just round up the rest!"])});
+      farm.escapesLeft>0?"Get all twenty home at once and they'll settle down.":"They're worn out. They won't sneak out again. Round up the rest!"])});
   } else {
     K.questions.forEach(q=>opts.push({label:q.q,fn:()=>say(q.a)}));
   }
@@ -84,8 +90,10 @@ function talkToKeelan(){
 }
 
 // ---------- movement helpers ----------
+const HEN_ONLY=[R(14,10,68,24), R(100,134,22,14)];   // behind the barn, under the roadside tree: places hens would vanish
 function henBlocked(x,y){
   const b=R(x-3,y-3,6,4);
+  if(HEN_ONLY.some(z=>hit(b,z)))return true;
   if(b.x<FARM_AREA.x||b.y<FARM_AREA.y||b.x+b.w>FARM_AREA.x+FARM_AREA.w||b.y+b.h>FARM_AREA.y+FARM_AREA.h)return true;
   return solids.some(s=>hit(b,s));
 }
@@ -135,7 +143,7 @@ function farmAmbient(dt){
 
 function farmUpdate(dt){
   // the cupcake
-  if(!have.cupcake&&!have.gaveCupcake&&Math.abs(P.x-CUPCAKE.x)<10&&Math.abs(P.y-CUPCAKE.y-2)<9){
+  if(!have.cupcake&&!have.gaveCupcake&&Math.abs(P.x-CUPCAKE.x)<9&&P.y>=CUPCAKE.y-8&&P.y<=CUPCAKE.y+3){
     have.cupcake=true; save(); renderBasket();
     showDialog({place:'Under a tree',speaker:'Ooh',pages:[KEELAN.foundCupcake],actions:[CLOSE]}); return;
   }
@@ -190,8 +198,8 @@ function farmUpdate(dt){
   // win / lose
   if(farm.loose.length>=FARM.LOSE_AT){
     farmReset(); showDialog({place:KEELAN.place,speaker:KEELAN.name,pages:KEELAN.lose,actions:[CLOSE]});
-  } else if(farm.escapesLeft<=0&&!farm.loose.length&&!farm.carrying&&!k.carrying){
-    farm.active=false; farm.won=true;
+  } else if(farm.penned.length>=FARM.HENS){   // everyone's home
+    farm.active=false; farm.won=true; have.farmWon=true; save();
     showDialog({place:KEELAN.place,speaker:KEELAN.name,pages:KEELAN.win,actions:[{label:KEELAN.thanks,fn:()=>{closeDialog();showReward('farm')}}]});
   }
 }
