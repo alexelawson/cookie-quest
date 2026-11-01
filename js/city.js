@@ -232,7 +232,7 @@ const say=(lines,done)=>{ // lines: [[speaker,text],...]
 };
 function briefing(){
   have.heistBriefed=true; save();
-  say([...HEIST.briefing.map(t=>[HEIST.stranger,t]),...HEIST.crewHello,['Tip',HEIST.howTo]]);
+  say([...HEIST.briefing.map(t=>[HEIST.stranger,t]),...HEIST.crewHello],()=>openHowTo());
 }
 function hintOnce(key,who,text){ if(heist.hinted[key])return; heist.hinted[key]=true; say([[who,text]]) }
 // walking up to the beam gives you a choice; only John can actually swing it over the gap
@@ -278,7 +278,7 @@ function pickCrate(i){
   if(!vault.open)return;
   if(i!==vault.choc){ $('vault').hidden=true; say(HEIST.raisins,()=>{ $('vault').hidden=false; paused=true }); return }
   vault.open=false; $('vault').hidden=true; have.heistStage=4; save();
-  say([['',HEIST.gotIt],['',HEIST.villainNote],...HEIST.finale,...HEIST.larsChallenge],()=>openAnagrams());
+  say([['',HEIST.gotIt],['',HEIST.villainNote],...HEIST.finale,...HEIST.larsChallenge],()=>openLarsMenu());
 }
 $('vaultPing').onclick=pingVault; $('crateA').parentNode.onclick=()=>pickCrate(0); $('crateB').parentNode.onclick=()=>pickCrate(1);
 
@@ -290,7 +290,7 @@ function heistTrigger(){
   if(Math.hypot(P.x-STRANGER.x,P.y-STRANGER.y)<16)return {label:'Talk to the stranger', btn:'Talk', act:()=>{
     if(have.city)return say([[HEIST.stranger,HEIST.after]]);
     if(st>=5)return showReward('city');
-    if(st===4)return say([[HEIST.stranger,HEIST.strangerRematch],...HEIST.larsChallenge.slice(1,2)],()=>openAnagrams());
+    if(st===4)return say([[HEIST.stranger,HEIST.strangerRematch],...HEIST.larsChallenge.slice(1,2)],()=>openLarsMenu());
     if(!have.heistBriefed)return briefing();
     say([[HEIST.stranger,HEIST.strangerAgain]])}};
   if(st<1&&hit(feet,R(LOOSE_BEAM.x-10,LOOSE_BEAM.y-6,LOOSE_BEAM.w+20,LOOSE_BEAM.h+12)))return {label:'Look at the beam', act:beamChoice};
@@ -315,7 +315,7 @@ function buildCrewBar(){
     b.querySelector('span').textContent=HEIST.crew[who.id]+' · '+HEIST.skills[who.id];
     b.onclick=()=>switchTo(i);
   });
-  $('followBtn').onclick=toggleFollow;
+  $('followBtn').onclick=toggleFollow; $('helpBtn').onclick=()=>{ if(!paused)openHowTo() };
   renderCrewBar();
 }
 
@@ -339,7 +339,7 @@ SCENES.city={
   key(code){ const i={Digit1:0,Digit2:1,Digit3:2}[code]; if(i!=null){switchTo(i);return true} if(code==='KeyF'){toggleFollow();return true} return false },
   abilityLabel:()=>HEIST.skills[lead().id],
   ambient(dt){
-    anaTick(dt);
+    anaTick(dt); lgTick(dt);
     for(const r of cityRain){r.y+=dt*.32;r.x-=dt*.08;if(r.y>CH){r.y=-4;r.x=Math.random()*(CW+40)}}
     for(const c of cars){c.y+=c.v*dt; if(c.y>CH+6)c.y=-6; if(c.y<-6)c.y=CH+6}
     nextFlash-=dt; if(nextFlash<=0){flashT=140; nextFlash=8000+Math.random()*9000} if(flashT>0)flashT-=dt;

@@ -18,7 +18,7 @@ const ANAGRAM_SETS=[
     3:['CAN','AND','END','DEN','LED','LAD','ACE','CAD','ALE']}},
 ];
 const ANAGRAM={TIME:60, POINTS:{3:100,4:400,5:1200,6:2000},
-  LARS:{FIRST:5000, GAP:[4500,7500], WEIGHTS:{3:4,4:3,5:1,6:.2}}};   // Lars finds a word every 4.5-7.5s, mostly short ones (~3,300 points a game)
+  LARS:{FIRST:4000, GAP:[3600,6000], WEIGHTS:{3:3,4:3,5:1.5,6:.3}}};   // Lars finds a word every 3.6-6s; scores ~4,000-5,500 a game
 
 const ana={open:false, set:null, picked:[], found:[], larsFound:[], you:0, lars:0, t:0, larsT:0, running:false, round:0};
 const anaWords=set=>Object.values(set.words).flat();
@@ -77,9 +77,7 @@ function anaEnd(){
   $('anaResult').textContent=won?`You win, ${ana.you} to ${ana.lars}!`:ana.you===ana.lars?`A tie at ${ana.you}. Tie goes to Lars, apparently.`:`Lars wins, ${ana.lars} to ${ana.you}.`;
   $('anaMissed').textContent=`The six-letter word${best.length>1?'s were':' was'}: ${best.join(', ')}.`;
   $('anaNext').textContent=won?HEIST.anagramDone:HEIST.anagramRematch;
-  $('anaNext').onclick=()=>{ $('anagram').hidden=true; ana.open=false;
-    if(won){ have.heistStage=5; save(); say(HEIST.larsLoses,()=>showReward('city')) }
-    else { ana.round++; say(HEIST.larsWins,()=>openAnagrams()) } };
+  $('anaNext').onclick=()=>{ $('anagram').hidden=true; ana.open=false; if(!won)ana.round++; larsGameOver(won) };
   setTimeout(()=>$('anaNext').focus({preventScroll:true}),0);
 }
 $('anaStart').onclick=anaGo; $('anaEnter').onclick=anaSubmit; $('anaBack').onclick=anaBack; $('anaClear').onclick=anaClear;

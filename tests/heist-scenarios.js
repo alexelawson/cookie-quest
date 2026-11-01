@@ -19,10 +19,11 @@ const R=[];const ok=(n,c,x='')=>R.push((c?'PASS ':'FAIL ')+n+(x?'  ('+x+')':''))
 await fresh();
 
 // A. briefing
-let r=await p.evaluate(()=>{T.enter(); const face=!$('dportrait').hidden&&$('dspeaker').textContent==='The Stranger'; const lines=T.clickThrough(); update(16.7); return {face,lines,bar:!$('crewbar').hidden,hud:$('hud').textContent,lab:$('alabel').textContent}});
+let r=await p.evaluate(()=>{T.enter(); const face=!$('dportrait').hidden&&$('dspeaker').textContent==='The Stranger'; const lines=T.clickThrough(); const how=!$('howto').hidden, rows=$('howRows').children.length, ctl=$('howControls').textContent; $('howOk').click(); update(16.7); return {face,how,rows,ctl,lines,bar:!$('crewbar').hidden,hud:$('hud').textContent,lab:$('alabel').textContent}});
 ok('A the stranger\'s face shows beside his lines',r.face);
 ok('A stranger briefs the crew, John + Lars chime in',r.lines[0].startsWith('The Stranger')&&r.lines.some(l=>l.startsWith('John'))&&r.lines.some(l=>l.startsWith('Lars')),r.lines.length+' lines');
 r.portrait=await p.evaluate(()=>1);
+ok('A how-to card lists all 3 powers + controls',r.how&&r.rows===3&&r.ctl.includes('Space')&&r.ctl.includes('press F'),r.rows+' rows');
 ok('A crew bar + objective + skill label',r.bar&&r.hud.includes('Bridge')&&r.lab==='Sonar',r.hud+' / '+r.lab);
 // B. only John lifts the beam
 r=await p.evaluate(()=>{T.hints=[]; const w=T.walkTo(88,140); const hint=T.hints; update(16.7); const lbl=prompt.textContent; action();
@@ -76,16 +77,37 @@ ok('F you can\'t rip the grate; John can',r.lbl.includes('grate')&&r.msg.include
 ok('F then you can drop in',r.next==='Drop through the skylight',r.next);
 // G. vault: raisins first, then the real thing
 r=await p.evaluate(()=>{action(); const open=!$('vault').hidden; const wrong=vault.choc===0?1:0; pickCrate(wrong); const raisin=T.clickThrough(); const reopened=!$('vault').hidden;
-  pingVault(); const note=$('vaultNote').textContent; pickCrate(vault.choc); const fin=T.clickThrough(); return {open,raisin,reopened,note,fin,ana:!$('anagram').hidden,st:have.heistStage}});
+  pingVault(); const note=$('vaultNote').textContent; pickCrate(vault.choc); const fin=T.clickThrough(); const menu=T.btns(); [...$('dbtns').querySelectorAll('button')].find(b=>b.textContent==='Anagrams').click(); return {open,raisin,reopened,note,fin,menu,ana:!$('anagram').hidden,st:have.heistStage}});
 ok('G vault opens with two crates',r.open); ok('G raisins: John objects, choose again',r.raisin.join().includes('Raisins')&&r.reopened,r.raisin[0]);
-ok('G sonar shows what\'s inside',r.note.includes('sonar'),r.note); ok('G finale, then Lars challenges you to anagrams',r.fin.some(l=>l.includes('one with the chocolate'))&&r.fin.some(l=>l.includes('Anagrams'))&&r.ana&&r.st===4,r.fin.length+' lines');
+ok('G sonar shows what\'s inside',r.note.includes('sonar'),r.note); ok('G finale, then Lars offers a choice of games',r.fin.some(l=>l.includes('one with the chocolate'))&&r.menu.join()==='Anagrams,Quick draw,Darts,Surprise me'&&r.ana&&r.st===4,r.menu.join(' | '));
 // lose to Lars first (do nothing), then rematch and win
 if(!r.ana){console.log(R.join('\n'));process.exit(1)}
-r=await p.evaluate(()=>{const set1=ana.set.letters; anaGo(); for(let i=0;i<60*62;i++)update(16.7); const res=$('anaResult').textContent; $('anaNext').click(); const gl=T.clickThrough();
-  return {set1,res,gl,again:!$('anagram').hidden,set2:ana.set.letters,lars:ana.lars}});
+r=await p.evaluate(()=>{const set1=ana.set.letters; anaGo(); for(let i=0;i<60*62;i++)update(16.7); const res=$('anaResult').textContent; $('anaNext').click(); const gl=T.clickThrough(); const menuAgain=T.btns(); [...$('dbtns').querySelectorAll('button')].find(b=>b.textContent==='Anagrams').click();
+  return {set1,res,gl,menuAgain,again:!$('anagram').hidden,set2:ana.set.letters,lars:ana.lars}});
 ok('G doing nothing loses to Lars, and he gloats',r.res.startsWith('Lars wins')&&r.gl.join().includes('Again'),r.res);
-ok('G rematch uses new letters',r.again&&r.set2!==r.set1,r.set1+' -> '+r.set2);
-r=await p.evaluate(()=>{anaGo(); const type=w=>{for(const ch of w){const i=ana.letters.findIndex((l,j)=>l===ch&&!ana.picked.includes(j)); ana.picked.push(i)} anaSubmit(); return $('anaMsg').textContent};
+ok('G losing goes back to the menu; anagram rematch uses new letters',r.menuAgain.includes('Darts')&&r.again&&r.set2!==r.set1,r.set1+' -> '+r.set2);
+// quick draw: three false starts lose; then three fast shots win
+r=await p.evaluate(()=>{$('anagram').hidden=true; ana.open=false; openQuickDraw(); $('lgBtn').onclick(); const early=[];
+  for(let i=0;i<3;i++){qdPress(); early.push($('qdSign').textContent); if(i<2)$('lgBtn').onclick()}
+  const res=$('lgResult').textContent, lost=!$('lgEnd').hidden; $('lgNext').click(); T.clickThrough();
+  [...$('dbtns').querySelectorAll('button')].find(b=>b.textContent==='Quick draw').click(); $('lgBtn').onclick();
+  for(let i=0;i<3;i++){clearTimeout(qd.timer); qdDraw(); clearTimeout(qd.timer); qd.drawAt=performance.now()-120; qdPress(); if(i<2)$('lgBtn').onclick()}
+  const res2=$('lgResult').textContent; return {early,res,lost,res2,st:have.heistStage}});
+ok('G quick draw: tapping early gives Lars the round',r.early[0].includes('Too early')&&r.lost&&r.res.startsWith('Lars wins'),r.res);
+ok('G quick draw: beat his reaction 3 times to win',r.res2.startsWith('You win'),r.res2);
+r=await p.evaluate(()=>{$('lgame').hidden=true; lg.open=false; return 1});
+// darts: three bullseyes win; three misses lose
+r=await p.evaluate(async()=>{const wait=ms=>new Promise(r=>setTimeout(r,ms));
+  const throwAt=async(tx,ty)=>{dartsAim(); dt_.t=tx; dartTap(); dt_.t=ty; dartTap(); await wait(800)};
+  openDarts(); $('lgBtn').onclick(); for(let i=0;i<3;i++){await throwAt(0,0); if(i<2)$('lgBtn').onclick()}
+  const win=$('lgResult').textContent, you1=[...dt_.you]; $('lgame').hidden=true; lg.open=false;
+  openDarts(); $('lgBtn').onclick(); const edge=DARTS.SWEEP_X/4; for(let i=0;i<3;i++){await throwAt(edge,DARTS.SWEEP_Y/4); if(i<2)$('lgBtn').onclick()}
+  const lose=$('lgResult').textContent, you2=[...dt_.you]; $('lgNext').click(); const gl=T.clickThrough(); const menu=T.btns(); return {win,you1,lose,you2,gl,menu}});
+ok('G darts: three bullseyes beats Lars',r.win.startsWith('You win')&&r.you1.every(p=>p===50),r.win+' '+r.you1);
+ok('G darts: three misses loses, back to the menu',r.lose.startsWith('Lars wins')&&r.you2.every(p=>p===0)&&r.menu.includes('Surprise me'),r.lose);
+r=await p.evaluate(()=>{[...$('dbtns').querySelectorAll('button')].find(b=>b.textContent==='Surprise me').click(); const which=!$('anagram').hidden?'anagrams':lg.game; $('anagram').hidden=true; ana.open=false; $('lgame').hidden=true; lg.open=false; lg.game=null; return which});
+ok('G surprise me picks one of the games',['anagrams','quickdraw','darts'].includes(r),r);
+r=await p.evaluate(()=>{openAnagrams(); anaGo(); const type=w=>{for(const ch of w){const i=ana.letters.findIndex((l,j)=>l===ch&&!ana.picked.includes(j)); ana.picked.push(i)} anaSubmit(); return $('anaMsg').textContent};
   const msgs=[type('ZZZ'.slice(0,0)+ana.set.letters.slice(0,3).split('').reverse().join(''))];
   const ws=[...ana.set.words[6],...ana.set.words[5]]; for(const w of ws)msgs.push(type(w)); const dup=type(ws[0]);
   for(let i=0;i<60*62;i++)update(16.7); const res=$('anaResult').textContent; $('anaNext').click(); const lines=T.clickThrough();
