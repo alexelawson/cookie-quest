@@ -11,9 +11,8 @@ function update(dt){
   for(const s of snow){s.y+=dt*s.s*.12;s.x+=Math.sin((time+s.y*40)/600)*.15;if(s.y>288){s.y=170;s.x=220+rnd()*164}}
   if(Math.random()<dt/400)smoke.push({x:207,y:90,a:1});
   for(const p of smoke){p.y-=dt*.012;p.x+=dt*.004;p.a-=dt/2600} while(smoke.length&&smoke[0].a<=0)smoke.shift();
-  for(const h of hens){h.t-=dt; if(h.t<=0){h.t=600+Math.random()*1400; const m=Math.random()<.5; h.vx=m?(Math.random()-.5)*.03:0; h.vy=m?(Math.random()-.5)*.03:0}
-    h.x=Math.min(141,Math.max(96,h.x+h.vx*dt)); h.y=Math.min(113,Math.max(68,h.y+h.vy*dt))}
-  if(paused)return;
+  farmAmbient(dt);
+  if(paused){farmHud();return}
   let dx=(dirs.right?1:0)-(dirs.left?1:0), dy=(dirs.down?1:0)-(dirs.up?1:0);
   P.moving=!!(dx||dy);
   if(P.moving){
@@ -24,9 +23,12 @@ function update(dt){
     P.dir=Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up');
     P.t+=dt; if(P.t>140){P.t=0;P.step++}
   }
+  farmUpdate(dt); farmHud();
+  if(paused)return;  // a mission may have opened a dialog
   const feet=R(P.x-4,P.y-3,8,4);
-  const t=triggers.find(tr=>hit(feet,tr.z));
-  if(t!==near){near=t; prompt.hidden=!t; if(t)prompt.textContent=(t.key==='kitchen'?'Enter ':'Visit ')+t.name; $('alabel').textContent=t?'Enter':''}
+  const t=farmTrigger()||triggers.find(tr=>hit(feet,tr.z))||null;
+  if((t&&t.label)!==(near&&near.label)){near=t; prompt.hidden=!t; if(t)prompt.textContent=t.label; $('alabel').textContent=t?(t.key==='keelan'?'Talk':'Enter'):''}
+  else near=t;
 }
 
 // ===================== DRAW =====================
@@ -58,14 +60,15 @@ function draw(){
   ctx.save(); ctx.translate(316,38); ctx.rotate(time/1400);
   for(let k=0;k<4;k++){ctx.rotate(Math.PI/2); ctx.fillStyle='#7a5a3c'; ctx.fillRect(-1,2,2,22); ctx.fillStyle='#f2ead8'; ctx.fillRect(1,6,6,17)}
   ctx.restore(); ctx.fillStyle='#4b3426'; ctx.fillRect(314,36,4,4);
-  // hens
-  for(const h of hens){const x=Math.round(h.x),y=Math.round(h.y),f=h.vx<0?-1:1;
-    ctx.fillStyle='rgba(0,0,0,.2)';ctx.fillRect(x-3,y+1,6,1);
-    ctx.fillStyle='#fffaf0';ctx.fillRect(x-3,y-4,6,5);ctx.fillRect(x+(f>0?1:-3),y-6,2,2);
-    ctx.fillStyle='#d43b2f';ctx.fillRect(x+(f>0?2:-3),y-7,1,1);ctx.fillStyle='#e8a33a';ctx.fillRect(x+(f>0?3:-4),y-5,1,1);ctx.fillRect(x-1,y+1,1,1)}
+  drawCupcake();
   // chimney smoke
   for(const p of smoke){ctx.fillStyle=`rgba(240,240,240,${Math.max(0,p.a)*.7})`;ctx.fillRect(Math.round(p.x),Math.round(p.y),3,3)}
-  drawPlayer(P.x,P.y);
+  // people, hens and trees, back to front
+  const ents=trees.map(([x,y])=>({y,draw:()=>drawTree(x,y)}));
+  farmEntities(ents);
+  ents.push({y:P.y,draw:()=>{drawPlayer(P.x,P.y); if(farm.carrying)drawHen(P.x,P.y-20,P.dir==='left'?-1:1)}});
+  ents.sort((a,b)=>a.y-b.y).forEach(e=>e.draw());
+  farmOverlay();
   // gas canopy (overhead)
   ctx.fillStyle='#c7372f';ctx.fillRect(244,184,52,6);ctx.fillStyle='#f1f4f8';ctx.fillRect(244,189,52,2);
   ctx.fillStyle='#8a8f9a';ctx.fillRect(246,191,2,14);ctx.fillRect(292,191,2,14);

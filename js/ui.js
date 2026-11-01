@@ -2,14 +2,17 @@
 const $=id=>document.getElementById(id);
 const dlg=$('dialog'), prompt=$('prompt');
 function renderBasket(){
-  $('basket').innerHTML=ITEMS.map(i=>`<span class="slot ${have[i.key]?'got':''}">${have[i.key]?'✓ ':''}${i.label}</span>`).join('');
+  $('basket').innerHTML=ITEMS.map(i=>`<span class="slot ${have[i.key]?'got':''}">${have[i.key]?'✓ ':''}${i.label}</span>`).join('')
+    +(have.cupcake&&!have.gaveCupcake?'<span class="slot extra">Cupcake</span>':'');
 }
-function showDialog({place,speaker,pages,actions,noteLast}){
+// pages: strings shown one at a time. actions: buttons on the last page.
+// menu:true lays the buttons out as a grid of choices (used for asking questions).
+function showDialog({place,speaker,pages,actions,noteLast,menu}){
   paused=true; prompt.hidden=true; let i=0;
   $('dplace').textContent=place||''; $('dspeaker').textContent=speaker||'';
   const draw=()=>{
     const t=$('dtext'); t.textContent=pages[i]; t.className=(noteLast&&i===pages.length-1)?'note':'';
-    const box=$('dbtns'); box.innerHTML='';
+    const box=$('dbtns'); box.innerHTML=''; const last=i===pages.length-1; box.classList.toggle('menu',!!menu&&last); dlg.classList.toggle('tall',!!menu&&last);
     const list=i<pages.length-1?[{label:'Next',fn:()=>{i++;draw()}}]:actions;
     list.forEach((a,n)=>{const b=document.createElement('button');b.className='btn'+(a.ghost?' ghost':'');b.textContent=a.label;b.onclick=a.fn;box.appendChild(b); if(n===0)setTimeout(()=>b.focus({preventScroll:true}),0)});
   };
@@ -35,8 +38,9 @@ function openKitchen(){
 }
 function action(){
   if(!$('titlecard').hidden){start();return}
-  if(!dlg.hidden){const b=$('dbtns').querySelector('button'); b&&b.click(); return}
-  if(near) near.key==='kitchen'?openKitchen():openLand(near.key);
+  if(!dlg.hidden){const f=document.activeElement, b=$('dbtns').contains(f)?f:$('dbtns').querySelector('button'); b&&b.click(); return}
+  if(!near)return;
+  if(near.key==='kitchen')openKitchen(); else if(near.key==='keelan')talkToKeelan(); else openLand(near.key);
 }
 function start(){$('titlecard').hidden=true; paused=false}
 $('startBtn').onclick=start;

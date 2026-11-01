@@ -6,11 +6,6 @@ const ITEMS = [
   {key:'fargo', label:'Sugar'},
 ];
 const STORY = {
-  farm:{place:'The Farm', speaker:'Farmer Hazel',
-    lines:["Oh, thank goodness you're here. The hens have staged a breakout.",
-           "Round them up and I'll throw in fresh butter. You'll be churning it yourself, mind."],
-    mission:"Mission preview: chase down the escaped hens, then a butter-churning rhythm game.",
-    done:"You got eggs and butter!", again:"The hens are back where they belong. Thanks again."},
   mill:{place:'The Old Mill', speaker:'The Miller',
     lines:["Flour? I can grind you some flour.",
            "But first you'll solve my crossword. I don't make the rules. Well. I do."],
@@ -29,6 +24,38 @@ const STORY = {
     mission:"Mission preview: find the cheapest pump, then harvest sugar beets in the snow.",
     done:"You got the sugar!", again:"Drive safe now. It's not this cheap anywhere else, ya know."},
 };
+// ---------- The farm: Keelan ----------
+// Each question is a button; the answer plays as one page per string.
+const KEELAN = {
+  place:'The Farm', name:'Keelan',
+  hello:"Hey. You here about the eggs? Because we've got a situation.",
+  helloAgain:"Back for another round?",
+  questions:[
+    {q:"What happened here?",       a:["One of the hens found a gap in the fence.","Then she found all the other gaps. Then she told her friends."]},
+    {q:"How do I catch them?",      a:["Run right into one to scoop it up. You can only carry one at a time.",
+                                       "Bring it back to the gate and it'll hop in.",
+                                       "They'll keep sneaking out, fast at first. They tire out eventually.",
+                                       "If eight are loose at once, they scatter and we start over."]},
+    {q:"How many chickens are there?", a:["Twenty. When they're all home, anyway."]},
+    {q:"Can't you catch them?",     a:["I've been chasing them since sunrise. I'm running on empty.",
+                                       "Man. I could really go for something sweet right now."]},
+    {q:"Can I get eggs and butter?", a:["Get my girls back in the pen and they're all yours."]},
+  ],
+  ready:"I'm ready",
+  start:["Alright. Stand back from the gate...","...and there they go."],
+  cupcakeQ:"Give Keelan the cupcake",
+  cupcakeA:["Wait. Is that a cupcake?","...","Okay. I've got a second wind. I'll help you round them up."],
+  foundCupcake:"You found a cupcake tucked under the tree. Chocolate, with sprinkles.",
+  midHello:"Keep going, you've got this!",
+  midQ:"How am I doing?",
+  backToIt:"Back to it",
+  lose:["Whoa. Whoa. That's too many.","Let's get them settled and try again. Talk to me when you're ready."],
+  win:["That's all twenty. You're a natural.","Eggs are yours. I'll throw in some butter too."],
+  winItem:"Eggs and butter are in your basket!",
+  after:"All twenty, home and accounted for. Thanks again.",
+  bye:"Bye",
+};
+
 const KITCHEN = {place:'Home', speaker:'Your kitchen',
   missing:"The recipe card says you still need:",
   ready:["Everything's in the basket.","Time to bake."],

@@ -48,3 +48,20 @@ canvas{width:100%;height:100%;display:block;image-rendering:pixelated;image-rend
 .hint{font-family:var(--pixel);color:var(--muted);font-size:.85rem;margin:0;text-align:center}
 @media (hover:hover) and (pointer:fine){.controls{display:none}}
 @media (hover:none),(pointer:coarse){.hint{display:none}}
+
+/* question menus */
+.dbtns.menu{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}
+.dbtns.menu .btn{font-size:.8rem;line-height:1.2;padding:4px 7px;text-align:left;background:var(--paper);border-width:2px}
+.dbtns.menu .btn:hover,.dbtns.menu .btn:focus-visible{background:var(--gold)}
+.dbtns.menu .btn.ghost{opacity:.75}
+.slot.extra{border-color:var(--berry);color:var(--paper);background:rgba(212,71,60,.25)}
+/* hen chase HUD */
+.hud{position:absolute;left:8px;bottom:8px;display:flex;gap:10px;align-items:center;background:var(--shade);border:2px solid var(--line);border-radius:4px;padding:3px 8px;font-family:var(--pixel);font-size:.85rem;color:var(--paper)}
+.pips{display:flex;gap:3px;align-items:center}
+.pips i{width:7px;height:7px;border:1px solid var(--muted);border-radius:1px}
+.pips i.on{background:var(--berry);border-color:var(--berry)}
+/* menus can grow past the bottom of the game screen (over the paused controls) */
+.screen{overflow:visible}
+canvas{border-radius:6px}
+.dialog{z-index:5}
+.dialog.tall{top:22%;bottom:auto;max-height:none;box-shadow:0 8px 24px rgba(0,0,0,.45)}

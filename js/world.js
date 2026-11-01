@@ -14,11 +14,11 @@ const solids=[
   ...trees.map(([x,y])=>R(x-3,y-3,6,4)),
 ];
 const triggers=[
-  {key:'farm', z:R(38,74,20,12), name:'The Farm'},
-  {key:'mill', z:R(306,74,20,12), name:'The Old Mill'},
-  {key:'city', z:R(124,240,20,12), name:'The City at Night'},
-  {key:'fargo',z:R(330,220,20,12), name:'Fargo'},
-  {key:'kitchen',z:R(182,142,20,10), name:'Your kitchen'},
+  {key:'mill', z:R(306,74,20,12), label:'Visit The Old Mill'},
+  {key:'city', z:R(124,240,20,12), label:'Visit The City at Night'},
+  {key:'fargo',z:R(330,220,20,12), label:'Visit Fargo'},
+  {key:'kitchen',z:R(182,142,20,10), label:'Enter your kitchen'},
+  // Keelan's trigger moves with him; see farm.js
 ];
 const hit=(a,b)=>a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y;
 
@@ -75,5 +75,12 @@ const bg=document.createElement('canvas'); bg.width=WW; bg.height=WH;
   F('#6b4430',186,128,12,14); F('#e8b04a',196,134,1,2);
   F('#ffd98a',174,122,8,7); F('#ffd98a',202,122,8,7); F('#a8794f',174,125,8,1); F('#a8794f',202,125,8,1);
   // trees
-  for(const [x,y] of trees){F('#6b4a2f',x-1,y-3,3,4); F('#2f6b36',x-6,y-14,12,11); F('#3d8443',x-4,y-16,8,6); F('#4d9a50',x-3,y-13,3,3)}
+  // pen gate (bottom fence, hens squeeze under it)
+  F('#8a5a34',112,117,16,3); F('#6b4428',112,118,16,1); F('#5a3a22',112,117,1,3); F('#5a3a22',127,117,1,3);
 })();
+
+// Trees are drawn as sprites, depth-sorted with people, so you can walk behind them.
+const treeSprite=document.createElement('canvas'); treeSprite.width=12; treeSprite.height=17;
+(function(){const g=treeSprite.getContext('2d'); const F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};
+  F('#6b4a2f',5,13,3,4); F('#2f6b36',0,2,12,11); F('#3d8443',2,0,8,6); F('#4d9a50',3,3,3,3);})();
+const drawTree=(x,y)=>ctx.drawImage(treeSprite,x-6,y-16);
