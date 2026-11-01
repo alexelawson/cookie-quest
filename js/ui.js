@@ -110,8 +110,9 @@ const REWARDS={
   mill:{from:'From John (and the Vikings)', name:'Flour', hint:'Tap it to put it in your basket.'},
   sprinkles:{from:'From Bryan', name:'Sprinkles', hint:'A bonus! Tap them to put them in your basket.'},
 };
-let rewardKey=null;
-function showReward(key){
+let rewardKey=null, rewardThen=null;
+function showReward(key,then){   // then: runs after the item lands in the basket
+  rewardThen=then||null;
   const r=REWARDS[key], c=$('rewardCanvas'), g=c.getContext('2d');
   g.clearRect(0,0,c.width,c.height); ART[key](g);
   $('rewardFrom').textContent=r.from; $('rewardName').textContent=r.name; $('rewardHint').textContent=r.hint;
@@ -123,7 +124,7 @@ function collectReward(){
   have[key]=true; save();
   const art=$('rewardArt'), i=ITEMS.findIndex(it=>it.key===key);
   const slot=$('basket').children[i], a=art.getBoundingClientRect(), b=slot?slot.getBoundingClientRect():a;
-  const done=()=>{$('reward').hidden=true; renderBasket(); const sl=$('basket').children[i]; sl&&sl.classList.add('pop'); paused=false};
+  const done=()=>{$('reward').hidden=true; renderBasket(); const sl=$('basket').children[i]; sl&&sl.classList.add('pop'); paused=false; if(rewardThen){const f=rewardThen; rewardThen=null; f()}};
   const still=matchMedia('(prefers-reduced-motion: reduce)').matches;
   if(still||!art.animate)return done();
   art.style.animation='none';

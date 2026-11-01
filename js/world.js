@@ -4,9 +4,10 @@ const WW=384, WH=288, VW=224, VH=168;
 const cv=document.getElementById('game'), ctx=cv.getContext('2d'); ctx.imageSmoothingEnabled=false;
 const R=(x,y,w,h)=>({x,y,w,h});
 const REG={farm:R(0,0,164,144), mill:R(220,0,164,144), city:R(0,170,164,118), fargo:R(220,170,164,118)};
-const trees=[[172,30],[212,30],[172,64],[212,64],[100,192],[54,236],[170,200],[214,228],[110,154],[270,154]];
+const trees=[[172,30],[212,30],[172,64],[212,64],[170,200],[214,228],[110,154],[270,154]];
 // snowy pines around the Birkie trailhead, dark pines in Wylee Woods (the disc golf entrance)
 const pines=[[228,14],[244,30],[262,12],[284,26],[232,52],[268,48],[290,62],[352,10],[372,24],[358,44],[378,62],[346,30],[236,74]];
+const cedars=[[100,194],[62,224],[154,252]];   // mossy cedars in the city
 const woods=[[168,250],[176,240],[171,270],[166,284],[212,248],[217,262],[211,282],[218,242]];
 const solids=[
   R(20,30,56,44),                                            // barn
@@ -17,11 +18,11 @@ const solids=[
   R(327,77,8,4),                                             // John
   R(178,282,4,4),R(201,282,4,4),                             // Wylee Woods arch posts
   R(166,98,52,42),                                           // farmhouse (your kitchen)
-  R(108,16,52,30),R(96,37,8,4),                              // Bryan's pond, and Bryan
-  R(67,204,3,3),R(103,260,3,3),                              // city streetlamps
-  R(8,178,40,52),R(110,184,48,56),R(0,242,64,46),R(94,224,6,4),   // city towers, the water, the steam clock
+  R(108,16,52,30),                                           // Bryan's pond (he's out in his boat)
+  R(67,204,3,3),R(103,258,3,3),                              // city streetlamps
+  R(8,178,40,52),R(110,184,48,56),R(0,244,72,44),R(72,264,92,24),R(94,224,6,4),   // city towers, the ocean, the steam clock
   R(310,180,60,40),R(256,198,6,10),R(280,198,6,10),R(235,214,3,12), // gas shop, pumps, sign pole
-  ...[...trees,...pines,...woods].map(([x,y])=>R(x-3,y-3,6,4)),
+  ...[...trees,...pines,...woods,...cedars].map(([x,y])=>R(x-3,y-3,6,4)),
 ];
 const triggers=[
   {z:R(320,70,24,18),  label:'Talk to John', btn:'Talk', act:()=>talkJohn()},
@@ -89,7 +90,7 @@ const bg=document.createElement('canvas'); bg.width=WW; bg.height=WH;
   const car=(x,y,c,rack)=>{F('rgba(0,0,0,.25)',x+1,y+14,10,2); F(c,x,y,10,15); F('#9fc4dc',x+1,y+2,8,3); F('#9fc4dc',x+1,y+11,8,2); F('#ffffff',x,y,10,1);
     if(rack){F('#2b2b2b',x+1,y+5,8,1); F('#2b2b2b',x+1,y+9,8,1); F('#c8322b',x+2,y+5,1,5); F('#ffc62f',x+5,y+5,1,5)} };
   car(237,90,'#2f6b36',true); car(261,90,'#2f6db0',false); car(273,124,'#8a8f9a',true);
-  // city (Vancouver, in the rain): glass towers with rooftop gardens, a green bike lane, the Gastown steam clock, the seawall
+  // city (Vancouver, in the rain): glass towers with rooftop gardens, a green bike lane, the Gastown steam clock, moss, the beach, freighters, mountains
   F('#262a38',0,170,164,118);
   for(let i=0;i<60;i++)F('#323a52',rnd()*164|0,170+rnd()*118|0,4,1);
   for(let x=0;x<164;x+=8)for(let y=172;y<288;y+=8)F('#2d3242',x,y,1,1);                         // sidewalk slabs
@@ -104,9 +105,18 @@ const bg=document.createElement('canvas'); bg.width=WW; bg.height=WH;
   // the tall blue one: a stepped glass crown, and an elevator lobby (the way up to the rooftops)
   {const b=R(110,184,48,56); F('#1c2c44',b.x+6,b.y-8,b.w-12,4); F('#1c2c44',b.x-1,b.y-5,b.w+2,6); F('#4f8fd0',b.x+8,b.y-8,b.w-16,1);
     glass(b,'#2c4a6e','#243d5c','#7fb0e0'); F('#ffe9a8',126,b.y+b.h-10,16,10); F('#d9c27a',134,b.y+b.h-10,1,10); F('#9aa3b2',125,b.y+b.h-11,18,1)}
-  // the seawall and False Creek
-  F('#1e3a52',0,244,62,44); for(let i=0;i<40;i++)F('#2a4c68',rnd()*60|0,246+rnd()*40|0,5,1);
-  F('#8a8f9a',0,242,63,2); F('#8a8f9a',62,242,2,46); F('#6b6f7a',0,244,62,1);
+  // moss everywhere: in the sidewalk cracks, along the curbs, on the tower roofs
+  for(let i=0;i<220;i++){const x=rnd()*164|0, y=170+rnd()*90|0; F(rnd()<.5?'#3a5e36':'#4a7442',x,y,1+(rnd()*3|0),1)}
+  for(let x=0;x<70;x+=3)F(rnd()<.5?'#3a5e36':'#4a7442',x,231,2,1); for(let x=8;x<48;x+=2)F('#4a7442',x,229,1,1);
+  F('#3a5e36',110,239,48,1); for(let x=110;x<158;x+=3)F('#4a7442',x,238,2,1);
+  // the beach (driftwood logs), English Bay, and the North Shore mountains across the water
+  F('#cdb98e',0,232,72,12); F('#cdb98e',72,256,92,8); for(let i=0;i<70;i++)F('#bba878',rnd()*164|0,232+rnd()*32|0,1,1);
+  for(const [x,y,w] of [[6,236,16],[30,239,12],[50,235,14],[92,259,18],[130,260,14]]){F('#8a7458',x,y,w,2); F('#a8916f',x,y,w,1); F('#6b5a44',x+w-1,y,1,2)}   // driftwood
+  F('#1e3a52',0,244,72,44); F('#1e3a52',72,264,92,24); F('#e8eef0',0,244,72,1); F('#e8eef0',72,264,92,1);   // ocean, little waves at the shore
+  for(let i=0;i<70;i++){const x=rnd()*164|0, y=246+rnd()*30|0; if(x>=72&&y<266)continue; F('#2a4c68',x,y,5,1)}
+  for(let x=0;x<164;x++){const h=6+Math.round(5*Math.sin(x/9)+3*Math.sin(x/4.3+1)); F('#3a4a62',x,288-h,1,h); if(h>9)F('#e8eef4',x,288-h,1,2)}   // mountains
+  for(let x=0;x<164;x+=2){const h=3+Math.round(2*Math.sin(x/5)); F('#2b3a50',x,288-h,2,h)}
+  F('rgba(200,210,225,.18)',0,276,164,4);   // mist
   // the green bike lane next to the street
   F('#3f8a4a',86,170,4,74); for(let y=180;y<240;y+=22){F('#e8eef0',87,y,2,1); F('#e8eef0',86,y+2,1,2); F('#e8eef0',89,y+2,1,2)}
   // fargo
@@ -182,6 +192,13 @@ function drawBryan(x,y,dir='right',g=ctx){
   if(dir==='right'){F('#2b2b2b',7,3,1,1); F('#b5654f',7,5,1,1); F(hair,3,1,2,3)}
   if(dir==='left'){F('#2b2b2b',4,3,1,1); F('#b5654f',4,5,1,1); F(hair,7,1,2,3)}
 }
+// Bryan lounging in his boat by the dock: leaning back, hands behind his head, feet up
+function drawBryanInBoat(x,y){ const b=Math.round(Math.sin(time/700)*1), F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x+dx,y+b+dy,w,h)};
+  const skin='#e8b48e', hair='#7a5232', tee='#8d949e';
+  F(tee,4,-3,6,5); F(skin,6,-8,5,5); F(hair,6,-9,5,2); F(hair,10,-8,1,2);           // leaning back against the stern, buzz cut
+  F(skin,4,-9,2,2); F(skin,11,-9,2,2); F(tee,4,-7,2,2); F(tee,11,-7,2,2);           // hands behind his head
+  F('#2b2b2b',7,-6,1,1); F('#2b2b2b',9,-6,1,1); F('#b5654f',8,-4,2,1);              // eyes half shut, little smile
+  F('#3a5f9e',10,-1,6,2); F('#5a3a22',16,-2,2,2) }                                 // jeans, feet up on the seat
 // his boat, bobbing on the pond
 function drawBoat(x,y){ const b=Math.round(Math.sin(time/700)*1), F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x+dx,y+b+dy,w,h)};
   F('rgba(20,40,70,.35)',-1,6,20,2); F('#7a4e2c',0,0,18,6); F('#a26c40',1,0,16,2); F('#5a3a22',2,5,14,1); F('#c94a3a',0,2,18,1);
@@ -191,7 +208,8 @@ const makePine=(dark,snowy)=>{const c=document.createElement('canvas'); c.width=
   F('#5a3d26',5,16,2,4); F(dark,1,11,10,6); F(dark,2,6,8,6); F(dark,4,1,4,6); F(dark,5,0,2,1);
   if(snowy){F('#ffffff',1,11,4,1); F('#ffffff',7,11,3,1); F('#ffffff',2,6,3,1); F('#ffffff',7,6,2,1); F('#ffffff',4,1,4,1)}
   else{F('#3f7a45',3,8,2,2); F('#3f7a45',6,13,2,2); F('#3f7a45',5,3,1,2)} return c};
-const snowPine=makePine('#2b5a3a',true), darkPine=makePine('#1f4a2c',false);
+const snowPine=makePine('#2b5a3a',true), darkPine=makePine('#1f4a2c',false), mossCedar=makePine('#24452c',false);
+{const g=mossCedar.getContext('2d'); g.fillStyle='#6b8f3a'; for(const [x,y] of [[2,12],[8,14],[4,7],[7,9],[5,3]])g.fillRect(x,y,2,1); g.fillStyle='#4a7442'; g.fillRect(5,17,2,1)}   // hanging moss
 const drawPine=(x,y,s)=>ctx.drawImage(s,x-6,y-19);
 
 // The two arches are sprites too, so you walk under the banner.
@@ -235,15 +253,13 @@ SCENES.world={
   },
   update(dt){farmUpdate(dt)},
   under(){
-    drawBoat(130,24);
+    drawBoat(114,27); drawBryanInBoat(114,27);
     drawCupcake();
     for(const p of smoke){ctx.fillStyle=`rgba(240,240,240,${Math.max(0,p.a)*.7})`;ctx.fillRect(Math.round(p.x),Math.round(p.y),3,3)}
   },
   ents(list){trees.forEach(([x,y])=>list.push({y,draw:()=>drawTree(x,y)}));
-    list.push({y:40,draw:()=>{ drawBryan(100,40,Math.hypot(P.x-100,P.y-40)<30?(P.x<100?'left':P.x>104?'right':'down'):'right');
-      ctx.fillStyle='#5a3a22'; ctx.fillRect(105,24,1,1); ctx.fillRect(104,26,1,2); ctx.fillRect(103,28,1,3); ctx.fillRect(106,22,1,2);   // fishing rod
-      ctx.fillStyle='rgba(240,240,240,.7)'; ctx.fillRect(107,22,1,1); ctx.fillRect(108,23,1,1); ctx.fillRect(109,24,1,8); ctx.fillStyle='#e54b4b'; ctx.fillRect(109,32+Math.round(Math.sin(time/500)),2,1) }});
-    pines.forEach(([x,y])=>list.push({y,draw:()=>drawPine(x,y,snowPine)})); woods.forEach(([x,y])=>list.push({y,draw:()=>drawPine(x,y,darkPine)}));
+
+    pines.forEach(([x,y])=>list.push({y,draw:()=>drawPine(x,y,snowPine)})); cedars.forEach(([x,y])=>list.push({y,draw:()=>drawPine(x,y,mossCedar)})); woods.forEach(([x,y])=>list.push({y,draw:()=>drawPine(x,y,darkPine)}));
     list.push({y:67,draw:()=>ctx.drawImage(birkArch,290,38)}); list.push({y:286,draw:()=>ctx.drawImage(woodsArch,176,254)});
     list.push({y:124,draw:()=>ctx.drawImage(yurt,336,94)}); list.push({y:81,draw:()=>drawTrailJohn(331,81,trailJohnDir())}); list.push({y:74,draw:drawBarn}); farmEntities(list)},
   over(){
@@ -256,15 +272,22 @@ SCENES.world={
     ctx.fillStyle='rgba(255,240,180,.08)'; ctx.beginPath(); ctx.moveTo(78,288);
     ctx.lineTo(78+Math.sin(ang-.12)*220,288-Math.cos(ang-.12)*220); ctx.lineTo(78+Math.sin(ang+.12)*220,288-Math.cos(ang+.12)*220); ctx.fill();
     ctx.fillStyle='rgba(170,190,230,.55)'; for(const r of rain)ctx.fillRect(Math.round(r.x),Math.round(r.y),1,3);
-    for(const [x,y] of [[68,206],[104,262]]){ctx.fillStyle='#4a4f60'; ctx.fillRect(x,y-16,1,16); ctx.fillRect(x-1,y-17,4,1); ctx.fillStyle='#ffe9a8'; ctx.fillRect(x+1,y-16,2,2);   // streetlamps
+    for(const [x,y] of [[68,206],[104,260]]){ctx.fillStyle='#4a4f60'; ctx.fillRect(x,y-16,1,16); ctx.fillRect(x-1,y-17,4,1); ctx.fillStyle='#ffe9a8'; ctx.fillRect(x+1,y-16,2,2);   // streetlamps
       const gr=ctx.createRadialGradient(x+2,y-8,1,x+2,y-4,20); gr.addColorStop(0,'rgba(255,225,150,.32)'); gr.addColorStop(1,'rgba(255,225,150,0)'); ctx.fillStyle=gr; ctx.fillRect(x-20,y-28,44,40)}
     // the Gastown steam clock (it whistles steam on the quarter hour... here, every few seconds)
     {const x=94,y=228; ctx.fillStyle='#5a3a22'; ctx.fillRect(x,y-22,6,22); ctx.fillStyle='#7a5232'; ctx.fillRect(x+1,y-20,4,18); ctx.fillStyle='#c9a24a'; ctx.fillRect(x-1,y-23,8,2); ctx.fillRect(x-1,y-2,8,2);
       ctx.fillStyle='#f2efe6'; ctx.fillRect(x+1,y-18,4,4); ctx.fillStyle='#2b2b2b'; ctx.fillRect(x+3,y-17,1,2); ctx.fillRect(x+3,y-16,2,1);
       ctx.fillStyle='#c9a24a'; ctx.fillRect(x+2,y-26,2,3); if(Math.floor(time/2600)%3===0){ctx.fillStyle='rgba(235,235,240,.55)'; const t=(time%2600)/2600; for(let k=0;k<4;k++)ctx.fillRect(x+1+((k*3+Math.floor(t*6))%5),y-30-k*3-t*6,3,3)}}
     // rain rings on the water, and the little rainbow ferry going back and forth
-    ctx.fillStyle='rgba(170,200,230,.45)'; for(let i=0;i<6;i++){const ph=((time/600+i*.37)%1), rx=(i*23+Math.floor(time/600+i*.37)*17)%56+3, ry=250+(i*13+Math.floor(time/600+i*.37)*7)%34, r=1+ph*3; ctx.fillRect(rx-r,ry,r*2,1)}
-    {const bx=Math.round(10+(Math.sin(time/5000)+1)*18), by=270; ctx.fillStyle='rgba(0,0,0,.25)'; ctx.fillRect(bx,by+5,14,2); ctx.fillStyle='#f2efe6'; ctx.fillRect(bx,by,14,5);
+    ctx.fillStyle='rgba(170,200,230,.45)'; for(let i=0;i<14;i++){const k=Math.floor(time/500+i*.37), ph=((time/500+i*.37)%1), rx=(i*23+k*17)%160+2, ry=(rx<72?248:268)+(i*13+k*7)%8, r=1+ph*3; ctx.fillRect(rx-r,ry,r*2,1)}
+    // the freighters anchored out in the bay (they're always there)
+    const ship=(x,y,len,cols)=>{const b=Math.round(Math.sin(time/1400+x)*.6); ctx.fillStyle='rgba(0,0,0,.25)'; ctx.fillRect(x+1,y+6+b,len,2);
+      ctx.fillStyle='#2b2f3a'; ctx.fillRect(x,y+1+b,len,5); ctx.fillStyle='#8a2a22'; ctx.fillRect(x+1,y+5+b,len-2,1); ctx.fillRect(x+len,y+3+b,1,2);
+      cols.forEach((c,i)=>{ctx.fillStyle=c; ctx.fillRect(x+3+i*4,y-2+b,4,3)});
+      ctx.fillStyle='#e8eef0'; ctx.fillRect(x+len-7,y-5+b,5,6); ctx.fillStyle='#ffe9a8'; ctx.fillRect(x+len-6,y-4+b,1,1); ctx.fillRect(x+len-4,y-4+b,1,1);
+      if(Math.floor(time/900+x)%2){ctx.fillStyle='#ff3b3b'; ctx.fillRect(x+len-5,y-7+b,1,1)}};
+    ship(4,254,36,['#c8322b','#2f6db0','#e8a020','#2f8a4a','#c8322b','#5fa8e8']); ship(104,270,42,['#2f8a4a','#e8a020','#c8322b','#2f6db0','#e8a020','#8a5a9a','#2f6db0']);
+    {const bx=Math.round(8+(Math.sin(time/5000)+1)*20), by=266; ctx.fillStyle='rgba(0,0,0,.25)'; ctx.fillRect(bx,by+5,14,2); ctx.fillStyle='#f2efe6'; ctx.fillRect(bx,by,14,5);
       ['#e54b4b','#f4a03a','#f4d35e','#4fbf73','#5fa8e8'].forEach((c,i)=>{ctx.fillStyle=c; ctx.fillRect(bx+2+i*2,by-2,2,2)}); ctx.fillStyle='#ffe9a8'; ctx.fillRect(bx+3,by+1,8,1)}
     ctx.fillStyle='#7d8694'; ctx.fillRect(150,170,1,10); if(Math.floor(time/700)%2){ctx.fillStyle='#ff3b3b'; ctx.fillRect(149,170,3,2)}   // antenna
     if(have.city){ // the cookie signal, up on the clouds

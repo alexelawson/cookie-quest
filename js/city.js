@@ -13,7 +13,6 @@ const LOOSE_BEAM=R(96,128,8,34);          // the beam lying on roof A before Joh
 const FUSE={x:312,y:100};   // just past the last searchlight column
 const SKYLIGHT=R(462,40,24,16);
 const LADDER=R(10,166,22,14);
-const STAIRS=R(488,148,20,16);              // a rooftop stairwell on the last roof: the way out at the end
 const STRANGER={x:44,y:62};
 // tripwires (invisible unless you ping the sonar): [x1,y1,x2,y2]
 const LASERS=[
@@ -84,7 +83,7 @@ const OUTFIT_LOOK={
   vikings:{top:'jersey', pants:'#ffc62f', boots:'#f2f2ee', head:'helmet'},
   disco:  {top:'disco', pants:'#f2efe6', boots:'#e8b04a', head:'afro', flare:true},
   avant:  {top:'avant', pants:'#1d1d22', boots:'#f2f2ee', head:'beret', flare:true},
-  cupcake:{top:'cupcake', pants:'#e8c08a', boots:'#e54b7a', head:'frosting'},
+  cupcake:{top:'cupcake', pants:'#f2efe6', boots:'#e54b7a', head:'frosting'},
 };
 const heroLook=()=>OUTFIT_LOOK[have.outfit]||OUTFIT_LOOK.cape;
 function drawHero(c,g=ctx,look=heroLook()){
@@ -101,7 +100,10 @@ function drawHero(c,g=ctx,look=heroLook()){
   else if(L.top==='sweater'){F('#c8322b',1,7,10,6); F('#2f8a4a',1,9,10,1); F('#2f8a4a',1,12,10,1); F('#ffffff',3,8,1,1); F('#ffffff',6,8,1,1); F('#ffffff',9,8,1,1); F('#ffffff',4,10,1,1); F('#ffffff',8,10,1,1); F('#f4d35e',6,10,1,2)}
   else if(L.top==='jersey'){F('#4f2683',1,7,10,6); F('#ffc62f',1,7,2,2); F('#ffc62f',9,7,2,2); F('#ffffff',5,9,2,3); F('#ffc62f',1,12,10,1)}   // purple jersey, gold shoulders, a white number
   else if(L.top==='avant'){F('#1d1d22',2,6,8,7); F('#1d1d22',3,5,6,1); F('#f2f2ee',-1,5,5,5); F('#d9d9d4',-1,9,5,1); F('#1d1d22',10,8,1,5); F('#f2f2ee',3,12,6,1)}   // turtleneck, one huge white shoulder
-  else if(L.top==='cupcake'){F('#f4a6c8',1,6,10,3); F('#e8c08a',2,9,8,4); for(let xx=2;xx<10;xx+=2)F('#c9985a',xx,9,1,4); F('#f4a6c8',0,8,1,3); F('#f4a6c8',11,8,1,3)}   // frosting top, striped wrapper
+  else if(L.top==='cupcake'){   // a big pleated cupcake wrapper from the chest to the knees, little arms poking out
+    for(let yy=7;yy<16;yy++){const inset=Math.floor((yy-7)/3); F('#e0b46a',-1+inset,yy,14-inset*2,1)}
+    for(let xx=0;xx<12;xx+=2)F('#b8863e',xx+(xx>5?0:0),8,1,8); F('#f2d49a',-1,7,14,1); F('#b8863e',1,15,10,1);
+    F('#f0c6a0',-2,9,1,3); F('#f0c6a0',13,9,1,3)}
   else if(L.top==='disco'){F('#f2efe6',1,7,10,6); F('#e8742a',4,7,4,4); F('#f2efe6',5,8,2,3); F('#ffd84d',5,10,2,1); F('#d9d3c4',1,9,1,4); F('#d9d3c4',10,9,1,4)}   // white suit, orange wide collar, gold chain
   else {F(L.top,2,7,8,7); F(L.top,1,8,1,4); F(L.top,10,8,1,4)}
   if(L.belt)F(L.belt,2,12,8,1);
@@ -126,13 +128,16 @@ function drawHero(c,g=ctx,look=heroLook()){
     if(c.dir==='left'){F('#1d1d22',2,3,2,2)}
     if(c.dir==='right'){F('#1d1d22',8,3,2,2)}
     return }
-  if(L.head==='frosting'){ F('#f4a6c8',1,-3,10,5); F('#f8c4da',2,-4,8,2); F('#f4a6c8',3,-5,6,1);   // a big swirl of frosting
-    for(const [sx,sy,col] of [[2,-3,'#4fbf73'],[5,-4,'#5fa8e8'],[8,-2,'#f4d35e'],[4,-1,'#ffffff'],[9,-4,'#e54b4b']])F(col,sx,sy,1,1);
-    F('#c8322b',5,-7,2,2); F('#2f8a4a',6,-8,1,1);   // cherry on top
+  if(L.head==='frosting'){   // a giant swirl of pink frosting all around the face, sprinkles, cherry on top
+    const P1='#f39ac0', P2='#fcc9de';
+    F(P1,-1,3,14,5); F(P1,0,0,12,4); F(P1,2,-3,8,3); F(P1,4,-5,4,2);
+    F(P2,1,1,4,1); F(P2,3,-2,3,1); F(P2,5,-4,2,1); F(P2,0,5,3,1); F(P2,9,4,3,1);
+    for(const [sx,sy,col] of [[1,4,'#4fbf73'],[10,2,'#5fa8e8'],[3,-2,'#f4d35e'],[8,-3,'#ffffff'],[11,6,'#e54b4b'],[0,1,'#5fa8e8'],[6,-4,'#4fbf73']])F(col,sx,sy,1,1);
+    F('#c8322b',5,-8,3,3); F('#e85a50',5,-8,1,1); F('#2f8a4a',7,-10,1,2);   // cherry
     if(c.dir==='up')return;
-    if(c.dir==='down'){F(eye,4,4,1,1); F(eye,7,4,1,1); F('#b5654f',5,6,2,1); F('#f2a7a0',3,5,1,1); F('#f2a7a0',8,5,1,1)}
-    if(c.dir==='left'){F(eye,3,4,1,1)}
-    if(c.dir==='right'){F(eye,8,4,1,1)}
+    if(c.dir==='down'){F(skin,3,2,6,5); F(eye,4,4,1,1); F(eye,7,4,1,1); F('#b5654f',5,6,2,1); F('#f2a7a0',3,5,1,1); F('#f2a7a0',8,5,1,1)}
+    if(c.dir==='left'){F(skin,2,2,5,5); F(eye,3,4,1,1); F('#b5654f',3,6,1,1)}
+    if(c.dir==='right'){F(skin,5,2,5,5); F(eye,8,4,1,1); F('#b5654f',8,6,1,1)}
     return }
   if(L.head==='afro'){ F('#4a2e1c',0,-3,12,7); F('#5a3a22',1,-4,10,2); F('#4a2e1c',0,3,2,3); F('#4a2e1c',10,3,2,3);               // big 70s hair
     if(c.dir==='up'){F('#4a2e1c',1,0,10,7); return}
@@ -165,7 +170,7 @@ function openWardrobe(then,mode='heist',fromSettings=false){   // mode 'look' = 
   $('wardTitle').textContent=look?ALEX_WELCOME.lookTitle:W.title; $('wardIntro').textContent=fromSettings?W.changeIntro:look?ALEX_WELCOME.lookIntro:W.intro; $('wardGo').textContent=look?ALEX_WELCOME.lookGo:W.go;
   const render=()=>{ $('outfits').querySelectorAll('.outfit').forEach(b=>b.classList.toggle('on',b.dataset.id===pick)); $('wardLine').textContent=list.find(o=>o.id===pick).line };
   $('outfits').replaceChildren(...list.map(o=>{const b=document.createElement('button'); b.className='outfit'; b.dataset.id=o.id;
-    const cv=document.createElement('canvas'); cv.width=14; cv.height=24; const who={x:7,y:23,dir:'down',moving:false,step:0};
+    const cv=document.createElement('canvas'); cv.width=16; cv.height=29; const who={x:8,y:28,dir:'down',moving:false,step:0};
     if(o.id==='jersey')drawJoeJersey(who,cv.getContext('2d')); else drawHero(who,cv.getContext('2d'),OUTFIT_LOOK[o.id]);
     const sp=document.createElement('span'); sp.textContent=o.name; b.append(cv,sp); b.onclick=()=>{pick=o.id; render()}; return b}));
   $('wardGo').onclick=()=>{ $('wardrobe').hidden=true; have[key]=pick; save(); paused=false; then&&then() };
@@ -357,6 +362,33 @@ function drawJumpEmotes(){
     F(c,x,y,2,1); F(c,x,y,1,2); F(c,x+4,y,2,1); F(c,x+5,y,1,2); F(c,x,y+5,2,1); F(c,x,y+4,1,2); F(c,x+4,y+5,2,1); F(c,x+5,y+4,1,2);
     if(on){F('#9fd2f0',J.x-8,J.y-20,2,3); F('#9fd2f0',J.x-7,J.y-21,1,1)} }                                                  // and a sweat drop
 }
+// ---------- the way home: Lars lugs the crate to the grate, John rolls his eyes, down they go ----------
+const EXIT={WALK:3200, FROM:{x:474,y:116}, TO:{x:474,y:66}};
+function heistExit(){
+  const L=heist.crew.find(c=>c.id==='lars'), J=heist.crew.find(c=>c.id==='john'), H=heist.crew.find(c=>c.id==='hero');
+  heist.lead=0; Object.assign(H,{x:452,y:92,dir:'right'}); Object.assign(J,{x:496,y:96,dir:'left'}); Object.assign(L,{x:EXIT.FROM.x,y:EXIT.FROM.y,dir:'up'});
+  P.x=H.x; P.y=H.y; P.dir='right'; buildCrewBar&&buildCrewBar();
+  heist.exit={t:0}; paused=true; prompt.hidden=true;
+}
+function exitTick(dt){
+  const e=heist.exit; if(!e)return; e.t+=dt; const L=heist.crew.find(c=>c.id==='lars'), J=heist.crew.find(c=>c.id==='john');
+  const u=Math.min(1,e.t/EXIT.WALK); L.x=EXIT.FROM.x+Math.sin(e.t/180)*2; L.y=EXIT.FROM.y+(EXIT.TO.y-EXIT.FROM.y)*u; L.dir='up';   // staggering under the weight
+  L.moving=u<1; L.t=(L.t||0)+dt; if(L.t>220){L.t=0; L.step++}
+  if(J){J.x=496+(L.x-496)*.2; J.y=EXIT.FROM.y-20+(EXIT.TO.y-EXIT.FROM.y)*u*.6; J.dir='left'}
+  if(e.t>=EXIT.WALK&&!e.talked){ e.talked=true; L.moving=false; say(HEIST.exitLines,()=>{ e.down=true; e.downT=0 }) }
+  if(e.down){ e.downT+=dt; if(e.downT>500){ heist.exit=null; goTo('world','fromCity') } }
+}
+function drawExit(){
+  const e=heist.exit; if(!e)return; const L=heist.crew.find(c=>c.id==='lars'), J=heist.crew.find(c=>c.id==='john'), F=(c,x,y,w,h)=>{ctx.fillStyle=c;ctx.fillRect(Math.round(x),Math.round(y),w,h)};
+  if(!e.down){ const cx=L.x-9, cy=L.y-36+(L.moving&&L.step%2?1:0);   // the crate, held over his head
+    F('#6a4224',cx,cy,18,11); F('#8a5a34',cx+1,cy+1,16,9); F('#6a4224',cx+1,cy+5,16,1); F('#6a4224',cx+5,cy+1,1,9); F('#6a4224',cx+12,cy+1,1,9);
+    pixText(ctx,'CHOC',cx+2,cy+3,'#efe2c4'); F('#f3cba8',L.x-6,L.y-25,2,3); F('#f3cba8',L.x+4,L.y-25,2,3);   // arms up
+    if(Math.floor(time/250)%2){F('#9fd2f0',L.x-9,L.y-20,1,2); F('#9fd2f0',L.x+8,L.y-22,1,2)} }   // sweat
+  if(J){ const bx=J.x-6, by=J.y-34;   // John's eye-roll
+    F('#ffffff',bx,by,13,8); F('#ffffff',bx+2,by+8,2,2); F('#2b2b2b',bx+1,by+2,4,4); F('#ffffff',bx+2,by+3,2,2); F('#2b2b2b',bx+7,by+2,4,4); F('#ffffff',bx+8,by+3,2,2);
+    const up=Math.floor(time/400)%2; F('#2b2b2b',bx+2+up,by+3,1,1); F('#2b2b2b',bx+8+up,by+3,1,1) }
+  if(e.down){ ctx.fillStyle=`rgba(0,0,0,${Math.min(.8,e.downT/600)})`; ctx.fillRect(SKYLIGHT.x-30,SKYLIGHT.y-10,SKYLIGHT.w+60,90) }
+}
 function liftBeam(){
   have.heistStage=1; save(); heist.beamAnim=600; say([['John',HEIST.beamDone]]);
 }
@@ -403,7 +435,6 @@ const nearCrew=(z,id)=>heist.crew.some(c=>(!id||c.id===id)&&hit(R(c.x-4,c.y-3,8,
 function heistTrigger(){
   const feet=R(P.x-4,P.y-3,8,4), st=heistStage();
   if(hit(feet,LADDER))return {label:HEIST.climbDown, act:()=>goTo('world','fromCity')};
-  if(hit(feet,R(STAIRS.x-2,STAIRS.y+STAIRS.h,STAIRS.w+4,9)))return {label:HEIST.stairsDown, act:()=>goTo('world','fromCity')};
   if(Math.hypot(P.x-STRANGER.x,P.y-STRANGER.y)<16)return {label:'Talk to the stranger', btn:'Talk', act:()=>{
     if(have.city)return say([[HEIST.stranger,HEIST.after]]);
     if(st>=5)return showReward('city');
@@ -441,7 +472,7 @@ const darkMask=document.createElement('canvas'); darkMask.width=VW; darkMask.hei
 SCENES.city={
   w:CW, h:CH, bounds:R(0,0,CW,CH), bg:cityBg, triggers:[],
   get walk(){ return [ROOF_A,ROOF_B,ROOF_C,PLANK_BC,LADDER,...(heistStage()>=1?[BEAM_SLOT]:[])] },
-  get solids(){ return [R(24,40,16,10),R(230,160,16,10),R(170,32,10,10),R(FUSE.x-6,FUSE.y-6,12,6),SKYLIGHT,STAIRS,R(STRANGER.x-4,STRANGER.y-3,8,4),
+  get solids(){ return [R(24,40,16,10),R(230,160,16,10),R(170,32,10,10),R(FUSE.x-6,FUSE.y-6,12,6),SKYLIGHT,R(STRANGER.x-4,STRANGER.y-3,8,4),
     ...(heistStage()<1?[LOOSE_BEAM]:[])] },
   entries:{start:{x:40,y:150,dir:'up'}, fromStreet:{x:40,y:150,dir:'up'}},
   enter(){
@@ -456,7 +487,7 @@ SCENES.city={
   key(code){ const i={Digit1:0,Digit2:1,Digit3:2}[code]; if(i!=null){switchTo(i);return true} if(code==='KeyF'){toggleFollow();return true} return false },
   abilityLabel:()=>HEIST.skills[lead().id],
   ambient(dt){
-    anaTick(dt); jumpTick(dt); if(heist.annoyT>0&&!heist.jump)heist.annoyT-=dt; if(heist.dazeT>0)heist.dazeT-=dt;
+    anaTick(dt); jumpTick(dt); exitTick(dt); if(heist.annoyT>0&&!heist.jump)heist.annoyT-=dt; if(heist.dazeT>0)heist.dazeT-=dt;
     for(const r of cityRain){r.y+=dt*.32;r.x-=dt*.08;if(r.y>CH){r.y=-4;r.x=Math.random()*(CW+40)}}
     for(const c of cars){c.y+=c.v*dt; if(c.y>CH+6)c.y=-6; if(c.y<-6)c.y=CH+6}
     nextFlash-=dt; if(nextFlash<=0){flashT=140; nextFlash=8000+Math.random()*9000} if(flashT>0)flashT-=dt;
@@ -486,15 +517,11 @@ SCENES.city={
     drawBeam(); drawGrate();
   },
   ents(list){
-    list.push({y:STAIRS.y+STAIRS.h,draw:()=>{const s=STAIRS, F=(c,x,y,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,h)};   // stairwell hut with a lit door
-      F('#3a3f50',s.x-1,s.y-4,s.w+2,5); F('#5a5f72',s.x,s.y,s.w,s.h); F('#4a4f60',s.x,s.y+4,s.w,1); F('#ffe9a8',s.x+5,s.y+4,10,12); F('#c9b07a',s.x+10,s.y+4,1,12);
-      ctx.fillStyle='rgba(255,233,168,.15)'; ctx.fillRect(s.x-4,s.y+14,s.w+8,10);
-      F('#1d6b3a',s.x+3,s.y-3,14,7); pixText(ctx,'EXIT',s.x+3,s.y-2,Math.floor(time/600)%2?'#7dff8a':'#5fd070')}});
     heist.crew.forEach((c,i)=>{if(i!==heist.lead)list.push({y:c.y,draw:()=>crewSprite(c)})});
     list.push({y:STRANGER.y,draw:drawStranger});
     if(heistStage()<4)list.push({y:heist.guardY,draw:drawGuard});
   },
-  over(){ drawJumpEmotes();
+  over(){ drawJumpEmotes(); drawExit();
     const st=heistStage();
     // searchlights on roof B
     if(st<2)for(const L of LIGHTS){const l=lightPos(L); ctx.fillStyle='rgba(255,244,190,.35)'; ctx.beginPath(); ctx.ellipse(l.x,l.y,LIGHT_R,LIGHT_R,0,0,Math.PI*2); ctx.fill();

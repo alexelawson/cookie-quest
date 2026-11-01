@@ -22,6 +22,6 @@ function openLarsMenu(){
   showDialog({place:HEIST.place,speaker:'Lars',pages:[HEIST.larsPick],actions:[{label:HEIST.larsReady,fn:()=>{closeDialog(); openAnagrams()}}]});
 }
 function larsGameOver(won){
-  if(won){ have.heistStage=5; save(); say(HEIST.larsLoses,()=>showReward('city')) }
+  if(won){ have.heistStage=5; save(); say(HEIST.larsLoses,()=>showReward('city',heistExit)) }
   else say(HEIST.larsWins,()=>openLarsMenu());
 }

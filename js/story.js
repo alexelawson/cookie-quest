@@ -105,10 +105,11 @@ const HEIST = {
   anagramRematch:"Rematch",
   larsWins:[['Lars',"Ha! Again? New letters this time, if that helps."]],
   larsLoses:[['Lars',"...Best two out of three?"],['John',"No. You carry the chocolate, Lars."]],
+  // after the chocolate: Lars lugs the crate back to the grate, John rolls his eyes, and everyone heads home
+  exitLines:[['Lars',"Who packed this?! It weighs as much as a Viking."],['John',"*rolls eyes* You lost. You carry. Those are the rules."],['Lars',"Best three out of five?"],['John',"Down the grate, Lars."]],
   strangerRematch:"Your friend wants his rematch.",
   after:"The cookie signal's up. The city sleeps easy tonight.",
   climbDown:"Climb down the ladder",
-  stairsDown:"Take the stairs down to the street",
 };
 
 // ---------- The welcome: Alex explains the game when you press Start the first time ----------

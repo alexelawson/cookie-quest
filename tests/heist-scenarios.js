@@ -106,17 +106,15 @@ ok('G real words score, repeats don\'t',r.msgs.slice(1).every(m=>m.includes('+')
 ok('G beat Lars -> chocolate',r.res.startsWith('You win')&&r.lines.join().includes('two out of three')&&r.reward&&r.name==='Chocolate'&&r.st===5,`${r.you} vs ${r.lars}: ${r.res}`);
 if(await p.evaluate(()=>$('reward').hidden)){console.log(R.join('\n'));console.log('stopped before reward', errs);process.exit(1)}
 await p.click('#rewardArt',{force:true}); await p.waitForTimeout(900);
-r=await p.evaluate(()=>({city:!!have.city,basket:$('basket').textContent,hud:$('hud').textContent,paused})); ok('G chocolate in the basket, cookie signal up',r.city&&r.basket.includes('✓ Chocolate')&&!r.paused,r.basket);
-// H. leave by the ladder; crew bar goes away
-r=await p.evaluate(()=>{const w=T.path([[455,180],[360,180],[360,146],[200,146],[200,102],[100,102],[40,160],[20,172]]); update(16.7); const lbl=prompt.textContent; action(); T.run(40); return {w,lbl,world:scene===SCENES.world,bar:$('crewbar').hidden}});
-ok('H walk back and climb down; crew bar hides',r.lbl==='Climb down the ladder'&&r.world&&r.bar,r.w+' '+r.lbl);
+r=await p.evaluate(()=>({city:!!have.city,basket:$('basket').textContent,exit:!!heist.exit})); ok('G chocolate in the basket, then the walk home starts',r.city&&r.basket.includes('✓ Chocolate')&&r.exit,r.basket);
+// H. the way home: Lars lugs the crate to the grate, John rolls his eyes, everyone goes down the grate, back on the main map
+r=await p.evaluate(()=>{const L=heist.crew.find(c=>c.id==='lars'), y0=L.y; for(let i=0;i<220;i++)SCENES.city.ambient(16.7); const y1=L.y, lines=T.clickThrough(); for(let i=0;i<60;i++){SCENES.city.ambient(16.7);update(16.7)}
+  return {y0,y1,lines,world:scene===SCENES.world,bar:$('crewbar').hidden}});
+ok('H Lars carries the crate to the grate, John rolls his eyes, and you land back on the map',r.y1<r.y0-30&&r.lines.join().includes('rolls eyes')&&r.world&&r.bar,r.lines.join(' / '));
 // I. reload mid-heist resumes at the right checkpoint
 await fresh(); await p.evaluate(()=>{have.heistStage=2; have.heistBriefed=true; save()}); await p.reload(); await p.click('#startBtn'); await p.evaluate(()=>skipWelcome()); await p.evaluate(helpers);
 r=await p.evaluate(()=>{T.enter(); const sp=dlg.hidden?'':$('dspeaker').textContent; return {sp,pos:(P.x|0)+','+(P.y|0),onC:hit(R(P.x-1,P.y-1,2,2),ROOF_C)}}); ok('I reload at stage 2 starts on roof C, no briefing',r.sp!=='The Stranger'&&r.onC,r.pos+' '+r.sp);
 // J. checkpoints are safe to stand on
 r=await p.evaluate(()=>{const bad=[]; for(let st=0;st<3;st++){have.heistStage=st; placeAtCheckpoint(); T.clickThrough(); for(let i=0;i<600;i++){update(16.7); if(!dlg.hidden){if($('dspeaker').textContent==='Spotted!'){bad.push(st+': '+$('dtext').textContent); T.clickThrough(); break} T.clickThrough()}}} return bad});
 ok('J standing still at each checkpoint never gets you caught',r.length===0,r.join('; '));
-// K. there's a way out at the far end: the stairwell on the last roof
-r=await p.evaluate(()=>{T.clickThrough(); P.x=STAIRS.x+STAIRS.w/2; P.y=STAIRS.y+STAIRS.h+5; update(16.7); const lbl=prompt.textContent; action(); T.run(40); return {lbl,world:scene===SCENES.world,bar:$('crewbar').hidden}});
-ok('K the stairwell on the last roof takes you back down to the street',r.lbl.includes('stairs')&&r.world&&r.bar,r.lbl);
 console.log(R.join('\n')); console.log('page errors:',errs.length?errs:'none'); await b.close()})();
