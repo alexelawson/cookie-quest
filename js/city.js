@@ -140,11 +140,19 @@ function drawGuard(){
   F('#2c2c34',3,12,2,5); F('#2c2c34',6,12,2,5); F('#5a5f6a',1,6,9,7); F('#e9b98f',3,1,5,5); F('#1c1c22',2,0,7,3);
   if(heist.guardDir>0){F('#2b2b2b',4,3,1,1);F('#2b2b2b',6,3,1,1);F('#c9ced4',8,11,2,3)} else F('#c9ced4',8,6,2,3);
 }
+// the "beam" is a big tree trunk: bark, knots, and a ring-marked cut end
 function drawBeam(){
-  ctx.fillStyle='#7d8694';
-  if(heistStage()>=1){const b=BEAM_SLOT; ctx.fillRect(b.x,b.y+2,b.w,8); ctx.fillStyle='#5f6676'; ctx.fillRect(b.x,b.y+5,b.w,2); for(let x=b.x+3;x<b.x+b.w;x+=6)ctx.fillRect(x,b.y+3,1,6)}
-  else {const b=LOOSE_BEAM; ctx.fillRect(b.x,b.y,b.w,b.h); ctx.fillStyle='#5f6676'; ctx.fillRect(b.x+3,b.y,2,b.h);
-    ctx.fillStyle='#c9d1db'; ctx.fillRect(b.x+1,b.y+((time/30)%(b.h+20))-10,b.w-2,3);          // a glint runs along it
+  const F=(c,x,y,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,h)};
+  if(heistStage()>=1){const b=BEAM_SLOT, y=b.y+1;
+    F('#5a3a22',b.x,y,b.w,10); F('#7a5232',b.x,y+1,b.w,7); F('#8f6440',b.x,y+2,b.w,2);           // bark, lying across the gap
+    for(let x=b.x+2;x<b.x+b.w-3;x+=5)F('#4a2e1a',x,y+((x/5|0)%2?3:5),3,1);                     // bark grain
+    F('#4a2e1a',b.x+14,y+4,2,2);                                                                   // a knot
+    F('#d9b47c',b.x+b.w-3,y+1,3,8); F('#b08a5a',b.x+b.w-2,y+3,1,4); F('#8a6440',b.x+b.w-2,y+5,1,1)}   // cut end with rings
+  else {const b=LOOSE_BEAM;
+    F('#5a3a22',b.x,b.y,b.w,b.h); F('#7a5232',b.x+1,b.y,b.w-2,b.h); F('#8f6440',b.x+2,b.y,2,b.h);
+    for(let y=b.y+3;y<b.y+b.h-3;y+=5)F('#4a2e1a',b.x+((y/5|0)%2?2:4),y,1,3);
+    F('#4a2e1a',b.x+4,b.y+14,2,2); F('#3d8443',b.x+b.w,b.y+20,2,2); F('#4d9a50',b.x+b.w+1,b.y+19,2,1);   // knot, a sprig of needles
+    F('#d9b47c',b.x+1,b.y,b.w-2,3); F('#b08a5a',b.x+3,b.y+1,2,1);                                   // cut end with rings
     // dashed outline across the gap, showing where it'd fit
     const s=BEAM_SLOT, on=(time/300|0)%2; ctx.fillStyle=`rgba(200,215,235,${on?.55:.3})`;
     for(let x=s.x;x<s.x+s.w;x+=6){ctx.fillRect(x,s.y+2,3,1); ctx.fillRect(x,s.y+9,3,1)} ctx.fillRect(s.x,s.y+2,1,8); ctx.fillRect(s.x+s.w-1,s.y+2,1,8)}
@@ -240,7 +248,7 @@ function beamChoice(){
   const H=HEIST;
   showDialog({place:H.place,speaker:'',pages:[H.beamLook],menu:true,actions:[
     {label:H.beamBridge,fn:()=>{ if(lead().id!=='john')return say(H.beamTooHeavy); closeDialog(); liftBeam() }},
-    {label:H.beamCut,fn:()=>say(H.beamCutReply)},
+    {label:H.beamJump,fn:()=>{ closeDialog(); say(H.beamJumpReply) }},
     {label:H.beamLeave,ghost:true,fn:closeDialog}]});
 }
 function liftBeam(){
@@ -255,32 +263,34 @@ function ripGrate(){
   have.heistStage=3; save(); say([['John',HEIST.grateDone]]);
 }
 
-// ---------- the vault: two crates ----------
-const vault={open:false, pinged:false, choc:0};
+// ---------- the vault: three crates and a puzzle (VAULT_PUZZLES in story.js) ----------
+const vault={open:false, puzzle:null, order:[], choc:0};
+const CRATE_POS=['the left crate','the middle crate','the right crate'];
 function openVault(){
-  vault.open=true; vault.pinged=false; vault.choc=Math.random()<.5?0:1;
-  $('vaultTitle').textContent=HEIST.vaultTitle; $('vaultNote').textContent=HEIST.vaultNote; $('vaultPing').textContent=HEIST.vaultPing;
-  drawCrates(); paused=true; prompt.hidden=true; $('vault').hidden=false; setTimeout(()=>$('vaultPing').focus({preventScroll:true}),0);
+  // a different puzzle than last time, shuffled crates
+  const pool=VAULT_PUZZLES.filter(p=>p!==vault.puzzle); vault.puzzle=pool[Math.floor(Math.random()*pool.length)];
+  vault.order=['X','Y','Z'].sort(()=>Math.random()-.5); vault.choc=vault.order.indexOf(vault.puzzle.answer); vault.open=true;
+  const name=k=>CRATE_POS[vault.order.indexOf(k)], fill=t=>{const f=t.replace(/\{([XYZ])\}/g,(_,k)=>name(k)); return f[0].toUpperCase()+f.slice(1)};
+  $('vaultTitle').textContent=HEIST.vaultTitle; $('vaultNote').textContent=HEIST.vaultNote; $('vaultRule').textContent=vault.puzzle.rule;
+  vault.order.forEach((k,i)=>{ $('crateLabel'+i).textContent=fill(vault.puzzle.labels[k]) });
+  $('vaultHint').textContent=HEIST.vaultHint; $('vaultHint').hidden=false; $('vaultHintText').hidden=true; $('vaultHintText').textContent=vault.puzzle.hint;
+  drawCrates(); paused=true; prompt.hidden=true; $('vault').hidden=false; setTimeout(()=>$('crate0').focus({preventScroll:true}),0);
 }
 function drawCrates(){
-  ['crateA','crateB'].forEach((id,i)=>{const c=$(id), g=c.getContext('2d'), F=(col,x,y,w,h)=>{g.fillStyle=col;g.fillRect(x,y,w,h)};
+  [0,1,2].forEach(i=>{const c=$('crateArt'+i), g=c.getContext('2d'), F=(col,x,y,w,h)=>{g.fillStyle=col;g.fillRect(x,y,w,h)};
     g.clearRect(0,0,c.width,c.height);
     F('#8a5a34',2,6,28,22); F('#a26c40',2,6,28,3); F('#6a4224',2,16,28,2); F('#6a4224',2,6,2,22); F('#6a4224',28,6,2,22);
     F('#efe2c4',11,10,10,5); F('#6a4224',12,12,8,1);   // stenciled label
-    if(vault.pinged){ g.globalAlpha=.85;
-      if(i===vault.choc){F('#7fd3ff',7,18,6,8);F('#7fd3ff',14,18,6,8);F('#7fd3ff',21,18,5,8);F('#0d2a3a',7,21,19,1)}
-      else for(let k=0;k<14;k++)F('#7fd3ff',5+(k*7)%22,18+(k*3)%8,2,2);
-      g.globalAlpha=1; }
   });
 }
-function pingVault(){ vault.pinged=true; $('vaultNote').textContent=HEIST.vaultPinged; drawCrates() }
+function vaultHint(){ $('vaultHint').hidden=true; $('vaultHintText').hidden=false }
 function pickCrate(i){
   if(!vault.open)return;
   if(i!==vault.choc){ $('vault').hidden=true; say(HEIST.raisins,()=>{ $('vault').hidden=false; paused=true }); return }
   vault.open=false; $('vault').hidden=true; have.heistStage=4; save();
   say([['',HEIST.gotIt],['',HEIST.villainNote],...HEIST.finale,...HEIST.larsChallenge],()=>openLarsMenu());
 }
-$('vaultPing').onclick=pingVault; $('crateA').parentNode.onclick=()=>pickCrate(0); $('crateB').parentNode.onclick=()=>pickCrate(1);
+$('vaultHint').onclick=vaultHint; [0,1,2].forEach(i=>$('crate'+i).onclick=()=>pickCrate(i));
 
 // ---------- triggers ----------
 const nearCrew=(z,id)=>heist.crew.some(c=>(!id||c.id===id)&&hit(R(c.x-4,c.y-3,8,4),z));
@@ -293,7 +303,7 @@ function heistTrigger(){
     if(st===4)return say([[HEIST.stranger,HEIST.strangerRematch],...HEIST.larsChallenge.slice(1,2)],()=>openLarsMenu());
     if(!have.heistBriefed)return briefing();
     say([[HEIST.stranger,HEIST.strangerAgain]])}};
-  if(st<1&&hit(feet,R(LOOSE_BEAM.x-10,LOOSE_BEAM.y-6,LOOSE_BEAM.w+20,LOOSE_BEAM.h+12)))return {label:'Look at the beam', act:beamChoice};
+  if(st<1&&hit(feet,R(LOOSE_BEAM.x-10,LOOSE_BEAM.y-6,LOOSE_BEAM.w+20,LOOSE_BEAM.h+12)))return {label:'Look at the log', act:beamChoice};
   if(st<2&&hit(feet,R(FUSE.x-10,FUSE.y,20,14)))return {label:HEIST.fuse, act:cutFuse};
   if(st===2&&hit(feet,R(SKYLIGHT.x-4,SKYLIGHT.y+SKYLIGHT.h,SKYLIGHT.w+8,12)))return {label:HEIST.grate, act:ripGrate};
   if(st===3&&hit(feet,R(SKYLIGHT.x-4,SKYLIGHT.y+SKYLIGHT.h,SKYLIGHT.w+8,12)))return {label:HEIST.dropIn, act:openVault};
@@ -339,7 +349,7 @@ SCENES.city={
   key(code){ const i={Digit1:0,Digit2:1,Digit3:2}[code]; if(i!=null){switchTo(i);return true} if(code==='KeyF'){toggleFollow();return true} return false },
   abilityLabel:()=>HEIST.skills[lead().id],
   ambient(dt){
-    anaTick(dt); lgTick(dt);
+    anaTick(dt);
     for(const r of cityRain){r.y+=dt*.32;r.x-=dt*.08;if(r.y>CH){r.y=-4;r.x=Math.random()*(CW+40)}}
     for(const c of cars){c.y+=c.v*dt; if(c.y>CH+6)c.y=-6; if(c.y<-6)c.y=CH+6}
     nextFlash-=dt; if(nextFlash<=0){flashT=140; nextFlash=8000+Math.random()*9000} if(flashT>0)flashT-=dt;

@@ -6,10 +6,11 @@ const GOLF={
   AIM_SPAN:.6, AIM_PERIOD:1600,                      // drive aim sweeps +-0.6 rad
   PUTT_SPAN:.32, PUTT_PERIOD:2100,                   // putt aim sweeps slower and narrower
   POWER_PERIOD:1300, PUTT_POWER_PERIOD:1700,
-  CHAINS:6, PUTT_CHAINS:7.5, TREE_R:6, FADE:.35, SPEED:.22, MAX_STROKES:7,
+  CHAINS:6, PUTT_CHAINS:7.5, TREE_R:6, TREE_HIT:1.6, TREE_NUDGE:.18,   // trees: only a hit within 1.6px of dead center stops the disc; closer passes get nudged around
+  FADE:.35, SPEED:.22, MAX_STROKES:7,
   PLATFORM:1.3, HIKE:.75, HIKE_WILD:.22,            // platform throws go 30% farther; hikes go 75% as far, +-0.11 rad wild
   // opponents' score on each hole relative to par (chances). Margie's the better player.
-  MARGIE:{'-1':.50,'0':.45,'1':.05},     // simulated over 5 holes: careful + average timing wins ~47%, sloppy ~24%
+  MARGIE:{'-1':.60,'0':.37,'1':.03},     // simulated: sharp timing wins ~84%, average ~59%, sloppy ~36%
   JACK:{'-1':.10,'0':.45,'1':.35,'2':.10},
 };
 const GW=224, GH=168, GOLF_OB=R(4,8,216,156);
@@ -96,14 +97,17 @@ const inWater=(h,x,y)=>h.water.some(w=>((x-w.x)/w.rx)**2+((y-w.y)/w.ry)**2<=1);
 function throwMode(){const h=golfHole(); if(golf.strokes>0||golf.lie.x!==h.tee.x||golf.lie.y!==h.tee.y)return ''; return h.platform?'platform':h.hike?'hike':''}
 function golfFlight(h,lie,angle,power,putt,mode=''){
   const mult=mode==='platform'?GOLF.PLATFORM:mode==='hike'?GOLF.HIKE:1;
-  const D=Math.max(8,power*(putt?GOLF.PUTT_MAX:GOLF.MAX)*mult), path=[]; let x=lie.x,y=lie.y,a=angle;
+  const D=Math.max(8,power*(putt?GOLF.PUTT_MAX:GOLF.MAX)*mult), path=[], passed=new Set(); let x=lie.x,y=lie.y,a=angle;
   for(let s=0;s<=D;s+=1){
     if(!putt&&mode!=='hike'){const f=s/D; if(f>.72)a-=GOLF.FADE/(D*.28)}    // backhand fade at the end
     x+=Math.cos(a); y+=Math.sin(a); path.push({x,y});
     const db=Math.hypot(x-h.basket.x,y-h.basket.y);
     if(db<(putt?GOLF.PUTT_CHAINS:GOLF.CHAINS)&&(putt||s>D*.55))return {path,end:{x:h.basket.x,y:h.basket.y},result:'in'};
-    if(!(mode==='platform'&&s<D*.5))for(const [tx,ty] of h.trees)if(Math.hypot(x-tx,y-ty+3)<GOLF.TREE_R){
-      const bx=x-Math.cos(a)*4, by=y-Math.sin(a)*4; path.push({x:bx,y:by}); return {path,end:{x:bx,y:by},result:'tree'}}
+    // trees: a dead-center hit stops the disc; anything else glances off and curves around the trunk
+    if(!(mode==='platform'&&s<D*.5))for(const [tx,ty] of h.trees){ const cy=ty-3; if(passed.has(tx+','+ty)||Math.hypot(x-tx,y-cy)>=GOLF.TREE_R)continue;
+      passed.add(tx+','+ty); const side=Math.cos(a)*(cy-y)-Math.sin(a)*(tx-x);   // how far the trunk is from the disc's line (+ = to the right)
+      if(Math.abs(side)<GOLF.TREE_HIT){ const bx=x-Math.cos(a)*4, by=y-Math.sin(a)*4; path.push({x:bx,y:by}); return {path,end:{x:bx,y:by},result:'tree'} }
+      a-=Math.sign(side)*GOLF.TREE_NUDGE }
     if(x<GOLF_OB.x||y<GOLF_OB.y||x>GOLF_OB.x+GOLF_OB.w||y>GOLF_OB.y+GOLF_OB.h)return {path,end:{x,y},result:'ob'};
   }
   return {path,end:{x,y},result:inWater(h,x,y)?'water':'land'};

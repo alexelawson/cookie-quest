@@ -14,8 +14,9 @@ For live reload while editing: `python3 -m http.server` and visit http://localho
 | `js/kitchen.js` | Kitchen interior scene; baking starts at the counter, recipe card on the fridge |
 | `js/city.js` | The chocolate heist: crew switching (you/Lars/John), sonar, sprint, lift, searchlights, guard, lasers, vault, cookie signal |
 | `js/portraits.js` | Faces shown beside dialog text, one painter per speaker name |
-| `js/larsgames.js` | Pick-a-game menu at the end of the heist, quick draw, darts, and the how-to-play card. Difficulty in `QUICKDRAW` and `DARTS` |
-| `js/anagrams.js` | Anagrams vs. Lars: letter sets + accepted words, scoring, Lars's difficulty in `ANAGRAM.LARS` |
+| `js/larsgames.js` | Lars's anagram challenge at the end of the heist, and the crew's how-to-play card |
+| `js/anagrams.js` | Anagrams vs. Lars: 14 letter sets (one picked at random each game) + accepted words, scoring, Lars's difficulty in `ANAGRAM.LARS` |
+| `js/story.js` → `VAULT_PUZZLES` | The vault's logic puzzles (and an inside-joke one). Add your own: a rule, three labels, the right answer. Crates get shuffled every time |
 | `js/golf.js` | Wylee Woods Disc Golf: 5 holes vs Jack and Margie (incl. a platform tee and a hike-it-through-your-legs hole) for the milk. Holes in `HOLES`, difficulty in `GOLF` |
 | `js/birkie.js` | The Birkie: John (brown hair, reading glasses) at the trailhead sends you off; guide the Vikings from Cable to Main Street, Hayward (pole in rhythm, tuck, snowplow, feed stations) for the flour. Course in `BIRK_SECTIONS`, difficulty in `BIRK` |
 | `js/fargo.js` | Fargo: drive the CR-V, find the cheapest gas, Bob's $30.00 pump, then the snack stop for Alex. Car color in `CAR_COLOR`, fuel/speeds in `FUEL` |
@@ -59,7 +60,7 @@ The cupcake is behind the barn, in the middle. Its frosting peeks up over the ro
 Bob's station (always $2.79) moves each attempt. Alex wants ginger ale + Mott's berry gummies. Two wrong picks and she sends you back outside.
 
 ## Spoilers: the heist
-Switch to John to lift the beam. Set the crew to Hold, switch to Lars, and sprint through a gap in the searchlights to the fuse box. On the last roof, wait for the guard to walk away, ping sonar, and follow the gaps in the lasers: bottom row left of center, middle row on the right, top row in the middle. Switch to John for the grate. In the vault, ping sonar: the chocolate is the crate with bars. Then beat Lars at a game of your choice: anagrams (he scores ~4,000-5,500), quick draw (he reacts in ~0.25s), or darts.
+Switch to John to lift the log (or let Lars try to long-jump it first, for fun). Set the crew to Hold, switch to Lars, and sprint through a gap in the searchlights to the fuse box. On the last roof, wait for the guard to walk away, ping sonar, and follow the gaps in the lasers: bottom row left of center, middle row on the right, top row in the middle. Switch to John for the grate. In the vault, solve the label puzzle (Lars gives a hint). Then beat Lars at anagrams (he usually scores ~3,600).
 
 ## Rewards
 Finishing a land shows a pop-up with the item's pixel art; tapping it flies it into the basket. Add the art for a new item to `ART` and its text to `REWARDS` in `js/ui.js`, then call `showReward('key')`.

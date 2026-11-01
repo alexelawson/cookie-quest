@@ -135,13 +135,20 @@ canvas{border-radius:6px}
 .crewbar .follow[aria-pressed="true"]{border-color:var(--berry);background:rgba(212,71,60,.3)}
 .crewbar button:focus-visible{outline:3px solid var(--berry);outline-offset:2px}
 /* heist: the vault */
-.vault{position:absolute;inset:0;z-index:6;display:flex;align-items:center;justify-content:center;background:rgba(8,9,16,.6);padding:10px;border-radius:6px}
-.vcard{background:#1d2130;color:var(--paper);border:3px solid #4d5a78;border-radius:8px;padding:10px 14px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;width:min(100%,320px);box-shadow:0 10px 30px rgba(0,0,0,.5);animation:rin .25s ease-out}
+.vault{position:absolute;inset:0;z-index:6;display:flex;align-items:safe center;justify-content:center;overflow-y:auto;background:rgba(8,9,16,.6);padding:4px;border-radius:6px}
+.vcard{background:#1d2130;color:var(--paper);border:3px solid #4d5a78;border-radius:8px;padding:8px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;margin:auto 0;text-align:center;width:min(100%,320px);box-shadow:0 10px 30px rgba(0,0,0,.5);animation:rin .25s ease-out}
 .vcard small{font-family:var(--pixel);font-size:.85rem;color:var(--gold);letter-spacing:.06em;text-transform:uppercase}
 .vcard p{margin:0;font-size:.88rem;line-height:1.35}
-.crates{display:flex;gap:10px}
-.crate{display:flex;flex-direction:column;align-items:center;gap:2px;background:#2a3044;border:2px solid #4d5a78;border-radius:6px;padding:6px 10px;cursor:pointer;color:var(--paper);font-family:var(--pixel);font-size:.8rem}
-.crate canvas{width:64px;height:60px;image-rendering:pixelated;image-rendering:crisp-edges}
+.crates{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;width:100%}
+.crate{display:flex;flex-direction:column;align-items:center;gap:2px;background:#2a3044;border:2px solid #4d5a78;border-radius:6px;padding:4px 4px;cursor:pointer;color:var(--paper);font-family:inherit;min-width:0}
+.crate b{font-family:var(--pixel);font-size:.8rem;color:var(--gold);font-weight:normal}
+.crate span{font-size:.7rem;line-height:1.2;background:#efe2c4;color:#2b2118;border-radius:3px;padding:4px 5px;width:100%;box-sizing:border-box}
+.crate canvas{width:28px;height:26px;image-rendering:pixelated;image-rendering:crisp-edges}
+.vcard .btn.ghost{color:var(--paper);border-color:#4d5a78}
+.vrule{font-style:italic;color:var(--gold)}
+.vcard #vaultNote{font-size:.8rem}
+.vcard .btn{padding-top:4px;padding-bottom:4px}
+.vhint{font-size:.82rem!important;color:#cfd6e6}
 .crate:hover,.crate:focus-visible{border-color:var(--gold);outline:none}
 
 /* speaker portrait beside dialog text */
@@ -184,16 +191,3 @@ canvas{border-radius:6px}
 .howto ul{margin:0;padding-left:1.1em;font-size:.85rem;line-height:1.35;display:flex;flex-direction:column;gap:3px;color:#cdd5e6}
 .crewbar .help{padding:6px 12px;font-weight:600}
 /* Lars's games */
-.lgame{position:absolute;left:6px;right:6px;top:3%;z-index:7;display:flex;justify-content:center}
-.lgscore{font-family:var(--pixel);font-size:.95rem!important;color:var(--gold)}
-.qd{display:grid;grid-template-columns:64px 1fr 64px;gap:8px;align-items:center}
-.qd canvas{width:64px;height:64px;image-rendering:pixelated;image-rendering:crisp-edges;border-radius:6px;border:2px solid #4d5a78}
-.qsign{font-family:var(--pixel);font-size:1rem;text-align:center;line-height:1.3;min-height:3.9em;display:flex;align-items:center;justify-content:center;border-radius:6px;background:#11141f;padding:6px}
-.qsign.draw{font-size:2rem;color:#11141f;background:var(--gold)}
-.qsign.early,.qsign.lose{color:#ff8a7a}
-.qsign.win{color:#8cff8c}
-.darts{display:flex;justify-content:center}
-.darts canvas{width:240px;height:240px;max-width:100%;image-rendering:pixelated;image-rendering:crisp-edges;background:#11141f;border-radius:50%}
-.bigbtn{font-size:1.2rem;padding:12px;touch-action:none;user-select:none;-webkit-user-select:none}
-#lgEnd{display:flex;flex-direction:column;gap:8px}
-#lgEnd[hidden]{display:none}

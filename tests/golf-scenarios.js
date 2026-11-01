@@ -38,11 +38,15 @@ r=await p.evaluate(()=>{golf.state='aim'; return 1});
 // hazards: tree, water, out of bounds
 r=await p.evaluate(()=>{const h=HOLES[2]; const water=golfFlight(h,h.tee,0,.6,false); const ob=golfFlight(h,h.tee,Math.PI/2,1,false); const h1=HOLES[0]; const t=h1.trees[0]; const toTree=golfFlight(h1,h1.tee,Math.atan2(t[1]-3-h1.tee.y,t[0]-h1.tee.x),1,false); return {water:water.result,ob:ob.result,tree:toTree.result}});
 ok('C water, out of bounds and trees all do their thing',r.water==='water'&&r.ob==='ob'&&r.tree==='tree',JSON.stringify(r));
+r=await p.evaluate(()=>{const h=HOLES[0], t=h.trees[0], tee=h.tee, d=Math.hypot(t[0]-tee.x,t[1]-3-tee.y), base=Math.atan2(t[1]-3-tee.y,t[0]-tee.x);
+  const at=off=>{const f=golfFlight(h,tee,base+off/d,1,false); return f.result+(f.result!=='tree'?'':' at '+Math.round(f.end.x)+','+Math.round(f.end.y))};
+  return {center:at(0), slight:at(.8), close:at(3), closeOther:at(-3), edge:at(5)}});
+ok('C trees: dead center stops the disc, close passes glance around it',r.center.startsWith('tree')&&r.slight.startsWith('tree')&&!r.close.startsWith('tree')&&!r.closeOther.includes('tree at 6')&&!r.edge.startsWith('tree'),JSON.stringify(r));
 // water costs a stroke and you throw again from the same spot
 r=await p.evaluate(()=>{golf.hole=2; golfStartHole(); T.through(); const before={...golf.lie}; golfTap(); golf.angle=0; golfTap(); golf.flight=golfFlight(HOLES[2],golf.lie,0,.6,false); golf.flight.i=0; for(let i=0;i<200&&golf.state==='flight';i++)update(16.7);
   return {strokes:golf.strokes, same:golf.lie.x===before.x&&golf.lie.y===before.y, msg:golf.msg}});
 ok('C landing in the pond: penalty stroke, rethrow from the same spot',r.strokes===2&&r.same&&r.msg.includes('Splash'),JSON.stringify(r));
-r=await p.evaluate(()=>{const L=HOLES[1], hk=HOLES[3]; const a=Math.atan2(L.basket.y-L.tee.y,L.basket.x-L.tee.x);
+r=await p.evaluate(()=>{const L=HOLES[1], hk=HOLES[3]; const t=L.trees.find(([x,y])=>Math.hypot(x-L.tee.x,y-L.tee.y)<60); const a=Math.atan2(t[1]-3-L.tee.y,t[0]-L.tee.x);   // straight at a tree by the tee
   const plat=golfFlight(L,L.tee,a,1,false,'platform'), flat=golfFlight(L,L.tee,a,1,false,'');
   const ha=Math.atan2(hk.basket.y-hk.tee.y,hk.basket.x-hk.tee.x), hike=golfFlight(hk,hk.tee,ha,1,false,'hike'), norm=golfFlight(hk,hk.tee,ha,1,false,'');
   golf.hole=3; golfStartHole(); const hint=T.through(); update(16.7); golfTap(); update(16.7); const lab=$('alabel').textContent, facing=P.dir; golf.state='aim';

@@ -56,11 +56,14 @@
       <div class="vcard">
         <small id="vaultTitle"></small>
         <p id="vaultNote"></p>
+        <p class="vrule" id="vaultRule"></p>
         <div class="crates">
-          <button class="crate" aria-label="Left crate"><canvas id="crateA" width="32" height="30"></canvas><span>Left crate</span></button>
-          <button class="crate" aria-label="Right crate"><canvas id="crateB" width="32" height="30"></canvas><span>Right crate</span></button>
+          <button class="crate" id="crate0"><canvas id="crateArt0" width="32" height="30"></canvas><b>Left</b><span id="crateLabel0"></span></button>
+          <button class="crate" id="crate1"><canvas id="crateArt1" width="32" height="30"></canvas><b>Middle</b><span id="crateLabel1"></span></button>
+          <button class="crate" id="crate2"><canvas id="crateArt2" width="32" height="30"></canvas><b>Right</b><span id="crateLabel2"></span></button>
         </div>
-        <button class="btn" id="vaultPing"></button>
+        <button class="btn ghost" id="vaultHint"></button>
+        <p class="vhint" id="vaultHintText" hidden></p>
       </div>
     </div>
     <div class="anagram" id="anagram" hidden role="dialog" aria-labelledby="anaTitle">
@@ -84,21 +87,6 @@
       <div id="howRows"></div>
       <ul id="howControls"></ul>
       <button class="btn" id="howOk"></button>
-    </div>
-    <div class="lgame" id="lgame" hidden role="dialog" aria-labelledby="lgTitle">
-      <div class="acard">
-        <div class="ahead"><h3 id="lgTitle"></h3></div>
-        <p class="lgscore" id="lgScore"></p>
-        <p id="lgMsg" aria-live="polite"></p>
-        <div id="lgDraw" hidden class="qd">
-          <canvas id="qdYou" width="32" height="32"></canvas>
-          <div class="qsign" id="qdSign" aria-live="assertive"></div>
-          <canvas id="qdLars" width="32" height="32"></canvas>
-        </div>
-        <div id="lgDarts" hidden class="darts"><canvas id="dartboard" width="140" height="140"></canvas></div>
-        <button class="btn bigbtn" id="lgBtn"></button>
-        <div id="lgEnd" hidden><p class="aresult" id="lgResult"></p><button class="btn" id="lgNext"></button></div>
-      </div>
     </div>
     <div class="titlecard" id="titlecard">
       <small>A Christmas game</small>
