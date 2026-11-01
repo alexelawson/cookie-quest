@@ -109,7 +109,7 @@ canvas{border-radius:6px}
 .shophead b{font-weight:600;font-variant-numeric:tabular-nums}
 .shophead .pips i{border-color:var(--ink)}
 .alexrow{display:flex;gap:10px;align-items:center}
-.alexrow canvas{width:60px;height:60px;image-rendering:pixelated;image-rendering:crisp-edges;flex:none;background:#e3d6bd;border-radius:6px}
+.alexrow canvas{width:80px;height:80px;image-rendering:pixelated;image-rendering:crisp-edges;flex:none;background:#e3d6bd;border-radius:6px}
 .alexrow p{margin:0;background:#fff;border:2px solid var(--ink);border-radius:8px;padding:6px 9px;font-size:.92rem;line-height:1.3;min-width:0;flex:1}
 .case{border-radius:6px;padding:6px;position:relative}
 .fridgecase{background:linear-gradient(#d6ecf5,#bcdcea);border:3px solid #8aa5b2;box-shadow:inset 0 0 0 2px rgba(255,255,255,.6)}

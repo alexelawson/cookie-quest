@@ -138,7 +138,7 @@ function drawAlex(x,y,mood){
   F('#2c2c34',3,13,3,5); F('#2c2c34',6,13,3,5); F('#3b2a1e',2,17,4,2); F('#3b2a1e',6,17,4,2);
   F(coat,2,7,8,7); F(coat,1,8,1,5); F(coat,10,8,1,5); F('#335a42',6,7,1,7);
   F(hair,2,0,8,3); F(hair,1,2,2,10); F(hair,9,2,2,10); F(hairL,2,1,3,1);   // long hair down past the shoulders
-  F(skin,3,2,6,5); F(hair,3,2,6,1);
+  F(skin,3,2,6,5); F(hair,3,2,4,1); F(hair,3,3,1,1);   // side-swept fringe
   F(eye,4,4,1,1); F(eye,7,4,1,1);
   if(mood==='happy'){F('#c0645a',5,6,2,1); F('#f0a39a',3,5,1,1); F('#f0a39a',8,5,1,1)}
   else if(mood==='frown'){F('#8a4a40',5,6,2,1); F('#8a4a40',4,7,1,1); F('#8a4a40',7,7,1,1); F(hair,4,3,1,1); F(hair,7,3,1,1)}
@@ -353,19 +353,45 @@ function giveToAlex(){
 function closeShop(){ shop.open=false; $('shop').hidden=true; paused=false }
 $('giveBtn').onclick=giveToAlex;
 
-// Alex's face for the shop panel (24x24)
+// Alex's face for the shop panel (40x40): long dark brown hair with a side part, brown eyes
 function drawAlexFace(g,mood){
-  const F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};
-  const hair='#3b2416', hairL='#4e3020', skin='#f2c9a5', eye='#5a3a22';
-  F(hair,4,1,16,6); F(hair,2,4,5,20); F(hair,17,4,5,20); F(hairL,6,2,6,1); F(hairL,3,10,1,10); F(hairL,20,12,1,8);
-  F(skin,6,5,12,14); F(skin,7,19,10,2); F(hair,6,5,12,2); F(hair,6,7,3,1);
-  F('#3f6b4f',4,21,16,3); F(skin,10,20,4,2);
-  if(mood==='frown'){F(hair,7,8,4,1); F(hair,13,8,4,1); F(hair,9,7,2,1); F(hair,13,7,2,1)} else {F(hair,7,8,4,1); F(hair,13,8,4,1)}
-  F('#ffffff',8,10,3,3); F('#ffffff',13,10,3,3); F(eye,9,10,2,3); F(eye,14,10,2,3); F('#ffffff',9,10,1,1); F('#ffffff',14,10,1,1);
-  F('#e0aa88',11,13,2,2);
-  if(mood==='happy'){F('#b04a44',9,16,6,1); F('#b04a44',8,15,1,1); F('#b04a44',15,15,1,1); F('#ffffff',10,16,4,1); F('#f0a39a',7,14,2,1); F('#f0a39a',15,14,2,1)}
-  else if(mood==='frown'){F('#8a4a40',9,16,6,1); F('#8a4a40',8,17,1,1); F('#8a4a40',15,17,1,1)}
-  else F('#b5735a',9,16,6,1);
+  const F=(c,x,y,w=1,h=1)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};
+  const hair='#3a2216', hairD='#2a170f', hairL='#5a3626', skin='#f2c9a5', skinS='#e3b08c', eye='#5a3a22', lash='#24140c', coat='#3f6b4f', coatD='#335a42';
+  // long hair behind (falls past the shoulders, slightly wavy)
+  for(let y=5;y<39;y++){let w; if(y<17){const t=(17-y)/12; w=Math.sqrt(Math.max(0,1-t*t))*13.5} else w=13.5-Math.max(0,y-32)*0.6;
+    const wave=Math.round(Math.sin(y/2.6)*0.8); F(hair,Math.round(20-w)+wave,y,Math.round(w*2)-wave*2,1)}
+  F(hairD,7,26,2,12); F(hairD,31,26,2,12);
+  // shoulders + coat, neck
+  F(coat,8,35,24,5); F(coat,6,37,28,3); F(coatD,19,35,2,5); F(skinS,17,30,6,5); F(skin,17,30,6,3);
+  // face (soft oval, narrower toward the chin)
+  for(let y=9;y<31;y++){const t=(y-19.5)/11.2; let hw=Math.sqrt(Math.max(0,1-t*t))*9.8; if(y>24)hw*=1-(y-24)*0.035; F(skin,Math.round(20-hw),y,Math.round(hw*2),1)}
+  F(skinS,11,24,1,2); F(skinS,28,24,1,2);   // jaw shading
+  // hair in front
+  // side part, sweeping across the forehead // side part, sweeping across the forehead
+    F(hair,11,6,18,4); F(hair,10,8,7,5); F(hair,16,9,9,2); F(hair,24,9,6,3); F(hair,9,12,3,18); F(hair,28,12,3,18); F(hair,14,11,4,1);
+    F(hairL,15,7,6,1); F(hairL,13,9,3,1); F(hairL,10,16,1,8); F(hairL,29,18,1,7);
+  
+  // eyebrows
+  if(mood==='frown'){F(hairD,14,15,4); F(hairD,17,16,1); F(hairD,22,16,1); F(hairD,22,15,4)}
+  else if(mood==='happy'){F(hairD,14,14,4); F(hairD,22,14,4)}
+  else {F(hairD,14,15,4); F(hairD,22,15,4)}
+  // eyes: lash line, white, brown iris, sparkle
+  if(mood==='happy'){ // smiling eyes
+    F(lash,14,19,1); F(lash,15,18,2); F(lash,17,19,1); F(lash,22,19,1); F(lash,23,18,2); F(lash,25,19,1);
+  } else {
+    F(lash,14,17,4); F(lash,13,17,1); F(lash,22,17,4); F(lash,26,17,1);
+    F('#ffffff',14,18,4,2); F('#ffffff',22,18,4,2);
+    F(eye,15,18,2,2); F(eye,23,18,2,2); F('#ffffff',15,18,1,1); F('#ffffff',23,18,1,1);
+    if(mood==='frown'){F(skinS,14,18,4,1); F(skinS,22,18,4,1); F(lash,14,18,4,1); F(lash,22,18,4,1)}
+  }
+  // nose
+  F(skinS,20,21,1,2); F(skinS,19,23,1,1);
+  // cheeks
+  if(mood!=='frown'){F('#f2a7a0',13,22,2,1); F('#f2a7a0',25,22,2,1)}
+  // mouth
+  if(mood==='happy'){F('#b4544c',17,25,6); F('#b4544c',16,24,1); F('#b4544c',23,24,1); F('#ffffff',18,25,4); F('#b4544c',18,26,4)}
+  else if(mood==='frown'){F('#a85a50',17,26,6); F('#a85a50',16,27,1); F('#a85a50',23,27,1)}
+  else {F('#c06a60',18,26,4); F('#d98a80',17,26,1); F('#d98a80',22,26,1)}
 }
 
 // pixel art for the shop items (16x20). Simple shapes and colors, no real packaging.
