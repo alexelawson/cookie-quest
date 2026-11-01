@@ -63,6 +63,14 @@ const bg=document.createElement('canvas'); bg.width=WW; bg.height=WH;
   F('#b9905c',93,63,54,54); for(let i=0;i<120;i++)F('#a67f4e',93+rnd()*54|0,63+rnd()*54|0,1,1);
   F('#f1e3c9',90,60,60,3);F('#f1e3c9',90,117,60,3);F('#f1e3c9',90,60,3,60);F('#f1e3c9',147,60,3,60);
   for(let x=90;x<150;x+=8){F('#d9c6a5',x,60,2,3);F('#d9c6a5',x,117,2,3)}
+  // a worn footpath from the road up to the barn door...
+  for(let y=74;y<150;y++){const x=45+Math.round(Math.sin(y/9)*2); F('#c9ad74',x,y,8,1); if(y%5===0)F('#b39760',x+1+(y%3),y,2,1)}
+  for(let i=0;i<14;i++)F('#8cc866',44+rnd()*10|0,76+rnd()*72|0,1,2);
+  // ...and a fainter trodden trail that forks off and sneaks around the side of the barn (toward the cupcake)
+  for(let y=24;y<96;y++){const x=9+Math.round(Math.sin(y/7)); F('#a9c56f',x,y,3,1)}
+  for(let x=12;x<47;x++)F('#a9c56f',x,19+Math.round(Math.sin(x/6)),3,1);
+  for(let x=12;x<45;x++){const y=96+Math.round((x-12)*.12); F('#a9c56f',x,y,3,1)}
+  F('#e54b7a',10,30,1,1); F('#f4d35e',12,46,1,1); F('#5fa8e8',9,63,1,1); F('#ffffff',24,20,1,1);   // a few stray sprinkles
   // Birkie trailhead: snow, a groomed trail heading north under the arch, a parking lot, the yurt
   F('#eef3f7',220,0,164,144);
   for(let i=0;i<260;i++)F(rnd()<.5?'#d6e0ea':'#ffffff',220+rnd()*164|0,rnd()*144|0,2,1);
