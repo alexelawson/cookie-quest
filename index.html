@@ -107,6 +107,17 @@
         <div class="brow"><button class="pbtn" id="bakeBtn"></button><button class="btn ghost" id="bakeAlt" hidden></button></div>
       </div>
     </div>
+    <div class="wardrobe" id="settings" hidden role="dialog" aria-labelledby="setTitle">
+      <div class="vcard">
+        <small id="setTitle">Settings</small>
+        <label class="srow" id="devRow"><input type="checkbox" id="devToggle"> Testing tools (for Alex 👀)</label>
+        <div class="devarea" id="devArea" hidden>
+          <button class="btn" id="devWin">Win everything → jump to the ending</button>
+          <p class="shint">Fills the basket and takes you to the kitchen. Testing tools stay off on any other computer unless you turn them on here.</p>
+        </div>
+        <button class="btn ghost" id="settingsClose">Close</button>
+      </div>
+    </div>
     <div class="titlecard" id="titlecard">
       <small>A Christmas game</small>
       <h2>The Great<br>Cookie Quest</h2>
@@ -132,7 +143,7 @@
     <div class="awrap"><button class="abtn" id="abtn" aria-label="Action">A</button><span class="alabel" id="alabel"></span></div>
   </div>
   <p class="hint">Arrow keys or WASD to walk · Space to talk</p>
-  <button class="reset" id="resetBtn">Start over</button>
+  <div class="resetrow"><button class="reset" id="resetBtn">Start over</button><button class="reset" id="settingsBtn">⚙ Settings</button></div>
 </div>
 
 <!-- Plain scripts (no modules) so the game also runs by double-clicking index.html. Order matters. -->
@@ -151,7 +162,7 @@
 <script src="js/golf.js"></script>
 <script src="js/birkie.js"></script>
 <script src="js/game.js"></script>
-<!-- DEV ONLY: delete the next line before giving the game to Joe -->
+<!-- Testing tools (off unless turned on in Settings). Delete the next line to remove them completely. -->
 <script src="js/devtools.js"></script>
 </body>
 </html>

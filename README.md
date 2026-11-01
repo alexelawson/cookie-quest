@@ -30,12 +30,10 @@ For live reload while editing: `python3 -m http.server` and visit http://localho
 
 Everything is drawn with `fillRect` on a 224×168 canvas scaled up with `image-rendering: pixelated`.
 
-## Before giving the game to Joe
-There's a **🛠 Dev: win everything** button under the game for testing the ending. To remove it, delete this line near the bottom of `index.html`:
-```html
-<script src="js/devtools.js"></script>
-```
-(or set `DEV_TOOLS = false` at the top of `js/devtools.js`). Nothing else depends on it. Then hit **Start over** so the game starts fresh with Alex's welcome.
+## Testing the ending
+Click **⚙ Settings** under the game, turn on **Testing tools**, then **Win everything → jump to the ending**. It fills the basket and drops you in the kitchen.
+The switch is off by default and remembered per browser, so Joe won't see it unless someone turns it on on his computer. To remove it completely, delete `<script src="js/devtools.js"></script>` near the bottom of `index.html`.
+Before handing it over, press **Start over** so the game starts fresh with Alex's welcome.
 
 ## Tests
 Needs Node and Playwright (`npm i -D playwright && npx playwright install chromium`).

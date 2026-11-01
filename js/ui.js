@@ -31,11 +31,18 @@ function openLand(key){
 }
 function action(){
   if(!$('titlecard').hidden){start();return}
-  if(!$('pump').hidden||!$('shop').hidden||!$('vault').hidden||!$('anagram').hidden||!$('howto').hidden||!$('wardrobe').hidden||!$('bake').hidden)return;   // the pump and shop have their own buttons
+  if(!$('pump').hidden||!$('shop').hidden||!$('vault').hidden||!$('anagram').hidden||!$('howto').hidden||!$('wardrobe').hidden||!$('bake').hidden||!$('settings').hidden)return;   // the pump and shop have their own buttons
   if(!$('reward').hidden){collectReward();return}
   if(!dlg.hidden){const f=document.activeElement, b=$('dbtns').contains(f)?f:$('dbtns').querySelector('button'); b&&b.click(); return}
   if(near)near.act(); else if(scene.ability)scene.ability();
 }
+// ---------- settings ----------
+function openSettings(){ $('devRow').hidden=typeof devWinEverything!=='function'; $('devToggle').checked=devOn(); $('devArea').hidden=!devOn();
+  $('settings').hidden=false; paused=true; prompt.hidden=true; setTimeout(()=>$('settingsClose').focus({preventScroll:true}),0) }
+function closeSettings(){ $('settings').hidden=true; paused=!dlg.hidden||!$('titlecard').hidden; $('settingsBtn').blur() }
+const devOn=()=>{ try{return localStorage.getItem('cookie-quest-dev')==='1'}catch(e){return false} };
+$('settingsBtn').onclick=openSettings; $('settingsClose').onclick=closeSettings;
+$('devToggle').onchange=()=>{ try{localStorage.setItem('cookie-quest-dev',$('devToggle').checked?'1':'0')}catch(e){} $('devArea').hidden=!$('devToggle').checked };
 function start(){$('titlecard').hidden=true; paused=false; if(!have.welcomed)welcome()}
 // the first time you press Start: Alex explains everything, then you pick Joe's look
 function welcome(){
