@@ -3,7 +3,8 @@ const $=id=>document.getElementById(id);
 const dlg=$('dialog'), prompt=$('prompt');
 function renderBasket(){
   $('basket').innerHTML=ITEMS.map(i=>`<span class="slot ${have[i.key]?'got':''}">${have[i.key]?'✓ ':''}${i.label}</span>`).join('')
-    +(have.cupcake&&!have.gaveCupcake?'<span class="slot extra">Cupcake</span>':'');
+    +(have.cupcake&&!have.gaveCupcake?'<span class="slot extra">Cupcake</span>':'')
+    +(have.sprinkles?'<span class="slot got">✓ Sprinkles</span>':'');   // a bonus from Bryan
 }
 // pages: strings shown one at a time. actions: buttons on the last page.
 // menu:true lays the buttons out as a grid of choices (used for asking questions).
@@ -54,6 +55,12 @@ $('startBtn').onclick=start;
 // ---------- reward pop-up ----------
 // showReward('farm') shows the item art; tapping it flies it into the basket and marks it collected.
 const ART={
+  sprinkles(g){ const F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};
+    // a shaker of rainbow sprinkles
+    F('#f2efe6',9,10,14,18); F('#d9d3c4',21,10,2,18); F('#c8322b',9,6,14,5); F('#a02a22',9,10,14,1); for(let x=11;x<22;x+=3)F('#ffffff',x,7,1,1);
+    const cs=['#e54b4b','#f4d35e','#4fbf73','#5fa8e8','#e54b7a','#ffffff'];
+    for(let k=0;k<18;k++)F(cs[k%6],10+(k*5)%11,14+(k*7)%12,2,1);
+    for(let k=0;k<6;k++)F(cs[k],4+k*4,29+(k%2),2,1) },
   farm(g){ const F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};
     // egg carton
     F('#a9875f',2,16,22,10); F('#c4a173',2,14,22,3); F('#8d6e4a',2,25,22,1);
@@ -98,6 +105,7 @@ const REWARDS={
   city:{from:'From a grateful city', name:'Chocolate', hint:'Tap it to put it in your basket.'},
   golf:{from:'From Margie, Jack and the creamery', name:'Milk', hint:'Tap it to put it in your basket.'},
   mill:{from:'From John (and the Vikings)', name:'Flour', hint:'Tap it to put it in your basket.'},
+  sprinkles:{from:'From Bryan', name:'Sprinkles', hint:'A bonus! Tap them to put them in your basket.'},
 };
 let rewardKey=null;
 function showReward(key){

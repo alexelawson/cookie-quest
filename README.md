@@ -9,7 +9,7 @@ For live reload while editing: `python3 -m http.server` and visit http://localho
 ## Layout
 | File | What's in it |
 |---|---|
-| `js/story.js` | All dialogue, character names, the ending note. Keelan is in `KEELAN`; Jack + Margie in `GOLF_TEXT`; the heist crew + The Confectioner in `HEIST`; Lil Q (the gas station owner), Alex's snack reactions and the correct drink/snack are in `FARGO` |
+| `js/story.js` | All dialogue, character names, the ending note. Keelan is in `KEELAN`; Jack + Margie in `GOLF_TEXT`; Bryan (the pond, sprinkles) in `BRYAN`; the heist crew + The Confectioner in `HEIST`; Lil Q (the gas station owner), Alex's snack reactions and the correct drink/snack are in `FARGO` |
 | `js/world.js` | Overworld map: collision rects (`solids`), doors (`triggers`), painting. Also defines the scene system (`SCENES`) |
 | `js/kitchen.js` | Kitchen interior scene; baking starts at the counter, recipe card on the fridge |
 | `js/city.js` | The chocolate heist: crew switching (you/Lars/John), sonar, sprint, lift, searchlights, guard, lasers, vault, cookie signal |
@@ -64,6 +64,7 @@ Add an object to `SCENES` with `w`, `h`, `bounds`, `bg` (a canvas), `solids`, `t
 - [x] Finale: Alex hugs Joe, crown, THE COOKIE DANCE
 
 ## Spoilers
+Bryan is fishing by the pond in the top corner of the farm. Talk to him for sprinkles: a bonus that adds a shake-the-sprinkles step to the baking.
 The cupcake is behind the barn, in the middle. Its frosting peeks up over the roof, and a sparkle flashes beside it every few seconds. Walk behind the barn to grab it.
 
 ## Spoilers: Fargo

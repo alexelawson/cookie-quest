@@ -73,4 +73,13 @@ r=await p.evaluate(()=>{const hiddenWin=$('devArea').hidden; $('settingsBtn').cl
   startParty(); for(let t=0;t<1500;t+=16.7)SCENES.kitchen.ambient(16.7); $('devWin').click(); for(let i=0;i<40;i++)update(16.7);
   return {offByDefault,shows,kitchen:scene===SCENES.kitchen,all:allIn(),hugging:!!kit.hugging,baked:!!have.baked,settings:$('settings').hidden,slots:$('basket').textContent}});
 ok('H Settings: testing tools are off by default; turn on, Win everything works even mid-ending',r.offByDefault&&r.shows&&r.kitchen&&r.all&&!r.hugging&&!r.baked&&r.settings&&!r.slots.includes('Cupcake'),JSON.stringify(r));
+// I. Bryan by the pond gives sprinkles; they show up in the basket and add a step to the baking
+await fresh({farm:1,mill:1,city:1,fargo:1,golf:1});
+r=await p.evaluate(()=>{P.x=96;P.y=48; update(16.7); const lbl=prompt.textContent; action(); const pages=[]; while(T.btns().includes('Next')){pages.push($('dtext').textContent);T.click('Next')} pages.push($('dtext').textContent); T.click('Take the sprinkles');
+  const reward=!$('reward').hidden&&$('rewardName').textContent; collectReward(); return {lbl,pages,reward}});
+await p.waitForTimeout(900);
+r.after=await p.evaluate(()=>({basket:$('basket').textContent, have:!!have.sprinkles}));
+ok('I Bryan is chill and gives Joe sprinkles',r.lbl==='Talk to Bryan'&&r.pages.join(' ').includes('sprinkles')&&r.reward==='Sprinkles'&&r.after.have&&r.after.basket.includes('Sprinkles'),r.pages.slice(-1)[0]);
+r=await p.evaluate(()=>{goTo('kitchen','fromDoor'); T.run(40); openBake(); const n=bakeSteps().length; bake.i=n-1; bakeSetup(); const step=$('bakeStep').textContent, btn=$('bakeBtn').textContent; for(let k=0;k<6;k++)bakePress(); return {n,step,btn,state:bake.state,crowd:CROWD.some(c=>c.name==='Bryan')}});
+ok('I with sprinkles there is a shake-the-sprinkles step, and Bryan comes to the party',r.n===7&&r.step.includes("Bryan's sprinkles")&&r.btn==='Shake!'&&r.state==='good'&&r.crowd,r.step);
 console.log(R.join('\n')); console.log('page errors:',errs.length?errs:'none'); await b.close()})();

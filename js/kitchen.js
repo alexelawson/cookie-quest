@@ -36,6 +36,7 @@ const CROWD=[
   {name:'John',x:166,y:130, draw:(x,y,d)=>drawJohn({x,y,dir:d||'left',moving:false,step:0})},
   {name:'Lil Q',x:184,y:146, draw:(x,y)=>drawBob(x,y)},
   {name:'Trail John',x:140,y:150, draw:(x,y,d)=>drawTrailJohn(x,y,d||'down')},
+  {name:'Bryan',x:72,y:150, draw:(x,y)=>drawBryan(x,y,'down')},
   {name:'Viking',x:204,y:136, draw:(x,y)=>drawVikingStanding(x,y)},
   {name:'Viking',x:212,y:152, draw:(x,y)=>drawVikingStanding(x,y)},
 ];
@@ -56,14 +57,15 @@ function drawCrown(x,y){ const F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(Ma
 const BAKE={RATE:1.25, TARGET:10, WINDOW:.5, MAX:15};   // oven runs 1.25 minutes per real second; take them out at 10:00 +/- 0:30
 const bake={open:false, i:0, state:'', amt:0, holding:false, eggs:0, stirs:0, t:0, lock:0};
 const kit={party:false, crownT:0, confetti:[]};
-const stepNow=()=>KITCHEN.steps[bake.i];
+const bakeSteps=()=>KITCHEN.steps.filter(s=>!s.needs||have[s.needs]);   // Bryan's sprinkles step only if you have them
+const stepNow=()=>bakeSteps()[bake.i];
 function bakeMsg(t,mood='ok'){ $('bakeMsg').textContent=t; const g=$('bakeFace').getContext('2d'); g.fillStyle='#e3d6bd'; g.fillRect(0,0,40,40); drawAlexFace(g,mood) }   // Alex says it, with her face
 function openBake(){ Object.assign(bake,{open:true,i:0}); bakeSetup(); paused=true; prompt.hidden=true; $('bake').hidden=false; setTimeout(()=>$('bakeBtn').focus({preventScroll:true}),0) }
 function bakeSetup(){
   const s=stepNow(), K=KITCHEN; Object.assign(bake,{state:s.kind, amt:0, holding:false, eggs:0, stirs:0, lock:0});
-  $('bakeTitle').textContent=K.bakeTitle; $('bakeStep').className='bstep'; $('bakeStep').textContent=`${bake.i+1}/${K.steps.length+1} · ${s.name}${s.label?' · '+s.label:''}`;
+  $('bakeTitle').textContent=K.bakeTitle; $('bakeStep').className='bstep'; $('bakeStep').textContent=`${bake.i+1}/${bakeSteps().length+1} · ${s.name}${s.label?' · '+s.label:''}`;
   bakeMsg(s.hint);
-  $('bakeBtn').textContent=s.kind==='pour'?K.pourHold:s.kind==='count'?K.eggTap:K.stirTap;
+  $('bakeBtn').textContent=s.kind==='pour'?K.pourHold:s.kind==='count'?K.eggTap:s.shake?'Shake!':K.stirTap;
   $('bakeAlt').hidden=s.kind!=='count'; $('bakeAlt').textContent=K.eggDone;
 }
 function bakeGood(){ const s=stepNow(); bake.state='good'; bakeMsg(s.good,'happy'); $('bakeBtn').textContent=KITCHEN.next; $('bakeAlt').hidden=true }
@@ -75,7 +77,7 @@ function bakePress(){
   if(bake.state==='pour'){ bake.holding=true; $('bakeBtn').classList.add('on'); return }
   if(bake.state==='count'){ bake.eggs++; if(bake.eggs>s.target){bakeMsg(K.eggMany,'frown'); bake.eggs=0; bake.lock=500} return }
   if(bake.state==='stir'){ bake.stirs++; if(bake.stirs>=s.taps)bakeGood(); return }
-  if(bake.state==='good'){ bake.i++; if(bake.i<K.steps.length)bakeSetup(); else ovenSetup(); return }
+  if(bake.state==='good'){ bake.i++; if(bake.i<bakeSteps().length)bakeSetup(); else ovenSetup(); return }
   if(bake.state==='oven'){ bake.state='baking'; bake.t=0; $('bakeBtn').textContent=K.bakeOut; bakeMsg('Okay, they\'re in. Watch the timer...'); return }
   if(bake.state==='baking'){ const m=ovenMin();
     if(Math.abs(m-BAKE.TARGET)<=BAKE.WINDOW){ bake.state='done'; bakeMsg(K.perfect,'happy'); $('bakeBtn').textContent='🍪 '+K.next }
@@ -102,10 +104,11 @@ function bakeTick(dt){
 function drawBakeArt(){
   const c=$('bakeArt'), g=c.getContext('2d'), F=(col,x,y,w,h)=>{g.fillStyle=col;g.fillRect(x,y,w,h)}, s=stepNow();
   F('#efe2c4',0,0,96,64); F('#e2d2ae',0,46,96,18);
-  const done=KITCHEN.steps.slice(0,bake.i+(bake.state==='good'?1:0));
+  const done=bakeSteps().slice(0,bake.i+(bake.state==='good'?1:0));
   const bowl=(x,y)=>{ F('#c9d6e0',x,y,40,14); F('#a9b8c4',x+2,y+14,36,3); F('#8a99a6',x+6,y+17,28,2);   // mixing bowl, with what's in it so far
     let lv=0; for(const d of done){ if(d.kind==='pour'){F(d.color,x+3,y+11-lv,34,2); lv+=2} if(d.kind==='count'){F('#f4c430',x+12,y+11-lv,4,2); F('#f4c430',x+22,y+11-lv,4,2)} }
-    if(done.some(d=>d.kind==='stir')){F('#e0bf86',x+3,y+4,34,8); for(let k=0;k<7;k++)F('#5a3220',x+5+k*5,y+5+(k%2)*3,2,2)}
+    if(done.some(d=>d.key==='stir')){F('#e0bf86',x+3,y+4,34,8); for(let k=0;k<7;k++)F('#5a3220',x+5+k*5,y+5+(k%2)*3,2,2)}
+    if(done.some(d=>d.key==='sprinkles'))for(let k=0;k<14;k++)F(['#e54b4b','#f4d35e','#4fbf73','#5fa8e8','#e54b7a'][k%5],x+5+(k*7)%30,y+4+(k*3)%7,2,1);
     F('#dfe8ee',x,y,40,1) };
   if(bake.state==='pour'||(bake.state==='good'&&s.kind==='pour')){
     const x=8,top=6,h=52, k=h/s.max; F('#ffffff',x,top,24,h); F('#c9d6e0',x-1,top,1,h); F('#c9d6e0',x+24,top,1,h); F('#c9d6e0',x-1,top+h,26,1); F('#c9d6e0',x+25,top+8,4,2); F('#c9d6e0',x+28,top+8,2,14);
@@ -118,15 +121,19 @@ function drawBakeArt(){
     bowl(50,36); for(let k=0;k<3;k++){const ex=10+k*12; if(k<bake.eggs){F('#ffffff',ex,40,9,3); F('#f4c430',ex+3,38,3,3)} else {F('#f6f0e2',ex+1,22,7,10); F('#e8dcc4',ex+1,30,7,2); F('#ffffff',ex+2,23,2,3)}}
     if(bake.state==='good')for(let k=0;k<2;k++){F('#ffffff',10+k*12,40,9,3); F('#f4c430',13+k*12,38,3,3)}
   } else if(bake.state==='stir'||(bake.state==='good'&&s.kind==='stir')){
-    bowl(28,30); const ang=bake.stirs*.9+(bake.state==='good'?time/200:0), sx=48+Math.cos(ang)*10, sy=36+Math.sin(ang)*3;
-    g.strokeStyle='#8a5a34'; g.lineWidth=2; g.beginPath(); g.moveTo(sx,sy); g.lineTo(sx+10,sy-22); g.stroke();
+    bowl(28,30);
+    if(s.shake){ const sx=44+Math.sin(bake.stirs*1.7)*6; F('#f2efe6',sx,4,10,14); F('#c8322b',sx,2,10,3);   // the shaker, and sprinkles falling
+      for(let k=0;k<bake.stirs*3;k++)F(['#e54b4b','#f4d35e','#4fbf73','#5fa8e8','#e54b7a'][k%5],32+(k*11)%32,20+(k*5)%12,2,1) }
+    else { const ang=bake.stirs*.9+(bake.state==='good'?time/200:0), sx=48+Math.cos(ang)*10, sy=36+Math.sin(ang)*3;
+      g.strokeStyle='#8a5a34'; g.lineWidth=2; g.beginPath(); g.moveTo(sx,sy); g.lineTo(sx+10,sy-22); g.stroke() }
     const p=Math.min(1,bake.stirs/s.taps); F('#c9d6e0',20,58,56,3); F('#4fbf73',20,58,56*p,3);
   } else { // the oven
     F('#9aa3b0',14,4,68,56); F('#7d8694',14,4,68,6); for(let x=20;x<78;x+=8)F('#2b2f36',x,6,3,2);
     F('#1d2026',22,16,52,30); const m=bake.state==='baking'?ovenMin():bake.state==='done'?BAKE.TARGET:(bake.burntAt||0);
     const glow=bake.state==='baking'?.35+.1*Math.sin(time/120):0; F(`rgba(255,140,40,${glow})`,22,16,52,30);
     const col=m<6?'#ead6a6':m<9.5?'#e3bd78':m<=10.5?'#c98a3a':m<12?'#8a5a2a':'#3a2a1e';
-    F('#8a8f9a',26,38,44,2); for(let k=0;k<4;k++){F(col,28+k*10,32,8,6); F('#5a3220',30+k*10,34,1,1); F('#5a3220',33+k*10,33,1,1)}
+    F('#8a8f9a',26,38,44,2); for(let k=0;k<4;k++){F(col,28+k*10,32,8,6); F('#5a3220',30+k*10,34,1,1); F('#5a3220',33+k*10,33,1,1);
+      if(have.sprinkles){F('#e54b7a',29+k*10,32,1,1); F('#5fa8e8',32+k*10,35,1,1); F('#f4d35e',34+k*10,32,1,1)}}
     F('#c3c9d2',22,14,52,1); F('#c3c9d2',30,50,36,2);
   }
 }
@@ -161,7 +168,8 @@ function danceMove(i){
   return {dx:0,dy:-2,cookie:true,dir:['left','up','right','down'][Math.floor(f*4)]};   // spin!
 }
 function drawCookie(x,y){ const F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(Math.round(x)+dx,Math.round(y)+dy,w,h)};
-  F('#c98a3a',-3,-2,6,4); F('#c98a3a',-2,-3,4,6); F('#5a3220',-1,-2,1,1); F('#5a3220',1,0,1,1); F('#5a3220',-2,1,1,1); F('#e0a85a',-2,-2,2,1) }
+  F('#c98a3a',-3,-2,6,4); F('#c98a3a',-2,-3,4,6); F('#5a3220',-1,-2,1,1); F('#5a3220',1,0,1,1); F('#5a3220',-2,1,1,1); F('#e0a85a',-2,-2,2,1);
+  if(have.sprinkles){F('#e54b7a',0,-2,1,1); F('#5fa8e8',-1,0,1,1); F('#f4d35e',2,1,1,1)} }
 let danceBanner=null;
 function drawDanceBanner(){
   if(!danceBanner){ const t=KITCHEN.danceTitle, w=textW(t)+6; danceBanner=document.createElement('canvas'); danceBanner.width=w; danceBanner.height=9;

@@ -17,6 +17,7 @@ const solids=[
   R(327,77,8,4),                                             // John
   R(178,282,4,4),R(201,282,4,4),                             // Wylee Woods arch posts
   R(166,98,52,42),                                           // farmhouse (your kitchen)
+  R(108,16,52,30),R(96,37,8,4),                              // Bryan's pond, and Bryan
   R(67,204,3,3),R(103,260,3,3),                              // city streetlamps
   R(8,178,40,52),R(110,184,48,56),R(0,242,64,46),R(94,224,6,4),   // city towers, the water, the steam clock
   R(310,180,60,40),R(256,198,6,10),R(280,198,6,10),R(235,214,3,12), // gas shop, pumps, sign pole
@@ -24,6 +25,7 @@ const solids=[
 ];
 const triggers=[
   {z:R(320,70,24,18),  label:'Talk to John', btn:'Talk', act:()=>talkJohn()},
+  {z:R(86,36,26,16),   label:'Talk to Bryan', btn:'Talk', act:()=>talkBryan()},
   {z:R(124,240,20,12), label:'Take the elevator up', act:()=>openWardrobe(()=>{ heist.outfitReact=true; goTo('city','fromStreet') })},
   {z:R(330,220,20,12), label:'Drive into Fargo',   act:()=>goTo('fargo','fromHighway')},
   {z:R(182,142,20,10), label:'Enter your kitchen', act:()=>goTo('kitchen','fromDoor')},
@@ -63,6 +65,11 @@ const bg=document.createElement('canvas'); bg.width=WW; bg.height=WH;
   F('#b9905c',93,63,54,54); for(let i=0;i<120;i++)F('#a67f4e',93+rnd()*54|0,63+rnd()*54|0,1,1);
   F('#f1e3c9',90,60,60,3);F('#f1e3c9',90,117,60,3);F('#f1e3c9',90,60,3,60);F('#f1e3c9',147,60,3,60);
   for(let x=90;x<150;x+=8){F('#d9c6a5',x,60,2,3);F('#d9c6a5',x,117,2,3)}
+  // Bryan's pond in the corner of the farm, with a little dock
+  for(let y=14;y<48;y++){const t=(y-31)/17, hw=Math.sqrt(Math.max(0,1-t*t))*27+Math.sin(y/3)*1.5; F('#3d7fb8',134-hw|0,y,hw*2|0,1)}
+  for(let y=18;y<44;y++){const t=(y-31)/13, hw=Math.sqrt(Math.max(0,1-t*t))*20; F('#4a8ec6',134-hw|0,y,hw*2|0,1)}
+  F('#d7ecf8',124,22,6,1); F('#d7ecf8',140,38,5,1); F('#d7ecf8',118,34,4,1);
+  for(let x=98;x<114;x+=3){F('#8a6a4a',x,30,2,6)} F('#6b4a2f',98,35,16,1); F('#6b4a2f',99,36,1,3); F('#6b4a2f',112,36,1,3);   // dock
   // a worn footpath from the road up to the barn door...
   for(let y=74;y<150;y++){const x=45+Math.round(Math.sin(y/9)*2); F('#c9ad74',x,y,8,1); if(y%5===0)F('#b39760',x+1+(y%3),y,2,1)}
   for(let i=0;i<14;i++)F('#8cc866',44+rnd()*10|0,76+rnd()*72|0,1,2);
@@ -163,6 +170,23 @@ const treeSprite=document.createElement('canvas'); treeSprite.width=12; treeSpri
 (function(){const g=treeSprite.getContext('2d'); const F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};
   F('#6b4a2f',5,13,3,4); F('#2f6b36',0,2,12,11); F('#3d8443',2,0,8,6); F('#4d9a50',3,3,3,3);})();
 const drawTree=(x,y)=>ctx.drawImage(treeSprite,x-6,y-16);
+// Bryan: medium brown hair, buzzed super short, gray tee, jeans. Very chill.
+function drawBryan(x,y,dir='right',g=ctx){
+  const X=Math.round(x)-6, Y=Math.round(y)-19, F=(c,dx,dy,w,h)=>{g.fillStyle=c;g.fillRect(X+dx,Y+dy,w,h)};
+  const skin='#e8b48e', hair='#7a5232', tee='#8d949e', jean='#3a5f9e', jeanD='#2c4a7c';
+  F('rgba(0,0,0,.2)',1,18,10,2);
+  F(jean,3,12,3,6); F(jean,6,12,3,6); F(jeanD,5,12,1,5); F('#5a3a22',2,17,4,2); F('#5a3a22',6,17,4,2);
+  F(tee,2,6,8,7); F(tee,1,7,1,3); F(tee,10,7,1,3); F(skin,1,10,1,3); F(skin,10,10,1,3); F('#7a8089',2,12,8,1);
+  F(skin,3,1,6,6); F(hair,3,0,6,2); F(hair,3,2,1,1); F(hair,8,2,1,1);   // buzz cut
+  if(dir==='down'){F('#2b2b2b',4,3,1,1); F('#2b2b2b',7,3,1,1); F('#c9876f',4,5,4,1); F(skin,5,5,2,1); F('#b5654f',5,5,2,1)}   // half-asleep chill smile
+  if(dir==='right'){F('#2b2b2b',7,3,1,1); F('#b5654f',7,5,1,1); F(hair,3,1,2,3)}
+  if(dir==='left'){F('#2b2b2b',4,3,1,1); F('#b5654f',4,5,1,1); F(hair,7,1,2,3)}
+}
+// his boat, bobbing on the pond
+function drawBoat(x,y){ const b=Math.round(Math.sin(time/700)*1), F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x+dx,y+b+dy,w,h)};
+  F('rgba(20,40,70,.35)',-1,6,20,2); F('#7a4e2c',0,0,18,6); F('#a26c40',1,0,16,2); F('#5a3a22',2,5,14,1); F('#c94a3a',0,2,18,1);
+  F('#6b4a2f',4,2,1,3); F('#6b4a2f',13,2,1,3); F('#c9a27a',-3,4,6,1); F('#c9a27a',15,4,6,1);   // seats, oars
+  F('#f2efe6',8,-1,3,2) }   // a cooler
 const makePine=(dark,snowy)=>{const c=document.createElement('canvas'); c.width=12; c.height=20; const g=c.getContext('2d'); const F=(col,x,y,w,h)=>{g.fillStyle=col;g.fillRect(x,y,w,h)};
   F('#5a3d26',5,16,2,4); F(dark,1,11,10,6); F(dark,2,6,8,6); F(dark,4,1,4,6); F(dark,5,0,2,1);
   if(snowy){F('#ffffff',1,11,4,1); F('#ffffff',7,11,3,1); F('#ffffff',2,6,3,1); F('#ffffff',7,6,2,1); F('#ffffff',4,1,4,1)}
@@ -211,10 +235,14 @@ SCENES.world={
   },
   update(dt){farmUpdate(dt)},
   under(){
+    drawBoat(130,24);
     drawCupcake();
     for(const p of smoke){ctx.fillStyle=`rgba(240,240,240,${Math.max(0,p.a)*.7})`;ctx.fillRect(Math.round(p.x),Math.round(p.y),3,3)}
   },
   ents(list){trees.forEach(([x,y])=>list.push({y,draw:()=>drawTree(x,y)}));
+    list.push({y:40,draw:()=>{ drawBryan(100,40,Math.hypot(P.x-100,P.y-40)<30?(P.x<100?'left':P.x>104?'right':'down'):'right');
+      ctx.fillStyle='#5a3a22'; ctx.fillRect(105,24,1,1); ctx.fillRect(104,26,1,2); ctx.fillRect(103,28,1,3); ctx.fillRect(106,22,1,2);   // fishing rod
+      ctx.fillStyle='rgba(240,240,240,.7)'; ctx.fillRect(107,22,1,1); ctx.fillRect(108,23,1,1); ctx.fillRect(109,24,1,8); ctx.fillStyle='#e54b4b'; ctx.fillRect(109,32+Math.round(Math.sin(time/500)),2,1) }});
     pines.forEach(([x,y])=>list.push({y,draw:()=>drawPine(x,y,snowPine)})); woods.forEach(([x,y])=>list.push({y,draw:()=>drawPine(x,y,darkPine)}));
     list.push({y:67,draw:()=>ctx.drawImage(birkArch,290,38)}); list.push({y:286,draw:()=>ctx.drawImage(woodsArch,176,254)});
     list.push({y:124,draw:()=>ctx.drawImage(yurt,336,94)}); list.push({y:81,draw:()=>drawTrailJohn(331,81,trailJohnDir())}); list.push({y:74,draw:drawBarn}); farmEntities(list)},

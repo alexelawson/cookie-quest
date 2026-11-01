@@ -94,7 +94,8 @@ const ANAGRAM={TIME:60, POINTS:{3:100,4:400,5:1200,6:2000},
 const ana={open:false, set:null, picked:[], found:[], larsFound:[], you:0, lars:0, t:0, larsT:0, running:false, };
 const anaWords=set=>Object.values(set.words).flat();
 function openAnagrams(){
-  const choices=ANAGRAM_SETS.filter(s=>s!==ana.set), set=choices[Math.floor(Math.random()*choices.length)];
+  const recent=ana.recent||[], choices=ANAGRAM_SETS.filter(s=>!recent.includes(s)), set=choices[Math.floor(Math.random()*choices.length)];   // never one of the last 3
+  ana.recent=[set,...recent].slice(0,3);
   ana.set=set; ana.open=true; ana.running=false; ana.picked=[]; ana.found=[]; ana.larsFound=[]; ana.you=0; ana.lars=0; ana.t=ANAGRAM.TIME*1000;
   ana.letters=[...set.letters].sort(()=>Math.random()-.5);
   $('anaTitle').textContent=HEIST.anagramTitle; $('anaMsg').textContent=HEIST.anagramRules;

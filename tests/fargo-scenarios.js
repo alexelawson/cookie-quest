@@ -62,7 +62,7 @@ ok('F Bob hands over the sugar',r.reward&&r.name==='Sugar'&&r.stage==='reward',r
 await p.click('#rewardArt',{force:true}); await p.waitForTimeout(900);
 r=await p.evaluate(()=>({fargo:!!have.fargo,basket:$('basket').textContent,paused}));
 ok('F sugar goes in the basket',r.fargo&&r.basket.includes('✓ Sugar')&&!r.paused,r.basket);
-r=await p.evaluate(()=>{T.toLot(fargo.bob); action(); return $('dtext').textContent}); ok('F Bob after: goodbye line',r.includes('Ride safe'),r);
+r=await p.evaluate(()=>{T.toLot(fargo.bob); action(); return $('dtext').textContent}); ok('F Bob after: goodbye line',r.includes('Lil Q out'),r);
 // G. reload in the middle of the shop errand
 await fresh(); await p.evaluate(()=>{have.fargoStage='store'; have.fargoBob=3; save()}); await p.reload(); await p.click('#startBtn'); await p.evaluate(()=>skipWelcome()); await p.evaluate(helpers);
 r=await p.evaluate(()=>{T.enter(); return {intro:!dlg.hidden,onFoot:fargo.onFoot,bob:fargo.bob,car:fargo.car&&hit(R(fargo.car.x-1,fargo.car.y-1,2,2),STATIONS[3].lot),free:!blocked(P.x,P.y)}});

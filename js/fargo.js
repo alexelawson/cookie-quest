@@ -154,14 +154,14 @@ function drawAttendant(x,y,i){
   F('rgba(0,0,0,.2)',1,16,8,2); F('#2c3e5a',2,11,3,5); F('#2c3e5a',5,11,3,5);
   F(coats[i%coats.length],1,5,8,7); F('#e9b98f',2,1,6,4); F(['#c8322b','#f4d35e','#3d8ad6'][i%3],2,0,6,2); F('#2b2b2b',3,3,1,1); F('#2b2b2b',6,3,1,1);
 }
-// Alex: long dark brown hair, brown eyes, a summer tee. Her mood shows in a little bubble.
+// Alex: dark brown hair just below the shoulders, brown eyes, a green tee. Her mood shows in a little bubble.
 function drawAlex(x,y,mood){
   const F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(Math.round(x)-6+dx,Math.round(y)-19+dy,w,h)};
   const {hair,hairL,skin,eye}=ALEX, coat=ALEX.top;
   F('rgba(0,0,0,.2)',1,18,10,2);
   F(ALEX.pants,3,13,3,5); F(ALEX.pants,6,13,3,5); F(ALEX.shoe,2,17,4,2); F(ALEX.shoe,6,17,4,2);
   F(coat,2,7,8,6); F(ALEX.pants,2,12,8,2); F(coat,1,8,1,2); F(coat,10,8,1,2); F(skin,1,10,1,3); F(skin,10,10,1,3); F(skin,5,7,2,1);   // tee with a scoop neck
-  F(hair,2,0,8,3); F(hair,1,2,2,10); F(hair,9,2,2,10); F(hairL,2,1,3,1);   // long hair down past the shoulders
+  F(hair,2,0,8,3); F(hair,1,2,2,8); F(hair,9,2,2,8); F(hairL,2,1,3,1);   // hair just below the shoulders
   F(skin,3,2,6,5); F(hair,3,2,4,1); F(hair,3,3,1,1);   // side-swept fringe
   F(eye,4,4,1,1); F(eye,7,4,1,1);
   if(mood==='happy'){F(ALEX.smile,5,6,2,1); F(ALEX.blush,3,5,1,1); F(ALEX.blush,8,5,1,1)}
@@ -397,14 +397,15 @@ $('giveBtn').onclick=giveToAlex;
 // Alex's face for the shop panel (40x40): long dark brown hair with a side part, brown eyes
 // Alex's colors, shared by her face (pop-ups) and her little walking sprite, so she always looks the same
 const ALEX={hair:'#3b2416', hairD:'#2a170f', hairL:'#4e3020', skin:'#f2c9a5', skinS:'#e3b08c', eye:'#5a3a22', lash:'#24140c',
-  top:'#5fa8c8', topD:'#4a8fb0', pants:'#2c2c34', shoe:'#3b2a1e', blush:'#f2a7a0', mouth:'#c06a60', smile:'#b4544c', frown:'#a85a50'};
+  top:'#3f7a55', topD:'#2f5f42', pants:'#2c2c34', shoe:'#3b2a1e', blush:'#f2a7a0', mouth:'#c06a60', smile:'#b4544c', frown:'#a85a50'};
 function drawAlexFace(g,mood){
   const F=(c,x,y,w=1,h=1)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};
   const {hair,hairD,hairL,skin,skinS,eye,lash}=ALEX;
   // long hair behind (falls past the shoulders, slightly wavy)
-  for(let y=5;y<39;y++){let w; if(y<17){const t=(17-y)/12; w=Math.sqrt(Math.max(0,1-t*t))*13.5} else w=13.5-Math.max(0,y-32)*0.6;
+  // hair just below the shoulders (ends around y 36, curling in a little)
+  for(let y=5;y<37;y++){let w; if(y<17){const t=(17-y)/12; w=Math.sqrt(Math.max(0,1-t*t))*13} else w=13-Math.max(0,y-31)*0.9;
     const wave=Math.round(Math.sin(y/2.6)*0.8); F(hair,Math.round(20-w)+wave,y,Math.round(w*2)-wave*2,1)}
-  F(hairD,7,26,2,12); F(hairD,31,26,2,12);
+  F(hairD,8,26,2,9); F(hairD,30,26,2,9);
   // shoulders in her light blue tee (same as her sprite), scoop neck
   F(ALEX.top,8,35,24,5); F(ALEX.top,6,37,28,3); F(skinS,17,30,6,5); F(skin,17,30,6,3); F(skin,17,35,6,1); F(skin,18,36,4,1); F(ALEX.topD,16,35,1,2); F(ALEX.topD,23,35,1,2); F(ALEX.topD,17,37,6,1);
   // face (soft oval, narrower toward the chin)
