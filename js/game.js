@@ -14,7 +14,7 @@ function finishSwap(){
 }
 
 function blocked(nx,ny,sc=scene){
-  const box=R(nx-4,ny-3,8,4), b=sc.bounds;
+  const box=sc.feet?sc.feet(nx,ny):R(nx-4,ny-3,8,4), b=sc.bounds;
   if(box.x<b.x||box.y<b.y||box.x+box.w>b.x+b.w||box.y+box.h>b.y+b.h)return true;
   // scenes with a `walk` list (rooftops) only let you stand inside those areas
   if(sc.walk){const pts=[[box.x,box.y],[box.x+box.w,box.y],[box.x,box.y+box.h],[box.x+box.w,box.y+box.h]];
@@ -28,26 +28,34 @@ function update(dt){
   if(fade.next){
     const was=fade.t; fade.t+=dt;
     if(was<fade.dur&&fade.t>=fade.dur)finishSwap();
-    if(fade.t>=fade.dur*2){fade.next=null; paused=false}
+    if(fade.t>=fade.dur*2){fade.next=null; paused=!dlg.hidden||!$('reward').hidden}
     return;
   }
-  if(paused){farmHud();return}
+  if(paused){updateHud();return}
   let dx=(dirs.right?1:0)-(dirs.left?1:0), dy=(dirs.down?1:0)-(dirs.up?1:0);
   P.moving=!!(dx||dy);
   if(P.moving){
     if(dx&&dy){dx*=.707;dy*=.707}
-    const sp=.07*dt;
+    const sp=(scene.speed?scene.speed():.07)*dt, x0=P.x, y0=P.y;
     if(!blocked(P.x+dx*sp,P.y))P.x+=dx*sp;
     if(!blocked(P.x,P.y+dy*sp))P.y+=dy*sp;
+    scene.moved&&scene.moved(Math.hypot(P.x-x0,P.y-y0));
     P.dir=Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up');
     P.t+=dt; if(P.t>140){P.t=0;P.step++}
   }
-  scene.update&&scene.update(dt); farmHud();
+  scene.update&&scene.update(dt); updateHud();
   if(paused)return;  // a mission may have opened a dialog
-  const feet=R(P.x-4,P.y-3,8,4);
+  const feet=scene.feet?scene.feet(P.x,P.y):R(P.x-4,P.y-3,8,4);
   const t=(scene.dynTrigger&&scene.dynTrigger())||scene.triggers.find(tr=>hit(feet,tr.z))||null;
   if((t&&t.label)!==(near&&near.label)){prompt.hidden=!t; if(t)prompt.textContent=t.label; $('alabel').textContent=t?(t.btn||'Enter'):''}
   near=t;
+}
+
+// the little status bar in the corner of the screen (hen counts, fuel...), per scene
+let lastHud=null;
+function updateHud(){
+  const h=scene.hud?scene.hud():''; const el=$('hud'); el.hidden=!h;
+  if(h!==lastHud){el.innerHTML=h; lastHud=h}
 }
 
 // ===================== DRAW =====================
@@ -80,7 +88,7 @@ function draw(){
   scene.under&&scene.under();
   // people, hens and furniture, back to front
   const ents=[]; scene.ents&&scene.ents(ents);
-  ents.push({y:P.y,draw:()=>{drawPlayer(P.x,P.y); if(farm.carrying)drawHen(P.x,P.y-20,P.dir==='left'?-1:1)}});
+  ents.push({y:P.y,draw:()=>{(scene.drawPlayer||drawPlayer)(P.x,P.y); if(farm.carrying&&scene===SCENES.world)drawHen(P.x,P.y-20,P.dir==='left'?-1:1)}});
   ents.sort((a,b)=>a.y-b.y).forEach(e=>e.draw());
   scene.over&&scene.over();
   if(fade.next){

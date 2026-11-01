@@ -17,7 +17,7 @@ const solids=[
 const triggers=[
   {z:R(306,74,20,12),  label:'Visit The Old Mill', act:()=>openLand('mill')},
   {z:R(124,240,20,12), label:'Enter the city',     act:()=>goTo('city','fromStreet')},
-  {z:R(330,220,20,12), label:'Visit Fargo',        act:()=>openLand('fargo')},
+  {z:R(330,220,20,12), label:'Drive into Fargo',   act:()=>goTo('fargo','fromHighway')},
   {z:R(182,142,20,10), label:'Enter your kitchen', act:()=>goTo('kitchen','fromDoor')},
   // Keelan's trigger moves with him; see farm.js
 ];
@@ -98,7 +98,8 @@ const drawTree=(x,y)=>ctx.drawImage(treeSprite,x-6,y-16);
 const SCENES={};
 SCENES.world={
   w:WW, h:WH, bounds:R(2,10,WW-4,WH-12), bg, solids, triggers,
-  entries:{start:{x:192,y:156,dir:'down'}, fromKitchen:{x:192,y:157,dir:'down'}, fromCity:{x:134,y:256,dir:'down'}},
+  entries:{start:{x:192,y:156,dir:'down'}, fromKitchen:{x:192,y:157,dir:'down'}, fromCity:{x:134,y:256,dir:'down'}, fromFargo:{x:340,y:238,dir:'down'}},
+  hud:()=>farmHud(),
   dynTrigger:()=>farmTrigger(),
   ambient(dt){
     for(const r of rain){r.y+=dt*.25;r.x-=dt*.05;if(r.y>288){r.y=170;r.x=rnd()*170}if(r.x<0)r.x+=164}

@@ -85,3 +85,19 @@ canvas{border-radius:6px}
 .reset{align-self:center;background:none;border:1px solid var(--line);color:var(--muted);font-family:var(--pixel);font-size:.8rem;padding:4px 12px;border-radius:4px;cursor:pointer}
 .reset.armed{border-color:var(--berry);color:var(--paper);background:rgba(212,71,60,.3)}
 .reset:focus-visible{outline:3px solid var(--berry);outline-offset:2px}
+
+/* Gary's pump */
+.pump{position:absolute;inset:0;z-index:6;display:flex;align-items:center;justify-content:center;background:rgba(8,9,16,.55);padding:10px;border-radius:6px}
+.pcard{background:#d9dde3;color:var(--ink);border:3px solid var(--ink);border-radius:8px;padding:10px 14px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;width:min(100%,300px);box-shadow:0 10px 30px rgba(0,0,0,.5);animation:rin .25s ease-out}
+.pcard small{font-family:var(--pixel);font-size:.85rem;font-weight:600;color:var(--berry)}
+.pdisp{background:#141a14;border-radius:4px;padding:8px 10px;display:grid;gap:2px;width:100%}
+.pdisp div{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.lbl{font-family:var(--pixel);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:#7f9a7f}
+.led{font-family:var(--pixel);font-size:1.7rem;color:#8cff8c;font-variant-numeric:tabular-nums;text-shadow:0 0 6px rgba(140,255,140,.5)}
+.led.small{font-size:1rem}
+.pump.over .led{color:#ff7a6a;text-shadow:0 0 6px rgba(255,120,100,.5)}
+.pcard p{margin:0;font-size:.85rem;min-height:2.4em}
+.pbtn{font-family:var(--pixel);font-size:1rem;border:3px solid var(--ink);background:var(--gold);color:var(--ink);padding:10px 20px;border-radius:6px;cursor:pointer;touch-action:none;user-select:none;-webkit-user-select:none;width:100%}
+.pbtn.on{background:#e2a93f;transform:translateY(1px)}
+.pbtn:focus-visible{outline:3px solid var(--berry);outline-offset:2px}
+.pips i.on.fuel{background:var(--gold);border-color:var(--gold)}

@@ -31,6 +31,7 @@ function openLand(key){
 }
 function action(){
   if(!$('titlecard').hidden){start();return}
+  if(!$('pump').hidden)return;   // the pump has its own button
   if(!$('reward').hidden){collectReward();return}
   if(!dlg.hidden){const f=document.activeElement, b=$('dbtns').contains(f)?f:$('dbtns').querySelector('button'); b&&b.click(); return}
   if(near)near.act();
@@ -50,8 +51,19 @@ const ART={
     F('#f7dd7a',25,14,12,7); F('#fbe9a6',25,14,12,2); F('#e2c35a',36,15,1,6);
     F('#ffffff',27,17,6,3); F('#3d8ad6',28,18,4,1);                    // paper wrapper label
   },
+  fargo(g){ const F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};
+    // paper sack of beet sugar, a little spilled
+    F('#e9e2d2',11,6,18,22); F('#d8cfba',11,6,18,2); F('#cfc5ae',11,6,2,22); F('#f3eee3',27,8,2,20);
+    F('#e9e2d2',12,3,16,4); F('#d8cfba',13,2,3,2); F('#d8cfba',19,1,3,3); F('#d8cfba',24,2,3,2);   // crumpled top
+    F('#2f6db0',11,14,18,7); F('#ffffff',11,14,18,1);
+    F('#7d2b52',17,15,6,5); F('#4f9a3c',19,13,2,3); F('#a03d6a',18,16,2,2);                     // a beet on the label
+    F('#ffffff',30,25,6,2); F('#ffffff',32,24,3,1); F('#f3eee3',36,26,2,1); F('#ffffff',6,26,4,1);  // spilled sugar
+  },
 };
-const REWARDS={farm:{from:'From Keelan', name:'Eggs & butter', hint:'Tap them to put them in your basket.'}};
+const REWARDS={
+  farm:{from:'From Keelan', name:'Eggs & butter', hint:'Tap them to put them in your basket.'},
+  fargo:{from:'From Gas Station Gary', name:'Sugar', hint:'Tap it to put it in your basket.'},
+};
 let rewardKey=null;
 function showReward(key){
   const r=REWARDS[key], c=$('rewardCanvas'), g=c.getContext('2d');

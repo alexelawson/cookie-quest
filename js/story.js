@@ -17,12 +17,6 @@ const STORY = {
            "...Yes, it's for cookies. That doesn't make it any less serious."],
     mission:"Mission preview: cape on, sneak across the rooftops, dodge the searchlights and recover the chocolate.",
     done:"You recovered the chocolate!", again:"The city sleeps a little easier tonight."},
-  fargo:{place:'Fargo', speaker:'Gas Station Gary',
-    lines:["Oh ya, you made it! Rolled in on fumes, I bet.",
-           "Two seventy-nine a gallon. Cheapest gas in all the land, don'tcha know.",
-           "Fill 'er up, then head out back. Farmer Lyle's got sugar beets coming out his ears."],
-    mission:"Mission preview: find the cheapest pump, then harvest sugar beets in the snow.",
-    done:"You got the sugar!", again:"Drive safe now. It's not this cheap anywhere else, ya know."},
 };
 // ---------- The farm: Keelan ----------
 // Each question is a button; the answer plays as one page per string.
@@ -55,6 +49,27 @@ const KEELAN = {
   thanks:"Thanks, Keelan!",
   after:"All twenty, home and accounted for. Thanks again.",
   bye:"Bye",
+};
+
+// ---------- Fargo: Gas Station Gary ----------
+const FARGO = {
+  place:'Fargo, ND', gary:'Gas Station Gary',
+  intro:["You roll into Fargo on fumes.","Somewhere in this town is the cheapest gas in the whole country. Find it."],
+  attendants:['Deb','Lars','Shelly','Ole','Marv'],
+  ask:p=>`$${p} a gallon. Fill 'er up?`,
+  fill:"Fill up", keep:"Keep looking",
+  wrong:p=>[`Tank's full. At $${p} a gallon.`,"On your way out of town you pass a sign that says $2.79.","Oof."],
+  retry:"Try again",
+  garyHello:["Oh ya, you found it! Cheapest gas in the whole darn country.","Two seventy-nine. You drove across America for this, didn't ya?"],
+  garyBet:["Tell ya what. Stop the pump on exactly thirty bucks and I'll throw in some sugar.","My cousin grows the beets. Best sugar there is."],
+  pumpTitle:"Gary's bet: stop on exactly $30.00",
+  pumpHint:"Hold to pump. Let go to stop. Quick taps for the last few cents.",
+  bust:["Ohhh, a penny over. So close.","Shoot. Over again. Go ahead, I'll reset it.","Thirty and what now? Again!","Uff da. One more try."],
+  win:["Thirty dollars even! Well, I'll be.","Here ya go. Sugar, fresh from the Red River Valley."],
+  thanks:"Thanks, Gary!",
+  after:"Come back anytime. It's not this cheap anywhere else, ya know.",
+  empty:"Out of gas! You're pushing the CR-V now.",
+  leave:"Head back to the highway",
 };
 
 const KITCHEN = {place:'Home', speaker:'Your kitchen',

@@ -15,7 +15,7 @@ function startBaking(){
   const missing=ITEMS.filter(i=>!have[i.key]).map(i=>i.label);
   if(missing.length) return say1(KITCHEN.missing+' '+missing.join(', ')+'.');
   showDialog({place:KITCHEN.place,speaker:KITCHEN.speaker,pages:[...KITCHEN.ready,KITCHEN.finale,KITCHEN.note],noteLast:true,actions:[
-    {label:'Play again',fn:()=>{have={};save();renderBasket();farmReset();closeDialog();goTo('world','start')}},
+    {label:'Play again',fn:()=>{have={};save();renderBasket();farmReset();fargo.won=false;closeDialog();goTo('world','start')}},
     {label:'Keep exploring',ghost:true,fn:closeDialog}]});
 }
 

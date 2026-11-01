@@ -213,9 +213,9 @@ function farmTrigger(){
 
 // ---------- HUD ----------
 function farmHud(){
-  const el=$('hud'); el.hidden=!farm.active; if(!farm.active)return;
+  if(!farm.active)return '';
   const pips=[...Array(FARM.LOSE_AT)].map((_,i)=>`<i class="${i<farm.loose.length?'on':''}"></i>`).join('');
-  el.innerHTML=`<span>Pen ${farm.penned.length}/${FARM.HENS}</span><span class="pips" title="Loose hens">Loose ${pips}</span>`;
+  return `<span>Pen ${farm.penned.length}/${FARM.HENS}</span><span class="pips" title="Loose hens">Loose ${pips}</span>`;
 }
 
 // ---------- drawing ----------
