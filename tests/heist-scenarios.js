@@ -20,41 +20,35 @@ const fresh=async()=>{await p.goto(URL);await p.evaluate(()=>localStorage.clear(
 const R=[];const ok=(n,c,x='')=>R.push((c?'PASS ':'FAIL ')+n+(x?'  ('+x+')':''));
 await fresh();
 
-// A. Dr. Alex: you walk up to her lab bench for the briefing
-let r=await p.evaluate(()=>{T.enter(); const auto=!dlg.hidden&&$('dspeaker').textContent==='Dr. Alex'; T.clickThrough(); T.hints=[]; const w=T.walkTo(58,140); const hint=T.hints.join(' / ');
-  const pre=(()=>{T.walkTo(76,146); update(16.7); action(); const t=T.clickThrough(); return t.join(' ')})();
-  T.path([[58,140],[58,100],[46,78]]); update(16.7); const lbl=prompt.textContent; action(); const face=!$('dportrait').hidden; const lines=T.clickThrough(); const how=!$('howto').hidden, rows=$('howRows').children.length, ctl=$('howControls').textContent; $('howOk').click(); update(16.7); T.walkTo(58,100);
-  return {auto,hint,pre,lbl,face,lines,how,rows,ctl,bar:!$('crewbar').hidden,hud:$('hud').textContent,lab:$('alabel').textContent}});
-ok('A no briefing pops up on its own; John points out the lab bench',!r.auto&&r.hint.includes('lab bench'),r.hint);
-ok('A the log waits until you\'ve talked to her',r.pre.includes('lab coat'),r.pre);
+// A. the log blocks the way to Dr. Alex: only John can lift it, then he carries it and follows you
+let r=await p.evaluate(()=>{T.enter(); const auto=!dlg.hidden&&$('dspeaker').textContent==='Dr. Alex'; T.clickThrough(); T.hints=[];
+  const blockedW=T.walkTo(58,100,400), stuckY=Math.round(P.y), hint=T.hints.join(' / ');
+  const look=lbl=>{T.walkTo(58,132); update(16.7); const l=prompt.textContent; action(); const menu=T.btns(); [...$('dbtns').querySelectorAll('button')].find(b=>b.textContent==='Lift it').click(); return {l,menu,said:T.clickThrough().join(' / ')}};
+  const joe=look(), lars=(switchTo(1),look()), john=(switchTo(2),look());
+  const carrying=!!heist.carry; switchTo(0); const switched=heist.lead===0;
+  const w=T.path([[58,100],[46,78]]); const J=heist.crew.find(c=>c.id==='john'), johnNear=Math.hypot(J.x-P.x,J.y-P.y)<40;
+  update(16.7); const lbl=prompt.textContent; action(); const face=!$('dportrait').hidden; const lines=T.clickThrough(); const how=!$('howto').hidden, rows=$('howRows').children.length, ctl=$('howControls').textContent; $('howOk').click(); update(16.7); T.walkTo(58,100);
+  return {auto,blockedW,stuckY,hint,joe,lars,john,carrying,switched,w,johnNear,lbl,face,lines,how,rows,ctl,bar:!$('crewbar').hidden,hud:$('hud').textContent,lab:$('alabel').textContent}});
+ok('A no briefing pops up on its own',!r.auto);
+ok('A the log blocks the way to Dr. Alex; John says so',r.blockedW!=='ok'&&r.stuckY>125&&r.hint.includes('blocking'),r.blockedW+' | '+r.hint);
+ok('A the log: Lift it / Leave it',r.joe.l==='Look at the log'&&r.joe.menu.join()==='Lift it,Leave it',r.joe.menu.join(' | '));
+ok('A Joe and Lars can\'t lift it; John can',r.joe.said.includes('Switch to me')&&r.lars.said.includes('forklift')&&r.john.said.includes('right behind you')&&r.carrying,r.john.said);
+ok('A John keeps carrying the log; you can switch back and walk to Dr. Alex with him following',r.switched&&r.w==='ok'&&r.johnNear,r.w);
 ok('A walk up to Dr. Alex (Alex as a mad scientist) and she briefs the crew',r.lbl==='Talk to Dr. Alex'&&r.face&&r.lines[0].startsWith('Dr. Alex')&&r.lines.join().includes('formula')&&r.lines.some(l=>l.startsWith('John'))&&r.lines.some(l=>l.startsWith('Lars')),r.lines.length+' lines');
 ok('A how-to card lists all 3 powers + controls',r.how&&r.rows===3&&r.ctl.includes('Space')&&r.ctl.includes('press F'),r.rows+' rows');
 ok('A crew bar + objective + skill label',r.bar&&r.hud.includes('Bridge')&&r.lab==='Sonar',r.hud+' / '+r.lab);
-// B. the log: you can't lift it; Lars tries the long jump (and finds ice cream)
-r=await p.evaluate(()=>{T.hints=[]; T.path([[58,100],[58,140],[76,146]]); const hint=T.hints; update(16.7); const lbl=prompt.textContent; action();
-  const menu=T.btns(); if(!menu.includes('Use it as a bridge'))return {dbg:[lbl,menu.join('|'),$('dtext').textContent,P.x|0,P.y|0,dlg.hidden]}; [...$('dbtns').querySelectorAll('button')].find(b=>b.textContent==='Use it as a bridge').click(); const msg=T.clickThrough().join(' / '); const st1=have.heistStage||0;
-  update(16.7); action(); [...$('dbtns').querySelectorAll('button')].find(b=>b.textContent==='Have Lars try to long-jump the gap').click(); const cut1=T.clickThrough(); const L=heist.crew.find(c=>c.id==='lars'); let maxX=0, air=0, annoyed=false;
+// B. the gap: Lars tries the long jump (and finds ice cream), then John lays the log across
+r=await p.evaluate(()=>{T.hints=[]; const w=T.walkTo(98,102); update(16.7); const lbl=prompt.textContent; action(); const menu=T.btns();
+  [...$('dbtns').querySelectorAll('button')].find(b=>b.textContent==='Lars: long-jump it').click(); const cut1=T.clickThrough(); const L=heist.crew.find(c=>c.id==='lars'); let maxX=0, air=0, annoyed=false;
   for(let i=0;i<300;i++){SCENES.city.ambient(16.7); maxX=Math.max(maxX,L.x); air=Math.max(air,(heist.jump&&heist.jump.air)||0); annoyed=annoyed||heist.annoyT>0} const landed=Math.round(L.x); const cut=[...cut1,'JUMP '+Math.round(maxX)+' air '+Math.round(air)+' land '+landed+' annoyed '+annoyed,...T.clickThrough()].join(' / '); const ice=!$('reward').hidden&&$('rewardName').textContent; if(ice)collectReward();
-  return {hint,lbl,menu,msg,cut,ice,st1}});
-if(r.dbg){console.log(R.join('\n'),r.dbg);process.exit(1)}
+  return {w,hint:T.hints.join(' / '),lbl,menu,cut,ice,st1:have.heistStage||0}});
 await p.waitForTimeout(1000);
-ok('B John hints at the log',r.hint.join().includes('log'),r.hint[0]); ok('B the log offers bridge / Lars long jump / leave',r.lbl==='Look at the log'&&r.menu.join()==='Use it as a bridge,Have Lars try to long-jump the gap,Leave it',r.menu.join(' | '));
-ok('B you can\'t lift it; John says switch to him',r.msg.includes('Switch to me')&&!r.st1,r.msg); ok('B Lars really runs and jumps, boings back, John is annoyed',r.cut.includes('Headwind')&&/JUMP 12\d air 1\d land 112 annoyed true/.test(r.cut)&&!r.st1,r.cut);
+ok('B John points out the gap',r.hint.includes('gap'),r.hint);
+ok('B at the gap: Lars / the log / not yet',r.w==='ok'&&r.lbl==='Cross the gap'&&r.menu.join()==='Lars: long-jump it,John: lay the log across,Not yet',r.lbl+' | '+r.menu.join(' | '));
+ok('B Lars really runs and jumps, boings back, John is annoyed',r.cut.includes('Headwind')&&/JUMP 12\d air 1\d land 112 annoyed true/.test(r.cut)&&!r.st1,r.cut);
 ok('B ...and Lars lands next to a pint of Maple Rosemary ice cream',r.ice==='Maple Rosemary ice cream'&&r.cut.includes('Maple Rosemary'),r.ice);
-// John carries it: too long to fit past the tank sideways, turn it upright, through, sideways again, across the gap
-r=await p.evaluate(()=>{switchTo(2); T.path([[58,140],[76,146]]); update(16.7); action(); [...$('dbtns').querySelectorAll('button')].find(b=>b.textContent==='Use it as a bridge').click(); const said=T.clickThrough();
-  const out={said:said[0],carry:heist.carry&&heist.carry.rot};
-  switchTo(0); out.switchBlocked=heist.lead===2&&prompt.textContent.includes('hands full');
-  out.sideways=T.walkTo(58,100,300); out.stuckY=Math.round(P.y);
-  out.turn=(()=>{T.walkTo(58,150); useSkill(); return heist.carry.rot})();
-  out.upright=T.walkTo(58,100,400);
-  out.noRoom=(()=>{const k=P.y; P.y=40; P.x=66; useSkill(); const m=prompt.textContent, rot=heist.carry.rot; P.y=k; P.x=58; return rot==='v'&&m.includes('No room')})();
-  useSkill(); out.turnBack=heist.carry.rot; out.toGap=T.walkTo(98,102); update(16.7); out.lbl=prompt.textContent; action(); out.done=T.clickThrough()[0]; out.st=have.heistStage; out.carrying=!!heist.carry;
-  return out});
-ok('B John picks up the log; nobody else can be switched to while he carries it',r.carry==='h'&&r.switchBlocked&&r.said.includes('Tap A'),r.said);
-ok('B sideways, the log won\'t fit between the tank and the vents',r.sideways!=='ok'&&r.stuckY>125,r.sideways);
-ok('B turn it upright and it fits through; you can\'t turn it where there\'s no room',r.turn==='v'&&r.upright==='ok'&&r.noRoom,r.upright);
-ok('B turn it sideways again, carry it to the edge, lay it across',r.turnBack==='h'&&r.toGap==='ok'&&r.lbl==='Lay the log across the gap'&&r.st===1&&!r.carrying,r.done);
+r=await p.evaluate(()=>{T.clickThrough(); paused=false; T.walkTo(98,102); update(16.7); action(); [...$('dbtns').querySelectorAll('button')].find(b=>b.textContent==='John: lay the log across').click(); const done=T.clickThrough()[0]; return {done,st:have.heistStage,carrying:!!heist.carry}});
+ok('B John lays the log across the gap',r.st===1&&!r.carrying&&r.done.includes('Log bridge'),r.done);
 r=await p.evaluate(()=>{T.hints=[]; const w=T.path([[110,102],[170,102]]); return {w,hint:T.hints,x:P.x}});
 ok('B the crew crosses the log to roof B',r.w==='ok',r.w); ok('B Lars calls the searchlights (and the shadows)',r.hint.join().includes('Searchlights')&&r.hint.join().includes('shadows'),r.hint[0]);
 // C. searchlights

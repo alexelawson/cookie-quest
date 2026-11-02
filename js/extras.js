@@ -129,18 +129,34 @@ solids.push(R(226,183,2,3),R(242,183,2,3));
     for(const k in GEAR)if(!GEAR[k].give&&!(have.gear&&k in have.gear))list.push({y:GEAR[k].y,draw:()=>drawGearItem(k,GEAR[k].x,GEAR[k].y)}) }}
 
 // the lucky clover sheds little green sparkles as Joe walks; Henrietta the hen trots along behind him
-const sparkles=[], henTrail=[]; let sparkleT=0;
+const sparkles=[], henTrail=[]; let sparkleT=0, henScene=null;
 function cloverTick(dt){
   if(gearWorn('clover')&&P.moving&&scene!==SCENES.birkie){ sparkleT-=dt; if(sparkleT<=0){ sparkleT=110; sparkles.push({x:P.x+(Math.random()*8-4),y:P.y-10+(Math.random()*6-3),vx:(Math.random()-.5)*.01,vy:-.012-Math.random()*.01,t:0,c:['#7fe08a','#c9f5a0','#fff3a8'][Math.floor(Math.random()*3)]}) } }
   for(const s of sparkles){s.t+=dt; s.x+=s.vx*dt; s.y+=s.vy*dt} while(sparkles.length&&sparkles[0].t>900)sparkles.shift();
-  const henHere=gearWorn('hen')&&(scene===SCENES.world||scene===SCENES.kitchen);
-  if(henHere){ const last=henTrail[henTrail.length-1]; if(!last||Math.hypot(P.x-last.x,P.y-last.y)>1.5){henTrail.push({x:P.x,y:P.y}); if(henTrail.length>40)henTrail.shift()}
+  if(henScene!==scene){henScene=scene; henTrail.length=0}   // a new place: she starts right next to Joe
+  if(henHere()){ const last=henTrail[henTrail.length-1]; if(!last||Math.hypot(P.x-last.x,P.y-last.y)>1.5){henTrail.push({x:P.x,y:P.y}); if(henTrail.length>40)henTrail.shift()}
     if(Math.random()<dt/7000)sfx('cluck') } else henTrail.length=0;
 }
 function henPos(){ if(!henTrail.length)return {x:P.x-10,y:P.y+2}; const k=Math.max(0,henTrail.length-12); return henTrail[k] }
 function drawSparkles(){ for(const s of sparkles){ const a=1-s.t/900; ctx.globalAlpha=Math.max(0,a); ctx.fillStyle=s.c; ctx.fillRect(Math.round(s.x),Math.round(s.y),1,1); if(s.t<300){ctx.fillRect(Math.round(s.x)-1,Math.round(s.y),3,1); ctx.fillRect(Math.round(s.x),Math.round(s.y)-1,1,3)} } ctx.globalAlpha=1 }
-for(const sc of ['world','kitchen']){const ents=SCENES[sc].ents; SCENES[sc].ents=function(list){ ents.call(this,list);
-  if(gearWorn('hen')&&!(scene===SCENES.world&&farm.carrying)){const h=henPos(), f=h.x<P.x?1:-1, hop=P.moving&&Math.floor(time/150)%2?1:0; list.push({y:h.y,draw:()=>{drawHen(h.x,h.y-hop,f); ctx.fillStyle='#e54b7a'; ctx.fillRect(Math.round(h.x)-1,Math.round(h.y-hop)-3,2,1)}})} }}   // (a little pink bow)
+// Henrietta comes everywhere once Keelan gives her to Joe (after the farm), in an outfit for each place
+const henHere=()=>gearWorn('hen')&&!(scene===SCENES.world&&farm.carrying)&&!(scene===SCENES.fargo&&!fargo.onFoot);   // (not while Joe's carrying a farm hen, or driving)
+function henEnt(){
+  if(!henHere())return null;
+  const h=henPos(), f=h.x<P.x?1:h.x>P.x?-1:(P.dir==='left'?-1:1), hop=P.moving&&Math.floor(time/150)%2?1:0;
+  return {y:h.y, draw:()=>drawHenrietta(h.x,h.y-hop,f,sceneName())};
+}
+function drawHenrietta(x,y,f,where){
+  x=Math.round(x); y=Math.round(y); const F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x+dx,y+dy,w,h)}, hx=f>0?1:-3;   // hx: where her head is
+  if(where==='birkie'){F('#2f6db0',-5,1,11,1); F('#2f6db0',f>0?5:-6,0,1,1)}                          // tiny skis
+  drawHen(x,y,f);
+  if(where==='kitchen'){F('#ffffff',hx-1,-11,4,3); F('#ffffff',hx,-8,2,1); F('#e3e3dc',hx-1,-9,4,1)}                       // chef's hat
+  else if(where==='city'){F('#1d1d22',hx,-8,2,2); F('#3a3a44',hx,-7,2,1); F('#0b0c12',hx,-6,2,1)}                           // black beanie and a mask
+  else if(where==='birkie'){F('#c8322b',hx,-8,2,2); F('#ffffff',hx+(f>0?0:1),-9,1,1); F('#ffffff',-2,-3,3,2); F('#1d1d22',-1,-3,1,1)}   // knit hat with a pompom, race bib
+  else if(where==='golf'){F('#2f8a4a',hx,-7,2,1); F('#2f8a4a',f>0?hx+2:hx-1,-7,1,1); F('#ffffff',hx,-7,1,1)}                // a golf visor
+  else if(where==='fargo'){F('#7a4a2a',hx-1,-9,4,2); F('#e9dcc4',hx-1,-7,4,1); F('#7a4a2a',hx-1,-6,1,2); F('#7a4a2a',hx+2,-6,1,2)}   // fur trapper hat with earflaps
+  else F('#e54b7a',-1,-3,2,1);                                                                                                // the main map: her little pink bow
+}
 
 // called from game.js every frame
 function extrasTick(){ sceneExitTick(); gearTick() }

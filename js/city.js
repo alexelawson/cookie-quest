@@ -3,17 +3,17 @@
 //   you  = sonar pulse (lights up the dark, chalk-marks the invisible tripwires)
 //   Lars = sprint (fast enough to dash between cover under the searchlights)
 //   John = lift (carries the log, rips off the grate)
-// Route: roof A (Dr. Alex's rooftop lab: the briefing; John carries the log to the gap) -> roof B (searchlights; Lars
+// Route: roof A (a log blocks the way to Dr. Alex's rooftop lab: John lifts it and carries it; the briefing; then the log bridges the gap) -> roof B (searchlights; Lars
 //        hops cover to cover to the LIGHT POWER switch) -> roof C (a guard + a laser maze around the skylight) -> the vault.
 const CW=520, CH=200;
 const ROOF_A=R(6,30,112,156), ROOF_B=R(150,20,170,166), ROOF_C=R(352,26,160,160);
 const BEAM_SLOT=R(116,96,36,12);          // where the log bridges A -> B
 const PLANK_BC=R(318,140,36,12);          // fixed plank B -> C
-const LOOSE_BEAM=R(60,150,34,7);          // the log, lying on roof A before John picks it up
+const LOOSE_BEAM=R(41,117,34,7);          // the log, wedged between the water tank and the vents: it blocks the only way to Dr. Alex until John lifts it
 // roof A: a water tank and a bank of vents split the roof; the only way through is a narrow gap between them
 const TANK=R(6,112,40,18), VENTS=R(70,112,48,14);
 const LAB={bench:R(16,46,32,8), coil:R(56,40,6,8)};
-const LOG_DROP=R(90,92,28,22);            // carry the log here, sideways, to lay it across the gap
+const LOG_DROP=R(90,92,28,22);            // the edge of roof A: walk up here to cross (Lars jumps, or John lays the log across)
 const FUSE={x:312,y:100};
 const SKYLIGHT=R(462,40,24,16);
 const LADDER=R(10,166,22,14);
@@ -271,10 +271,7 @@ function drawBeam(){
   const s=BEAM_SLOT, on=(time/300|0)%2; ctx.fillStyle=`rgba(200,215,235,${on?.55:.3})`;
   for(let x=s.x;x<s.x+s.w;x+=6){ctx.fillRect(x,s.y+2,3,1); ctx.fillRect(x,s.y+9,3,1)} ctx.fillRect(s.x,s.y+2,1,8); ctx.fillRect(s.x+s.w-1,s.y+2,1,8);
 }
-function drawCarriedLog(c){ if(!heist.carry||c.id!=='john')return; const x=Math.round(c.x), y=Math.round(c.y);
-  if(heist.carry.rot==='h')logH(x-17,y-15,34); else logV(x-3,y-30,30) }
-// the log's footprint while John carries it (used for bumping into things)
-const carryBox=(x,y)=>heist.carry.rot==='h'?R(x-17,y-9,34,10):R(x-4,y-27,8,28);
+function drawCarriedLog(c){ if(!heist.carry||c.id!=='john')return; logV(Math.round(c.x)+3,Math.round(c.y)-32,30) }   // up on John's shoulder
 function drawGrate(){
   if(heistStage()>=3){ctx.fillStyle='#5f6676'; ctx.fillRect(SKYLIGHT.x+26,SKYLIGHT.y+18,12,10); return}   // tossed aside
   ctx.fillStyle='#8b93a3'; for(let x=SKYLIGHT.x;x<SKYLIGHT.x+SKYLIGHT.w;x+=4)ctx.fillRect(x,SKYLIGHT.y,1,SKYLIGHT.h);
@@ -286,7 +283,6 @@ const lead=()=>heist.crew[heist.lead];
 function syncLeadFromP(){const c=lead(); c.x=P.x;c.y=P.y;c.dir=P.dir;c.moving=P.moving;c.step=P.step}
 function switchTo(i){
   if(i===heist.lead||paused)return;
-  if(heist.carry)return flashPrompt(HEIST.handsFull);
   syncLeadFromP(); heist.lead=i; const c=lead(); P.x=c.x;P.y=c.y;P.dir=c.dir;P.moving=false;
   heist.trail=[{x:c.x,y:c.y}]; heist.sprintT=0; renderCrewBar();
 }
@@ -319,12 +315,7 @@ function useSkill(){
   const id=lead().id;
   if(id==='hero'&&heist.sonarCd<=0){sfx('ping'); heist.sonarT=4200; heist.sonarCd=1600; heist.sonarAt={x:P.x,y:P.y}; if(P.x>ROOF_C.x-10)heist.marked=true}   // pinging near the maze chalk-marks the tripwires
   if(id==='lars'&&heist.sprintCd<=0){sfx('whoosh'); heist.sprintT=800; heist.sprintCd=1100}
-  if(id==='john'){ if(heist.carry)return turnLog(); flashPrompt('Nothing heavy here.') }
-}
-function turnLog(){
-  const was=heist.carry.rot; heist.carry.rot=was==='h'?'v':'h';
-  if(blocked(P.x,P.y)){heist.carry.rot=was; sfx('bad'); return flashPrompt(HEIST.noRoom)}
-  sfx('thud');
+  if(id==='john')flashPrompt(heist.carry?HEIST.johnHolding:'Nothing heavy here.')
 }
 function flashPrompt(text){prompt.textContent=text; prompt.hidden=false; heist.promptT=1400}
 
@@ -380,19 +371,21 @@ function briefing(){
   say([...HEIST.briefing.map(t=>[HEIST.stranger,t]),...HEIST.crewHello],()=>openHowTo());
 }
 function hintOnce(key,who,text){ if(heist.hinted[key])return; heist.hinted[key]=true; say([[who,text]]) }
-// walking up to the log gives you a choice; only John can carry it
+// the log blocks the way: only John can lift it, and then he carries it everywhere until it's a bridge
 function beamChoice(){
   const H=HEIST;
-  if(!have.heistBriefed)return say([['John',H.briefFirst]]);
   showDialog({place:H.place,speaker:'',pages:[H.beamLook],menu:true,actions:[
-    {label:H.beamBridge,fn:()=>{ if(lead().id!=='john')return say(H.beamTooHeavy); closeDialog(); pickUpLog() }},
-    {label:H.beamJump,fn:()=>{ closeDialog(); say(H.beamJumpBefore,larsJump) }},
+    {label:H.beamLift,fn:()=>{ if(lead().id!=='john')return say(lead().id==='lars'?H.beamTooHeavyLars:H.beamTooHeavy); closeDialog(); pickUpLog() }},
     {label:H.beamLeave,ghost:true,fn:closeDialog}]});
 }
-function pickUpLog(){
-  heist.carry={rot:'h'}; const b=LOOSE_BEAM; P.x=b.x+b.w/2; P.y=b.y+9; sfx('thud');
-  if(blocked(P.x,P.y)){P.y+=3}
-  say([['John',HEIST.carryHint]]);
+function pickUpLog(){ heist.carry={rot:'v'}; sfx('thud'); say([['John',HEIST.carryHint]]) }
+// at the edge of roof A: Lars wants to jump it; John has the log
+function gapChoice(){
+  const H=HEIST;
+  showDialog({place:H.place,speaker:'',pages:[H.gapLook],menu:true,actions:[
+    {label:H.beamJump,fn:()=>{ closeDialog(); say(H.beamJumpBefore,larsJump) }},
+    {label:H.gapLog,fn:()=>{ if(!heist.carry)return say(H.needLog); if(!have.heistBriefed)return say([['John',H.briefFirst]]); closeDialog(); liftBeam() }},
+    {label:H.gapLater,ghost:true,fn:closeDialog}]});
 }
 // Lars's long jump: walk back for a run-up, sprint at the gap, leap... and boing right back. John is not amused.
 const JUMP={WALK:900, RUN:450, AIR:650, DAZE:1400, Y:104, START:58, EDGE:112};
@@ -491,8 +484,7 @@ function heistTrigger(){
     if(st===4)return say([[HEIST.stranger,HEIST.strangerRematch],...HEIST.larsChallenge.slice(1,2)],()=>openLarsMenu());
     if(!have.heistBriefed)return briefing();
     say([[HEIST.stranger,HEIST.strangerAgain]])}};
-  if(st<1&&heist.carry&&hit(feet,LOG_DROP)&&heist.carry.rot==='h')return {label:HEIST.layLog, act:liftBeam};
-  if(st<1&&heist.carry&&hit(feet,LOG_DROP))return {label:HEIST.turnIt, act:turnLog};
+  if(st<1&&hit(feet,LOG_DROP))return {label:HEIST.gapLabel, act:gapChoice};
   if(st<1&&!heist.carry&&hit(feet,R(LOOSE_BEAM.x-10,LOOSE_BEAM.y-6,LOOSE_BEAM.w+20,LOOSE_BEAM.h+12)))return {label:'Look at the log', act:beamChoice};
   if(st<2&&hit(feet,R(FUSE.x-14,FUSE.y-14,28,28)))return {label:HEIST.fuse, act:cutFuse};
   if(st>=2&&st<4&&!lasersOff()&&hit(feet,R(LASER_PANEL.x-4,LASER_PANEL.y,LASER_PANEL.w+6,16)))return {label:HEIST.lasersOff, act:lasersOffNow};
@@ -527,14 +519,13 @@ SCENES.city={ music:'heist',
   get walk(){ return [ROOF_A,ROOF_B,ROOF_C,PLANK_BC,LADDER,...(heistStage()>=1?[BEAM_SLOT]:[])] },
   get solids(){ return [TANK,VENTS,LAB.bench,LAB.coil,...COVERS,R(FUSE.x-14,FUSE.y-20,28,6),SKYLIGHT,LASER_PANEL,R(STRANGER.x-4,STRANGER.y-3,8,4),
     ...(heistStage()<1&&!heist.carry?[LOOSE_BEAM]:[])] },
-  feet(x,y){ return heist.carry&&lead().id==='john'?carryBox(x,y):R(x-4,y-3,8,4) },   // carrying the log, the whole log has to fit
   entries:{start:{x:40,y:156,dir:'up'}, fromStreet:{x:40,y:156,dir:'up'}},
   enter(){
     heist.lead=0; heist.follow=true; heist.hinted={}; heist.sonarT=0; heist.sprintT=0; heist.marked=false;
     placeAtCheckpoint(); $('crewbar').hidden=false; buildCrewBar();   // (Dr. Alex waits at her lab bench: walk up to her for the briefing)
   },
   leave(){ $('crewbar').hidden=true },
-  speed:()=>heist.carry?.05:heist.sprintT>0?.19:(lead().id==='lars'?.09:.07),
+  speed:()=>heist.sprintT>0?.19:(lead().id==='lars'?.09:lead().id==='john'&&heist.carry?.06:.07),
   dynTrigger:()=>heistTrigger(),
   ability:()=>useSkill(),
   key(code){ const i={Digit1:0,Digit2:1,Digit3:2}[code]; if(i!=null){switchTo(i);return true} if(code==='KeyF'){toggleFollow();return true} return false },
@@ -559,8 +550,9 @@ SCENES.city={ music:'heist',
     const hz=checkHazards(); if(hz)return caught(hz);
     // a few one-time hints as you reach each part
     const st=heistStage();
-    if(!have.heistBriefed&&P.y<150)hintOnce('who','John',HEIST.whoIsThat);
-    else if(st<1&&have.heistBriefed&&!heist.carry&&P.y>136)hintOnce('gap','John',HEIST.johnGap);
+    if(st<1&&!heist.carry&&P.y<146)hintOnce('log','John',HEIST.johnLog);
+    else if(!have.heistBriefed&&heist.carry&&P.y<108)hintOnce('who','John',HEIST.whoIsThat);
+    else if(st<1&&have.heistBriefed&&heist.carry&&P.x>70&&P.y<110)hintOnce('gap','John',HEIST.johnGap);
     else if(st===1&&P.x>160)hintOnce('lights','Lars',HEIST.larsLights);
     else if(st>=2&&st<3&&P.x>356)hintOnce('lasers',HEIST.crew.hero,HEIST.heroLasers);
   },
