@@ -103,8 +103,8 @@ function legs(c){ return [c.moving&&c.step%2?1:0, c.moving&&!(c.step%2)?1:0] }
 // Joe: whatever he picked in the wardrobe (WARDROBE in story.js). Colors and pieces for each outfit:
 const OUTFIT_LOOK={
   cape:   {top:'#34405c', pants:'#14161f', boots:'#0b0c12', belt:'#5a3a22', cape:['#0e1017','#1d2130'], head:'hair', mask:'#0b0c12'},
-  ninja:  {top:'#17181f', pants:'#17181f', boots:'#0b0c12', belt:'#2a2b36', head:'wrap'},
-  burglar:{top:'stripes', pants:'#1d1d22', boots:'#0b0c12', head:'beanie', hat:'#1d1d22', mask:'#0b0c12', sack:true},
+  potato: {top:'foil', pants:'#9aa1aa', boots:'#6b4a2e', head:'potato'},                 // a baked potato in foil, split open, with a pat of butter on top
+  crumb:  {top:'crumb', pants:'#2b2d33', boots:'#141519', belt:'#c9ced4', cape:['#5d626d','#454953'], head:'hair', mask:'#141519', whisk:true},   // Captain Crumb: an original baker superhero
   sweater:{top:'sweater', pants:'#3a5f9e', boots:'#3b2a1e', head:'santa'},
   vikings:{top:'jersey', pants:'#ffc62f', boots:'#f2f2ee', head:'helmet'},
   disco:  {top:'disco', pants:'#f2efe6', boots:'#e8b04a', head:'afro', flare:true},
@@ -113,16 +113,17 @@ const OUTFIT_LOOK={
 };
 const heroLook=()=>OUTFIT_LOOK[have.outfit]||OUTFIT_LOOK.cape;
 function drawHero(c,g=ctx,look=heroLook()){
-  const x=Math.round(c.x)-6, y=Math.round(c.y)-18, F=(col,dx,dy,w,h)=>{g.fillStyle=col;g.fillRect(x+dx,y+dy,w,h)};
+  const x=Math.round(c.x)-6, y=Math.round(c.y)-20, F=(col,dx,dy,w,h)=>{g.fillStyle=col;g.fillRect(x+dx,y+dy,w,h)};
   const skin='#f0c6a0', hair='#b08355', eye='#3d8ad6', L=look;
   const [a,b]=legs(c), sway=c.moving?(c.step%2?1:-1):0;
-  F('rgba(0,0,0,.25)',1,17,10,2);
-  if(L.cape&&c.dir!=='up'){F(L.cape[0],0+sway,7,12,10); F(L.cape[1],1+sway,8,1,8)}            // cape behind you
-  if(L.sack&&c.dir!=='right'){F('#c9b07a',9,6,4,7); F('#a8905a',10,6,2,1); F('#8a7448',9,12,4,1)}   // loot sack over the shoulder
-  F(L.pants,3,13,2,4-a); F(L.pants,7,13,2,4-b); F(L.boots,2,17-a,3,1); F(L.boots,7,17-b,3,1);
-  if(L.flare){F(L.pants,2,16-a,4,1); F(L.pants,6,16-b,4,1); F(L.boots,2,17-a,4,1); F(L.boots,6,17-b,4,1)}   // bell-bottoms + platforms
+  F('rgba(0,0,0,.25)',1,19,10,2);
+  if(L.cape&&c.dir!=='up'){F(L.cape[0],0+sway,7,12,12); F(L.cape[1],1+sway,8,1,10)}            // cape behind you
+  F(L.pants,3,13,2,6-a); F(L.pants,7,13,2,6-b); F(L.boots,2,19-a,3,1); F(L.boots,7,19-b,3,1);
+  if(L.flare){F(L.pants,2,18-a,4,1); F(L.pants,6,18-b,4,1); F(L.boots,2,19-a,4,1); F(L.boots,6,19-b,4,1)}   // bell-bottoms + platforms
   // body
-  if(L.top==='stripes'){F('#f2f2ee',2,7,8,6); F('#f2f2ee',1,8,1,4); F('#f2f2ee',10,8,1,4); for(let yy=8;yy<13;yy+=2){F('#1d1d22',1,yy,10,1)}}
+  if(L.top==='crumb'){F('#2b2d33',2,7,8,7); F('#2b2d33',1,8,1,4); F('#2b2d33',10,8,1,4); F('#f2f2ee',1,11,1,2); F('#f2f2ee',10,11,1,2);   // black suit, white oven-mitt gloves
+    if(c.dir==='down'){F('#f2f2ee',4,8,4,3); F('#ffffff',4,8,2,1); F('#6b707a',5,9,1,1); F('#6b707a',7,8,1,1); F('#6b707a',6,10,1,1)} }   // the white cookie emblem   // the cookie emblem
+  else if(L.top==='foil'){F('#b9c0c8',1,6,10,8); F('#8d949c',1,13,10,1); for(const [fx,fy] of [[2,7],[5,8],[8,7],[3,10],[7,11],[9,9],[4,12]])F('#eef1f4',fx,fy,1,1); F('#8d949c',6,9,1,2); F('#8d949c',3,8,1,1)}   // crinkly foil   // fuzzy suit, lighter belly
   else if(L.top==='sweater'){F('#c8322b',1,7,10,6); F('#2f8a4a',1,9,10,1); F('#2f8a4a',1,12,10,1); F('#ffffff',3,8,1,1); F('#ffffff',6,8,1,1); F('#ffffff',9,8,1,1); F('#ffffff',4,10,1,1); F('#ffffff',8,10,1,1); F('#f4d35e',6,10,1,2)}
   else if(L.top==='jersey'){F('#4f2683',1,7,10,6); F('#ffc62f',1,7,2,2); F('#ffc62f',9,7,2,2); F('#ffffff',5,9,2,3); F('#ffc62f',1,12,10,1)}   // purple jersey, gold shoulders, a white number
   else if(L.top==='avant'){F('#1d1d22',2,6,8,7); F('#1d1d22',3,5,6,1); F('#f2f2ee',-1,5,5,5); F('#d9d9d4',-1,9,5,1); F('#1d1d22',10,8,1,5); F('#f2f2ee',3,12,6,1)}   // turtleneck, one huge white shoulder
@@ -133,13 +134,17 @@ function drawHero(c,g=ctx,look=heroLook()){
   else if(L.top==='disco'){F('#f2efe6',1,7,10,6); F('#e8742a',4,7,4,4); F('#f2efe6',5,8,2,3); F('#ffd84d',5,10,2,1); F('#d9d3c4',1,9,1,4); F('#d9d3c4',10,9,1,4)}   // white suit, orange wide collar, gold chain
   else {F(L.top,2,7,8,7); F(L.top,1,8,1,4); F(L.top,10,8,1,4)}
   if(L.belt)F(L.belt,2,12,8,1);
-  if(L.sack&&c.dir==='right'){F('#c9b07a',-1,6,4,7); F('#a8905a',0,6,2,1)}
+  if(L.whisk&&c.dir!=='left'){F('#8a5a34',9,11,1,2); F('#c9ced4',8,13,3,1); F('#c9ced4',8,14,1,1); F('#c9ced4',10,14,1,1); F('#c9ced4',9,15,1,1)}   // a whisk on the belt
   F(skin,3,2,6,5);
   // head
-  if(L.head==='wrap'){ F(L.top,2,0,8,7);
-    if(c.dir==='down'){F(skin,3,3,6,2); F(eye,4,3,1,1); F(eye,7,3,1,1)}
-    if(c.dir==='left'){F(skin,2,3,3,2); F(eye,3,3,1,1)}
-    if(c.dir==='right'){F(skin,7,3,3,2); F(eye,8,3,1,1)}
+  if(L.head==='potato'){ const SK='#8a5a34', SKD='#6b4428', FL='#f6e7bd', BU='#f6d44c';   // potato skin around the face, fluffy inside, butter melting on top, chives
+    F(SK,1,-1,10,8); F(SKD,1,6,10,1); F(SKD,2,0,1,1); F(SKD,9,3,1,1);
+    if(c.dir!=='up'){ F(FL,2,0,8,6);
+      if(c.dir==='down'){F(skin,3,1,6,5); F(eye,4,3,1,1); F(eye,7,3,1,1); F('#b5654f',5,5,2,1); F('#f5b6b0',3,4,1,1); F('#f5b6b0',8,4,1,1)}
+      if(c.dir==='left'){F(skin,2,1,4,5); F(eye,3,3,1,1)}
+      if(c.dir==='right'){F(skin,6,1,4,5); F(eye,8,3,1,1)} }
+    F(BU,3,-3,6,3); F('#fff3a8',4,-3,3,1); F('#e0b830',3,-1,6,1); F(BU,3,0,1,1); F(BU,8,0,1,2);   // the butter hat, dripping
+    for(const [cx,cy] of [[2,-1],[9,0],[5,-4],[1,2]])F('#3f9a3a',cx,cy,1,1);                       // chives
     return }
   if(L.head==='helmet'){ F('#4f2683',2,-1,8,7); F('#3d1d66',2,5,8,1); F('#ffc62f',5,-1,2,7);                                // helmet with a gold stripe
     if(c.dir==='up')return;
@@ -186,7 +191,6 @@ function drawHero(c,g=ctx,look=heroLook()){
     if(c.dir==='left'){F(hair,7,2,3,4); if(m)F(m,3,3,4,2); F(eye,3,4,1,1)}
     if(c.dir==='right'){F(hair,2,2,3,4); if(m)F(m,5,3,4,2); F(eye,8,4,1,1)}
   }
-  if(L.head==='beanie'){F(L.hat,2,-1,8,3); F('#3a3a44',2,1,8,1)}
   if(L.head==='santa'){F('#c8322b',3,-3,6,3); F('#c8322b',8,-4,2,2); F('#ffffff',11,-5,2,2); F('#c8322b',10,-5,1,2); F('#ffffff',2,0,8,1)}
 }
 // ---------- the wardrobe: pick Joe's stealth outfit before going up ----------

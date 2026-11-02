@@ -144,8 +144,8 @@ const WARDROBE = {title:"Suit up, Joe", intro:"It's a stealth mission. What are 
   jersey:{id:'jersey', name:"Joe's Jersey", line:"White jersey, red trim. The classic Joe."},   // only offered at the start
   outfits:[
     {id:'cape',    name:"The Classic",      line:"Dark suit, mask, dramatic cape. Very brooding."},
-    {id:'ninja',   name:"All-Black Ninja",  line:"Head to toe in black. Only your eyes show."},
-    {id:'burglar', name:"Cat Burglar",      line:"Striped shirt, beanie, eye mask, and a sack for the loot."},
+    {id:'potato',  name:"Baked Potato",     line:"Wrapped in foil, split open, a pat of butter for a hat. Chives. Fully loaded."},
+    {id:'crumb',   name:"Captain Crumb",    line:"Superhero of the late-night kitchen. Black suit, white cookie emblem, grey cape, oven mitts, and a whisk on the belt."},
     {id:'sweater', name:"Ugly Xmas Sweater",line:"Stealth: zero. Festive: maximum."},
     {id:'vikings', name:"Vikings Gameday",  line:"Purple jersey, gold pants, horned helmet. SKOL."},
     {id:'disco',   name:"70s Disco",        line:"White suit, gold chain, big hair. Stayin' alive."},
@@ -154,8 +154,9 @@ const WARDROBE = {title:"Suit up, Joe", intro:"It's a stealth mission. What are 
   ],
   changeOutfit:"Change outfit",   // the button in Settings
   changeIntro:"Change it up any time. What are you wearing?",
-  react:{cape:[['Lars',"Very dramatic. The cape is a lot."],['John',"I love the cape."]], ninja:[['John',"I can't see you. That's the point, right?"]],
-         burglar:[['Lars',"You look like a cartoon robber."],['John',"It's perfect."]],
+  react:{cape:[['Lars',"Very dramatic. The cape is a lot."],['John',"I love the cape."]],
+         crumb:[['Lars',"Who are you supposed to be?"],['John',"Captain Crumb. Protector of cookies. Enemy of the Confectioner."],['Lars',"Is that a whisk?"],['John',"It's a symbol of justice."]],
+         potato:[['Lars',"Why are you a potato."],['John',"Baked. Buttered. Unstoppable."],['Lars',"You're going to crinkle the whole way in."]],
          sweater:[['Lars',"They're going to see you from space."],['John',"Festive though."]],
          vikings:[['John',"SKOL!!!"],['Lars',"We're breaking into a vault, not tailgating."],['John',"Why not both."]],
          avant:[['Lars',"Is that... art?"],['John',"He looks like a security guard from the year 3000."],['Lars',"Avant Guard. I get it. I hate that I get it."]],

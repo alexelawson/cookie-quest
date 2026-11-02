@@ -69,16 +69,16 @@ function drawPlayer(x0,y0){
   const c={x:x0,y:y0,dir:P.dir,moving:P.moving,step:P.step};
   const look=have.look&&have.look!=='jersey'&&OUTFIT_LOOK[have.look]; if(look)drawHero(c,ctx,look); else drawJoeJersey(c,ctx);
   drawGear(c,ctx,look||null);   // Oakleys, headband, racing shoes, if he found them
-  if(have.crown&&scene!==SCENES.kitchen)drawCrown(x0,y0-23);   // the Cookie King
+  if(have.crown&&scene!==SCENES.kitchen)drawCrown(x0,y0-25);   // the Cookie King
 }
 function drawJoeJersey(P,g=ctx){
-  const x=Math.round(P.x)-6, y=Math.round(P.y)-18;
+  const x=Math.round(P.x)-6, y=Math.round(P.y)-20;   // (20 px tall: a bit taller than everyone but Lars)
   const F=(c,dx,dy,w,h)=>{g.fillStyle=c;g.fillRect(x+dx,y+dy,w,h)};
   const skin='#f0c6a0',hair='#b08355',hairD='#8d6440',shirt='#fbfbf7',red='#c8322b',blk='#1d1d22',eye='#3d8ad6';
-  F('rgba(0,0,0,.25)',2,17,8,2);
+  F('rgba(0,0,0,.25)',2,19,8,2);
   const a=P.moving&&P.step%2?1:0, b=P.moving&&!(P.step%2)?1:0;
-  F(skin,3,14,2,3-a); F(skin,7,14,2,3-b); F(blk,3,14,2,1); F(blk,7,14,2,1);
-  F(blk,2,17-a,3,1); F(blk,7,17-b,3,1);
+  F(skin,3,14,2,5-a); F(skin,7,14,2,5-b); F(blk,3,14,2,1); F(blk,7,14,2,1);
+  F(blk,2,19-a,3,1); F(blk,7,19-b,3,1);
   F(blk,2,12,8,3);
   F(shirt,2,7,8,5); F(shirt,1,7,1,2); F(shirt,10,7,1,2); F(red,1,8,1,1); F(red,10,8,1,1); F('#e2e2d8',8,8,2,4); F('#e2e2d8',2,11,8,1);   // a little shading on the jersey
   F(skin,1,9,1,3); F(skin,10,9,1,3);

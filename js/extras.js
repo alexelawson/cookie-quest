@@ -80,7 +80,7 @@ function drawGearItem(k,x,y){
 }
 // drawn on top of whatever Joe is wearing. c: {x,y,dir,moving,step}; look: the outfit (null for the jersey)
 function drawGear(c,g=ctx,look=null){
-  if(!have.gear)return; const x=Math.round(c.x)-6, y=Math.round(c.y)-18, F=(col,dx,dy,w,h)=>{g.fillStyle=col;g.fillRect(x+dx,y+dy,w,h)};
+  if(!have.gear)return; const x=Math.round(c.x)-6, y=Math.round(c.y)-20, F=(col,dx,dy,w,h)=>{g.fillStyle=col;g.fillRect(x+dx,y+dy,w,h)};
   const head=look?look.head:'hair', a=c.moving&&c.step%2?1:0, b=c.moving&&!(c.step%2)?1:0;
   if(gearWorn('jersey')){ const P='#4f2683', PD='#3d1d66', GO='#ffc62f', W='#ffffff';      // a purple #18 Vikings jersey: white/gold sleeve stripes, numbers front and back
     F(P,2,7,8,7); F(PD,2,13,8,1); F(P,1,7,1,3); F(P,10,7,1,3); F(W,1,8,1,1); F(W,10,8,1,1); F(GO,1,9,1,1); F(GO,10,9,1,1);
@@ -93,7 +93,7 @@ function drawGear(c,g=ctx,look=null){
   if(gearWorn('clover')&&c.dir!=='up'){ const tw=Math.floor(time/250)%3===0;               // the lucky clover pin, with a gold glint
     if(gearWorn('jersey')){ const px=c.dir==='left'?9:0; F('#1d5a2a',px,5,3,3); F('#5fd36a',px,5,1,1); F('#5fd36a',px+2,5,1,1); F('#5fd36a',px,7,1,1); F('#5fd36a',px+2,7,1,1); F('#9ff0a8',px,5,1,1); if(tw)F('#fff3a8',px+3,4,1,1) }   // small, on the shoulder, so the 18 shows
     else { const px=c.dir==='left'?3:7; F('#1d5a2a',px-1,7,5,5); F('#5fd36a',px,7,1,1); F('#5fd36a',px+2,7,1,1); F('#5fd36a',px,9,1,1); F('#5fd36a',px+2,9,1,1); F('#3fbf55',px+1,8,1,1); F('#9ff0a8',px,7,1,1); F('#2e8a3e',px+1,10,1,2); if(tw)F('#fff3a8',px+3,6,1,1) } }
-  if(gearWorn('shoes')){F('#ff5a1f',2,17-a,3,1); F('#ff5a1f',7,17-b,3,1); F('#f4d35e',4,17-a,1,1); F('#f4d35e',9,17-b,1,1)}   // bright carbon racers
+  if(gearWorn('shoes')){F('#ff5a1f',2,19-a,3,1); F('#ff5a1f',7,19-b,3,1); F('#f4d35e',4,19-a,1,1); F('#f4d35e',9,19-b,1,1)}   // bright carbon racers
   const bare=head==='hair'||!look;
   if(gearWorn('headband')&&bare&&!gearWorn('hat')){F('#2fb3a0',2,1,8,1); if(c.dir==='down')F('#ffffff',5,1,2,1)}
   const hat=gearWorn('hat')&&bare;
@@ -102,7 +102,7 @@ function drawGear(c,g=ctx,look=null){
   if(gearWorn('goggles')&&bare&&c.dir!=='up'){                                             // Dr. Alex's goggles: up on his forehead, or round his neck under the hat
     const gy=hat?6:0; F('#2b2b2b',2,gy,8,1);
     const lh=hat?1:2; if(c.dir==='down'){F('#7fd3ff',3,gy,2,lh); F('#7fd3ff',7,gy,2,lh); F('#d6f2ff',3,gy,1,1)} else F('#7fd3ff',c.dir==='left'?3:7,gy,2,lh) }
-  if(gearWorn('oakleys')&&head!=='wrap'){
+  if(gearWorn('oakleys')&&head!=='potato'){
     if(c.dir==='down'){F('#1d1d22',2,4,8,1); F('#e0603a',3,4,2,1); F('#7a4fa0',7,4,2,1); F('#ffd0a0',3,4,1,1)}
     else if(c.dir==='left'){F('#1d1d22',2,4,5,1); F('#e0603a',2,4,2,1)}
     else if(c.dir==='right'){F('#1d1d22',5,4,5,1); F('#7a4fa0',8,4,2,1)}

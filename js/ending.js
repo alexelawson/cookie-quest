@@ -34,7 +34,7 @@ const PHOTO_SCENES={
     F('#8a8f9a',51,6,2,16); F('#c9ced4',47,6,10,2); F('#e8b04a',47,8,10,1); for(let x=48;x<56;x+=2)F('#c9ced4',x,9,1,6); F('#8a8f9a',47,14,10,3);
     drawMargie(14,44); drawJack(28,44); joeAt(44,44); F('#f4d35e',38,20,5,2) },
   kitchen(F){ F('#b98352',0,0,64,48); for(let y=0;y<48;y+=6)F('#a5703f',0,y,64,1); F('#ecd2ac',0,0,64,10); F('#8a5a34',0,10,64,2);
-    drawAlex(24,44,'happy'); joeAt(38,44); drawCrown(38,22);
+    drawAlex(24,44,'happy'); joeAt(38,44); drawCrown(38,20);
     F('#e54b7a',28,14,3,3); F('#e54b7a',32,14,3,3); F('#e54b7a',27,16,9,3); F('#e54b7a',29,19,5,2); F('#e54b7a',31,21,1,1);
     for(const [x,y] of [[6,40],[54,36],[8,20],[56,16]])drawCookie(x,y) },
 };

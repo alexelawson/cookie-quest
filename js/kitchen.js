@@ -337,7 +337,7 @@ SCENES.kitchen={ place:KITCHEN.place, music:()=>kit.dance?'jingle':'kitchen',
     kit.confetti=kit.confetti.filter(p=>!p.dead);
     if(kit.crownT>0){ kit.crownT-=dt; if(kit.crownT<=0){ have.crown=true; save(); sfx('crown'); kit.dance=true; kit.danceAt=time; playMusic(); setTimeout(finalNote,PARTY.BEAT*16) } } },
   drawPlayer(x,y){ const m=danceMove(-1); if(kit.dance&&m.dir)P.dir=m.dir; const X=x+m.dx, Y=y+m.dy; drawPlayer(X,Y);
-    if(kit.crownT>0){const t=Math.min(1,(1-kit.crownT/1600)*1.4); drawCrown(X,Y-23-(1-t)*60)} else if(have.crown)drawCrown(X,Y-23);
+    if(kit.crownT>0){const t=Math.min(1,(1-kit.crownT/1600)*1.4); drawCrown(X,Y-25-(1-t)*60)} else if(have.crown)drawCrown(X,Y-25);
     if(m.cookie)drawCookie(X+7,Y-20) },
   solids:[R(78,104,68,14), R(194,104,24,10), R(6,52,16,6)],
   entries:{start:{x:112,y:152,dir:'up'}, fromDoor:{x:112,y:154,dir:'up'}},

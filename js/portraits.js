@@ -34,17 +34,20 @@ PORTRAITS['John']={size:32, bg:'#f2d9c4', draw(g){ const F=px(g);
 PORTRAITS['Joe']={size:32, bg:'#2a3044', draw(g){ const F=px(g), L=(typeof heroLook==='function')?heroLook():{top:'#34405c',head:'hair',mask:'#0b0c12',cape:1};
   const skin='#f0c6a0', hair='#b08355', eye='#3d8ad6';
   // shoulders
-  if(L.top==='stripes'){F('#f2f2ee',5,22,22,10); for(let y=23;y<32;y+=3)F('#1d1d22',5,y,22,1)}
+  if(L.top==='crumb'){F('#2b2d33',4,22,24,10); F('#f2f2ee',12,24,8,6); F('#ffffff',12,24,4,2); F('#6b707a',14,26,2,2); F('#6b707a',18,25,1,1); F('#6b707a',16,28,2,1)}   // black suit, white cookie emblem
+  else if(L.top==='foil'){F('#b9c0c8',4,22,24,10); for(const [x,y] of [[6,24],[11,27],[17,23],[22,26],[26,29],[8,30],[20,30]])F('#eef1f4',x,y,2,1); F('#8d949c',14,25,1,4)}
   else if(L.top==='sweater'){F('#c8322b',4,22,24,10); F('#2f8a4a',4,25,24,1); for(let x=6;x<26;x+=4)F('#ffffff',x,28,1,1)}
   else if(L.top==='jersey'){F('#4f2683',4,22,24,10); F('#ffc62f',4,22,6,4); F('#ffc62f',22,22,6,4); F('#ffffff',14,25,4,6)}
   else if(L.top==='avant'){F('#1d1d22',6,22,20,10); F('#1d1d22',12,19,8,4); F('#f2f2ee',0,20,10,9); F('#d9d9d4',0,27,10,2)}
   else if(L.top==='cupcake'){F('#e0b46a',2,26,28,6); for(let x=3;x<30;x+=3)F('#b8863e',x,27,1,5); F('#f2d49a',2,26,28,1)}
   else if(L.top==='disco'){F('#f2efe6',4,22,24,10); F('#e8742a',11,22,10,6); F('#f2efe6',14,23,4,6); F('#ffd84d',13,27,6,1)}
   else F(L.top,6,22,20,10);
-  if(L.cape){F('#0e1017',3,22,4,10); F('#0e1017',25,22,4,10); F('#1d2130',5,20,4,6); F('#1d2130',23,20,4,6)}
-  if(L.sack){F('#c9b07a',24,18,7,12); F('#a8905a',25,18,4,2)}
+  if(L.cape){const [c0,c1]=Array.isArray(L.cape)?L.cape:['#0e1017','#1d2130']; F(c0,3,22,4,10); F(c0,25,22,4,10); F(c1,5,20,4,6); F(c1,23,20,4,6)}
   F(skin,13,19,6,4); F(skin,10,6,12,15);
-  if(L.head==='wrap'){F(L.top,9,3,14,18); F(skin,11,10,10,4); F(eye,12,11,2,2); F(eye,18,11,2,2); return}
+  if(L.head==='potato'){F('#8a5a34',6,3,20,22); F('#6b4428',6,23,20,2); F('#f6e7bd',8,5,16,17); F(skin,10,7,12,13);
+    F(eye,12,11,2,2); F(eye,18,11,2,2); F('#f5b6b0',10,15,2,1); F('#f5b6b0',20,15,2,1); F('#e0aa88',15,14,2,2); F('#b5654f',13,17,6,1);
+    F('#f6d44c',9,-2,14,7); F('#fff3a8',10,-2,8,2); F('#e0b830',9,4,14,1); F('#f6d44c',10,5,2,3); F('#f6d44c',20,5,2,4);
+    for(const [x,y] of [[7,6],[24,8],[15,-3],[6,14],[25,18]])F('#3f9a3a',x,y,2,1); return}   // baked potato: butter hat, chives
   if(L.head==='beret'){F('#1d1d22',9,5,14,3); F('#c8322b',6,0,20,6); F('#c8322b',20,-1,4,3); F('#8a1f1a',15,0,2,1);
     F('#1d1d22',11,11,4,3); F('#1d1d22',17,11,4,3); F('#1d1d22',15,12,2,1); F('#b5654f',14,18,4,1); return}
   if(L.head==='frosting'){F('#f39ac0',2,6,28,21); F('#f39ac0',5,1,22,6); F('#f39ac0',10,-2,12,4); F('#fcc9de',7,2,8,2); F('#fcc9de',4,14,3,6); F('#fcc9de',25,16,3,5);
@@ -59,7 +62,6 @@ PORTRAITS['Joe']={size:32, bg:'#2a3044', draw(g){ const F=px(g), L=(typeof heroL
   F(hair,9,3,14,6); F('#8d6440',11,4,8,1); F(hair,9,8,2,6); F(hair,21,8,2,5);
   if(L.mask)F(L.mask,9,10,14,4);
   F(eye,12,11,2,2); F(eye,18,11,2,2); F('#e0aa88',15,14,2,2); F('#b5654f',14,17,4,1);
-  if(L.head==='beanie'){F(L.hat,8,1,16,7); F('#3a3a44',8,7,16,2)}
   if(L.head==='santa'){F('#c8322b',9,0,14,6); F('#c8322b',20,-1,6,4); F('#ffffff',25,0,4,4); F('#ffffff',8,5,16,3)}
 }};
 // Keelan: lanky farmer, short brown hair, red plaid
