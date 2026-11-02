@@ -431,6 +431,11 @@ const LOGAN_TEXT = {
   help:"Help him look", later:"Leave him to it",
   found:["...","Wait. WAIT. Right by your foot. You found one!","Here. You keep it. Pin it on. You're gonna need the luck."],
   wear:"Pin it on",
+  huntTitle:"Find the four-leaf clover",
+  huntIntro:"It's in here somewhere. Four leaves, not three. Count carefully.",
+  huntMiss:["Three leaves. Doesn't count.","Nope. Count the leaves.","So close. That's a three-leaf.","That one's lying to you. Three."],
+  huntHint:"Here, look... something's glinting over there.",
+  huntLater:"Leave it for now",
   after:["Still on my break. Interval seven can wait.","Found a three-leaf. Doesn't count.","Clovers are about patience. Rollerskiing is about not falling. I'm better at clovers."],
 };
 // ---------- Alex's "where to next?" hints: shown if Joe stands still on the map for a bit ----------

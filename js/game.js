@@ -87,12 +87,9 @@ function drawSprite(g,x,y,set,pal,dir,eyeRow,seed){
 // eyes on row 4, jersey from row 7, shoes on row 19 (the gear in extras.js lines up with those)
 const JOE_PAL={H:'#a8794c',L:'#c99a66',h:'#83593a',S:'#f2c9a3',s:'#deac88',W:'#ffffff',E:'#3d7fc9',M:'#b5654f',J:'#fbfbf7',j:'#dcdcd2',R:'#c8322b',K:'#2a2a33',k:'#3e3e4a'};
 const JOE_ROWS={
-  down: ["..HHHHHHHH..",".HHHLLLHHHH.",".HHLHHHHHHH.",".HHHHHHHHHH.",".HhSSSSSShH.",".HSWESSEWSH.",".sSSSssSSSs.","..SSSMMSSS..",
-         ".JJJRSSRJJJ.",".RJJJJJJJJR.",".SJJJJJJJjS.",".SJJJJJJJjS.",".sjjjjjjjjs.","..KKKKKKKK..","..KKKkkKKK.."],
-  up:   ["..HHHHHHHH..",".HHHLLLHHHH.",".HHLHHHHHHH.",".HHHHHHHHHH.",".HHHHHHHHHH.",".SHHHHHHHHS.",".hHHHHHHHHh.","..hhSSSShh..",
-         ".JJJJJJJJJJ.",".RJJJJJJJJR.",".SJJJJJJJjS.",".SJJJJJJJjS.",".sjjjjjjjjs.","..KKKKKKKK..","..KKKKKKKK.."],
-  right:["..HHHHHHHH..",".HHHHLLLHHH.",".HHHHHHHHHH.",".HHHHHHHHHH.",".HHHHHSSShH.",".HHHsSSSWE..",".HhsSSSSSSS.","..hSSSSSMS..",
-         "..JJJJJSSJ..","..JJJJRJJJ..","..JJJJSJJj..","..JJJJSJJj..","..jjjjsjjj..","..KKKKKKKK..","..KKKkkKKK.."],
+  down: ["...HH.HHH...","..HHLLHHHHH.",".HHLLHHLLHH.",".HHHHLLHHHH.",".hHSSSShHHh.",".HSWESSEWSH.",".sSSSssSSSs.","..SSSMMSSS..",".JJJRSSRJJJ.",".RJJJJJJJJR.",".SJJJJJJJjS.",".SJJJJJJJjS.",".sjjjjjjjjs.","..KKKKKKKK..","..KKKkkKKK.."],
+  up:   ["...HH.HHH...","..HHLLHHHHH.",".HHLLHHLLHH.",".HHHHLLHHHH.",".HHHHHHLHHH.",".SHhHHHHhHS.",".hhHHHHHHhh.","..hhSSSShh..",".JJJJJJJJJJ.",".RJJJJJJJJR.",".SJJJJJJJjS.",".SJJJJJJJjS.",".sjjjjjjjjs.","..KKKKKKKK..","..KKKKKKKK.."],
+  right:["...HH.HHH...","..HHLLHHHH..",".HHLLHHLLHH.",".HHHHLLHHHH.",".hHHHHSShHH.",".HHHsSSSWE..",".HhsSSSSSSS.","..hSSSSSMS..","..JJJJJSSJ..","..JJJJRJJJ..","..JJJJSJJj..","..JJJJSJJj..","..jjjjsjjj..","..KKKKKKKK..","..KKKkkKKK.."],
 };
 function drawJoeJersey(P,g=ctx){
   const x=Math.round(P.x)-6, y=Math.round(P.y)-20, pal=JOE_PAL, dir=P.dir||'down';

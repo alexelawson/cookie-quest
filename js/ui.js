@@ -34,7 +34,7 @@ function showDialog({place,speaker,face,pages,actions,noteLast,menu}){
   dlg.hidden=false; draw(); sfx('blip');
 }
 // is any pop-up still open? (so closing one menu never unpauses the game under another)
-const OVERLAYS=['dialog','reward','pump','shop','vault','anagram','howto','wardrobe','bake','xword','ending','settings','titlecard'];
+const OVERLAYS=['dialog','reward','pump','shop','vault','anagram','howto','wardrobe','bake','xword','cloverHunt','ending','settings','titlecard'];
 const overlayOpen=()=>OVERLAYS.some(id=>!$(id).hidden);
 function closeDialog(){dlg.hidden=true; paused=overlayOpen(); cv.focus?.()}
 const CLOSE={label:'Close',fn:closeDialog};

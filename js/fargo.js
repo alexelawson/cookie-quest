@@ -183,12 +183,13 @@ function drawAttendant(x,y,i){
 // Alex: dark brown hair just below the shoulders, brown eyes, a green tee. Her mood shows in a little bubble.
 // Alex, waiting in the car park: long straight dark-brown hair swept back off her face, past her shoulders; big smile; green scoop-neck tee. mood: happy / frown / ok
 const ALEX_SPR={down:["..HHHHHHHH..",".HHLLhLLHHH.",".HHSSSSSSHH.",".HSBBSSBBSH.",".HSWESSEWSH.",".HSSSssSSSH.",".HSSSSSSSSH.",
-  ".HHTTSSTTHH.",".HHTTTTTTHH.",".HTTTTTTTtH.",".STTTTTTTtS.",".STTTTTTTtS.",".sPPPPPPPPs.","..PPPPPPPP.."]};
+  ".HHHsSSsHHH.",".HHTTSSTTHH.",".HHTTTTTTHH.",".HSTTTTTTSH.","..STTTTTtS..","..STTTTTtS..","..sTTTTTts..","...PPPPPP...","...PPPPPP..."]};   // tall and lanky
 function drawAlex(x,y,mood){
-  const X=Math.round(x)-6, Y=Math.round(y)-19, F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(X+dx,Y+dy,w,h)};
+  const X=Math.round(x)-6, Y=Math.round(y)-21, F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(X+dx,Y+dy,w,h)};
   const pal={H:ALEX.hair,h:ALEX.hairD,L:ALEX.hairL,B:ALEX.hairD,S:ALEX.skin,s:ALEX.skinS,W:'#ffffff',E:ALEX.eye,T:ALEX.top,t:ALEX.topD,P:ALEX.pants};
-  F('rgba(0,0,0,.2)',1,18,10,2);
-  F(ALEX.pants,3,14,3,4); F(ALEX.pants,6,14,3,4); F('#22222a',5,14,1,4); F(ALEX.shoe,2,17,4,2); F(ALEX.shoe,6,17,4,2); F('#5a4030',2,17,1,1); F('#5a4030',6,17,1,1);
+  F('rgba(0,0,0,.2)',2,20,8,2);
+  F(ALEX.pants,3,16,2,4); F(ALEX.pants,7,16,2,4); F('#22222a',4,16,1,4); F('#22222a',8,16,1,4);                                  // long legs
+  F(ALEX.shoe,2,20,3,1); F(ALEX.shoe,7,20,3,1); F('#5a4030',2,20,1,1); F('#5a4030',7,20,1,1);
   drawSprite(ctx,X,Y,ALEX_SPR,pal,'down',4,10);
   if(mood==='happy'){F(ALEX.smile,5,6,2,1); F(ALEX.smile,4,5,1,1); F(ALEX.smile,7,5,1,1); F(ALEX.blush,2,5,1,1); F(ALEX.blush,9,5,1,1)}   // a big smile
   else if(mood==='frown'){F(ALEX.frown,5,6,2,1); F(ALEX.skin,3,3,2,1); F(ALEX.skin,7,3,2,1); F(ALEX.hairD,3,3,1,1); F(ALEX.hairD,4,2,1,1); F(ALEX.hairD,8,3,1,1); F(ALEX.hairD,7,2,1,1)}   // cross brows

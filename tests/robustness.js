@@ -68,9 +68,11 @@ for(const [vpName,vp,touch] of [['desktop',{width:1280,height:800}],['phone',{wi
 {const p=await page(); await fresh(p,ALL);
   let r=await p.evaluate(()=>{const T=(n)=>{for(let i=0;i<n;i++)update(16.7)}; goTo('world','start'); T(40);
     P.x=LOGAN.x+6;P.y=LOGAN.y+2; T(2); action(); while([...$('dbtns').querySelectorAll('button')].some(b=>b.textContent==='Next'))[...$('dbtns').querySelectorAll('button')].find(b=>b.textContent==='Next').click();
-    [...$('dbtns').querySelectorAll('button')].find(b=>b.textContent===LOGAN_TEXT.help).click(); goTo('kitchen','fromDoor'); T(200);
-    const inKitchen=!dlg.hidden?$('dspeaker').textContent:''; goTo('world','fromKitchen'); T(200); const back=$('dspeaker').textContent; return {inKitchen,back,clover:have.gear&&have.gear.clover}});
-  ok('D walking away mid clover-hunt: Logan doesn\'t talk to you in the kitchen; he finishes when you\'re back',r.inKitchen!=='Logan'&&r.back==='Logan',JSON.stringify(r));
+    [...$('dbtns').querySelectorAll('button')].find(b=>b.textContent===LOGAN_TEXT.help).click(); const opened=!$('cloverHunt').hidden&&paused; $('cloverLater').click();
+    const closed=$('cloverHunt').hidden&&!paused&&!(have.gear&&have.gear.clover); T(2); action(); while([...$('dbtns').querySelectorAll('button')].some(b=>b.textContent==='Next'))[...$('dbtns').querySelectorAll('button')].find(b=>b.textContent==='Next').click();
+    [...$('dbtns').querySelectorAll('button')].find(b=>b.textContent===LOGAN_TEXT.help).click(); const again=!$('cloverHunt').hidden; $('cloverField').querySelector('[data-four]').click();
+    const back=$('dspeaker').textContent; closeDialog(); paused=false; return {opened,closed,again,back,clover:have.gear&&have.gear.clover}});
+  ok('D leaving the clover hunt halfway: no clover yet, the game carries on, and you can go back and find it',r.opened&&r.closed&&r.again&&r.back==='Logan'&&r.clover===1,JSON.stringify(r));
   r=await p.evaluate(()=>{const T=(n)=>{for(let i=0;i<n;i++)update(16.7)}; closeDialog(); paused=false; P.x=60;P.y=150; idle.t=HINTS.AFTER_MS+1; T(2); const shown=!$('hint').hidden; goTo('kitchen','fromDoor'); T(60); return {shown,kitchen:$('hint').hidden}});
   ok('D Alex\'s hint goes away when you leave the map',r.shown&&r.kitchen,JSON.stringify(r));
   await p.context().close()}

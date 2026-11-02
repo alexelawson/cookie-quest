@@ -216,7 +216,7 @@ function openWardrobe(then,mode='heist',fromSettings=false){   // mode 'look' = 
   render(); paused=true; prompt.hidden=true; $('wardrobe').hidden=false; setTimeout(()=>$('wardGo').focus({preventScroll:true}),0);
 }
 // Lars: tall runner, short blond hair, singlet with a race bib, split shorts, neon shoes
-// Lars: tall runner, short blond hair, blue singlet with a race bib, split shorts, white socks, bright pink racing shoes. 10 x 24 px.
+// Lars: tall runner, short blond hair, blue singlet with a race bib, split shorts, white socks, neon pink racing shoes. 10 x 24 px.
 const LARS_PAL={L:'#e6c46a',l:'#c9a54a',y:'#f2d88a',S:'#f3cba8',s:'#ddb18c',E:'#3d6fb0',M:'#c9876f',B:'#2f6db0',b:'#245a94',w:'#ffffff',r:'#c8322b',K:'#1c1c22',k:'#2e2e38'};
 const LARS_SPR={
   down: ["...LyyL...","..LLLLLL..","..LSSSSL..","..SESSES..","..sSssSs..","...SMMS...",
@@ -230,20 +230,17 @@ function drawLars(c,g=ctx){
   const x=Math.round(c.x)-5, y=Math.round(c.y)-23, F=(col,dx,dy,w,h)=>{g.fillStyle=col;g.fillRect(x+dx,y+dy,w,h)};
   const [a,b]=legs(c);
   F('rgba(0,0,0,.25)',1,22,8,2);
-  const leg=(x0,lift)=>{F('#f3cba8',x0,14,2,6-lift); F('#ddb18c',x0+1,14,1,6-lift); F('#ffffff',x0,20-lift,2,1); F('#ff3fae',x0-1,21-lift,3,2); F('#ff8ccf',x0-1,21-lift,2,1); F('#ffffff',x0,22-lift,2,1)};   // long legs, white socks, pink racers
+  const leg=(x0,lift)=>{F('#f3cba8',x0,14,2,6-lift); F('#ddb18c',x0+1,14,1,6-lift); F('#ffffff',x0,20-lift,2,1); F('#ff1fd2',x0-1,21-lift,3,2); F('#ffb3f5',x0-1,21-lift,2,1); F('#c6ff1a',x0-1,22-lift,3,1)};   // long legs, white socks, neon pink racers with neon-yellow soles
   leg(2,a); leg(6,b);
   drawSprite(g,x,y,LARS_SPR,LARS_PAL,c.dir||'down',3,11);
 }
 // John: shorter, super jacked, white muscle tank, jeans, red bandana
-// John: shorter, super jacked, white muscle tank, jeans, a red bandana knotted at the back. 15 x 19 px.
+// John: shorter, super jacked, a big head, white muscle tank, jeans, a red bandana knotted at the back. 15 x 21 px.
 const JOHN_PAL={R:'#c8322b',r:'#9e2620',w:'#f4f4f0',H:'#5a3b24',S:'#e2aa80',s:'#c98f66',E:'#2b2b2b',M:'#a86a50',T:'#f4f4f0',t:'#dcdcd6'};
 const JOHN_SPR={
-  down: ["....RRRRRRR....","....RRwRRwRRR..",".....HHHHH..r..",".....SESES.....",".....sSsSs.....",".....SMMMS.....",
-         ".SSSTTTTTTTSSS.",".SSSTTTTTTTSSS.","SSSsTTTTTTTsSSS","SSSsTTTTTTTsSSS","SsSsTTTTTTtsSsS","SsSstttttttsSsS","SsS.........SsS"],
-  right:["....RRRRRRR....","...RRRwRRwRR...","..rR.HHHHH.....","......SSESS....","......sSSSSS...","......SSMS.....",
-         ".SSSTTTTTTTSSS.",".SSSTTTTTTTSSS.","SSSsTTTTTTTsSSS","SSSsTTTTTTTsSSS","SsSsTTTTTTtsSsS","SsSstttttttsSsS","SsS.........SsS"],
-  up:   ["....RRRRRRR....","....RRRRRRR....","....rRHHHHRr...","....r.HHHHH....",".....sHHHs.....",".....sSSSs.....",
-         ".SSSTTTTTTTSSS.",".SSSTTTTTTTSSS.","SSSsTTTTTTTsSSS","SSSsTTTTTTTsSSS","SsSsTTTTTTtsSsS","SsSstttttttsSsS","SsS.........SsS"],
+  down: ["...RRRRRRRRR...","...RRwRRRRwRRr.","...HHHHHHHHH.r.","...SSSSSSSSS...","...SSESSSESS...","...sSSSsSSSs...","...SSSMMMSSS...","....sSSSSSs....",".SSSTTTTTTTSSS.",".SSSTTTTTTTSSS.","SSSsTTTTTTTsSSS","SSSsTTTTTTTsSSS","SsSsTTTTTTtsSsS","SsSstttttttsSsS","SsS.........SsS"],
+  right:["....RRRRRRRRR..","..rRRRwRRRRwR..",".r..HHHHHHH....","....SSSSSSSS...","....SSSSSSES...","....sSSSSSSSS..","....SSSSSMSS...",".....sSSSSs....",".SSSTTTTTTTSSS.",".SSSTTTTTTTSSS.","SSSsTTTTTTTsSSS","SSSsTTTTTTTsSSS","SsSsTTTTTTtsSsS","SsSstttttttsSsS","SsS.........SsS"],
+  up:   ["...RRRRRRRRR...","...RRRRRRRRR...","...rRHHHHHRr...","...r.HHHHHH....","....sHHHHHs....","....sHHHHHs....","....sSSSSSs....",".....sSSSs.....",".SSSTTTTTTTSSS.",".SSSTTTTTTTSSS.","SSSsTTTTTTTsSSS","SSSsTTTTTTTsSSS","SsSsTTTTTTtsSsS","SsSstttttttsSsS","SsS.........SsS"],
 };
 function drawJohn(c,g=ctx){
   const x=Math.round(c.x)-7, y=Math.round(c.y)-18, F=(col,dx,dy,w,h)=>{g.fillStyle=col;g.fillRect(x+dx,y+dy,w,h)};
@@ -251,16 +248,16 @@ function drawJohn(c,g=ctx){
   F('rgba(0,0,0,.25)',2,17,11,2);
   F('#3a5f9e',3,12,4,5-a); F('#3a5f9e',8,12,4,5-b); F('#2c4a7c',6,12,1,4-a); F('#2c4a7c',11,12,1,4-b); F('#4d74b4',3,13,1,2); F('#4d74b4',8,13,1,2);   // jeans
   F('#3b2a1e',3,16-a,4,2); F('#3b2a1e',8,16-b,4,2); F('#5a4030',3,16-a,2,1); F('#5a4030',8,16-b,2,1);                                                       // boots
-  drawSprite(g,x,y,JOHN_SPR,JOHN_PAL,c.dir||'down',3,12);
+  drawSprite(g,x,y-2,JOHN_SPR,JOHN_PAL,c.dir||'down',4,12);   // (a bigger head: it starts two rows higher)
 }
 // Dr. Alex: Alex in a mad-scientist costume. Lab coat over her green tee, goggles, hair gone wild, a bubbling flask.
 function drawStranger(sx=STRANGER.x,sy=STRANGER.y){
   drawAlex(sx,sy,'ok');
-  const F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(Math.round(sx)-6+dx,Math.round(sy)-19+dy,w,h)};
-  F('#f4f4f0',1,7,3,8); F('#f4f4f0',8,7,3,8); F('#dcdcd6',3,7,1,8); F('#dcdcd6',8,7,1,8); F('#f4f4f0',2,14,8,2);   // lab coat, open over the tee
+  const F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(Math.round(sx)-6+dx,Math.round(sy)-21+dy,w,h)};
+  F('#f4f4f0',1,8,3,10); F('#f4f4f0',8,8,3,10); F('#dcdcd6',3,8,1,10); F('#dcdcd6',8,8,1,10); F('#f4f4f0',2,16,2,2); F('#f4f4f0',8,16,2,2); F('#c9ced4',2,12,1,1);   // a long lab coat, open over the tee (and a pen in the pocket)
   F(ALEX.hair,0,0,2,2); F(ALEX.hair,10,0,2,2); F(ALEX.hair,1,-1,2,1); F(ALEX.hair,5,-2,2,2); F(ALEX.hair,9,-1,2,1); F(ALEX.hair,0,4,1,3); F(ALEX.hair,11,4,1,3);   // frizzed out
   F('#2b2b2b',3,1,6,1); F('#7fd3ff',3,1,2,1); F('#7fd3ff',7,1,2,1);                 // goggles pushed up
-  const b=Math.floor(time/300)%3; F('#cfe6f2',11,9,3,4); F('#5fff8a',11,11,3,2); F('#cfe6f2',12,8,1,1); F('#9fffbf',12,6-b,1,1);   // a bubbling flask
+  const b=Math.floor(time/300)%3; F('#cfe6f2',11,11,3,4); F('#5fff8a',11,13,3,2); F('#cfe6f2',12,10,1,1); F('#9fffbf',12,8-b,1,1);   // a bubbling flask
 }
 // the Confectioner's guard: cap with a badge, grey uniform, a flashlight
 const GUARD_PAL={C:'#1c1c22',c:'#2b2b33',Y:'#e0b030',S:'#e9b98f',s:'#d29f77',E:'#2b2b2b',M:'#a86a50',U:'#5a5f6a',u:'#474c56',l:'#6f7480'};
