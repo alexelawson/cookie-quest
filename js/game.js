@@ -77,23 +77,24 @@ function blit(g,x,y,rows,pal,flip){
     for(let c=0;c<w;c++){const k=row[c]; if(k==='.'||k===' ')continue; const col=pal[k]; if(!col)continue; g.fillStyle=col; g.fillRect(x+(flip?w-1-c:c),y+r,1,1)}}
 }
 const blinkNow=(seed=0)=>((time+seed*977)%3700)<130;   // everyone blinks now and then (seed staggers them)
-// Joe in his jersey: white with red trim, brown hair. 12 x 21 px; eyes on row 4, jersey from row 7, shoes on row 19 (the gear in extras.js lines up with those)
-const JOE_PAL={o:'#3b2a24',H:'#a8794c',L:'#c99a66',h:'#7d5636',S:'#f2c9a3',s:'#d9a583',B:'#6b4a2e',W:'#ffffff',E:'#3d7fc9',M:'#b5654f',J:'#fbfbf7',j:'#d6d6cc',R:'#c8322b',K:'#2a2a33',k:'#3e3e4a'};
+// Joe in his jersey: white with red trim, brown hair. No outline: shape comes from shading. 12 x 21 px;
+// eyes on row 4, jersey from row 7, shoes on row 19 (the gear in extras.js lines up with those)
+const JOE_PAL={H:'#a8794c',L:'#c99a66',h:'#83593a',S:'#f2c9a3',s:'#deac88',W:'#ffffff',E:'#3d7fc9',M:'#b5654f',J:'#fbfbf7',j:'#dcdcd2',R:'#c8322b',K:'#2a2a33',k:'#3e3e4a'};
 const JOE_ROWS={
-  down:["..oooooooo..",".oHHLLLHHHo.",".oHLHHHHhHo.",".oHBBSSBBHo.",".oSWESSEWSo.",".oSSSssSSSo.","..osSMMSso..",
-        "oJJJJSSJJJJo","oRJJJRRJJJRo","oSJJJJJJJjSo","oSJJJJJJJjSo","osjjjjjjjjso",".oKKKKKKKKo.",".oKKKkkKKKo."],
-  up:  ["..oooooooo..",".oHHLLLHHHo.",".oHHHHHHHHo.",".oHHHHHHHHo.",".oHHHHHHHHo.",".ohHHHHHHho.","..osSSSSso..",
-        "oJJJJJJJJJJo","oRJJJJJJJJRo","oSJJJJJJJjSo","oSJJJJJJJjSo","osjjjjjjjjso",".oKKKKKKKKo.",".oKKKKKKKKo."],
-  right:["..oooooooo..",".oHHHLLLHHo.",".oHHHHHHHHo.",".oHHHHSSBSo.",".oHHHSSSWEo.",".ohHsSSSSSSo","..ohSSSSMSo.",
-        ".oJJJJJRSSJo",".oJJJJJJRRJo",".oJJJJSJJJjo",".oJJJJSJJJjo",".ojjjjsjjjjo",".oKKKKKKKKo.",".oKKKkkKKKo."],
+  down: ["...HHHHHH...","..HHLLLHHH..",".HHLHHHHHHH.",".HhSSSSSShH.",".HSWESSEWSH.",".sSSSssSSSs.","..SSSMMSSS..",
+         ".JJJRSSRJJJ.",".RJJJJJJJJR.",".SJJJJJJJjS.",".SJJJJJJJjS.",".sjjjjjjjjs.","..KKKKKKKK..","..KKKkkKKK.."],
+  up:   ["...HHHHHH...","..HHLLLHHH..",".HHLHHHHHHH.",".HHHHHHHHHH.",".SHHHHHHHHS.",".hHHHHHHHHh.","..hhSSSShh..",
+         ".JJJJJJJJJJ.",".RJJJJJJJJR.",".SJJJJJJJjS.",".SJJJJJJJjS.",".sjjjjjjjjs.","..KKKKKKKK..","..KKKKKKKK.."],
+  right:["...HHHHHH...","..HHHLLLHH..",".HHHHHHHHHH.",".HHHHHSSShH.",".HHHsSSSWE..",".HhsSSSSSSS.","..hSSSSSMS..",
+         "..JJJJJSSJ..","..JJJJRJJJ..","..JJJJSJJj..","..JJJJSJJj..","..jjjjsjjj..","..KKKKKKKK..","..KKKkkKKK.."],
 };
 function drawJoeJersey(P,g=ctx){
   const x=Math.round(P.x)-6, y=Math.round(P.y)-20, pal=JOE_PAL, dir=P.dir||'down';
   const F=(c,dx,dy,w,h)=>{g.fillStyle=c;g.fillRect(x+dx,y+dy,w,h)};
-  F('rgba(0,0,0,.25)',2,19,8,2);
+  F('rgba(0,0,0,.22)',2,19,8,2);
   const a=P.moving&&P.step%2?1:0, b=P.moving&&!(P.step%2)?1:0;
-  const leg=(x0,lift,outer)=>{F(pal.o,outer,14,1,6-lift); F(pal.K,x0,14,2,1); F(pal.S,x0,15,2,3-lift); F(pal.s,x0+1,15,1,3-lift); F(pal.W,x0,18-lift,2,1); F('#1d1d22',x0-1,19-lift,3,1); F('#4a4a55',x0-1,19-lift,1,1);};
-  leg(3,a,2); leg(7,b,9); F(pal.K,5,14,2,1);   // (the gap between his legs shows the ground)
+  const leg=(x0,lift)=>{F(pal.K,x0,14,2,1); F(pal.S,x0,15,2,3-lift); F(pal.s,x0+1,15,1,3-lift); F(pal.W,x0,18-lift,2,1); F('#2b2b33',x0-1,19-lift,3,1); F('#4a4a55',x0-1,19-lift,1,1)};
+  leg(3,a); leg(7,b);
   let rows=dir==='left'?JOE_ROWS.right:(JOE_ROWS[dir]||JOE_ROWS.down);
   if(blinkNow()&&dir!=='up')rows=rows.map((r,i)=>i===4?r.replace(/W/g,'s').replace(/E/g,'s'):r);
   blit(g,x,y,rows,pal,dir==='left');

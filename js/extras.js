@@ -88,7 +88,7 @@ function drawGear(c,g=ctx,look=null){
       F(W,3,8,1,5); F(W,5,8,3,1); F(W,5,10,3,1); F(W,5,12,3,1); F(W,5,9,1,1); F(W,7,9,1,1); F(W,5,11,1,1); F(W,7,11,1,1);   // 1 8
       F(GO,4,8,1,1); F(GO,8,12,1,1) }                                                      // gold outline flecks, like the real trim
     else { const sx=c.dir==='left'?4:5; F(W,sx,8,3,1); F(W,sx,12,3,1); F(W,sx,10,3,1); F(W,sx,9,1,1); F(W,sx+2,9,1,1); F(W,sx,11,1,1); F(W,sx+2,11,1,1) } }   // side-on: the 8 on the sleeve-side
-  if(gearWorn('disc')){ if(c.dir==='up'){F('#f4d35e',3,7,6,6); F('#f4d35e',2,8,8,4); F('#e0b030',4,9,4,2); F('#ffe98a',4,7,3,1); F('#c9902a',5,9,2,2)}   // Margie's lucky disc, on his back
+  if(gearWorn('disc')){ if(c.dir==='up'){F('#5a3a22',2,7,8,1); F('#f4d35e',-1,6,4,5); F('#e0b030',-1,9,4,1); F('#ffe98a',0,6,2,1); F('#c9902a',0,8,2,1)}   // Margie's lucky disc, slung over one shoulder (a strap across the back)
     else if(c.dir==='left'){F('#f4d35e',11,8,1,4); F('#e0b030',12,9,1,2)} else if(c.dir==='right'){F('#f4d35e',0,8,1,4); F('#e0b030',-1,9,1,2)} }   // (side-on: just its rim)
   if(gearWorn('clover')&&c.dir!=='up'){ const tw=Math.floor(time/250)%3===0;               // the lucky clover pin, with a gold glint
     if(gearWorn('jersey')){ const px=c.dir==='left'?9:0; F('#1d5a2a',px,5,3,3); F('#5fd36a',px,5,1,1); F('#5fd36a',px+2,5,1,1); F('#5fd36a',px,7,1,1); F('#5fd36a',px+2,7,1,1); F('#9ff0a8',px,5,1,1); if(tw)F('#fff3a8',px+3,4,1,1) }   // small, on the shoulder, so the 18 shows
