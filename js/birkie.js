@@ -1,20 +1,23 @@
 // The Vikings ski the Birkie: guide a pack of Vikings (and the flour) from Cable to Main Street, Hayward.
-// You lead; they follow your exact tracks. Steer left/right, tap A in rhythm on climbs, tuck (Down) on descents.
+// A lane runner on a skate trail: tap left/right to change lanes, jump fallen skiers, go around packs of slow skiers,
+// grab a cup of flat Coke at each feed station and hold steady while you drink it. The sweep snowmobile is behind you.
 const BIRK={
   W:224, L:2700,                         // course size (px)
-  STEER:.065, HALF:34,                   // steering speed, trail half-width
-  // speed = base + bonus x rhythm. Rhythm (0-1) builds with on-beat taps, drops with off-beat ones, fades if you stop.
-  SPEED:{flat:[.040,.026], up:[.015,.040], down:[.095,0], lake:[.028,.032], finish:[.05,.02]},
-  BEAT:850, WINDOW:130,                  // poling rhythm (ms) and how close to the beat counts as good
-  GAIN:.35, MISS_KEEP:.5, FADE_MS:1400,  // how fast rhythm builds, how much a miss keeps, how fast it fades
-  PUSH_COST:4, MISS_COST:10, REGEN:.004, // stamina
-  CRASH_MS:1300, CLOCK:170,              // a crash costs 1.3s; race clock runs 170x real time
+  LANE:16,                               // distance between lanes (px); three lanes: -1, 0, 1
+  LANE_MS:110,                           // how quickly you slide over to a new lane
+  SPEED:{flat:.057, up:.039, down:.082, lake:.052, finish:.064},   // px per ms at full energy
+  TIRED:.64,                             // speed multiplier at zero energy
+  DRAIN:{up:.0016, other:.0007},         // energy lost per ms
+  JUMP_LEN:28, JUMP_H:9,                 // a jump carries you this far down the trail (px), this high (so it feels the same uphill or down)
+  CRASH_MS:1500, CRASH_COST:14,          // a crash: how long you're down, and the energy it costs
+  DRINK_MS:1500, SPILL_KEEP:20,          // feed stations: hold steady this long to drink; a spill still gives you a little
+  CLOCK:170,                             // the race clock runs 170x real time
   CUTOFF:3*3600,                         // the sweep snowmobile reaches the finish at 3:00:00
   SWEEP_START:15*60,                     // ...and leaves the start at 0:15:00, at a steady pace
   ELITE:2*3600+30*60,                    // under 2:30 gets a shout-out
-  // simulated finish times: great rhythm ~2:22, ok ~2:47, sloppy ~3:13, never poling 3:50
+  // simulated (tests/birkie-difficulty.js): sharp ~2:22, good ~2:28, casual ~2:36 (all finish), distracted 16/20 finish, never dodging 0/20
 };
-// course sections, top to bottom
+// course sections, top to bottom (the landmarks)
 const BIRK_SECTIONS=[
   {y:0,    type:'flat', name:'Start · Cable'},
   {y:160,  type:'roll', name:'Powerline Hills'},
@@ -30,7 +33,7 @@ const BIRK_SECTIONS=[
   {y:2240, type:'lake', name:'Lake Hayward (windy!)'},
   {y:2560, type:'finish', name:'Main Street · Hayward'},
 ];
-const FEEDS=[{y:820},{y:1700}];
+const FEEDS=[{y:820},{y:1500},{y:2390}];
 const FINISH_Y=2620;
 // trail centerline wanders; Bobblehead has a sharp left turn; the bridge and Main Street are straight
 function trailX(y){
@@ -40,22 +43,34 @@ function trailX(y){
   if(y>2040)x=x+(112-x)*Math.min(1,(y-2040)/100);           // straighten out toward the bridge
   return x;
 }
-const trailHalf=y=>y>=2140&&y<2240?16:y>=2560?60:BIRK.HALF;
+const trailHalf=y=>y>=2140&&y<2240?16:y>=2560?60:34;
+const laneScale=y=>Math.min(1,trailHalf(y)/34);              // lanes squeeze together on the narrow bridge
+const laneX=(y,lane)=>trailX(y)+lane*BIRK.LANE*laneScale(y);
 function sectionAt(y){let s=BIRK_SECTIONS[0]; for(const t of BIRK_SECTIONS)if(y>=t.y)s=t; return s}
 function terrainAt(y){const s=sectionAt(y); if(s.type!=='roll')return s.type; return Math.floor((y-s.y)/70)%2?'down':'up'}
-// people who fell, a snowmobile crossing at Bobblehead, a deer on the lake
-const FALLEN=[[300,.6],[620,-.5],[980,.4],[1380,-.6],[1520,.5],[1860,-.4],[2010,.5],[2350,-.5]].map(([y,o])=>({y,x:trailX(y)+o*BIRK.HALF}));
+// what's on the trail: skiers who fell (jump them) and packs of slow skiers across two lanes (go around).
+// Never on the bridge, never right at a feed station; there's always a way through.
+const OBSTACLES=(()=>{const out=[], lanes=[0,-1,1,0,1,-1,-1,0,1], gaps=[130,105,150,95,120,140,110];
+  let y=230, k=0; while(y<2540){
+    if(!FEEDS.some(f=>y>f.y-90&&y<f.y+70)&&!(y>2110&&y<2260)){
+      const lane=lanes[k%lanes.length];
+      if(k%4===3)out.push({kind:'pack',y,lanes:lane===1?[0,1]:lane===-1?[-1,0]:[-1,0]});
+      else out.push({kind:'fallen',y,lanes:[lane]});
+      k++ }
+    y+=gaps[k%gaps.length] }
+  return out})();
+const FALLEN=OBSTACLES.filter(o=>o.kind==='fallen');   // (kept for anything that still looks for fallen skiers)
 
-const birk={running:false, v:0, stamina:100, push:0, crashT:0, beatT:0, t:0, trail:[], vikings:[], msg:'', msgT:0, done:false, flash:''};
+const birk={running:false, v:0, energy:100, lane:0, lx:0, jumpD:0, crashT:0, t:0, trail:[], vikings:[], msg:'', msgT:0, drink:null, said:{}};
 const birkBg=document.createElement('canvas'); birkBg.width=BIRK.W; birkBg.height=BIRK.L;
 (function(){
   const g=birkBg.getContext('2d'), F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};
   F('#e9f0f6',0,0,BIRK.W,BIRK.L); for(let i=0;i<4000;i++)F(rnd()<.5?'#dbe5ee':'#ffffff',rnd()*BIRK.W|0,rnd()*BIRK.L|0,2,1);
-  for(let y=0;y<BIRK.L;y+=2){const cx=trailX(y), hw=trailHalf(y);                      // groomed trail with classic tracks
-    F('#f6f9fb',cx-hw,y,hw*2,2); F('#cfdbe6',cx-hw+6,y,1,2); F('#cfdbe6',cx-hw+10,y,1,2); F('#dde6ee',cx-hw,y,1,2); F('#dde6ee',cx+hw-1,y,1,2)}
+  for(let y=0;y<BIRK.L;y+=2){const cx=trailX(y), hw=trailHalf(y);                      // a wide groomed skate trail, corduroy
+    F('#f6f9fb',cx-hw,y,hw*2,2); if(y%4===0)F('#ebf1f6',cx-hw+1,y,hw*2-2,1); F('#dde6ee',cx-hw,y,1,2); F('#dde6ee',cx+hw-1,y,1,2)}
   // the lake: flat and icy-blue
   F('#d4e5f1',0,2240,BIRK.W,320); for(let i=0;i<300;i++)F('#c3d8e8',rnd()*BIRK.W|0,2240+rnd()*320|0,6,1);
-  for(let y=2240;y<2560;y+=2){F('#f6f9fb',112-BIRK.HALF,y,BIRK.HALF*2,2)}
+  for(let y=2240;y<2560;y+=2){F('#f6f9fb',112-34,y,68,2); if(y%4===0)F('#ebf1f6',112-33,y,66,1)}
   // the bridge over Highway 77: road underneath, rails on the sides
   F('#5f6676',0,2160,BIRK.W,50); F('#f4d35e',0,2184,BIRK.W,2); for(let x=0;x<BIRK.W;x+=14)F('#ffffff',x,2172,6,1);
   F('#f6f9fb',96,2140,32,100); F('#8a5a34',94,2140,2,100); F('#8a5a34',128,2140,2,100);
@@ -64,7 +79,7 @@ const birkBg=document.createElement('canvas'); birkBg.width=BIRK.W; birkBg.heigh
   F('#c8322b',48,2570,2,140); F('#c8322b',174,2570,2,140);
   // feed stations: an orange tent and a table of flat Coke on each side, and a FEED banner over the trail (drawn in under())
   for(const f of FEEDS){const cx=trailX(f.y);
-    for(const x of [cx+BIRK.HALF+2, cx-BIRK.HALF-24]){
+    for(const x of [cx+34+2, cx-34-24]){
       F('#c94a1a',x-2,f.y-22,26,4); for(let i=0;i<26;i+=6)F('#ffffff',x-2+i,f.y-22,3,4); F('#8a8f9a',x-1,f.y-18,1,14); F('#8a8f9a',x+22,f.y-18,1,14);   // striped tent roof
       F('#8a5a34',x,f.y-6,22,8); F('#c49a6a',x,f.y-6,22,2);
       for(let i=0;i<5;i++){F('#ffffff',x+1+i*4,f.y-10,3,4); F('#4a2412',x+1+i*4,f.y-10,3,2)}}}   // cups of flat Coke
@@ -76,8 +91,10 @@ function drawSkier(x,y,o={}){ // generic skier: o.jersey, o.helmet, o.horns, o.d
   const X=Math.round(x)-5, Y=Math.round(y)-16, F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(X+dx,Y+dy,w,h)};
   if(o.down){F('rgba(0,0,0,.2)',-2,13,14,3); F(o.jersey||'#c8322b',-1,9,10,4); F('#f0c6a0',9,9,3,3); F('#2b2b36',-4,13,16,1); F('#2b2b36',-2,6,1,8); return}
   F('rgba(0,0,0,.18)',0,15,10,2);
-  F('#2b2b36',1,3,1,14); F('#2b2b36',8,3,1,14);                     // skis (seen from above, pointing down the trail)
-  F('#3b3b44',0,6,1,9); F('#3b3b44',9,6,1,9);                       // poles
+  // skate skis in a V (tails together behind, tips out in front); the pushing ski kicks out further
+  const push=o.step!=null?o.step%2:0;
+  for(let k=0;k<13;k++){const d=Math.floor(k/(push?3:4)), e=Math.floor(k/(push?4:3)); F('#2b2b36',3-d,4+k,1,1); F('#2b2b36',6+e,4+k,1,1)}
+  F('#3b3b44',0,5,1,8); F('#3b3b44',9,5,1,8);                       // poles
   F(o.pants||'#1d1d22',2,10,6,4); F(o.jersey||'#fbfbf7',2,4,6,6); if(o.trim)F(o.trim,2,4,6,1);
   F('#f0c6a0',3,0,4,4); F(o.hair||'#b08355',3,0,4,2);
   if(o.helmet){F(o.helmet,2,-1,6,3); if(o.horns){F('#f6f2e4',1,-3,1,3); F('#f6f2e4',8,-3,1,3)}}
@@ -86,58 +103,71 @@ const VIKING_LOOK={jersey:'#4f2683', trim:'#ffc62f', pants:'#ffc62f', helmet:'#4
 
 // ---------- race ----------
 function birkStart(){
-  Object.assign(birk,{running:true,v:.03,stamina:100,q:0,crashT:0,beatT:0,t:0,trail:[],msg:'',msgT:0,done:false,said:{}});
-  FEEDS.forEach(f=>f.used=false); birkSay(BIRKIE.radioStart[1]);
+  Object.assign(birk,{running:true,v:.03,energy:100,lane:0,lx:0,jumpD:0,crashT:0,t:0,trail:[],msg:'',msgT:0,drink:null,said:{},hit:new Set(),prev:{}});
+  FEEDS.forEach(f=>{f.used=false; f.cup=[-1,0,1][Math.floor(Math.random()*3)]}); birkSay(BIRKIE.radioStart[1]);
   P.x=trailX(30); P.y=30; P.dir='down';
-  birk.vikings=[0,1,2,3].map(i=>({x:P.x,y:P.y-14*(i+1),down:0}));
-}
-function birkTap(){
-  if(!birk.running||birk.crashT>0)return;
-  const terr=terrainAt(P.y), phase=birk.beatT%BIRK.BEAT, off=Math.min(phase,BIRK.BEAT-phase);
-  if(off<=BIRK.WINDOW){ sfx('pole'); birk.q=birk.q+(1-birk.q)*BIRK.GAIN; birk.stamina=Math.max(0,birk.stamina-BIRK.PUSH_COST); birk.flash='good' }
-  else { sfx('bad'); birk.q*=BIRK.MISS_KEEP; birk.stamina=Math.max(0,birk.stamina-BIRK.MISS_COST); birk.flash='miss' }   // off beat: you lose your rhythm
-  birk.flashT=220;
+  birk.vikings=[0,1,2,3].map(i=>({x:P.x,y:P.y-14*(i+1)}));
 }
 function birkSay(m){birk.msg=m; birk.msgT=1800+m.length*35}
 function birkOnce(k,m){if(!birk.said[k]){birk.said[k]=true; birkSay(m)}}
+const birkAir=()=>birk.jumpD>0?Math.sin(Math.PI*Math.min(1,birk.jumpD/BIRK.JUMP_LEN))*BIRK.JUMP_H:0;
+function spill(){ const d=birk.drink; if(!d)return; birk.drink=null; sfx('splash'); birk.energy=Math.min(100,birk.energy+BIRK.SPILL_KEEP); birkSay(BIRKIE.spill[Math.floor(Math.random()*BIRKIE.spill.length)]) }
+function birkLane(d){ if(!birk.running||birk.crashT>0)return; const n=Math.max(-1,Math.min(1,birk.lane+d)); if(n===birk.lane)return; birk.lane=n; sfx('whoosh'); if(birk.drink)spill() }
+function birkJump(){ if(!birk.running||birk.crashT>0||birk.jumpD>0)return; birk.jumpD=.001; sfx('jump'); if(birk.drink)spill() }
+function birkTap(){ birkJump() }   // the A button
 // where the sweep snowmobile is: leaves the start at SWEEP_START, reaches the finish at CUTOFF
 const sweepY=()=>{const c=birk.t*BIRK.CLOCK/1000; return Math.max(0,Math.min(1,(c-BIRK.SWEEP_START)/(BIRK.CUTOFF-BIRK.SWEEP_START)))*FINISH_Y};
 const clockStr=ms=>{const s=Math.floor(ms*BIRK.CLOCK/1000), h=Math.floor(s/3600), m=Math.floor(s%3600/60), x=s%60; return `${h}:${String(m).padStart(2,'0')}:${String(x).padStart(2,'0')}`};
+const curLane=()=>Math.round(birk.lx/(BIRK.LANE*laneScale(P.y)||1));
 function birkUpdate(dt){
   if(!birk.running)return;
-  birk.t+=dt; const lastBeat=Math.floor(birk.beatT/BIRK.BEAT); birk.beatT+=dt; if(Math.floor(birk.beatT/BIRK.BEAT)!==lastBeat&&terrainAt(P.y)==='up')sfx('beat');   // a soft tick on climbs if(birk.flashT>0)birk.flashT-=dt; if(birk.msgT>0)birk.msgT-=dt;
+  birk.t+=dt; if(birk.msgT>0)birk.msgT-=dt;
+  // taps: a fresh press of left/right changes lane, up jumps (holding a key doesn't keep switching)
+  for(const k of ['left','right','up']){ if(dirs[k]&&!birk.prev[k]){ if(k==='up')birkJump(); else birkLane(k==='left'?-1:1) } birk.prev[k]=dirs[k] }
   if(sweepY()>=P.y)return birkFinish(false);                       // the sweep caught you
   if(P.y-sweepY()<160)birkOnce('sweep'+Math.floor(P.y/400),BIRKIE.sweepClose);
   if(birk.crashT>0){birk.crashT-=dt; return}
   const terr=terrainAt(P.y);
-  birk.q*=Math.exp(-dt/BIRK.FADE_MS); if(birk.stamina<=0)birk.q=Math.min(birk.q,.1);
-  const [base,bonus]=BIRK.SPEED[terr]||BIRK.SPEED.flat; let target=base+bonus*birk.q;
-  if(terr==='down'&&dirs.down)target+=.035;                  // tuck
-  if(dirs.up)target*=.5;                                      // snowplow
-  if(birk.stamina<=0){target=Math.min(target,.03); if(!birk.bonked){birk.bonked=true; birkSay(BIRKIE.bonk)}} else if(birk.stamina>25)birk.bonked=false;
-  const off=Math.abs(P.x-trailX(P.y))>trailHalf(P.y); if(off)target=Math.min(target,.025);
-  birk.v+=(target-birk.v)*Math.min(1,dt/350);
-  if(terr!=='up')birk.stamina=Math.min(100,birk.stamina+BIRK.REGEN*dt*(terr==='down'?1.6:1));
-  const steer=(dirs.right?1:0)-(dirs.left?1:0);
-  P.x=Math.max(4,Math.min(BIRK.W-4,P.x+steer*BIRK.STEER*dt*(terr==='down'&&dirs.down?.7:1)));
-  P.y+=birk.v*dt; P.moving=true; P.t+=dt; if(P.t>160){P.t=0;P.step++}
-  P.dir=steer>0?'right':steer<0?'left':'down';
-  // the Vikings follow your tracks
-  const t=birk.trail; t.push({x:P.x,y:P.y}); if(t.length>600)t.shift();
-  birk.vikings.forEach((v,i)=>{let need=(i+1)*14, k=t.length-1, acc=0; while(k>0&&acc<need){acc+=Math.hypot(t[k].x-t[k-1].x,t[k].y-t[k-1].y);k--} const g=t[Math.max(0,k)]; v.x=g.x; v.y=g.y});
-  // crashes into people who fell
-  for(const f of FALLEN)if(Math.abs(P.y-f.y)<6&&Math.abs(P.x-f.x)<9){birk.crashT=BIRK.CRASH_MS; birk.v=0; sfx('crash'); birkSay(BIRKIE.crash[Math.floor(Math.random()*BIRKIE.crash.length)]); P.y+=10; break}
-  // feed stations
-  for(const f of FEEDS){ if(!f.used&&f.y-P.y<120&&f.y>P.y)birkOnce('feedAhead'+f.y,BIRKIE.feedAhead);
-    if(!f.used&&Math.abs(P.y-f.y)<14){f.used=true; birk.stamina=100; birkSay(BIRKIE.feed); sfx('glug'); setTimeout(()=>sfx('glug'),120); setTimeout(()=>sfx('glug'),240)} }
+  birk.energy=Math.max(0,birk.energy-dt*(terr==='up'?BIRK.DRAIN.up:BIRK.DRAIN.other));
+  if(birk.energy<20)birkOnce('bonk'+Math.floor(P.y/500),BIRKIE.bonk);
+  const target=(BIRK.SPEED[terr]||BIRK.SPEED.flat)*(BIRK.TIRED+(1-BIRK.TIRED)*birk.energy/100);
+  birk.v+=(target-birk.v)*Math.min(1,dt/400);
+  // slide toward your lane, and move down the trail
+  const want=birk.lane*BIRK.LANE*laneScale(P.y); birk.lx+=(want-birk.lx)*Math.min(1,dt/BIRK.LANE_MS);
+  P.y+=birk.v*dt; if(birk.jumpD>0){birk.jumpD+=birk.v*dt; if(birk.jumpD>=BIRK.JUMP_LEN)birk.jumpD=0}
+  P.x=trailX(P.y)+birk.lx; P.moving=true; P.t+=dt; if(P.t>200){P.t=0;P.step++}
+  P.dir=Math.abs(want-birk.lx)>2?(want>birk.lx?'right':'left'):'down';
+  // the Vikings follow your tracks (and hop where you hopped)
+  const t=birk.trail; t.push({x:P.x,y:P.y,air:birkAir()}); if(t.length>600)t.shift();
+  birk.vikings.forEach((v,i)=>{let need=(i+1)*14, k=t.length-1, acc=0; while(k>0&&acc<need){acc+=Math.hypot(t[k].x-t[k-1].x,t[k].y-t[k-1].y);k--} const g=t[Math.max(0,k)]; v.x=g.x; v.y=g.y; v.air=g.air||0});
+  // obstacles
+  const lane=curLane();
+  for(const o of OBSTACLES){ if(birk.hit.has(o))continue; const oy=obstacleY(o); if(Math.abs(P.y-oy)>5)continue;
+    if(!o.lanes.includes(lane))continue;
+    if(o.kind==='fallen'&&birkAir()>2)continue;                      // cleared it
+    birk.hit.add(o); birk.crashT=BIRK.CRASH_MS; birk.v=0; birk.jumpD=0; birk.energy=Math.max(0,birk.energy-BIRK.CRASH_COST); sfx('crash');
+    if(birk.drink)spill(); else birkSay(o.kind==='pack'?BIRKIE.packCrash[Math.floor(Math.random()*BIRKIE.packCrash.length)]:BIRKIE.crash[Math.floor(Math.random()*BIRKIE.crash.length)]);
+    break }
+  // feed stations: be in the cup's lane to grab it, then hold steady (no jumping, no lane changes) until it's down
+  for(const f of FEEDS){ if(!f.used&&f.y-P.y<150&&f.y>P.y)birkOnce('feedAhead'+f.y,BIRKIE.feedAhead);
+    if(!f.used&&P.y>=f.y){ f.used=true;
+      if(lane===f.cup&&birkAir()<2){ birk.drink={t:0}; sfx('pickup'); birkSay(BIRKIE.grab) } else birkSay(BIRKIE.feedMissed) } }
+  if(birk.drink){ birk.drink.t+=dt; if(birk.drink.t>=BIRK.DRINK_MS){ birk.drink=null; birk.energy=100; birkSay(BIRKIE.feed); sfx('glug'); setTimeout(()=>sfx('glug'),120); setTimeout(()=>sfx('glug'),240) } }
   if(P.y>440&&P.y<480)birkOnce('climb1',BIRKIE.climb); if(P.y>1720&&P.y<1760)birkOnce('climb2',BIRKIE.climb);
-  if(P.y>1260&&P.y<1300)birkOnce('half',BIRKIE.halfway); if(P.y>2240&&P.y<2280)birkOnce('lake',BIRKIE.lake);
+  if(P.y>1260&&P.y<1300)birkOnce('half',BIRKIE.halfway); if(P.y>2140&&P.y<2180)birkOnce('bridge',BIRKIE.bridge); if(P.y>2250&&P.y<2290)birkOnce('lake',BIRKIE.lake);
   if(P.y>=FINISH_Y)birkFinish(true);
 }
+// on a phone: swipe left/right on the game to change lanes, swipe up (or tap) to jump
+{let sw=null; cv.addEventListener('pointerdown',e=>{ if(scene===SCENES.birkie&&birk.running)sw={x:e.clientX,y:e.clientY} });
+  cv.addEventListener('pointerup',e=>{ if(!sw)return; const dx=e.clientX-sw.x, dy=e.clientY-sw.y; sw=null;
+    if(Math.abs(dx)>24&&Math.abs(dx)>Math.abs(dy))birkLane(dx>0?1:-1); else birkJump() });
+  cv.addEventListener('pointercancel',()=>{sw=null}) }
+// where an obstacle is on the trail
+const obstacleY=o=>o.y;   // (packs used to creep along; it made unfair pile-ups with fallen skiers)
 const J=t=>[BIRKIE.john,t,'Trail John'];   // a line from John, with his face
 function birkFinish(made){
   sfx(made?'fanfare':'buzz');
-  birk.running=false; const tm=clockStr(birk.t); FEEDS.forEach(f=>f.used=false);
+  birk.running=false; birk.drink=null; const tm=clockStr(birk.t); FEEDS.forEach(f=>f.used=false);
   if(made){ have.birkie=true; have.birkieTime=tm; save(); const elite=birk.t*BIRK.CLOCK/1000<BIRK.ELITE;
     say([J(BIRKIE.finishWin(tm)[0]),J(elite?BIRKIE.elite:BIRKIE.finishWin(tm)[1]),J(BIRKIE.vikingsWin),J(BIRKIE.johnDone)],()=>showReward('mill',()=>goTo('world','fromMill'))) }   // John hands you the flour right there
   else say([J(BIRKIE.finishLate(tm)[0]),J(BIRKIE.finishLate(tm)[1])],()=>showDialog({place:BIRKIE.place,speaker:BIRKIE.john,face:'Trail John',pages:[BIRKIE.againAsk],actions:[{label:BIRKIE.again,fn:()=>{closeDialog();birkStart()}},{label:BIRKIE.leave,ghost:true,fn:()=>{closeDialog();goTo('world','fromMill')}}]}));
@@ -190,17 +220,29 @@ SCENES.birkie={ place:BIRKIE.place, music:'birkie',
   enter(){ birk.running=false; P.x=trailX(30); P.y=30; birk.vikings=[0,1,2,3].map(i=>({x:P.x,y:16-i*14})); birk.introPending=true },
   speed:()=>0,                                  // you don't walk here; birkUpdate moves you
   ability:()=>birkTap(),
-  abilityLabel:()=>birk.running?(terrainAt(P.y)==='up'?'Pole!':'Pole'):'',
+  abilityLabel:()=>birk.running?'Jump':'',
   update(dt){
     if(birk.introPending){birk.introPending=false; return birkHowTo(()=>say([J(BIRKIE.radioStart[0])],()=>birkStart()))}
     birkUpdate(dt);
   },
-  drawPlayer:(x,y)=>{ if(birk.crashT>0)drawSkier(x,y,{down:true,jersey:'#fbfbf7'}); else drawSkier(x,y,{jersey:'#fbfbf7',trim:'#c8322b',hair:'#b08355'}) },
+  drawPlayer:(x,y)=>{ if(birk.crashT>0)return drawSkier(x,y,{down:true,jersey:'#fbfbf7'}); const h=birkAir();
+    if(h>0){ctx.fillStyle='rgba(0,0,0,.15)'; ctx.fillRect(Math.round(x)-5,Math.round(y)-1,10,2)}                       // shadow stays on the snow
+    drawSkier(x,y-h,{jersey:'#fbfbf7',trim:'#c8322b',hair:'#b08355',step:P.step});
+    if(birk.drink){const X=Math.round(x)+5, Y=Math.round(y-h)-12; ctx.fillStyle='#ffffff'; ctx.fillRect(X,Y,3,4); ctx.fillStyle='#4a2412'; ctx.fillRect(X,Y,3,2)} },
   under(){
-    for(const f of FALLEN)drawSkier(f.x,f.y,{down:true,jersey:['#2f6db0','#e8742a','#2f8a4a','#c8322b'][Math.floor(f.y)%4]});
+    for(const o of OBSTACLES){const oy=obstacleY(o); if(Math.abs(oy-P.y)>200)continue;
+      if(o.kind==='fallen')drawSkier(laneX(oy,o.lanes[0]),oy,{down:true,jersey:['#2f6db0','#e8742a','#2f8a4a','#c8322b'][Math.floor(o.y)%4]});
+      else o.lanes.forEach((l,i)=>drawSkier(laneX(oy,l),oy-(i%2)*2,{jersey:['#8a8f9a','#c49a6a','#7a8aa0'][(o.y/10+i)%3|0],pants:'#3a3f4a',hair:'#6b4429',step:Math.floor(time/300)+i}))}
     // FEED banners over the trail
-    for(const f of FEEDS){const cx=Math.round(trailX(f.y)), hw=BIRK.HALF; ctx.fillStyle='#8a8f9a'; ctx.fillRect(cx-hw-2,f.y-20,2,22); ctx.fillRect(cx+hw,f.y-20,2,22);
+    for(const f of FEEDS){const cx=Math.round(trailX(f.y)), hw=34; ctx.fillStyle='#8a8f9a'; ctx.fillRect(cx-hw-2,f.y-20,2,22); ctx.fillRect(cx+hw,f.y-20,2,22);
       ctx.fillStyle='#e8742a'; ctx.fillRect(cx-hw-2,f.y-24,hw*2+4,9); ctx.fillStyle='#ffffff'; ctx.fillRect(cx-hw-2,f.y-24,hw*2+4,1); pixText(ctx,'FEED',cx-7,f.y-22,'#ffffff')}
+    // the cup of flat Coke, held out over one lane by a volunteer at the trail edge (with a bouncing arrow over it)
+    for(const f of FEEDS){ if(f.used||f.cup==null||Math.abs(f.y-P.y)>200)continue; const x=Math.round(laneX(f.y,f.cup)), y=f.y+6, side=f.cup<0?-1:1, ex=Math.round(trailX(f.y)+side*37);
+      ctx.fillStyle='#e8742a'; for(let k=0;k<16;k+=3){ctx.fillRect(x-7,y-12+k,1,2); ctx.fillRect(x+7,y-12+k,1,2)}   // dashed lines marking the lane to aim for
+      ctx.fillStyle='#e8742a'; ctx.fillRect(ex-3,y-12,7,10); ctx.fillStyle='#f0c6a0'; ctx.fillRect(ex-2,y-17,5,5); ctx.fillStyle='#6b4428'; ctx.fillRect(ex-2,y-17,5,2);   // the volunteer
+      ctx.fillStyle='#f0c6a0'; ctx.fillRect(Math.min(ex,x),y-8,Math.abs(ex-x),2);                              // a looong arm
+      ctx.fillStyle='#ffffff'; ctx.fillRect(x-3,y-11,6,7); ctx.fillStyle='#4a2412'; ctx.fillRect(x-3,y-11,6,2); ctx.fillStyle='#d9d9d4'; ctx.fillRect(x+2,y-11,1,7);
+      const b=Math.round(Math.sin(time/140)*2); ctx.fillStyle='#e8742a'; ctx.fillRect(x-3,y-20+b,7,1); ctx.fillRect(x-2,y-19+b,5,1); ctx.fillRect(x-1,y-18+b,3,1); ctx.fillRect(x,y-17+b,1,1) }
     // the sweep snowmobile, when it's close enough to see
     {const sy=sweepY(); if(birk.running&&sy>0){const sx=Math.round(trailX(sy)); ctx.fillStyle='rgba(0,0,0,.2)'; ctx.fillRect(sx-6,sy+1,12,3);
       ctx.fillStyle='#c8322b'; ctx.fillRect(sx-5,sy-12,10,12); ctx.fillStyle='#2b2b36'; ctx.fillRect(sx-6,sy-14,2,16); ctx.fillRect(sx+4,sy-14,2,16); ctx.fillStyle='#9fd2f0'; ctx.fillRect(sx-3,sy-3,6,2);
@@ -208,19 +250,20 @@ SCENES.birkie={ place:BIRKIE.place, music:'birkie',
     // start arch: the American Birkebeiner banner over the start line
     ctx.drawImage(birkStartArch,trailX(46)-30,24);
     // section signs
-    ctx.font='7px monospace'; for(const s of BIRK_SECTIONS){ if(!s.name)continue; const sx=Math.round(trailX(s.y+10)+BIRK.HALF+4), w=Math.ceil(ctx.measureText(s.name).width)+6, x=Math.max(2,Math.min(sx,BIRK.W-w-2));
+    ctx.font='7px monospace'; for(const s of BIRK_SECTIONS){ if(!s.name)continue; const sx=Math.round(trailX(s.y+10)+34+4), w=Math.ceil(ctx.measureText(s.name).width)+6, x=Math.max(2,Math.min(sx,BIRK.W-w-2));
       ctx.fillStyle='#8a5a34'; ctx.fillRect(x+4,s.y+10,2,8); ctx.fillStyle='#1d3f73'; ctx.fillRect(x,s.y,w,10); ctx.fillStyle='#ffffff'; ctx.fillText(s.name,x+3,s.y+7) }
     // finish banner + crowd
     ctx.fillStyle='#4f2683'; ctx.fillRect(40,FINISH_Y-8,144,9); ctx.fillStyle='#ffc62f'; ctx.font='7px monospace'; ctx.fillText('FINISH · HAYWARD',76,FINISH_Y-1);
     for(let i=0;i<30;i++){const x=i<15?30+((i*7)%18):176+((i*7)%18), y=2590+(i%15)*8, j=Math.sin(time/150+i)>.6?-1:0; ctx.fillStyle=['#c8322b','#2f6db0','#ffc62f','#4f2683','#2f8a4a'][i%5]; ctx.fillRect(x,y+j,4,5); ctx.fillStyle='#f0c6a0'; ctx.fillRect(x+1,y-2+j,2,2)}
   },
-  ents(list){ birk.vikings.forEach((v,i)=>list.push({y:v.y,draw:()=>{drawSkier(v.x,v.y,VIKING_LOOK); if(i===0){ctx.fillStyle='#efe2c4'; ctx.fillRect(Math.round(v.x)-3,Math.round(v.y)-14,6,5); ctx.fillStyle='#c94a3a'; ctx.fillRect(Math.round(v.x)-2,Math.round(v.y)-12,4,1)}}})) },
+  ents(list){ birk.vikings.forEach((v,i)=>list.push({y:v.y,draw:()=>{const y=v.y-(v.air||0); drawSkier(v.x,y,{...VIKING_LOOK,step:P.step+i}); if(i===0){ctx.fillStyle='#efe2c4'; ctx.fillRect(Math.round(v.x)-3,Math.round(y)-14,6,5); ctx.fillStyle='#c94a3a'; ctx.fillRect(Math.round(v.x)-2,Math.round(y)-12,4,1)}}})) },
   over(){
     const tf=ctx.getTransform(), cx=-tf.e, cy=-tf.f;
-    // rhythm ring: closes in on you every beat (shown on climbs, where it matters most)
-    if(birk.running&&birk.crashT<=0){const ph=(birk.beatT%BIRK.BEAT)/BIRK.BEAT, r=4+ (1-ph)*18, up=terrainAt(P.y)==='up';
-      ctx.strokeStyle=up?'rgba(79,38,131,.85)':'rgba(79,38,131,.3)'; ctx.lineWidth=1.5; ctx.beginPath(); ctx.arc(P.x,P.y-8,r,0,Math.PI*2); ctx.stroke();
-      if(birk.flashT>0){ctx.fillStyle=birk.flash==='good'?'#2f8a4a':'#c8322b'; ctx.font='8px monospace'; ctx.fillText(birk.flash==='good'?'push!':'off beat',P.x+10,P.y-18)}}
+    // drinking: a meter at the bottom of the screen. Don't jump or change lanes until it's full.
+    if(birk.drink){const k=Math.min(1,birk.drink.t/BIRK.DRINK_MS), bx=cx+52, by=cy+128;
+      ctx.fillStyle='rgba(29,33,48,.9)'; ctx.fillRect(bx,by,120,20); ctx.fillStyle='#e8742a'; ctx.fillRect(bx,by,120,1);
+      ctx.font='7px monospace'; ctx.fillStyle='#ffffff'; ctx.fillText(BIRKIE.holdSteady,bx+5,by+8);
+      ctx.fillStyle='#3a3f50'; ctx.fillRect(bx+5,by+12,110,4); ctx.fillStyle='#c98a3a'; ctx.fillRect(bx+5,by+12,Math.round(110*k),4)}
     // falling snow + messages
     ctx.fillStyle='rgba(255,255,255,.9)'; for(let i=0;i<40;i++){const sx=(i*53+time*.02*(1+i%3))%BIRK.W, sy=cy+(i*37+time*.04*(1+i%2))%168; ctx.fillRect(sx|0,sy|0,1,1)}
     if(terrainAt(P.y)==='lake'){ctx.fillStyle='rgba(255,255,255,.5)'; for(let i=0;i<20;i++){const x=(i*61+time*.25)%BIRK.W; ctx.fillRect(x|0,(cy+(i*29)%168)|0,6,1)}}
@@ -238,8 +281,7 @@ SCENES.birkie={ place:BIRKIE.place, music:'birkie',
   },
   hud(){
     if(!birk.running)return '';
-    const s=sectionAt(P.y), pips=[...Array(10)].map((_,i)=>`<i class="${i<Math.ceil(birk.stamina/10)?'on fuel':''}"></i>`).join('');
-    const rh=[...Array(5)].map((_,i)=>`<i class="${i<Math.round(birk.q*5)?'on':''}"></i>`).join('');
-    return `<span>${clockStr(birk.t)}</span><span class="pips">Rhythm ${rh}</span><span class="pips">Energy ${pips}</span>`;
+    const pips=[...Array(10)].map((_,i)=>`<i class="${i<Math.ceil(birk.energy/10)?'on fuel':''}"></i>`).join('');
+    return `<span>${clockStr(birk.t)}</span><span class="pips">Energy ${pips}</span>`;
   },
 };

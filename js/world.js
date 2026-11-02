@@ -95,7 +95,6 @@ const bg=document.createElement('canvas'); bg.width=WW; bg.height=WH;
   F('#eef3f7',220,0,164,144); soft(R(220,0,164,144),'#eef3f7','lb'); soft(R(219,0,1,144),'#ffffff','l');
   for(let i=0;i<90;i++)F(rnd()<.5?'#dfe7ef':'#ffffff',220+rnd()*164|0,rnd()*144|0,2,1);
   F('#f7fafc',300,0,32,76); for(let y=0;y<76;y+=2)F('#e1e9f0',302,y,28,1);       // corduroy
-  F('#c4d0dc',304,0,1,76); F('#c4d0dc',308,0,1,76); F('#c4d0dc',324,0,1,76); F('#c4d0dc',328,0,1,76);   // classic tracks
   F('#5d636e',230,86,80,56); for(let i=0;i<120;i++)F('#555a64',230+rnd()*80|0,86+rnd()*56|0,2,1);    // parking lot
   F('#dfe6ec',230,86,78,2); F('#dfe6ec',230,140,78,2);                                               // plowed snowbanks
   for(let x=233;x<300;x+=12){F('#e8e8e0',x,89,1,16); F('#e8e8e0',x,123,1,16)}

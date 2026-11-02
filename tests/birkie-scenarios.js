@@ -1,49 +1,69 @@
-// Plays the Vikings Birkie. Run: node tests/birkie-scenarios.js
-const {chromium}=require('playwright');const path=require('path');(async()=>{
+// Plays the Vikings Birkie (the lane runner). Run: node tests/birkie-scenarios.js
+const {chromium}=require('playwright');const path=require('path');const fs=require('fs');(async()=>{
 const b=await chromium.launch();const p=await b.newPage();const errs=[];p.on('pageerror',e=>errs.push(e.message));
 const URL='file://'+path.resolve(__dirname,'../index.html');
+const BOT=fs.readFileSync(path.join(__dirname,'birkie-difficulty.js'),'utf8').match(/window\.birkBot=[\s\S]*?\} \} \};/)[0];   // the same skier the simulator uses
 const helpers=()=>{window.T={
   btns:()=>[...$('dbtns').querySelectorAll('button')].map(b=>b.textContent),
   click:t=>[...$('dbtns').querySelectorAll('button')].find(b=>b.textContent===t).click(),
   through:()=>{const seen=[]; for(let i=0;i<30&&!dlg.hidden&&!T.btns().includes('Try again');i++){seen.push($('dspeaker').textContent+': '+$('dtext').textContent); [...$('dbtns').querySelectorAll('button')][0].click()} return seen},
   run:n=>{for(let i=0;i<n;i++)update(16.7)},
-  // a decent skier: steers down the trail around fallen skiers, tucks downhill, poles on the beat
-  ski:(maxFrames=20000,pole=true)=>{let next=null,f=0; while(birk.running&&f++<maxFrames){ let tx=trailX(P.y+20); for(const s of FALLEN)if(s.y>P.y&&s.y-P.y<40&&Math.abs(s.x-tx)<12)tx=s.x+(s.x<trailX(s.y)?14:-14);
-      for(const k in dirs)dirs[k]=false; if(tx-P.x>1.5)dirs.right=true; if(tx-P.x<-1.5)dirs.left=true; if(terrainAt(P.y)==='down')dirs.down=true;
-      const can=pole&&terrainAt(P.y)!=='down'&&birk.stamina>12; if(can&&next===null){let tb=BIRK.BEAT-birk.beatT%BIRK.BEAT; if(tb<BIRK.BEAT*.25)tb+=BIRK.BEAT; next=birk.t+tb} if(next!==null&&birk.t>=next){if(can)birkTap(); next=null}
-      update(16.7); if(!dlg.hidden&&birk.running)T.through() } for(const k in dirs)dirs[k]=false; return f},
+  tap:k=>{dirs[k]=true; update(16.7); dirs[k]=false; update(16.7)},
+  // put Joe just above a spot on the course, in a lane, at speed, with nothing else going on
+  setup:(y,lane)=>{birk.lane=lane; birk.lx=lane*BIRK.LANE*laneScale(y); P.y=y; P.x=trailX(y)+birk.lx; birk.v=.06; birk.jumpD=0; birk.crashT=0; birk.drink=null; birk.energy=80; birk.msg=''; birk.hit=new Set(OBSTACLES.filter(o=>o!==T.only)); birk.said={feedAhead820:1,feedAhead1500:1,feedAhead2390:1}},   // only T.only counts (if set)
+  ski:(miss=0,max=40000)=>{const bot=birkBot(miss); let f=0; while(birk.running&&f++<max){bot(); update(16.7); if(!dlg.hidden&&birk.running)T.through()} return f},
 }};
-const fresh=async()=>{await p.goto(URL);await p.evaluate(()=>localStorage.clear());await p.reload();await p.click('#startBtn'); await p.evaluate(()=>skipWelcome());await p.evaluate(helpers)};
+const fresh=async()=>{await p.goto(URL);await p.evaluate(()=>localStorage.clear());await p.reload();await p.click('#startBtn'); await p.evaluate(()=>skipWelcome());await p.evaluate(helpers); await p.addScriptTag({content:BOT})};
 const R=[];const ok=(n,c,x='')=>R.push((c?'PASS ':'FAIL ')+n+(x?'  ('+x+')':''));
+const start=()=>p.evaluate(()=>{P.x=320;P.y=84;update(16.7); action(); while(T.btns().includes('Next'))T.click('Next'); T.click('Head to the start line'); T.run(45); const card=$('howTitle').textContent, steps=$('howControls').textContent; $('howOk').click(); const hello=T.through(); T.run(2); return {card,steps,hello}});
 await fresh();
-let r=await p.evaluate(()=>{P.x=320;P.y=84;update(16.7); const lbl=prompt.textContent; action(); const sp=$('dspeaker').textContent; const pages=[]; while(T.btns().includes('Next')){pages.push($('dtext').textContent);T.click('Next')} pages.push($('dtext').textContent);
-  const btns=T.btns(); T.click('Head to the start line'); T.run(45); const card=!$('howto').hidden&&$('howTitle').textContent; $('howOk').click(); const hello=T.through(); T.run(2);
-  return {lbl,sp,pages,btns,card,hello,running:birk.running,scene:scene===SCENES.birkie,label:$('alabel').textContent,hud:$('hud').textContent}});
+let r=await p.evaluate(()=>{P.x=320;P.y=84;update(16.7); const lbl=prompt.textContent; action(); const sp=$('dspeaker').textContent; const pages=[]; while(T.btns().includes('Next')){pages.push($('dtext').textContent);T.click('Next')} closeDialog(); return {lbl,sp,pages}});
 ok('A John explains: Vikings carry the flour, Birkie-style',r.lbl==='Talk to John'&&r.sp==='John'&&r.pages.join(' ').includes('Vikings'),r.pages[2]);
-ok('A how-to card, then the Vikings, then the race starts',r.scene&&r.card==='The Birkie'&&r.hello.join().includes('Vikings')&&r.running,r.hud);
-ok('A the A button says Pole',r.label.startsWith('Pole'),r.label);
-// mechanics
-r=await p.evaluate(()=>{const q0=birk.q; birk.beatT=Math.round(BIRK.BEAT*10); birkTap(); const good=birk.flash, q1=birk.q; birk.beatT=Math.round(BIRK.BEAT*10.5); birkTap(); const miss=birk.flash, q2=birk.q; return {q0,q1,q2,good,miss}});
-ok('B on-beat taps build rhythm, off-beat taps knock it down',r.good==='good'&&r.q1>r.q0&&r.miss==='miss'&&r.q2<r.q1,JSON.stringify(r));
-r=await p.evaluate(()=>{const f=FALLEN[0]; P.x=f.x; P.y=f.y-5; birk.v=.06; update(16.7); const c=birk.crashT>0, msg=birk.msg; const y=P.y; T.run(20); const stuck=Math.abs(P.y-y)<.5; T.run(80); return {c,msg,stuck,moved:P.y>y+1,known:BIRKIE.crash.includes(msg)}});
-ok('B skiing into a fallen skier: crash, short pause, then you go again',r.c&&r.stuck&&r.moved&&r.known,r.msg);
-r=await p.evaluate(()=>{birk.stamina=5; P.x=trailX(FEEDS[0].y); P.y=FEEDS[0].y-10; update(16.7); return {st:birk.stamina,msg:birk.msg}});
-ok('B a feed station fills your energy back up',r.st===100&&r.msg.includes('Flat Coke'),r.msg);
-r=await p.evaluate(()=>{const y=1265; P.x=trailX(y)+60; P.y=y; birk.v=.06; birk.q=1; T.run(60); const offV=birk.v; P.x=trailX(P.y); T.run(60); return {offV,onV:birk.v}});
-ok('B deep snow off the trail is slow',r.offV<.03&&r.onV>r.offV,`${r.offV.toFixed(3)} vs ${r.onV.toFixed(3)}`);
-// lose: never poling, the sweep catches you
-await fresh(); r=await p.evaluate(()=>{P.x=320;P.y=84;update(16.7);action(); while(T.btns().includes('Next'))T.click('Next'); T.click('Head to the start line'); T.run(45); $('howOk').click(); T.through();
-  T.ski(30000,false); const lines=T.through(); return {lines,btns:T.btns(),done:!!have.birkie}});
-ok('C no poling: the sweep snowmobile catches you, try again offered',r.lines.join().includes('sweep')&&r.lines.every(l=>l.startsWith('John:'))&&r.btns.includes('Try again')&&!r.done,r.lines[0]);
-// win: decent rhythm finishes, back at the trailhead, flour from John
-r=await p.evaluate(()=>{T.click('Try again'); T.ski(); const lines=T.through(); return {lines,done:!!have.birkie,time:have.birkieTime,reward:!$('reward').hidden,name:$('rewardName').textContent}});
-ok('D good rhythm makes the cutoff; Vikings celebrate',r.done&&r.lines.join().includes('SKOL')&&r.lines.every(l=>l.startsWith('John:')),r.time+' | '+r.lines[0]);
-ok('D John hands over the flour right at the finish (no need to talk to him again)',r.reward&&r.name==='Flour',r.lines.slice(-1)[0]);
+r=await start(); const r2=await p.evaluate(()=>({running:birk.running,scene:scene===SCENES.birkie,label:$('alabel').textContent,hud:$('hud').textContent}));
+ok('A how-to card (lanes, jumping, packs, feed cups), then the race starts',r.card==='The Birkie'&&/lane/i.test(r.steps)&&/jump/i.test(r.steps)&&/spill/i.test(r.steps)&&r2.running&&r2.scene,r2.hud);
+ok('A the A button says Jump; no more rhythm meter',r2.label==='Jump'&&!/Rhythm/.test(r2.hud)&&/Energy/.test(r2.hud),r2.label+' | '+r2.hud);
+// B. lanes
+r=await p.evaluate(()=>{T.only=null; T.setup(300,0); T.tap('right'); const a=birk.lane; dirs.right=true; T.run(20); const held=birk.lane; dirs.right=false; T.run(1); T.tap('right'); const clamp=birk.lane; T.tap('left'); T.tap('left'); const b=birk.lane; T.run(30); const off=P.x-trailX(P.y); return {a,held,clamp,b,off}});
+ok('B a tap changes one lane; holding the key doesn\'t keep switching; three lanes, no further',r.a===1&&r.held===1&&r.clamp===1&&r.b===-1&&r.off<-12,JSON.stringify(r));
+// C. fallen skiers: jump them, or crash
+r=await p.evaluate(()=>{const o=OBSTACLES.find(o=>o.kind==='fallen'); T.only=o; T.setup(o.y-30,o.lanes[0]); let crashed=false; for(let i=0;i<60;i++){ if(o.y-P.y<BIRK.JUMP_LEN*.6&&birk.jumpD===0&&P.y<o.y)birkJump(); update(16.7); if(birk.crashT>0)crashed=true} const jumped=!crashed&&P.y>o.y;
+  T.setup(o.y-30,o.lanes[0]); let msg=''; for(let i=0;i<40&&!msg;i++){update(16.7); if(birk.crashT>0)msg=birk.msg} const y=P.y; T.run(30); const stuck=Math.abs(P.y-y)<.5; T.run(120); return {jumped,msg,stuck,moved:P.y>y+5,known:BIRKIE.crash.includes(msg)}});
+ok('C jump a fallen skier and you sail over (the Vikings hop too)',r.jumped);
+ok('C ski into one: crash, a short pause, then you go again',r.known&&r.stuck&&r.moved,r.msg);
+// D. packs: go around (jumping doesn't help)
+r=await p.evaluate(()=>{const o=OBSTACLES.find(o=>o.kind==='pack'); T.only=o; const free=[-1,0,1].find(l=>!o.lanes.includes(l));
+  T.setup(o.y-20,o.lanes[0]); birkJump(); let hitWhileJumping=false; for(let i=0;i<30;i++){update(16.7); if(birk.crashT>0)hitWhileJumping=true}
+  const msg=birk.msg; T.setup(o.y-20,free); let clean=true; for(let i=0;i<30;i++){update(16.7); if(birk.crashT>0)clean=false} return {hitWhileJumping,msg,clean,known:BIRKIE.packCrash.includes(msg)}});
+ok('D a pack of slow skiers: jumping won\'t clear it, going around will',r.hitWhileJumping&&r.known&&r.clean,r.msg);
+// E. feed stations: grab the cup, hold steady, don't spill
+r=await p.evaluate(()=>{const f=FEEDS[0], out={};
+  f.used=false; T.setup(f.y-10,f.cup); birk.energy=30; T.run(10); out.grab=birk.msg; out.drinking=!!birk.drink; T.run(Math.ceil(BIRK.DRINK_MS/16.7)+5); out.full=birk.energy; out.done=birk.msg;
+  f.used=false; T.setup(f.y-10,f.cup); birk.energy=30; T.run(10); T.tap(f.cup===1?'left':'right'); out.spill=birk.msg; out.after=birk.energy; out.gone=!birk.drink;
+  f.used=false; T.setup(f.y-10,f.cup); birk.energy=30; T.run(10); birkJump(); out.spillJump=birk.msg;
+  f.used=false; T.setup(f.y-10,f.cup===0?1:0); birk.energy=30; T.run(10); out.missed=birk.msg; out.missE=birk.energy; out.grabLine=BIRKIE.grab; out.spills=BIRKIE.spill; return out});
+ok('E ski into the cup\'s lane: grab it, hold steady, energy full',r.grab===r.grabLine&&r.drinking&&r.full>99&&r.done.includes('Flat Coke'),JSON.stringify(r).slice(0,300));
+ok('E change lanes (or jump) while drinking and it spills: just a sip',r.spills.includes(r.spill)&&r.gone&&r.after<60&&r.spills.includes(r.spillJump),r.spill);
+ok('E wrong lane: you miss the cup',r.missed.includes('Missed')&&r.missE<35,r.missed);
+// F. energy
+r=await p.evaluate(()=>{T.only=null; T.setup(500,0); birk.energy=100; birk.v=.03; T.run(200); const vFull=birk.v, eAfter=birk.energy; T.setup(500,0); birk.energy=0; birk.v=.03; T.run(200); return {vFull,eAfter,vEmpty:birk.v}});
+ok('F energy drains as you go, and running on empty is slow',r.eAfter<100&&r.vEmpty<r.vFull*.8,`${r.vFull.toFixed(3)} vs ${r.vEmpty.toFixed(3)}`);
+// G. the course is always passable
+r=await p.evaluate(()=>{const bad=OBSTACLES.filter(o=>o.lanes.length>=3||(o.y>2110&&o.y<2260)||FEEDS.some(f=>Math.abs(o.y-f.y)<60)); return {bad:bad.length,n:OBSTACLES.length,packs:OBSTACLES.filter(o=>o.kind==='pack').length,bridge:laneX(2180,1)-laneX(2180,0),trail:laneX(1000,1)-laneX(1000,0)}});
+ok('G every obstacle leaves a way through; none on the bridge or at a feed; lanes squeeze on the bridge',!r.bad&&r.n>12&&r.packs>2&&r.bridge<r.trail,JSON.stringify(r));
+// H. lose: never dodging, the sweep catches you
+await fresh(); await start();
+r=await p.evaluate(()=>{T.ski(1); return {lines:T.through(),btns:T.btns(),done:!!have.birkie}});
+ok('H never dodging anything: the sweep catches you, try again offered',r.lines.join().includes('sweep')&&r.btns.includes('Try again')&&!r.done,r.lines[0]);
+// I. win: a decent skier finishes, John hands over the flour right away
+r=await p.evaluate(()=>{T.click('Try again'); T.ski(.1); const lines=T.through(); return {lines,done:!!have.birkie,time:have.birkieTime,reward:!$('reward').hidden,name:$('rewardName').textContent}});
+ok('I a decent skier makes the cutoff; Vikings celebrate',r.done&&r.lines.join().includes('SKOL')&&r.lines.every(l=>l.startsWith('John:')),r.time+' | '+r.lines[0]);
+ok('I John hands over the flour right at the finish',r.reward&&r.name==='Flour');
 await p.click('#rewardArt',{force:true}); await p.waitForTimeout(900);
-r=await p.evaluate(()=>{T.run(45); return {mill:!!have.mill,basket:$('basket').textContent,world:scene===SCENES.world}}); ok('D flour in the basket, back at the trailhead',r.mill&&r.world&&r.basket.includes('✓ Flour'),r.basket);
-await fresh(); r=await p.evaluate(()=>{P.x=320;P.y=84;update(16.7);action(); while(T.btns().includes('Next'))T.click('Next'); T.click('Head to the start line'); T.run(45); $('howOk').click(); T.through(); const s0=sweepY(); birk.t=(BIRK.CUTOFF/2)*1000/BIRK.CLOCK; const mid=sweepY(); P.y=mid+40; P.x=trailX(P.y); update(16.7); const warn=birk.msg, still=birk.running; P.y=mid-1; update(16.7); return {s0,mid,warn:warn===BIRKIE.sweepClose,still,caught:!birk.running}});
-ok('F the sweep starts behind you, warns you when close, and catches you if it reaches you',r.s0===0&&r.still&&r.warn&&r.caught,JSON.stringify(r));
-// the course: you can't fall off the edge of the world; the bridge is narrow; Main Street is wide
-r=await p.evaluate(()=>({bridge:trailHalf(2180),trail:trailHalf(1000),main:trailHalf(2600),bobble:trailX(1200)<trailX(1000)}));
-ok('E the bridge is narrow, Main Street is wide, Bobblehead turns left',r.bridge<r.trail&&r.main>r.trail&&r.bobble,JSON.stringify(r));
+r=await p.evaluate(()=>{T.run(45); return {mill:!!have.mill,world:scene===SCENES.world,got:!!$('basket').querySelector('[data-key="mill"].got')}});
+ok('I flour in the basket, back at the trailhead',r.mill&&r.world&&r.got);
+// J. phone: swipe to change lanes, tap to jump
+await fresh(); await start();
+r=await p.evaluate(()=>{T.setup(300,0); const c=$('game'), ev=(t,x,y)=>c.dispatchEvent(new PointerEvent(t,{clientX:x,clientY:y,bubbles:true}));
+  ev('pointerdown',200,300); ev('pointerup',260,305); const swipe=birk.lane; ev('pointerdown',200,300); ev('pointerup',201,300); const tap=birk.jumpD>0; return {swipe,tap}});
+ok('J on a phone: swipe right changes lane, a tap jumps',r.swipe===1&&r.tap,JSON.stringify(r));
 console.log(R.join('\n')); console.log('page errors:',errs.length?errs:'none'); await b.close()})();

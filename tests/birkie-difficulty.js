@@ -1,24 +1,24 @@
-// Simulates skiers of different rhythm accuracy on the Birkie. Usage: node tests/birkie-difficulty.js '{"CUTOFF":12000}'
+// Simulates skiers of different skill on the Birkie lane runner. Usage: node tests/birkie-difficulty.js '{"CUTOFF":12000}'
+// A skier looks ahead, changes lane around packs, jumps fallen skiers, grabs the feed cup and holds steady.
+// "miss" is the chance they react wrong (or too late) to each thing on the trail.
 const {chromium}=require('playwright');const path=require('path');const OV=JSON.parse(process.argv[2]||'{}');(async()=>{
 const b=await chromium.launch();const p=await b.newPage();await p.goto('file://'+path.resolve(__dirname,'../index.html'));await p.click('#startBtn'); await p.evaluate(()=>skipWelcome());
-const out=await p.evaluate((OV)=>{Object.assign(BIRK,OV); have.miller=true; scene=SCENES.birkie; paused=false;
-  const g=()=>{let u=0,v=0;while(!u)u=Math.random();while(!v)v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)};
-  function run(sigma,pole,steerErr){birkStart(); let next=null, guard=0;
-    while(birk.running&&guard++<20000){
-      // steer: aim for the trail center, dodge the next fallen skier ahead
-      let tx=trailX(P.y+20); for(const f of FALLEN)if(f.y>P.y&&f.y-P.y<40&&Math.abs(f.x-tx)<12)tx=f.x+(f.x<trailX(f.y)?14:-14);
-      tx+=steerErr*Math.sin(guard/40);
-      for(const k in dirs)dirs[k]=false; if(tx-P.x>1.5)dirs.right=true; if(tx-P.x<-1.5)dirs.left=true; if(terrainAt(P.y)==='down')dirs.down=true;
-      // pole: schedule a tap at the next beat (plus timing error), tap when it comes; skip descents and rest when tired
-      const canPole=pole&&terrainAt(P.y)!=='down'&&birk.stamina>12;
-      if(canPole&&next===null){const ph=birk.beatT%BIRK.BEAT; let toBeat=BIRK.BEAT-ph; if(toBeat<BIRK.BEAT*.25)toBeat+=BIRK.BEAT; next=birk.t+toBeat+g()*sigma}
-      if(next!==null&&birk.t>=next){ if(canPole)birkTap(); next=null }
-      birkUpdate(16.7);
-    }
-    for(const k in dirs)dirs[k]=false; return {made:P.y>=FINISH_Y, t:birk.t*BIRK.CLOCK/1000}}
+const out=await p.evaluate((OV)=>{Object.assign(BIRK,OV); scene=SCENES.birkie; paused=false;
+  window.birkBot=(miss)=>{ const decided=new Map(); return ()=>{
+    const lane=curLane(), ahead=o=>{const d=obstacleY(o)-P.y; return d>0&&d<46};
+    const blocked=(l,d=60)=>OBSTACLES.some(o=>{const dd=obstacleY(o)-P.y; return dd>-4&&dd<d&&o.lanes.includes(l)&&o.kind==='pack'});
+    for(const o of OBSTACLES){ if(!ahead(o)||birk.hit.has(o)||!o.lanes.includes(lane))continue;
+      if(!decided.has(o))decided.set(o,Math.random()>=miss); if(!decided.get(o))continue;
+      if(o.kind==='fallen'){ if(obstacleY(o)-P.y<BIRK.JUMP_LEN*.6)birkJump() }
+      else { const opts=[-1,0,1].filter(l=>!o.lanes.includes(l)&&!blocked(l)).sort((a,b)=>Math.abs(a-lane)-Math.abs(b-lane)); if(opts.length&&!birk.drink)birkLane(opts[0]>lane?1:-1) } }
+    for(const f of FEEDS){ const d=f.y-P.y; if(f.used||d<0||d>130)continue; if(!decided.has(f))decided.set(f,Math.random()>=miss);
+      if(decided.get(f)&&lane!==f.cup&&!blocked(f.cup,d+6))birkLane(f.cup>lane?1:-1) } } };
+  function run(miss){birkStart(); const bot=birkBot(miss); let guard=0;
+    while(birk.running&&guard++<30000){ bot(); birkUpdate(16.7) }
+    return {made:P.y>=FINISH_Y, t:birk.t*BIRK.CLOCK/1000, crashes:birk.hit.size}}
   const fmt=s=>`${Math.floor(s/3600)}:${String(Math.floor(s%3600/60)).padStart(2,'0')}`;
-  const res={}; for(const [name,sig,pole,se] of [['great rhythm',40,true,0],['ok rhythm',90,true,4],['sloppy rhythm',160,true,8],['never poles',0,false,6]]){
-    let made=0, ts=[]; for(let k=0;k<20;k++){const r=run(sig,pole,se); if(r.made){made++; ts.push(r.t)}} ts.sort((a,b)=>a-b);   // times of finishers only (the sweep catching you isn't a 'best time')
-    res[name]=made?`finishes ${made}/20, median ${fmt(ts[ts.length>>1])}, best ${fmt(ts[0])}`:`finishes 0/20`}
+  const res={}; for(const [name,miss] of [['sharp',0],['good',.12],['casual',.3],['distracted',.55],['never reacts',1]]){
+    let made=0, ts=[], cr=0; for(let k=0;k<20;k++){const r=run(miss); cr+=r.crashes; if(r.made){made++; ts.push(r.t)}} ts.sort((a,b)=>a-b);
+    res[name]=(made?`finishes ${made}/20, median ${fmt(ts[ts.length>>1])}, best ${fmt(ts[0])}`:'finishes 0/20')+`, avg ${(cr/20).toFixed(1)} crashes`}
   return res},OV);
-console.log(OV,out);await b.close()})();
+console.log(OV,out); await b.close()})();
