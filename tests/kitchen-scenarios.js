@@ -22,7 +22,7 @@ await fresh(ALL);
 r=await p.evaluate(()=>{goTo('kitchen','fromDoor'); T.run(40); P.x=30;P.y=94; update(16.7); const lbl=prompt.textContent; action(); const sp=$('dspeaker').textContent; T.through(); return {lbl,sp,n:CROWD.length}});
 ok('B everyone came over (and you can talk to them)',r.lbl==='Talk to Keelan'&&r.sp==='Keelan'&&r.n>=10,r.lbl);
 r=await p.evaluate(()=>{P.x=64;P.y=60; update(16.7); action(); const pages=[]; while(T.btns().includes('Next')){pages.push($('dtext').textContent);T.click('Next')} T.click("Let's bake"); const pwOpen=!$('xword').hidden, bakeFirst=!$('bake').hidden;
-  $('pwInput').value='  PassWord '; pwCheck(); const right=$('pwMsg').textContent, btn=$('pwGo').textContent; $('pwGo').click();
+  $('pwInput').value='  '+PASSWORD.word[0].toUpperCase()+PASSWORD.word.slice(1)+' '; pwCheck(); const right=$('pwMsg').textContent, btn=$('pwGo').textContent; $('pwGo').click();
   return {pages,pwOpen,bakeFirst,right,btn,ok:have.passwordOk,open:!$('bake').hidden,step:$('bakeStep').textContent}});
 ok('B Let\'s bake opens the locked recipe card first (the secret word)',r.pwOpen&&!r.bakeFirst,r.right);
 ok('B the right word (any capitals, extra spaces) unlocks it and goes straight on to baking at step 1 (butter)',r.ok&&r.btn==="Let's bake"&&r.open&&r.step.includes('Butter'),r.step);

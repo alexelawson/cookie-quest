@@ -366,7 +366,7 @@ const FARGO = {
 // ---------- The locked recipe card: Joe types the secret word from Alex's paper crossword ----------
 // Change `word` to the real answer. Capitals and spaces don't matter.
 const PASSWORD = {
-  word:'password',
+  word:'klister',   // from the paper crossword: the circled letters spell it
   title:"The locked recipe card",
   intro:"The recipe card is locked! Solve the crossword I gave you, then type the secret word here.",
   placeholder:"Secret word",
