@@ -15,7 +15,7 @@ const EXITS={
 };
 let exitArmed=false;   // you have to step out of an exit before it works (so arriving next to one doesn't bounce you out)
 const sceneName=()=>Object.keys(SCENES).find(k=>SCENES[k]===scene);
-const exitsHere=()=>(EXITS[sceneName()]||[]).filter(e=>!e.when||e.when());
+const exitsHere=()=>(scene===SCENES.kitchen&&(kit.taste||kit.hugging))?[]:(EXITS[sceneName()]||[]).filter(e=>!e.when||e.when());   // (no EXIT arrow in the middle of the taste test)
 function sceneExitTick(){
   const feet=scene.feet?scene.feet(P.x,P.y):R(P.x-4,P.y-3,8,4), e=exitsHere().find(e=>hit(feet,e.z));
   if(!e){exitArmed=true; return}

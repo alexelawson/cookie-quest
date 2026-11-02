@@ -35,6 +35,8 @@ const CROWD=[
   {name:'Viking',x:204,y:136, draw:(x,y)=>drawVikingStanding(x,y,'norse')},
   {name:'Football Viking',x:212,y:152, draw:(x,y)=>drawVikingStanding(x,y,'football','21')},
   {name:'Logan',x:40,y:110, draw:(x,y)=>drawLogan(x,y,true)},
+  {name:'Ethan',x:132,y:150, draw:(x,y,d)=>drawEthan(x,y,d||'down')},
+  {name:'Maureen',x:150,y:148, draw:(x,y,d)=>drawMaureen(x,y,d||'down')},
   {name:'Jackie',x:120,y:72, draw:(x,y,d)=>drawJackie(x,y,d||'down'), needs:'metJackie'},
 ];
 // two kinds of Vikings: the old Norse kind (iron helmet, fur, beard, shield) and the football kind (purple and gold, pads, facemask)
@@ -160,10 +162,35 @@ addEventListener('keyup',e=>{ if(bake.open&&['Space','Enter'].includes(e.code))b
 
 // ---------- the party: Alex hugs Joe, everyone talks, the crown, then THE COOKIE DANCE ----------
 const PARTY={WALK:1300, HUG:2600, BEAT:420};
+// first, the taste test: Ethan (designated grill master) and Maureen (a very precise baker) try one. Everyone holds their breath.
+const TASTE={WALK:1200, NERVOUS:2800, SPOT:{Ethan:{x:92,y:128}, Maureen:{x:132,y:128}}};
 function startParty(){
-  have.baked=true; save(); kit.party=true; kit.dance=false; sfx('fanfare'); P.x=112; P.y=134; P.dir='down';
-  const A=CROWD.find(c=>c.name==='Alex'); kit.alex={x:A.x,y:A.y}; kit.hugT=0; kit.hugging=true; paused=true; prompt.hidden=true;
-  for(let k=0;k<70;k++)kit.confetti.push({x:Math.random()*224,y:-Math.random()*120,v:.02+Math.random()*.04,c:['#e54b4b','#f4d35e','#4fbf73','#5fa8e8','#e54b7a','#ffffff'][k%6]});
+  have.baked=true; save(); kit.party=false; kit.dance=false; sfx('ding'); P.x=112; P.y=134; P.dir='down';
+  const A=CROWD.find(c=>c.name==='Alex'); kit.alex={x:A.x,y:A.y}; kit.hugT=0; kit.hugging=false; paused=true; prompt.hidden=true;
+  kit.taste={phase:'walk', t:0}; kit.tasters={};
+}
+function tasteTick(dt){
+  const k=kit.taste; if(!k)return; k.t+=dt; if(dlg.hidden)paused=true;   // nobody wanders off mid-taste-test
+  for(const n of ['Ethan','Maureen']){const c=CROWD.find(c=>c.name===n), s=TASTE.SPOT[n], u=Math.min(1,k.t/TASTE.WALK); if(k.phase==='walk')kit.tasters[n]={x:c.x+(s.x-c.x)*u, y:c.y+(s.y-c.y)*u}}
+  if(k.phase==='walk'&&k.t>=TASTE.WALK){ k.phase='talk'; say(KITCHEN.tasteBefore,()=>{ k.phase='nervous'; k.t=0 }) }
+  if(k.phase==='nervous'){ if(Math.floor((k.t-dt)/180)!==Math.floor(k.t/180))sfx('beat');   // a little drumroll
+    if(k.t>=TASTE.NERVOUS){ k.phase='verdict'; sfx('fanfare'); kit.party=true;
+      for(let j=0;j<70;j++)kit.confetti.push({x:Math.random()*224,y:-Math.random()*120,v:.02+Math.random()*.04,c:['#e54b4b','#f4d35e','#4fbf73','#5fa8e8','#e54b7a','#ffffff'][j%6]});
+      say(KITCHEN.tasteAfter,()=>{ kit.taste=null; kit.hugT=0; kit.hugging=true; paused=true }) } }
+}
+// while they chew: everyone else is sweating it
+function drawTasteNerves(){
+  const k=kit.taste; if(!k||k.phase!=='nervous')return;
+  CROWD.forEach((c,i)=>{ if(c.name==='Ethan'||c.name==='Maureen'||(c.needs&&!have[c.needs]))return; const pos=(c.name==='Alex'&&kit.alex)?kit.alex:c, x=Math.round(pos.x)+5, y=Math.round(pos.y)-24+((Math.floor(time/200)+i)%2);
+    ctx.fillStyle='#9fd2f0'; ctx.fillRect(x,y,2,3); ctx.fillRect(x+1,y-1,1,1) });                            // sweat drops
+  {const x=Math.round(P.x)+6, y=Math.round(P.y)-26; ctx.fillStyle='#9fd2f0'; ctx.fillRect(x,y,2,3)}
+}
+// the little captions during the finale (the taste test, the hug): the same pop-up as the rest of the game, up top, clear of everything
+let captionShown='';
+function kitCaption(){
+  const k=kit.taste, t=k&&k.phase==='nervous'?KITCHEN.tasteHush:(kit.hugging&&kit.hugT>PARTY.WALK)?KITCHEN.hug:'', el=$('caption');
+  if(!t||scene!==SCENES.kitchen){ if(!el.hidden)el.hidden=true; captionShown=''; return }
+  if(t!==captionShown){ $('captionWho').textContent=t===KITCHEN.hug?KITCHEN.place:KITCHEN.captionPlace; $('captionText').textContent=t; captionShown=t } el.hidden=false;
 }
 function partyTick(dt){
   if(!kit.hugging)return; kit.hugT+=dt; const A=CROWD.find(c=>c.name==='Alex'), u=Math.min(1,kit.hugT/PARTY.WALK), tx=104, ty=135;
@@ -198,7 +225,7 @@ function drawHug(){
   const F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(Math.round(x+dx*s),Math.round(y+dy*s),Math.ceil(w*s),Math.ceil(h*s))};   // a big pink heart over the hug
   F('#e54b7a',-6,-4,5,4); F('#e54b7a',1,-4,5,4); F('#e54b7a',-7,-2,14,4); F('#e54b7a',-5,2,10,2); F('#e54b7a',-3,4,6,2); F('#e54b7a',-1,6,2,1); F('#ffb3c9',-5,-3,2,2);
   for(let k=0;k<5;k++){const ph=((t/900)+k*.2)%1; ctx.fillStyle=`rgba(229,75,122,${1-ph})`; const hx=x-20+k*10, hy=y+20-ph*30; ctx.fillRect(hx,hy,2,2); ctx.fillRect(hx+3,hy,2,2); ctx.fillRect(hx,hy+1,5,2); ctx.fillRect(hx+1,hy+3,3,1)}
-  ctx.fillStyle='rgba(29,33,48,.85)'; ctx.font='8px monospace'; const msg=KITCHEN.hug, w=ctx.measureText(msg).width+10; ctx.fillRect((224-w)/2,150,w,12); ctx.fillStyle='#ffffff'; ctx.fillText(msg,(224-w)/2+5,159);
+
 }
 
 const kitBg=document.createElement('canvas'); kitBg.width=224; kitBg.height=168;
@@ -305,7 +332,7 @@ function drawXmasTree(){
 SCENES.kitchen={ place:KITCHEN.place, music:()=>kit.dance?'jingle':'kitchen',
   w:224, h:168, bounds:R(6,52,212,116), bg:kitBg, triggers:KIT_TRIGGERS,
   dynTrigger(){ const c=crowdNear(); if(!c)return null; const f=crowdFace(c.name); return {label:'Talk to '+f.speaker, btn:'Talk', act:()=>showDialog({place:KITCHEN.place,speaker:f.speaker,face:f.face,pages:[KITCHEN.crowd[c.name]],actions:[CLOSE]})} },
-  ambient(dt){ bakeTick(dt); partyTick(dt);
+  ambient(dt){ bakeTick(dt); tasteTick(dt); partyTick(dt);
     for(const p of kit.confetti){p.y+=p.v*dt; p.x+=Math.sin((time+p.y*30)/400)*.2; if(p.y>170){ if(kit.party&&kit.confetti.length<140){p.y=-4;p.x=Math.random()*224} else p.dead=true }}
     kit.confetti=kit.confetti.filter(p=>!p.dead);
     if(kit.crownT>0){ kit.crownT-=dt; if(kit.crownT<=0){ have.crown=true; save(); sfx('crown'); kit.dance=true; kit.danceAt=time; playMusic(); setTimeout(finalNote,PARTY.BEAT*16) } } },
@@ -314,10 +341,11 @@ SCENES.kitchen={ place:KITCHEN.place, music:()=>kit.dance?'jingle':'kitchen',
     if(m.cookie)drawCookie(X+7,Y-20) },
   solids:[R(78,104,68,14), R(194,104,24,10), R(6,52,16,6)],
   entries:{start:{x:112,y:152,dir:'up'}, fromDoor:{x:112,y:154,dir:'up'}},
-  leave(){ stopMusic() },
+  leave(){ stopMusic(); $('caption').hidden=true },
   enter(){ kit.party=!!have.baked; kit.dance=!!have.crown; kit.danceAt=time; if(kit.dance)playMusic(); if(have.baked){const A=CROWD.find(c=>c.name==='Alex'); kit.alex={x:104,y:135}} },
   ents(list){list.push({y:118,draw:drawTable},{y:114,draw:drawXmasTree});
-    if(allIn()||have.baked)CROWD.forEach((c,i)=>{ if(c.needs&&!have[c.needs])return; const pos=(c.name==='Alex'&&kit.alex)?kit.alex:c;
+    if(allIn()||have.baked)CROWD.forEach((c,i)=>{ if(c.needs&&!have[c.needs])return; const pos=(c.name==='Alex'&&kit.alex)?kit.alex:(kit.tasters&&kit.tasters[c.name])||c;
+      if(kit.taste&&kit.tasters&&kit.tasters[c.name]&&kit.taste.phase!=='walk'){const chew=kit.taste.phase==='nervous'&&Math.floor(time/160)%2; list.push({y:pos.y,draw:()=>{c.draw(pos.x,pos.y,'down'); if(c.name==='Ethan')drawEthan(pos.x,pos.y,'down',chew); else drawMaureen(pos.x,pos.y,'down',chew); drawCookie(pos.x+6,pos.y-12)}}); return}
       list.push({y:pos.y,draw:()=>{const m=danceMove(i); c.draw(pos.x+m.dx,pos.y+m.dy,m.dir); if(m.cookie)drawCookie(pos.x+m.dx+7,pos.y+m.dy-21)}}) })},
   under(){ // oven glow
     const f=.55+.15*Math.sin(time/300)+.08*Math.sin(time/77);
@@ -326,5 +354,5 @@ SCENES.kitchen={ place:KITCHEN.place, music:()=>kit.dance?'jingle':'kitchen',
   },
   over(){ctx.fillStyle='rgba(255,190,110,.06)'; ctx.fillRect(0,0,224,168);   // warm light
     for(const p of kit.confetti){ctx.fillStyle=p.c; ctx.fillRect(p.x|0,p.y|0,2,2)}
-    drawHug(); if(kit.dance)drawDanceBanner() },
+    drawHug(); drawTasteNerves(); kitCaption(); if(kit.dance)drawDanceBanner() },
 };

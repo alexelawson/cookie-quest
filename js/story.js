@@ -432,7 +432,7 @@ const ENDING = {
   // [portrait, name, role, (only if have[...])]
   credits:[
     ['Joe','Joe','The Cookie King'],['Alex','Alex','Head Baker, Snack Critic'],['Keelan','Keelan','Eggs, Butter, Hen Wrangling'],
-    ['Logan','Logan','Four-Leaf Clover Specialist'],['Bryan','Bryan','Sprinkles. Very Chill.'],['Trail John','John (the other one)','Flour, 50 km'],
+    ['Logan','Logan','Four-Leaf Clover Specialist'],['Maureen','Maureen','Head Taste Tester (very precise)'],['Ethan','Ethan','Designated Grill Master'],['Bryan','Bryan','Sprinkles. Very Chill.'],['Trail John','John (the other one)','Flour, 50 km'],
     ['Lars','Lars','Long Jump (Attempted)'],['John','John','Heavy Lifting, Eye Rolling'],['Dr. Alex','Dr. Alex','Mad Scientist (Rooftop Division)'],
     ['Lil Q','Lil Q','Exactly $30.00 of Gas'],['Jackie','Jackie','Straight Talk','metJackie'],['Margie','Margie','The Main Character (self-appointed)'],
     ['Jack','Jack','2.1 Cookies Per Guest'],[null,'The Vikings','SKOL'],[null,'The Hens','Uncooperative'],
@@ -468,7 +468,7 @@ const KITCHEN = {place:'Home', speaker:'Your kitchen',
   // what everyone says if you talk to them in the kitchen before baking
   crowd:{Keelan:"Those are my eggs. Treat them with respect.", Alex:"I'm on dough-tasting duty.", 'Lil Q':"Scooted all the way over from Fargo for this. Rookie better deliver.", Jack:"Cookies per guest is 2.1 right now. I need it at 3.",
          Lars:"I'll time the oven. I have a watch with splits.", John:"I'll carry the tray. Or the whole oven.", 
-         Margie:"I brought the milk. I'm basically the main character.", Bryan:"Nice kitchen. Very chill in here.", Logan:"I checked your yard. No clovers. Great cookies though.", Jackie:"You figured out the snacks. Proud of you. Don't make it weird.", 'Trail John':"Flour made it all fifty kilometers.", Viking:"SKOL! When do we eat?"},
+         Margie:"I brought the milk. I'm basically the main character.", Bryan:"Nice kitchen. Very chill in here.", Logan:"I checked your yard. No clovers. Great cookies though.", Ethan:"Grill's preheating. Just in case.", Maureen:"Did you weigh the flour, or scoop it? ...Either way, dear. It smells wonderful.", Jackie:"You figured out the snacks. Proud of you. Don't make it weird.", 'Trail John':"Flour made it all fifty kilometers.", Viking:"SKOL! When do we eat?"},
   // the baking card: one step per ingredient, in recipe order. target and tol are in cups.
   bakeTitle:"Bake the cookies",
   // Alex is your baking helper: she talks you through every step (her lines are the hint, good, and the oops lines below)
@@ -490,7 +490,15 @@ const KITCHEN = {place:'Home', speaker:'Your kitchen',
   bakeHint:"Into the oven. Ten minutes. Pull them right at 10:00, golden, not burnt.", bakeStart:"Put them in", bakeOut:"Take them out",
   raw:"Still raw in the middle! New tray, try again.", burnt:"Burnt. Lars is already opening a window. New tray!", perfect:"Golden brown. PERFECT. Come here, you.",
   // the party, in order. [speaker, line] (or [speaker, line, portrait] to borrow someone's face)
-  hug:"Alex gives Joe a big hug.",
+  // the taste test: Ethan (Joe's brother) and Maureen (Joe's mom) try the first cookie. Everyone's nervous.
+  tasteBefore:[['Ethan',"As designated grill master, I require being the second opinion on the cookie taste test."],
+    ['Maureen',"And I'll be the first opinion. Let's see... even spread, nice golden edges. Lovely color, dear."],
+    ['Ethan',"Okay. Moment of truth."]],
+  tasteHush:"Ethan and Maureen take a bite. Nobody breathes...",
+  captionPlace:"The taste test",
+  tasteAfter:[['Maureen',"Oh, these are wonderful! Crisp edges, soft middle. Exactly right. I'm so proud of you."],
+    ['Ethan',"...Yeah. Yeah, these are legit. Grill master approved."],['Lars',"Oh thank goodness."],['John',"I was SO nervous."]],
+  hug:"Alex runs over and gives Joe the biggest hug.",
   danceTitle:"THE COOKIE DANCE",
   party:[['Alex',"THEY'RE PERFECT. You're perfect. Okay, everybody's turn."],['Keelan',"Best eggs in the county. Best cookies in the world."],['Lil Q',"Thirty bucks of gas. Worth every penny. Lil Q approves. *mic drop*"],
     ['Lars',"Okay. These beat my PR."],['John',"Can I have six? I'm having six."],

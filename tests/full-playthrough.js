@@ -62,11 +62,12 @@ ok('4 after a reload the crossword stays solved: straight to baking',!r.xw&&r.ba
 r=await p.evaluate(()=>{const tick=ms=>{for(let t=0;t<ms;t+=16.7)SCENES.kitchen.ambient(16.7)};
   for(let guard=0;guard<30&&bake.state!=='oven';guard++){const s=stepNow(); if(bake.state==='good'){bakePress();continue}
     if(s.kind==='pour'){bakePress(); tick(s.target/s.rate*1000); bakeRelease()} else if(s.kind==='count'){for(let k=0;k<s.target;k++)bakePress(); eggsDone()} else {for(let k=0;k<(s.taps||12);k++)bakePress()}}
-  bakePress(); tick(BAKE.TARGET/BAKE.RATE*1000); bakePress(); const done=bake.state; bakePress(); return {done,party:kit.party,baked:have.baked}});
-ok('4 every baking step, then the oven to 10:00: the party starts',r.party&&r.baked,JSON.stringify(r));
+  bakePress(); tick(BAKE.TARGET/BAKE.RATE*1000); bakePress(); const done=bake.state; bakePress(); return {done,taste:!!kit.taste,baked:have.baked}});
+ok('4 every baking step, then the oven to 10:00: the taste test starts',r.taste&&r.baked,JSON.stringify(r));
 
 // 5. the party, the dance, the ending
-await p.evaluate(()=>{const tick=ms=>{for(let t=0;t<ms;t+=16.7)SCENES.kitchen.ambient(16.7)}; tick(PARTY.WALK+PARTY.HUG+400); while(!dlg.hidden)[...$('dbtns').querySelectorAll('button')][0].click(); tick(1700)});
+await p.evaluate(()=>{const tick=ms=>{for(let t=0;t<ms;t+=16.7)SCENES.kitchen.ambient(16.7)}; const clk=()=>{while(!dlg.hidden)[...$('dbtns').querySelectorAll('button')][0].click()};
+  tick(TASTE.WALK+60); clk(); tick(TASTE.NERVOUS+60); clk(); tick(PARTY.WALK+PARTY.HUG+400); clk(); tick(1700)});   // the taste test, the hug, everyone's lines, the crown
 await p.waitForTimeout(8000);
 r=await p.evaluate(()=>({crown:!!have.crown,dance:kit.dance,ending:!$('ending').hidden,song}));
 ok('5 the crown, the Cookie Dance (Jingle Bells), then the credits',r.crown&&r.dance&&r.ending,JSON.stringify(r));

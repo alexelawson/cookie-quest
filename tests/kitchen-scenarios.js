@@ -46,7 +46,14 @@ r=await p.evaluate(()=>{const at=m=>{bakePress(); T.tick(m/BAKE.RATE*1000); bake
 ok('D pull early: raw; late: burnt; forget them: burnt',r.raw.includes('raw')&&r.burnt.includes('Burnt')&&r.auto.includes('Burnt'),r.raw+' | '+r.burnt);
 ok('D 10:00 on the dot: golden brown',r.state==='done'&&r.good.includes('PERFECT'),r.good);
 // E. party: everyone talks, Joe gets the crown, the note
-r=await p.evaluate(()=>{bakePress(); const party=kit.party, closed=$('bake').hidden; const A=CROWD.find(c=>c.name==='Alex'); const start={...kit.alex}; T.tick(PARTY.WALK+400); const near=Math.hypot(kit.alex.x-P.x,kit.alex.y-P.y), hugging=kit.hugging, noDlg=dlg.hidden; T.tick(PARTY.HUG+200);
+r=await p.evaluate(()=>{bakePress(); const closed0=$('bake').hidden, partyEarly=kit.party; T.tick(TASTE.WALK+60); const E=kit.tasters.Ethan, at=Math.hypot(E.x-TASTE.SPOT.Ethan.x,E.y-TASTE.SPOT.Ethan.y);
+  const before=T.through(); T.tick(TASTE.NERVOUS/2); draw(); const nervous=kit.taste&&kit.taste.phase, hugEarly=kit.hugging;
+  const cap=$('caption'), cr=cap.getBoundingClientRect(), gr=$('game').getBoundingClientRect(), capOk=!cap.hidden&&$('captionText').textContent===KITCHEN.tasteHush&&cr.top>=gr.top-2&&cr.bottom<gr.top+gr.height*.45&&cr.left>=gr.left&&cr.right<=gr.right&&exitsHere().length===0; T.tick(TASTE.NERVOUS/2+60); const after=T.through();
+  return {closed0,partyEarly,at,before,nervous,hugEarly,after,capOk,party:kit.party,hugging:kit.hugging}});
+ok('E first, Ethan and Maureen step up to taste one (Ethan: designated grill master)',r.closed0&&!r.partyEarly&&r.at<2&&r.before.some(l=>l.startsWith('Ethan:')&&l.includes('grill master'))&&r.before.some(l=>l.startsWith('Maureen:')),r.before[0]);
+ok('E the caption while they chew is a pop-up up top, fully on screen, no EXIT arrow under it',r.capOk);
+ok('E everyone holds their breath while they chew... then they love them',r.nervous==='nervous'&&!r.hugEarly&&r.after.some(l=>l.startsWith('Maureen:'))&&r.after.some(l=>l.startsWith('Ethan:'))&&r.party&&r.hugging,r.after.join(' / ').slice(0,120));
+r=await p.evaluate(()=>{const party=kit.party, closed=$('bake').hidden; const A=CROWD.find(c=>c.name==='Alex'); const start={x:A.x,y:A.y}; T.tick(PARTY.WALK+400); const near=Math.hypot(kit.alex.x-P.x,kit.alex.y-P.y), hugging=kit.hugging, noDlg=dlg.hidden; T.tick(PARTY.HUG+200);
   const lines=T.through(); T.tick(1700); const dance=kit.dance; return new Promise(res=>setTimeout(()=>res({party,closed,start,near,hugging,noDlg,lines,dance,crown:!!have.crown,baked:!!have.baked,ending:!$('ending').hidden,credits:!$('credits').hidden}),PARTY.BEAT*16+300))});
 ok('E Alex walks over and hugs Joe first',r.hugging&&r.noDlg&&r.near<10&&Math.hypot(r.start.x-112,r.start.y-134)>30,'gap '+r.near.toFixed(1));
 ok('E party: everyone has a line, and they bounce',r.party&&r.closed&&['Alex','Keelan','Lil Q','Lars','John','Margie','Jack'].every(n=>r.lines.some(l=>l.startsWith(n+':'))),r.lines.length+' lines');

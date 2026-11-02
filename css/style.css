@@ -307,3 +307,5 @@ canvas{border-radius:6px}
 .devskip .btn{color:var(--paper);border-color:#4d5a78}
 .alexhint.radio{bottom:auto;top:6px;animation:none;pointer-events:none}
 .alexhint.radio b{display:block;font-family:var(--pixel);font-size:.72rem;color:var(--berry);margin-bottom:1px}
+.alexhint.caption{width:auto;max-width:92%;padding:6px 14px;text-align:center}
+.alexhint.caption p{font-size:.9rem}

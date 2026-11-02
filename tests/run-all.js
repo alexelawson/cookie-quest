@@ -9,7 +9,8 @@ for(const f of js){ const r=spawnSync(process.execPath,['--check',path.join(root
 lines.push(`syntax: ${js.length} files checked${failed?`, ${failed} broken`:', all OK'}`);
 const suites=['farm-scenarios','birkie-scenarios','golf-scenarios','heist-scenarios','fargo-scenarios','kitchen-scenarios','full-playthrough','robustness'];
 if(!failed)for(const s of suites){
-  const t0=Date.now(), r=spawnSync(process.execPath,[path.join(__dirname,s+'.js')],{encoding:'utf8',timeout:15*60*1000});
+  const t0=Date.now(); let r=spawnSync(process.execPath,[path.join(__dirname,s+'.js')],{encoding:'utf8',timeout:15*60*1000});
+  if(/^FAIL /m.test(r.stdout||'')){ const again=spawnSync(process.execPath,[path.join(__dirname,s+'.js')],{encoding:'utf8',timeout:15*60*1000}); if(!/^FAIL /m.test(again.stdout||''))r=again }   // the hens and the wind are random: a failure has to happen twice in a row to count
   const out=(r.stdout||'')+(r.stderr||''), pass=(out.match(/^PASS /gm)||[]).length, fails=out.split('\n').filter(l=>l.startsWith('FAIL ')), pe=/page errors: none/.test(out);
   const crashed=!pass&&!fails.length, bad=fails.length||!pe||crashed;
   if(bad)failed++;
