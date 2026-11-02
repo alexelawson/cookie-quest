@@ -227,16 +227,20 @@ const treeSprite=document.createElement('canvas'); treeSprite.width=16; treeSpri
 })();
 const drawTree=(x,y)=>ctx.drawImage(treeSprite,x-8,y-19);
 // Bryan: medium brown hair, buzzed super short, gray tee, jeans. Very chill.
+// Bryan: chill, buzz cut, half-asleep smile, grey tee, jeans, brown boots. 12 x 20 px.
+const BRYAN_PAL={H:'#7a5232',h:'#5e3e25',S:'#e8b48e',s:'#d09a74',E:'#3b2a20',M:'#b5654f',T:'#8d949e',t:'#737a85',l:'#a5abb4',J:'#3a5f9e',j:'#2c4a7c',B:'#5a3a22'};
+const BRYAN_SPR={
+  down:["...HHHHHH...","..HhHHhHHH..","..HSSSSSSH..","..SEESSEES..","..sSSssSSs..","...SMMMMS...",
+        ".TTTTllTTTT.",".TTTTTTTTtT.",".TTTTTTTTtT.",".STTTTTTTtS.",".STTTTTTTtS.",".SttttttttS."],
+  right:["...HHHHHH...","..HHhHHHHH..","..HHHSSSSS..","..HHsSSEES..","..hSSSSSSSS.","...sSSSSMS..",
+        ".TTTTTTTTTT.",".TTTTTTTTtT.",".TTTTSTTTtT.",".TTTTSTTTtT.",".TTTTSTTTtT.",".ttttsttttt."],
+};
 function drawBryan(x,y,dir='right',g=ctx){
   const X=Math.round(x)-6, Y=Math.round(y)-19, F=(c,dx,dy,w,h)=>{g.fillStyle=c;g.fillRect(X+dx,Y+dy,w,h)};
-  const skin='#e8b48e', hair='#7a5232', tee='#8d949e', jean='#3a5f9e', jeanD='#2c4a7c';
   F('rgba(0,0,0,.2)',1,18,10,2);
-  F(jean,3,12,3,6); F(jean,6,12,3,6); F(jeanD,5,12,1,5); F('#5a3a22',2,17,4,2); F('#5a3a22',6,17,4,2);
-  F(tee,2,6,8,7); F(tee,1,7,1,3); F(tee,10,7,1,3); F(skin,1,10,1,3); F(skin,10,10,1,3); F('#7a8089',2,12,8,1);
-  F(skin,3,1,6,6); F(hair,3,0,6,2); F(hair,3,2,1,1); F(hair,8,2,1,1);   // buzz cut
-  if(dir==='down'){F('#2b2b2b',4,3,1,1); F('#2b2b2b',7,3,1,1); F('#c9876f',4,5,4,1); F(skin,5,5,2,1); F('#b5654f',5,5,2,1)}   // half-asleep chill smile
-  if(dir==='right'){F('#2b2b2b',7,3,1,1); F('#b5654f',7,5,1,1); F(hair,3,1,2,3)}
-  if(dir==='left'){F('#2b2b2b',4,3,1,1); F('#b5654f',4,5,1,1); F(hair,7,1,2,3)}
+  F('#3a5f9e',3,12,3,6); F('#3a5f9e',6,12,3,6); F('#2c4a7c',5,12,1,5); F('#4d74b4',3,13,1,3); F('#4d74b4',6,13,1,3);   // jeans
+  F('#5a3a22',2,17,4,2); F('#5a3a22',6,17,4,2); F('#7a5236',2,17,2,1); F('#7a5236',6,17,2,1);                          // boots
+  drawSprite(g,X,Y,BRYAN_SPR,BRYAN_PAL,dir==='up'?'down':dir,null,2);   // (his eyes are already half shut)
 }
 // Bryan lounging in his boat by the dock: leaning back, hands behind his head, feet up
 function drawBryanInBoat(x,y){ const b=Math.round(Math.sin(time/700)*1), F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x+dx,y+b+dy,w,h)};

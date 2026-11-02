@@ -44,25 +44,29 @@ function drawCow(x,y){
   if((time/1500|0)%3===0)F('#2b2b2b',-1,1,1,3);   // tail swish
 }
 // Jack: short blond hair, teal polo, khaki shorts
+// Jack: extremely serious, extremely into stats. Blond, teal polo, khaki shorts, a disc in hand. 12 x 20 px.
+const JACK_PAL={L:'#e6c46a',l:'#c9a54a',y:'#f2d88a',S:'#f3cba8',s:'#ddb18c',B:'#a8873a',W:'#ffffff',E:'#2b2b2b',M:'#b07060',P:'#2a9d8f',p:'#1f7a6f',K:'#c9b17a',k:'#a8925e'};
+const JACK_SPR={down:["...LLLLLL...","..LLyyLLLL..","..LBBSSBBL..","..SWESSEWS..","..sSSssSSs..","...SSMMSS...",
+  "..PPWWWWPP..",".PPPPPWPPPP.",".SPPPPPPPpS.",".SPPPPPPPpS.",".SPPPPPPPpS.","..KKKKKKKK..","..KKKkkKKK.."]};
 function drawJack(x,y){
-  const F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(Math.round(x)-6+dx,Math.round(y)-19+dy,w,h)};
-  F('rgba(0,0,0,.2)',1,18,10,2); F('#f3cba8',3,13,2,5); F('#f3cba8',7,13,2,5); F('#ffffff',3,17,2,1); F('#ffffff',7,17,2,1); F('#3b3b44',2,18,4,1); F('#3b3b44',6,18,4,1);
-  F('#c9b17a',2,11,8,3); F('#2a9d8f',2,6,8,6); F('#ffffff',5,6,2,1); F('#f3cba8',1,7,1,4); F('#f3cba8',10,7,1,4);
-  F('#f3cba8',3,1,6,5); F('#e6c46a',3,0,6,2); F('#2b2b2b',4,3,1,1); F('#2b2b2b',7,3,1,1); F('#c9876f',5,5,2,1);
-  F('#f4d35e',11,9,4,1); F('#e8742a',11,8,4,1);   // a disc in hand
+  const X=Math.round(x)-6, Y=Math.round(y)-19, F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(X+dx,Y+dy,w,h)};
+  F('rgba(0,0,0,.2)',1,18,10,2); F('#f3cba8',3,13,2,4); F('#f3cba8',7,13,2,4); F('#ddb18c',4,13,1,4); F('#ddb18c',8,13,1,4);
+  F('#ffffff',3,17,2,1); F('#ffffff',7,17,2,1); F('#3b3b44',2,18,4,1); F('#3b3b44',6,18,4,1);
+  drawSprite(ctx,X,Y,JACK_SPR,JACK_PAL,'down',3,6);
+  F('#f4d35e',11,9,4,1); F('#e8742a',11,8,4,1); F('#ffe98a',12,8,2,1);   // a disc in hand
 }
 // Margie: long blond hair, fun heart-shaped pink sunglasses, bright top
+// Margie: the one to beat. Long blond hair, heart sunglasses, pink top with a yellow heart, denim shorts, a disc in hand. 12 x 20 px.
+const MARGIE_PAL={L:'#e6c46a',l:'#c9a54a',y:'#f2d88a',S:'#f3cba8',s:'#ddb18c',G:'#ff4fa3',w:'#ffffff',M:'#c9576a',T:'#e54b7a',t:'#c23a64',Y:'#ffd84d',J:'#3a5f9e',j:'#2c4a7c'};
+const MARGIE_SPR={down:["..LLLLLLLL..",".LLyyyLLLLL.",".LLSSSSSSLL.",".LLGwGGwGLL.",".LLSGSSGSLL.",".LLSSssSSLL.",".LLSSMMSSLL.",
+  ".LTTTTTTTTL.",".LTTYTTYTTL.",".STTYYYYTTS.",".STTTYYTTtS.","..JJJJJJJJ..","..JJJjjJJJ.."]};
 function drawMargie(x,y){
-  const F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(Math.round(x)-6+dx,Math.round(y)-19+dy,w,h)};
-  F('rgba(0,0,0,.2)',1,18,10,2); F('#f3cba8',3,13,2,5); F('#f3cba8',7,13,2,5); F('#ffffff',2,17,3,2); F('#ffffff',7,17,3,2);
-  F('#3a5f9e',2,11,8,3); F('#e54b7a',2,6,8,6); F('#ffd84d',4,8,4,2); F('#f3cba8',1,7,1,4); F('#f3cba8',10,7,1,4);
-  F('#e6c46a',2,0,8,3); F('#e6c46a',1,2,2,9); F('#e6c46a',9,2,2,9); F('#f2d88a',3,1,3,1);   // long blond hair
-  F('#f3cba8',3,2,6,5); F('#e6c46a',3,2,6,1);
-  F('#ff4fa3',3,3,3,2); F('#ff4fa3',6,3,3,2); F('#ffffff',4,3,1,1); F('#ffffff',7,3,1,1);   // heart sunglasses
-  F('#c9576a',5,6,2,1);
-  F('#7fd3ff',-3,8,4,1); F('#2f6db0',-3,9,4,1);   // a disc in hand
+  const X=Math.round(x)-6, Y=Math.round(y)-19, F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(X+dx,Y+dy,w,h)};
+  F('rgba(0,0,0,.2)',1,18,10,2); F('#f3cba8',3,13,2,4); F('#f3cba8',7,13,2,4); F('#ddb18c',4,13,1,4); F('#ddb18c',8,13,1,4);
+  F('#ffffff',2,17,3,2); F('#ffffff',7,17,3,2); F('#ff4fa3',3,17,1,1); F('#ff4fa3',8,17,1,1); F('#d9d9d4',2,18,3,1); F('#d9d9d4',7,18,3,1);   // white sneakers, pink laces
+  drawSprite(ctx,X,Y,MARGIE_SPR,MARGIE_PAL,'down',null,7);   // (sunglasses: no blinking to see)
+  F('#7fd3ff',-3,8,4,1); F('#2f6db0',-3,9,4,1); F('#c9eeff',-2,8,2,1);   // a disc in hand
 }
-
 // ---------- backgrounds, one per hole ----------
 const golfBgs=HOLES.map((h,i)=>{
   const c=document.createElement('canvas'); c.width=GW; c.height=GH; const g=c.getContext('2d'), F=(col,x,y,w,hh)=>{g.fillStyle=col;g.fillRect(x,y,w,hh)};

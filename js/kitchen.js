@@ -51,6 +51,7 @@ function drawVikingStanding(x,y,kind='norse',num='7'){
     F('#4f2683',2,-2,9,7); F('#6a3ea8',3,-2,4,1); F('#ffc62f',6,-2,1,7); F('#3d1d66',2,4,9,1);   // helmet with a gold stripe
     F('#8a5a3a',4,1,5,3); F('#2b2b2b',5,2,1,1); F('#2b2b2b',7,2,1,1); F('#1d1d22',4,3,1,1); F('#1d1d22',8,3,1,1);   // face, eye black
     F('#c9ced4',3,2,7,1); F('#c9ced4',3,4,7,1); F('#c9ced4',6,1,1,4);                        // facemask bars
+    F('#7a4fc0',3,-1,2,2); F('#3d1d66',1,8,12,1); F('#6a3ea8',1,6,1,6); F('#3d1d66',12,7,1,5); F('#e0a820',3,15,1,2); F('#e0a820',7,15,1,2); F('#ffffff',5,2,1,1); F('#ffffff',7,2,1,1);   // shading: helmet shine, jersey folds, gold-pants shade, eye glints
     return }
   F('#6b4a2f',3,14,3,4); F('#6b4a2f',7,14,3,4); F('#8a6a4a',2,17,4,3); F('#8a6a4a',7,17,4,3); F('#a8875f',2,17,4,1); F('#a8875f',7,17,4,1);   // leather trousers, fur boots
   F('#8a8f9a',1,7,11,8); for(let k=0;k<11;k+=2)for(let j=7;j<15;j+=2)F('#6f7480',1+k+((j/2|0)%2),j,1,1); F('#4a3020',1,13,11,1); F('#c9a24a',6,13,1,1);   // chainmail, belt
@@ -59,6 +60,10 @@ function drawVikingStanding(x,y,kind='norse',num='7'){
   F('#f0c6a0',3,1,7,5); F('#2b2b2b',4,3,1,1); F('#2b2b2b',8,3,1,1);
   F('#c8642a',2,4,9,4); F('#c8642a',3,8,7,2); F('#a8501f',5,10,3,1); F('#e08a4a',4,5,2,1);   // huge red beard, braided
   F('#9aa3b0',2,-2,9,4); F('#c9ced4',3,-2,4,1); F('#6f7686',6,1,1,3); F('#f6f2e4',0,-4,2,4); F('#f6f2e4',11,-4,2,4); F('#e8e2d6',-1,-5,1,2); F('#e8e2d6',13,-5,1,2);   // iron helmet, nose guard, horns
+  F('#d9cdb4',1,-2,1,2); F('#d9cdb4',12,-2,1,2); F('#6f7686',2,1,9,1); F('#c9ced4',3,0,1,1); F('#c9ced4',9,0,1,1);   // horn shading, helmet rim and rivets
+  F('#ffffff',4,3,1,1); F('#ffffff',8,3,1,1); F('#2b2b2b',5,3,1,1); F('#2b2b2b',9,3,1,1); F('#d9a07a',3,1,1,2);   // eyes with whites, cheek shade
+  F('#e89a5a',3,8,1,2); F('#e89a5a',9,8,1,2); F('#f4d35e',3,10,1,1); F('#f4d35e',9,10,1,1); F('#a8501f',6,5,1,4);   // braid highlights with gold beads, beard parting
+  F('#5a4028',1,14,11,1); F('#e8dcbf',-1,9,1,1);   // chainmail hem shadow, shield shine
 }
 const crowdFace=n=>n==='Trail John'?{speaker:'John',face:'Trail John'}:{speaker:n};
 function crowdNear(){ if(!(allIn()||have.baked))return null; let best=null,bd=16; for(const c of CROWD){if(c.needs&&!have[c.needs])continue; const d=Math.hypot(P.x-c.x,P.y-c.y); if(d<bd){bd=d;best=c}} return best }

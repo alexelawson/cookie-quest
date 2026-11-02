@@ -3,15 +3,20 @@
 // Their lines are in story.js (JACKIE, LOGAN, HINTS).
 
 // ---------- Jackie: short, short brown hair, very direct ----------
+// Jackie: short, short brown hair (side-swept), very direct: one eyebrow up, flat mouth, arms crossed. 11 x 17 px.
+const JACKIE_PAL={H:'#6b4428',h:'#4f301b',L:'#8a5a38',S:'#f0c6a0',s:'#dcae88',E:'#2b2b2b',W:'#ffffff',B:'#3b2a1e',M:'#a8574a',T:'#2b2b33',t:'#3c3c48',J:'#3a5f9e'};
+const JACKIE_SPR={
+  down:["..HHHHHHH..",".HHHHLLHHH.",".HSSHHHHBH.",".HSWESSWEh.","..SSSsSSS..","..sSMMMSs..",
+        "..TTTTTTT..",".TTTTTTTTT.",".TSSSSSSST.",".TsSSSSSsT.",".TtTTTTTtT."],
+  up:  ["..HHHHHHH..",".HHHLLHHHH.",".HHHHHHHHH.",".HHHHHHHHh.","..hHHHHHh..","...sSSSs...",
+        "..TTTTTTT..",".TTTTTTTTT.",".TTTTTTTTT.",".TTTTTTTTT.",".TtTTTTTtT."],
+};
 function drawJackie(x,y,dir='down'){
-  const F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(Math.round(x)-5+dx,Math.round(y)-16+dy,w,h)};
-  const skin='#f0c6a0', hair='#6b4428', hairD='#4f301b', top='#2b2b33', jean='#3a5f9e';
+  const X=Math.round(x)-5, Y=Math.round(y)-16, F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(X+dx,Y+dy,w,h)};
   F('rgba(0,0,0,.25)',1,15,9,2);
-  F(jean,3,11,2,4); F(jean,6,11,2,4); F('#f2f2ee',2,15,3,1); F('#f2f2ee',6,15,3,1);
-  F(top,2,6,7,5); F(top,1,7,1,3); F(top,9,7,1,3); F(skin,2,8,7,2); F('#e3b08c',2,9,7,1);   // arms crossed. obviously
-  F(skin,3,1,5,5);
-  F(hair,2,0,7,2); F(hairD,2,2,1,2);
-  if(dir==='up'){F(hair,2,0,7,5)} else {F(hair,8,1,1,2); F(hair,3,2,3,1); F('#2b2b2b',4,3,1,1); F('#2b2b2b',6,3,1,1); F('#3b2a1e',6,2,1,1); F('#b5654f',4,5,3,1)}   // side-swept fringe, one eyebrow up, flat mouth
+  F('#3a5f9e',3,11,2,4); F('#3a5f9e',6,11,2,4); F('#2c4a7c',4,11,1,4); F('#2c4a7c',7,11,1,4);
+  F('#f2f2ee',2,15,3,1); F('#f2f2ee',6,15,3,1); F('#c9ced4',2,15,1,1); F('#c9ced4',6,15,1,1);   // white sneakers
+  drawSprite(ctx,X,Y,JACKIE_SPR,JACKIE_PAL,dir==='up'?'up':'down',3,3);
 }
 PORTRAITS['Jackie']={size:32, bg:'#e8dcc8', draw(g){ const F=px(g);
   F('#2b2b33',5,25,22,7); F('#f0c6a0',13,21,6,4);
@@ -23,20 +28,21 @@ PORTRAITS['Jackie']={size:32, bg:'#e8dcc8', draw(g){ const F=px(g);
 }};
 
 // ---------- Ethan (Joe's brother): a little stocky, short-medium brown hair, glasses, grey/white/black, black Crocs ----------
+// Ethan: Joe's brother, a little stocky. Short medium-brown hair, glasses, grey tee with white trim, black shorts, black Crocs. 13 x 20 px.
+const ETHAN_PAL={H:'#6b4428',h:'#4f301b',L:'#8a5a38',S:'#eab896',s:'#d4a07c',E:'#2b2b2b',G:'#1d1d22',g:'#9fd2f0',M:'#b5654f',T:'#8a8f9a',l:'#9aa0ab',t:'#6f7480',R:'#ffffff',K:'#1d1d22',k:'#2b2b33'};
+const ETHAN_SPR={
+  down:["...HHHLLHH...","..HHHHHHHHH..","..HSSSSSSSH..","..SGGGSGGGS..","..sGgEGEgGs..","..SSSSsSSSS..","...sSMMMSs...",
+        ".TTTTRRRTTTT.","STTTTTTTTTTtS","STTTTTTTTTTtS","SRTTTTTTTTTRS","sRTTTTTTTTTRs",".ttttttttttt.",".KKKKKkKKKKK.","..KKKKkKKKK.."],
+  up:  ["...HHHLLHH...","..HHHHHHHHH..","..HHHHHHHHH..","..HHHHHHHHH..","..sHHHHHHHs..","..hHHHHHHHh..","...sSSSSSs...",
+        ".TTTTTTTTTTT.","STTTTTTTTTTtS","STTTTTTTTTTtS","SRTTTTTTTTTRS","sRTTTTTTTTTRs",".ttttttttttt.",".KKKKKKKKKKK.","..KKKKKKKKK.."],
+};
 function drawEthan(x,y,dir='down',chew=0){
-  const F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(Math.round(x)-6+dx,Math.round(y)-19+dy,w,h)};
-  const skin='#eab896', hair='#6b4428', hairL='#8a5a38';
+  const X=Math.round(x)-6, Y=Math.round(y)-19, F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(X+dx,Y+dy,w,h)};
   F('rgba(0,0,0,.25)',1,18,11,2);
-  F('#1d1d22',2,17,4,2); F('#1d1d22',7,17,4,2); F('#3a3f4a',3,17,1,1); F('#3a3f4a',8,17,1,1); F('#3a3f4a',5,18,1,1); F('#3a3f4a',10,18,1,1);   // black Crocs (with the holes)
-  F(skin,3,14,3,3); F(skin,7,14,3,3);
-  F('#1d1d22',2,11,9,4); F('#2b2b33',6,11,1,4);                                         // black shorts
-  F('#8a8f9a',1,5,11,7); F('#9aa0ab',1,5,11,1); F('#ffffff',5,5,3,1); F('#ffffff',1,9,1,3); F('#ffffff',11,9,1,3); F('#6f7480',1,11,11,1);   // grey tee, white trim
-  F(skin,0,6,1,5); F(skin,12,6,1,5);
-  F(skin,3,0,7,6); F(skin,4,5,5,1);                                                    // a broad face
-  F(hair,3,-1,7,2); F(hairL,4,-1,3,1); F(hair,2,0,1,3); F(hair,10,0,1,3);
-  if(dir==='up'){F(hair,3,-1,7,5); return}
-  F('#1d1d22',3,2,3,2); F('#1d1d22',7,2,3,2); F('#1d1d22',6,2,1,1); F('#9fd2f0',4,2,1,1); F('#9fd2f0',8,2,1,1);   // glasses
-  F('#b5654f',5,4+(chew?1:0),3,1);
+  F('#eab896',3,14,3,3); F('#eab896',7,14,3,3); F('#d4a07c',5,14,1,3); F('#d4a07c',9,14,1,3);
+  F('#1d1d22',2,17,4,2); F('#1d1d22',7,17,4,2); F('#3a3f4a',3,17,1,1); F('#3a3f4a',8,17,1,1); F('#3a3f4a',5,18,1,1); F('#3a3f4a',10,18,1,1); F('#3a3f4a',4,18,1,1); F('#3a3f4a',9,17,1,1);   // black Crocs (with the holes)
+  let set=ETHAN_SPR; if(chew&&dir!=='up')set={down:ETHAN_SPR.down.map((r,i)=>i===6?'...sSSSSSs...':i===7?'.TTTTRMRTTTT.':r)};   // chewing: mouth drops a row
+  drawSprite(ctx,X,Y-1,set,ETHAN_PAL,dir==='up'?'up':'down',4,4);
 }
 PORTRAITS['Ethan']={size:32, bg:'#d9dde3', draw(g){ const F=px(g);
   F('#8a8f9a',3,24,26,8); F('#ffffff',13,24,6,2); F('#eab896',12,20,8,4);
@@ -45,19 +51,21 @@ PORTRAITS['Ethan']={size:32, bg:'#d9dde3', draw(g){ const F=px(g);
   F('#d9a37f',15,16,2,2); F('#b5654f',13,19,6,1);
 }};
 // ---------- Maureen (Joe's mom): tall and thin, curly light-brown hair, a very precise (and very sweet) baker ----------
+// Maureen: Joe's mom. Tall and thin, curly light-brown hair, lavender cardigan over a white blouse, an apron, a warm smile. 11 x 24 px.
+const MAUREEN_PAL={H:'#b08560',c:'#c9a07a',h:'#8f6a48',S:'#f2cfb0',s:'#e0b896',E:'#4a6a8a',B:'#8f6a48',r:'#eaa3a0',M:'#c06a60',V:'#9b8ac4',v:'#b8aadb',D:'#7a6aa8',W:'#ffffff',A:'#f6efe2',a:'#e8dcc6'};
+const MAUREEN_SPR={
+  down:["...HcHcHc...".slice(0,11),"..cHhhhhHc.",".HcSSSSScH.",".cHSBSBSHc.",".HcSESESCH.".replace('C','c'),".cHrSSSrHc.",".HcSMMMScH.","..cHsSsHc..",
+        "..VvWWWvV..",".SVVWWWVVS.",".SVVVWVVVS.",".SVAAAAAVS.",".SVAAAAAVS.",".sVAAaAAVs.","..VAAAAAV..","..VaaaaaV..","..DDDDDDD.."],
+  up:  ["...HcHHcH..".slice(0,11),"..cHHHHHcH.",".HHcHHHcHH.",".cHHHHcHHc.",".HHcHHHHcH.",".hHHHcHHHh.",".HhHHHHHhH.","..chsSshc..",
+        "..VVVVVVV..",".SVVVVVVVS.",".SVVVVVVVS.",".SVVVVVVVS.",".SVVVVVVVS.",".sVVVVVVVs.","..VVVVVVV..","..VVVVVVV..","..DDDDDDD.."],
+};
 function drawMaureen(x,y,dir='down',chew=0){
-  const F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(Math.round(x)-5+dx,Math.round(y)-23+dy,w,h)};
-  const skin='#f2cfb0', hair='#b08560', hairL='#c9a07a', hairD='#8f6a48';
+  const X=Math.round(x)-5, Y=Math.round(y)-23, F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(X+dx,Y+dy,w,h)};
   F('rgba(0,0,0,.22)',1,22,9,2);
-  F('#5a6070',3,15,2,7); F('#5a6070',6,15,2,7); F('#8a5a3a',2,21,3,2); F('#8a5a3a',6,21,3,2);   // slim trousers, flats
-  F('#9b8ac4',2,7,7,9); F('#b8aadb',2,7,7,1); F('#ffffff',4,7,3,3); F('#7a6aa8',2,15,7,1);    // lavender cardigan over a white blouse
-  F('#f6efe2',3,10,5,5); F('#e8dcc6',3,14,5,1);                                                 // an apron
-  F(skin,1,8,1,6); F(skin,9,8,1,6);
-  F(skin,3,1,5,6); F(skin,4,6,3,1);
-  for(const [hx,hy] of [[2,0],[4,-1],[6,-1],[8,0],[1,2],[9,2],[1,4],[9,4],[2,6],[8,6]]){F(hair,hx,hy,2,2); F(hairL,hx,hy,1,1)}   // curls
-  F(hairD,3,0,5,1);
-  if(dir==='up'){F(hair,3,0,5,5); return}
-  F('#4a6a8a',4,3,1,1); F('#4a6a8a',6,3,1,1); F('#e8a0a0',3,4,1,1); F('#e8a0a0',7,4,1,1); F('#c06a60',4,5+(chew?1:0),3,1);   // a warm smile
+  F('#5a6070',3,16,2,6); F('#5a6070',6,16,2,6); F('#474c5a',4,16,1,6); F('#474c5a',7,16,1,6);   // slim trousers
+  F('#8a5a3a',2,21,3,2); F('#8a5a3a',6,21,3,2); F('#a8764e',2,21,2,1); F('#a8764e',6,21,2,1);   // flats
+  let set=MAUREEN_SPR; if(chew&&dir!=='up')set={down:MAUREEN_SPR.down.map((r,i)=>i===6?'.HcSSMSScH.':r)};
+  drawSprite(ctx,X,Y-1,set,MAUREEN_PAL,dir==='up'?'up':'down',4,5);
 }
 PORTRAITS['Maureen']={size:32, bg:'#ece4f4', draw(g){ const F=px(g);
   F('#9b8ac4',4,25,24,7); F('#ffffff',12,25,8,4); F('#f2cfb0',13,21,6,4);

@@ -228,24 +228,23 @@ function drawHen(x,y,f){
   ctx.fillStyle='#d43b2f';ctx.fillRect(x+(f>0?2:-3),y-7,1,1);
   ctx.fillStyle='#e8a33a';ctx.fillRect(x+(f>0?3:-4),y-5,1,1);ctx.fillRect(x-1,y+1,1,1);
 }
+// Keelan: tall and lanky farmer, short brown hair, red plaid shirt with rolled sleeves, jeans, work boots. 10 x 24 px.
+const KEELAN_PAL={H:'#5a3b24',h:'#3f2918',L:'#7a5236',S:'#e9b98f',s:'#d29f77',E:'#2b2b2b',B:'#3f2918',M:'#b5735a',P:'#c0392b',D:'#7a1f1a',l:'#e0675b',T:'#3b2a1e',Y:'#c9a24a'};
+const KEELAN_SPR={
+  down:["..HHLLHH..",".HHHHHHHH.",".HSBSSBSH.",".sSESSESs.","..SSssSS..","..sSMMSs..","...sSSs...",
+        ".PDPPDPPD.",".DDDDDDDD.",".PDPPDPPD.",".lDllDllD.",".SDPPDPPS.",".SDPPDPPS.",".STTTYTTS."],
+  right:["..HHLLHH..","..HHHHHHH.","..HHHSBSS.","..HHsSSES.","...hSSSSSS","....SSMS..","....sSs...",
+        ".PDPPDPPD.",".DDDDDDDD.",".PDPPDPPD.",".lDllDllD.",".PDPPSPPD.",".PDPPSPPD.",".TTTTYTTT."],
+  up:  ["..HHLLHH..",".HHHHHHHH.",".HHHHHHHH.",".sHHHHHHs.","..hHHHHh..","...hhhh...","....ss....",
+        ".PDPPDPPD.",".DDDDDDDD.",".PDPPDPPD.",".lDllDllD.",".SDPPDPPS.",".SDPPDPPS.",".STTTTTTS."],
+};
 function drawKeelan(k){
-  // tall and lanky: long legs, narrow shoulders, skinny arms
-  const x=Math.round(k.x)-5, y=Math.round(k.y)-23;
-  const F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x+dx,y+dy,w,h)};
-  const skin='#e9b98f', hair='#5a3b24', plaid='#c0392b', dark='#7a1f1a', light='#e0675b', jean='#3a5f9e', jeanD='#2c4a7c', boot='#5a3a22';
+  const x=Math.round(k.x)-5, y=Math.round(k.y)-23, F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x+dx,y+dy,w,h)};
   F('rgba(0,0,0,.25)',1,22,8,2);
   const a=k.moving&&k.step%2?1:0, b=k.moving&&!(k.step%2)?1:0;
-  F(jean,2,13,2,9-a); F(jean,6,13,2,9-b); F(jeanD,4,13,2,3);              // long skinny legs
-  F(boot,1,21-a,3,2); F(boot,6,21-b,3,2);
-  F('#3b2a1e',2,13,6,1);                                                 // belt
-  F(plaid,2,6,6,7); for(let i=2;i<8;i+=3)F(dark,i,6,1,7); F(dark,2,8,6,1); F(light,2,11,6,1);   // narrow plaid shirt
-  F(plaid,1,7,1,4); F(plaid,8,7,1,4); F(skin,1,11,1,3); F(skin,8,11,1,3); // thin arms, rolled sleeves
-  F(skin,3,1,4,5); F(skin,4,6,2,1);                                       // long face, neck
-  F(hair,3,0,4,2);                                                        // short hair
-  if(k.dir==='up'){F(hair,3,0,4,4)}
-  else if(k.dir==='left'){F(hair,6,1,1,2);F('#2b2b2b',3,3,1,1)}
-  else if(k.dir==='right'){F(hair,3,1,1,2);F('#2b2b2b',6,3,1,1)}
-  else {F('#2b2b2b',4,3,1,1);F('#2b2b2b',6,3,1,1);F('#b5735a',4,5,2,1)}
+  const leg=(x0,lift)=>{F('#3a5f9e',x0,14,2,7-lift); F('#2c4a7c',x0+1,14,1,7-lift); F('#4d74b4',x0,15,1,2); F('#5a3a22',x0-1,21-lift,3,2); F('#7a5236',x0-1,21-lift,1,1)};   // long skinny legs, work boots
+  leg(2,a); leg(6,b);
+  drawSprite(ctx,x,y,KEELAN_SPR,KEELAN_PAL,k.dir||'down',3,1);
   if(k.carrying)drawHen(k.x,k.y-24,k.dir==='left'?-1:1);
 }
 function drawCupcake(){

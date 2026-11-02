@@ -117,6 +117,8 @@ function drawSkier(x,y,o={}){ // generic skier: o.jersey, o.helmet, o.horns, o.d
   if(o.helmet){F(o.helmet,2,-1,6,3); if(o.horns){F('#f6f2e4',1,-3,1,3); F('#f6f2e4',8,-3,1,3)}}
   if(o.headband)F(o.headband,3,1,4,1); if(o.glasses){F(o.glasses,2,2,6,1); F('#5a5f6a',3,2,1,1)}   // headband; wraparound sunglasses with a little shine
   if(o.panels){F(o.panels,2,5,1,5); F(o.panels,7,5,1,5)} if(o.stripe)F(o.stripe,2,12,6,1);   // race-suit side panels, a stripe on the tights
+  F('rgba(0,0,0,.18)',6,4,1,6); F('rgba(0,0,0,.18)',5,10,2,4); F('rgba(255,255,255,.25)',4,0,2,1); F('#d9a583',6,2,1,2);   // shading: jersey side, tights, hair shine, cheek
+  if(!o.glasses&&!o.helmet){F('#2b2b2b',4,2,1,1); F('#2b2b2b',6,2,1,1)}   // eyes
 }
 const JOE_RACE_KIT=()=>({jersey:'#2e9a45',trim:'#8fe09a',pants:'#111114',panels:'#111114',stripe:'#2e9a45',hair:'#b08355',headband:'#ffffff',glasses:'#111114',step:P.step});   // green race suit, black side panels and tights, white headband, black Oakleys
 const VIKING_KINDS=[{kind:'norse',sack:true},{kind:'football',num:'21'},{kind:'norse'},{kind:'football',num:'52'}];   // the lead Norse Viking carries the flour
@@ -129,6 +131,7 @@ function drawVikingSkier(x,y,v,step){
     F('#ffc62f',3,11,2,4); F('#ffc62f',7,11,2,4); F('#4f2683',3,14,6,1);                  // gold pants, purple socks
     F('#4f2683',1,5,10,7); F('#ffc62f',1,5,2,2); F('#ffc62f',9,5,2,2); F('#3d1d66',1,5,10,1); pixText(ctx,v.num,X+3,Y+7,'#ffffff');   // jersey + pads + number
     F('#8a5a34',4,3,4,2); F('#4f2683',3,-1,6,5); F('#ffc62f',5,-1,2,5); F('#c9ced4',3,3,6,1); F('#c9ced4',5,2,1,3);   // helmet, stripe, facemask
+    F('#7a4fc0',3,-1,2,1); F('#3d1d66',10,6,1,6); F('#e0a820',4,11,1,3); F('#e0a820',8,11,1,3);   // shading
   } else {
     F('#6b4a2f',3,11,2,4); F('#6b4a2f',7,11,2,4); F('#8a6a4a',3,14,2,1); F('#8a6a4a',7,14,2,1);   // leather trousers, fur boots
     F('#8a8f9a',2,6,8,6); F('#6f7480',3,7,1,1); F('#6f7480',5,8,1,1); F('#6f7480',7,7,1,1); F('#6f7480',4,10,1,1); F('#6f7480',8,9,1,1); F('#4a3020',2,10,8,1);   // chainmail, belt
@@ -136,6 +139,7 @@ function drawVikingSkier(x,y,v,step){
     F('#f0c6a0',4,1,4,3); F('#c8642a',3,3,6,3); F('#c8642a',4,6,4,1); F('#e08a4a',4,3,2,1);   // red beard
     F('#9aa3b0',3,-1,6,3); F('#c9ced4',4,-1,2,1); F('#f6f2e4',1,-2,2,2); F('#f6f2e4',9,-2,2,2); F('#e8e2d6',1,-4,1,2); F('#e8e2d6',10,-4,1,2);   // iron helmet, horns
     if(v.sack){F('#efe2c4',3,6,6,5); F('#c94a3a',4,8,4,1); F('#8a5a34',5,5,2,1)}         // the flour, on his back
+    F('#2b2b2b',5,2,1,1); F('#2b2b2b',7,2,1,1); F('#e89a5a',3,5,1,1); F('#e89a5a',8,5,1,1); F('#6f7686',3,1,6,1); F('#d9cdb4',1,-1,1,1); F('#d9cdb4',10,-1,1,1);   // eyes, braid shine, helmet rim, horn shading
   }
 }
 
@@ -261,6 +265,8 @@ function drawTrailJohn(cx,cy,dir){
   else if(dir==='right'){F('#2b2b2b',7,3,1,1); F(glass,6,3,2,1); F(hair,3,1,1,3)}
   else {F(glass,3,3,2,2); F(glass,6,3,2,2); F(glass,5,3,1,1); F('#2b2b2b',4,4,1,1); F('#2b2b2b',6,4,1,1); F('#b5735a',4,5,3,1)}   // reading glasses
   if(dir!=='up'){F('#8a5a34',8,9,3,5); F('#ffffff',8,10,3,3)}                       // clipboard
+  F('#163261',8,7,2,6); F('#163261',1,13,9,1); F('#2a5590',2,7,2,1); F('#9a805a',4,13,1,5); F('#9a805a',8,13,1,5); F('#8a5a38',4,0,2,1);   // coat shading, pants shade, hair shine
+  if(dir!=='up'){F('#d4a07c',3,5,1,1); F('#d4a07c',7,5,1,1); if(dir==='down'){F('#8a8f9a',8,11,2,1); F('#8a8f9a',8,12,1,1); F('#c9ced4',9,9,1,1)}}   // cheeks, notes on the clipboard, its clip
 }
 function talkJohn(){
   const T=BIRKIE;

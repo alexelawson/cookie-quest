@@ -152,19 +152,16 @@ function drawCar(x,y,dir=P.dir,parked=false){
 
 // ---------- people ----------
 // Lil Q (the code still calls her "bob"): biker. Short red hair, shades, black moto tee under a leather vest, jeans, boots.
+// Lil Q (the code still calls her "bob"): biker. Short spiky red hair, shades, red lips, gold earrings, black tee with an orange wing under a leather vest, tattoos. 12 x 21 px.
+const BOB_PAL={R:'#c8402a',r:'#e0603a',d:'#9a2e1e',S:'#f0c3a0',s:'#d9a882',G:'#1c1c20',g:'#3a4a60',Y:'#f4d35e',l:'#c0303a',V:'#4a2e1c',v:'#6b4428',T:'#1c1c20',O:'#e8742a',W:'#ffffff',i:'#2b3a4f',J:'#2c3e5a',C:'#c9ced4'};
+const BOB_SPR={down:["........RR..","..RRrRRRdR..","..RRRrrRRR..","..RSSSSSSR..","..SGgGGgGS..","..YSSssSSY..","...SSllSS...","....sSSs....",
+  ".VVVTTTTVVV.","SVvVTTTTVvVS","SVvVTOOTVvVS","iVvVOOOOVvVi","SVvVTWWTVvVS","SVVVTTTTVVVS","..JJCCCCJJ.."]};
 function drawBob(x,y){
-  const F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(Math.round(x)-6+dx,Math.round(y)-20+dy,w,h)};
-  const skin='#f0c3a0', hair='#c8402a', hairL='#e0603a', tee='#1c1c20', vest='#4a2e1c', vestL='#6b4428', jean='#2c3e5a', boot='#1d1d22';
+  const X=Math.round(x)-6, Y=Math.round(y)-20, F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(X+dx,Y+dy,w,h)};
   F('rgba(0,0,0,.2)',1,19,10,2);
-  F(jean,3,13,3,6); F(jean,6,13,3,6); F(boot,2,18,4,2); F(boot,6,18,4,2);
-  F(tee,1,7,10,7); F(vest,1,7,3,7); F(vest,8,7,3,7); F(vestL,3,8,1,5); F(vestL,8,8,1,5);   // leather vest open over the tee
-  F('#e8742a',5,9,2,1); F('#e8742a',4,10,4,1); F('#ffffff',5,11,2,1);                      // orange wing graphic on the shirt
-  F('#c9ced4',4,13,4,1);                                                                    // belt buckle chain
-  F(skin,0,8,1,5); F(skin,11,8,1,5); F('#2b3a4f',0,10,1,1); F('#2b3a4f',11,9,1,2);       // arms, tattoos
-  F(skin,3,1,6,6); F(skin,5,7,2,1);
-  F(hair,2,0,8,2); F(hair,2,2,1,3); F(hair,9,2,1,2); F(hairL,4,0,3,1); F(hair,8,-1,2,2);    // short spiky red hair
-  F('#1c1c20',3,3,6,1); F('#3a4a60',4,3,1,1); F('#3a4a60',7,3,1,1);                         // sunglasses
-  F('#c0303a',5,5,2,1); F('#f4d35e',2,4,1,1); F('#f4d35e',9,4,1,1);                         // red lips, gold earrings
+  F('#2c3e5a',3,14,3,5); F('#2c3e5a',6,14,3,5); F('#22324a',5,14,1,5); F('#3d5274',3,15,1,2); F('#3d5274',6,15,1,2);   // jeans
+  F('#1d1d22',2,18,4,2); F('#1d1d22',6,18,4,2); F('#3a3a44',2,18,1,1); F('#3a3a44',6,18,1,1);                          // boots
+  drawSprite(ctx,X,Y-1,BOB_SPR,BOB_PAL,'down',null,8);   // (shades on: no blinking to see)
 }
 // Lil Q's motorcycle, parked by her shop
 function drawBike(x,y){
@@ -174,24 +171,28 @@ function drawBike(x,y){
   F('#c9ced4',2,3,2,8); F('#1c1c20',0,4,6,5); F('#e8742a',1,5,4,2);   // tank in orange + black
   F('#3b2416',1,8,4,3); F('#c9ced4',-1,2,8,1);           // seat, handlebars
 }
+// the gas station attendants: cap, work coat with a name patch
 function drawAttendant(x,y,i){
-  const coats=['#2f6db0','#2f8a4a','#7a4fa0','#e08a2a','#555b66'], F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(Math.round(x)-5+dx,Math.round(y)-17+dy,w,h)};
-  F('rgba(0,0,0,.2)',1,16,8,2); F('#2c3e5a',2,11,3,5); F('#2c3e5a',5,11,3,5);
-  F(coats[i%coats.length],1,5,8,7); F('#e9b98f',2,1,6,4); F(['#c8322b','#f4d35e','#3d8ad6'][i%3],2,0,6,2); F('#2b2b2b',3,3,1,1); F('#2b2b2b',6,3,1,1);
+  const coats=['#2f6db0','#2f8a4a','#7a4fa0','#e08a2a','#555b66'], caps=['#c8322b','#f4d35e','#3d8ad6'];
+  const shade=c=>'#'+[1,3,5].map(k=>Math.max(0,parseInt(c.slice(k,k+2),16)-40).toString(16).padStart(2,'0')).join('');
+  const pal={C:caps[i%3],c:shade(caps[i%3]),S:'#e9b98f',s:'#d29f77',E:'#2b2b2b',M:'#b5735a',T:coats[i%coats.length],t:shade(coats[i%coats.length]),W:'#f2f2ee'};
+  const X=Math.round(x)-5, Y=Math.round(y)-17, F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(X+dx,Y+dy,w,h)};
+  F('rgba(0,0,0,.2)',1,16,8,2); F('#2c3e5a',2,11,3,5); F('#2c3e5a',5,11,3,5); F('#22324a',4,11,1,5); F('#1d1d22',2,15,3,1); F('#1d1d22',5,15,3,1);
+  drawSprite(ctx,X,Y,{down:["..CCCCCC..","..cccccc..","..SSSSSS..","..SESSES..","..sSMMSs..",".TTTSSTTT.",".TTTTTTTT.",".TWTTTTTT.",".STTTTTtS.",".STTTTTtS.",".tttttttt."]},pal,'down',3,9+i);
 }
 // Alex: dark brown hair just below the shoulders, brown eyes, a green tee. Her mood shows in a little bubble.
+// Alex, waiting in the car park: long dark-brown hair past her shoulders, side-swept fringe, green scoop-neck tee. mood: happy / frown / ok
+const ALEX_SPR={down:["..HHHHHHHH..",".HHhLLLHHHH.",".HHHHHSSSSH.",".HSSHSSSSSH.",".HSWESSEWSH.",".HSSSssSSSH.",".HSSSSSSSSH.",
+  ".HHTTSSTTHH.",".HHTTTTTTHH.",".HTTTTTTTtH.",".STTTTTTTtS.",".STTTTTTTtS.",".sPPPPPPPPs.","..PPPPPPPP.."]};
 function drawAlex(x,y,mood){
-  const F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(Math.round(x)-6+dx,Math.round(y)-19+dy,w,h)};
-  const {hair,hairL,skin,eye}=ALEX, coat=ALEX.top;
+  const X=Math.round(x)-6, Y=Math.round(y)-19, F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(X+dx,Y+dy,w,h)};
+  const pal={H:ALEX.hair,h:ALEX.hairD,L:ALEX.hairL,S:ALEX.skin,s:ALEX.skinS,W:'#ffffff',E:ALEX.eye,T:ALEX.top,t:ALEX.topD,P:ALEX.pants};
   F('rgba(0,0,0,.2)',1,18,10,2);
-  F(ALEX.pants,3,13,3,5); F(ALEX.pants,6,13,3,5); F(ALEX.shoe,2,17,4,2); F(ALEX.shoe,6,17,4,2);
-  F(coat,2,7,8,6); F(ALEX.pants,2,12,8,2); F(coat,1,8,1,2); F(coat,10,8,1,2); F(skin,1,10,1,3); F(skin,10,10,1,3); F(skin,5,7,2,1);   // tee with a scoop neck
-  F(hair,2,0,8,3); F(hair,1,2,2,8); F(hair,9,2,2,8); F(hairL,2,1,3,1);   // hair just below the shoulders
-  F(skin,3,2,6,5); F(hair,3,2,4,1); F(hair,3,3,1,1);   // side-swept fringe
-  F(eye,4,4,1,1); F(eye,7,4,1,1);
-  if(mood==='happy'){F(ALEX.smile,5,6,2,1); F(ALEX.blush,3,5,1,1); F(ALEX.blush,8,5,1,1)}
-  else if(mood==='frown'){F(ALEX.frown,5,6,2,1); F(ALEX.frown,4,7,1,1); F(ALEX.frown,7,7,1,1); F(ALEX.hairD,4,3,1,1); F(ALEX.hairD,7,3,1,1)}
-  else {F(ALEX.mouth,5,6,2,1); F(ALEX.blush,3,5,1,1); F(ALEX.blush,8,5,1,1)}
+  F(ALEX.pants,3,14,3,4); F(ALEX.pants,6,14,3,4); F('#22222a',5,14,1,4); F(ALEX.shoe,2,17,4,2); F(ALEX.shoe,6,17,4,2); F('#5a4030',2,17,1,1); F('#5a4030',6,17,1,1);
+  drawSprite(ctx,X,Y,ALEX_SPR,pal,'down',4,10);
+  if(mood==='happy'){F(ALEX.smile,5,6,2,1); F(ALEX.smile,4,5,1,1); F(ALEX.smile,7,5,1,1); F(ALEX.blush,2,5,1,1); F(ALEX.blush,9,5,1,1)}   // a big smile
+  else if(mood==='frown'){F(ALEX.frown,5,6,2,1); F(ALEX.hairD,3,3,2,1); F(ALEX.hairD,7,3,2,1)}   // cross brows
+  else {F(ALEX.mouth,5,6,2,1); F(ALEX.blush,2,5,1,1); F(ALEX.blush,9,5,1,1)}
   if(mood!=='ok'){ // bubble
     const bx=Math.round(x)+5, by=Math.round(y)-30; ctx.fillStyle='#ffffff'; ctx.fillRect(bx,by,9,8); ctx.fillRect(bx+1,by+8,2,2);
     ctx.fillStyle=mood==='happy'?'#e54b7a':'#4a4a5a';
