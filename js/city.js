@@ -26,6 +26,8 @@ const LASERS=[
 ];
 const BLINK={y:124, x1:420, x2:512, period:2400, on:1300, warn:300};        // row 2: a visible beam across the whole row that blinks off
 const SLIDER={y:72, x1:420, x2:512, gap:16, speed:.0011};                     // row 4: a visible beam with a gap that slides back and forth
+const LASER_PANEL=R(496,52,12,8);          // past the maze, next to the skylight: shuts every laser off so the rest of the crew can walk through
+const lasersOff=()=>!!have.lasersOff;
 // searchlights on roof B: some sweep up and down, some swing in loops. Lamps sit on the roof's top edge.
 const LIGHTS=[{x:200,kind:'sweep',speed:.15,phase:0},{x:228,kind:'orbit',cx:228,cy:104,r:46,speed:.09,phase:0},
               {x:258,kind:'sweep',speed:.21,phase:2.2},{x:286,kind:'orbit',cx:286,cy:100,r:52,speed:-.11,phase:1.3},
@@ -350,7 +352,7 @@ function checkHazards(){
     const gx=GUARD.x, gy=heist.guardY-6, along=(p.y-3-gy)*heist.guardDir, perp=Math.abs(p.x-gx);
     if(heist.guardWait<=0&&along>0&&along<62&&perp<along*.5+3)return {msg:HEIST.spottedGuard, who:p.id};
     const box=R(p.x-3,p.y-3,6,4);
-    if(heistStage()<4)for(const [x1,y1,x2,y2] of laserSegs())if(segHitsBox(x1,y1,x2,y2,box))return {msg:HEIST.spottedLaser, who:p.id};
+    if(heistStage()<4&&!lasersOff())for(const [x1,y1,x2,y2] of laserSegs())if(segHitsBox(x1,y1,x2,y2,box))return {msg:HEIST.spottedLaser, who:p.id};
   }
   return null;
 }
@@ -438,6 +440,10 @@ function cutFuse(){
   if(lead().id!=='lars')return flashPrompt(HEIST.onlyLars);
   have.heistStage=2; save(); sfx('chunk'); say([['Lars',HEIST.fuseDone]]);
 }
+function lasersOffNow(){ have.lasersOff=true; save(); sfx('chunk'); say([[HEIST.crew.hero,HEIST.lasersDone]]) }
+function drawLaserPanel(){ const p=LASER_PANEL, F=(c,x,y,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,h)}, off=lasersOff();
+  F('rgba(0,0,0,.4)',p.x+1,p.y+p.h,p.w,2); F('#5f6676',p.x,p.y,p.w,p.h); F('#8b93a3',p.x,p.y,p.w,1);
+  F('#1d2130',p.x+2,p.y+2,8,4); F(off?'#3fbf5a':(Math.floor(time/300)%2?'#ff3b4a':'#8a1f28'),p.x+3,p.y+3,2,2); F(off?'#2a3a2a':'#c9ced4',p.x+7,p.y+3,2,2) }
 function ripGrate(){
   if(lead().id!=='john')return flashPrompt(HEIST.onlyJohn);
   have.heistStage=3; save(); say([['John',HEIST.grateDone]]);
@@ -486,6 +492,7 @@ function heistTrigger(){
   if(st<1&&heist.carry&&hit(feet,LOG_DROP))return {label:HEIST.turnIt, act:turnLog};
   if(st<1&&!heist.carry&&hit(feet,R(LOOSE_BEAM.x-10,LOOSE_BEAM.y-6,LOOSE_BEAM.w+20,LOOSE_BEAM.h+12)))return {label:'Look at the log', act:beamChoice};
   if(st<2&&hit(feet,R(FUSE.x-14,FUSE.y-14,28,28)))return {label:HEIST.fuse, act:cutFuse};
+  if(st>=2&&st<4&&!lasersOff()&&hit(feet,R(LASER_PANEL.x-4,LASER_PANEL.y,LASER_PANEL.w+6,16)))return {label:HEIST.lasersOff, act:lasersOffNow};
   if(st===2&&hit(feet,R(SKYLIGHT.x-4,SKYLIGHT.y+SKYLIGHT.h,SKYLIGHT.w+8,12)))return {label:HEIST.grate, act:ripGrate};
   if(st===3&&hit(feet,R(SKYLIGHT.x-4,SKYLIGHT.y+SKYLIGHT.h,SKYLIGHT.w+8,12)))return {label:HEIST.dropIn, act:openVault};
   return null;
@@ -515,7 +522,7 @@ const darkMask=document.createElement('canvas'); darkMask.width=VW; darkMask.hei
 SCENES.city={ music:'heist',
   w:CW, h:CH, bounds:R(0,0,CW,CH), bg:cityBg, triggers:[],
   get walk(){ return [ROOF_A,ROOF_B,ROOF_C,PLANK_BC,LADDER,...(heistStage()>=1?[BEAM_SLOT]:[])] },
-  get solids(){ return [TANK,VENTS,LAB.bench,LAB.coil,...COVERS,R(FUSE.x-14,FUSE.y-20,28,6),SKYLIGHT,R(STRANGER.x-4,STRANGER.y-3,8,4),
+  get solids(){ return [TANK,VENTS,LAB.bench,LAB.coil,...COVERS,R(FUSE.x-14,FUSE.y-20,28,6),SKYLIGHT,LASER_PANEL,R(STRANGER.x-4,STRANGER.y-3,8,4),
     ...(heistStage()<1&&!heist.carry?[LOOSE_BEAM]:[])] },
   feet(x,y){ return heist.carry&&lead().id==='john'?carryBox(x,y):R(x-4,y-3,8,4) },   // carrying the log, the whole log has to fit
   entries:{start:{x:40,y:156,dir:'up'}, fromStreet:{x:40,y:156,dir:'up'}},
@@ -557,7 +564,7 @@ SCENES.city={ music:'heist',
   drawPlayer:(x,y)=>{syncLeadFromP(); crewSprite(lead()); drawCarriedLog(lead())},
   under(){
     for(const c of cars){const x=c.x+(c.lane?18:6); ctx.fillStyle=c.v>0?'#ffe9a0':'#ff4a3a'; ctx.fillRect(x,c.y|0,1,1); ctx.fillRect(x+3,c.y|0,1,1)}
-    drawBeam(); drawGrate(); drawPowerSwitch();
+    drawBeam(); drawGrate(); drawPowerSwitch(); drawLaserPanel();
   },
   ents(list){
     heist.crew.forEach((c,i)=>{if(i!==heist.lead)list.push({y:c.y,draw:()=>{crewSprite(c); drawCarriedLog(c)}})});
@@ -578,7 +585,7 @@ SCENES.city={ music:'heist',
       ctx.lineTo(GUARD.x-31,gy+62*d); ctx.lineTo(GUARD.x+31,gy+62*d); ctx.fill()}
     // lasers: the visible ones always (with a flicker warning before the blinking row comes back on); the invisible ones only with sonar (then chalk-marked)
     const reveal=heist.sonarT>0?Math.min(1,heist.sonarT/600):0;
-    if(st<4){
+    if(st<4&&!lasersOff()){
       for(const [x1,y1,x2,y2,vis] of laserSegs()){
         if(vis){ctx.fillStyle='rgba(255,40,60,.25)'; ctx.fillRect(Math.min(x1,x2),y1-1,Math.abs(x2-x1),3); ctx.fillStyle='#ff3b4a'; ctx.fillRect(Math.min(x1,x2),y1,Math.abs(x2-x1),1)}
         else if(reveal){ctx.fillStyle=`rgba(255,60,70,${.85*reveal})`; if(x1===x2)ctx.fillRect(x1,Math.min(y1,y2),1,Math.abs(y2-y1)); else ctx.fillRect(Math.min(x1,x2),y1,Math.abs(x2-x1),1)}
@@ -595,7 +602,8 @@ SCENES.city={ music:'heist',
     if(st<2)for(const L of LIGHTS){const l=lightPos(L); hole(l.x,l.y,24)}
     if(st<4)hole(GUARD.x,heist.guardY-6,26);
     hole(STRANGER.x,STRANGER.y-8,24); hole(LAB.bench.x+16,LAB.bench.y,22);   // Dr. Alex's lab glows
-    if(st<4){hole((BLINK.x1+BLINK.x2)/2,BLINK.y,22); hole(sliderGap(time)+8,SLIDER.y,20)}
+    if(st<4&&!lasersOff()){hole((BLINK.x1+BLINK.x2)/2,BLINK.y,22); hole(sliderGap(time)+8,SLIDER.y,20)}
+    hole(LASER_PANEL.x+6,LASER_PANEL.y+4,14);
     hole(436,30,26); hole(476,30,26);   // under the neon sign
     ctx.drawImage(darkMask,cx,cy);
     // the old CANDY WORKS neon sign on roof C (one letter keeps flickering), and sparks off Dr. Alex's tesla coil

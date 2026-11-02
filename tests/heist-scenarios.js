@@ -83,8 +83,13 @@ r=await p.evaluate(()=>{const on=t=>laserSegs(t).some(([a,b,c,d,v])=>v&&b===BLIN
   const g1=sliderGap(0), g2=sliderGap(1400); const marked0=heist.marked; P.x=440; P.y=180; useSkill(); return {blink:[...states].length===2,slides:Math.abs(g1-g2)>20,marked0,marked:heist.marked}});
 ok('E a visible row blinks on and off; the top row\'s gap slides back and forth',r.blink&&r.slides);
 ok('E one sonar ping near the maze chalk-marks the hidden tripwires',!r.marked0&&r.marked);
-r=await p.evaluate(()=>{placeAtCheckpoint(); heist.marked=true; if(heist.follow)toggleFollow(); switchTo(2); const res=heistBots.lasers(); return {res,pos:(P.x|0)+','+(P.y|0),lbl:(update(16.7),prompt.textContent)}});
-ok('E John (crew on Hold) times the blink and the slider, dodges the guard, and reaches the grate',r.res.ok&&r.lbl.includes('grate'),JSON.stringify(r.res)+' at '+r.pos);
+r=await p.evaluate(()=>{placeAtCheckpoint(); heist.marked=true; if(heist.follow)toggleFollow(); switchTo(0); const res=heistBots.lasers();
+  T.walkTo(500,64); update(16.7); const lbl=prompt.textContent; action(); const said=T.clickThrough(); return {res,lbl,said,off:!!have.lasersOff,pos:(P.x|0)+','+(P.y|0)}});
+ok('E Joe (crew on Hold) times the blink and the slider, dodges the guard, and gets through the maze',r.res.ok,JSON.stringify(r.res)+' at '+r.pos);
+ok('E past the maze, a panel shuts every laser off',r.lbl==='Shut off the lasers'&&r.off&&r.said[0].includes('Lasers off'),r.said[0]);
+r=await p.evaluate(()=>{switchTo(2); let w=0; while(!(heist.guardDir<0&&heist.guardY<110&&heist.guardWait<=0)&&w<1500){update(16.7);w++}
+  const route=T.path([[384,184],[443,184],[443,100],[474,66]]); const msg=dlg.hidden?'':$('dtext').textContent; T.clickThrough(); update(16.7); return {route,msg,lbl:prompt.textContent}});
+ok('E with the lasers off, John walks straight up to the grate',r.route==='ok'&&r.lbl.includes('grate'),r.route+' '+r.msg);
 // F. only John can open the grate
 r=await p.evaluate(()=>{switchTo(0); const keep={x:P.x,y:P.y}; ripGrate(); const msg=prompt.textContent; switchTo(2); update(16.7); action(); const said=T.clickThrough(); update(16.7); return {msg,said,st:have.heistStage,next:prompt.textContent}});
 ok('F only John can rip the grate',r.msg.includes('Only John')&&r.st===3,`${r.msg} / ${r.said[0]}`);
