@@ -135,7 +135,7 @@ PORTRAITS['Football Viking']={size:32, bg:'#efe6c8', draw(g){ const F=px(g);   /
 // Dr. Alex: Alex in her mad-scientist costume (the client in the city heist): frizzed hair, goggles up, lab coat
 PORTRAITS['Dr. Alex']={size:40, bg:'#1d2a24', draw(g){ drawAlexFace(g,'happy'); const F=(c,x,y,w=1,h=1)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};
   for(const [x,y,w,h] of [[4,4,5,4],[2,10,4,5],[31,4,5,4],[34,10,4,5],[9,1,5,3],[25,1,5,3],[16,0,7,2]])F(ALEX.hair,x,y,w,h);   // gone wild
-  F('#2b2b2b',9,9,22,3); F('#7fd3ff',11,9,7,3); F('#7fd3ff',22,9,7,3); F('#d6f2ff',12,9,2,1); F('#d6f2ff',23,9,2,1);         // goggles pushed up
+  F('#2b2b2b',8,17,24,2); F('#2b2b2b',11,14,9,7); F('#2b2b2b',20,14,9,7); F('#7fd3ff',12,15,7,5); F('#7fd3ff',21,15,7,5); F('#d6f2ff',13,15,2,1); F('#d6f2ff',22,15,2,1); F('#5fb6e6',12,19,7,1); F('#5fb6e6',21,19,7,1);   // lab goggles, on
   F('#f4f4f0',4,34,9,6); F('#f4f4f0',27,34,9,6); F('#dcdcd6',12,35,2,5); F('#dcdcd6',26,35,2,5);                                // lab coat lapels
   F('#cfe6f2',32,22,5,9); F('#5fff8a',32,26,5,5); F('#9fffbf',34,19,1,2) }};
 

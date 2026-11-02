@@ -256,7 +256,7 @@ function drawStranger(sx=STRANGER.x,sy=STRANGER.y){
   const F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(Math.round(sx)-6+dx,Math.round(sy)-21+dy,w,h)};
   F('#f4f4f0',1,8,3,10); F('#f4f4f0',8,8,3,10); F('#dcdcd6',3,8,1,10); F('#dcdcd6',8,8,1,10); F('#f4f4f0',2,16,2,2); F('#f4f4f0',8,16,2,2); F('#c9ced4',2,12,1,1);   // a long lab coat, open over the tee (and a pen in the pocket)
   F(ALEX.hair,0,0,2,2); F(ALEX.hair,10,0,2,2); F(ALEX.hair,1,-1,2,1); F(ALEX.hair,5,-2,2,2); F(ALEX.hair,9,-1,2,1); F(ALEX.hair,0,4,1,3); F(ALEX.hair,11,4,1,3);   // frizzed out
-  F('#2b2b2b',3,1,6,1); F('#7fd3ff',3,1,2,1); F('#7fd3ff',7,1,2,1);                 // goggles pushed up
+  F('#2b2b2b',1,4,10,1); F('#2b2b2b',2,3,4,3); F('#2b2b2b',6,3,4,3); F('#7fd3ff',3,3,2,2); F('#7fd3ff',7,3,2,2); F('#d6f2ff',3,3,1,1); F('#d6f2ff',7,3,1,1);   // lab goggles, on
   const b=Math.floor(time/300)%3; F('#cfe6f2',11,11,3,4); F('#5fff8a',11,13,3,2); F('#cfe6f2',12,10,1,1); F('#9fffbf',12,8-b,1,1);   // a bubbling flask
 }
 // the Confectioner's guard: cap with a badge, grey uniform, a flashlight
