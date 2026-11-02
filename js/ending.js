@@ -81,7 +81,7 @@ function showStats(){
   const E=ENDING, c=card(E.statsTitle), dl=document.createElement('dl'); dl.className='stats';
   const look=[WARDROBE.jersey,...WARDROBE.outfits].find(o=>o.id===(have.look||'jersey'));
   const rows=[[E.stats.birkie,have.birkieTime||'—'],[E.stats.golf,have.golfCard||'—'],[E.stats.anagrams,have.anaScore||'—'],[E.stats.spotted,have.spotted||0],
-    [E.stats.snacks,have.fargoWrong||0],[E.stats.hints,have.xwHints||0],[E.stats.steps,Math.round(have.steps||0).toLocaleString()],[E.stats.look,look?look.name:'—']];
+    [E.stats.snacks,have.fargoWrong||0],[E.stats.pwTries,have.pwTries||0],[E.stats.steps,Math.round(have.steps||0).toLocaleString()],[E.stats.look,look?look.name:'—']];
   for(const [k,v] of rows){const dt=document.createElement('dt'), dd=document.createElement('dd'); dt.textContent=k; dd.textContent=v; dl.append(dt,dd)}
   c.append(dl);
   const sec=document.createElement('div'); sec.className='secrets'; const n=secretsFound();

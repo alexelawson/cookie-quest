@@ -187,7 +187,7 @@ const VAULT_PUZZLES = [
    hint:"Think road trip. Think future home."},
 ];
 
-// ---------- The Birkie trailhead: John sends the Vikings off with the flour, then the crossword ----------
+// ---------- The Birkie trailhead: John sends the Vikings off with the flour ----------
 const BIRKIE = {
   place:'Birkie Trailhead', john:'John',
   johnHello:["You're here for flour? Great. Problem.",
@@ -363,30 +363,17 @@ const FARGO = {
   alexWaiting:"Snacks. Please. I've been in this car for nine hours.",
 };
 
-// ---------- The smudged recipe card: a crossword before the baking ----------
-// Change, add or remove words freely: the grid fits them together by itself (letters only; spaces are ignored).
-// Each answer needs to share a letter with at least one other answer so it can cross it.
-const CROSSWORD = {
-  title:"The smudged recipe card",
-  intro:"Oh no. I spilled vanilla on the recipe card and smudged the ingredients. Help me figure out what goes in!",
-  words:[
-    {answer:'CHOCOLATE', clue:"Lars wanted to keep the whole crate"},
-    {answer:'BUTTER',    clue:"Keelan's farm sent this. One cup, goes in first"},
-    {answer:'FLOUR',     clue:"The Vikings skied it all the way to Main Street, Hayward"},
-    {answer:'SUGAR',     clue:"Picked up in Fargo, after exactly $30.00 of gas"},
-    {answer:'EGGS',      clue:"The hens did NOT want to give these up"},
-    {answer:'MILK',      clue:"Margie says bringing this makes her the main character"},
-    {answer:'OVEN',      clue:"375 degrees, ten minutes, don't walk away"},
-    {answer:'COOKIE',    clue:"The whole point of this quest"},
-  ],
-  across:'Across', down:'Down',
-  check:'Check', hint:'Hint', later:'Later',
-  empty:"Some boxes are still empty. Keep going!",
-  wrong:n=>n===1?"One letter's off. It's the red one.":`${n} letters are off. They're the red ones.`,
-  hintSay:"Here, I'll fill one in for you.",
-  wordDone:"That one's already right! Tap another clue.",
-  solved:"You cracked it! The card's readable again. Let's bake.",
-  solvedClue:"All the ingredients, figured out.",
+// ---------- The locked recipe card: Joe types the secret word from Alex's paper crossword ----------
+// Change `word` to the real answer. Capitals and spaces don't matter.
+const PASSWORD = {
+  word:'password',
+  title:"The locked recipe card",
+  intro:"The recipe card is locked! Solve the crossword I gave you, then type the secret word here.",
+  placeholder:"Secret word",
+  check:"Unlock", later:"Later",
+  empty:"Type the secret word from the crossword first.",
+  wrong:"Hmm, that's not it. Check the crossword again!",
+  right:"That's it! The recipe card is unlocked. Let's bake.",
   go:"Let's bake",
 };
 // ---------- Joe's gear, hidden around the main map (where: GEAR in extras.js) ----------
@@ -440,7 +427,7 @@ const ENDING = {
   thanks:["Made with love by Alex","For Joe · Christmas 2026"],
   skip:"Skip", next:"Next", close:"Close", toNote:"One more thing...",
   statsTitle:"Joe's stats",
-  stats:{birkie:"Birkie time", golf:"Wylee Woods", anagrams:"Anagrams vs Lars", spotted:"Spotted on the rooftops", snacks:"Wrong snacks for Alex", hints:"Crossword hints", steps:"Steps walked", look:"Look"},
+  stats:{birkie:"Birkie time", golf:"Wylee Woods", anagrams:"Anagrams vs Lars", spotted:"Spotted on the rooftops", snacks:"Wrong snacks for Alex", pwTries:"Wrong passwords", steps:"Steps walked", look:"Look"},
   secretsLine:(n,of)=>`Secrets found: ${n} of ${of}`,
   secretNames:{cupcake:'Cupcake',sprinkles:'Sprinkles',icecream:'Ice cream',oakleys:'Oakleys',headband:'Headband',shoes:'Carbon shoes',clover:'Lucky clover'},
   secretsTip:"Keep exploring to find the rest. Find them all for a surprise.",

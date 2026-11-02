@@ -21,7 +21,7 @@ For live reload while editing: `python3 -m http.server` and visit http://localho
 | `js/birkie.js` | The Birkie: John (brown hair, reading glasses) at the trailhead sends you off. A lane runner on a skate trail from Cable to Main Street, Hayward: tap left/right to change lanes, jump fallen skiers, go around packs of slow skiers, grab the flat Coke at each feed station and hold steady so it doesn't spill, stay ahead of the sweep snowmobile. Course and landmarks in `BIRK_SECTIONS`, feeds in `FEEDS`, what's on the trail in `OBSTACLES`, speeds and difficulty in `BIRK` |
 | `js/fargo.js` | Fargo: drive the CR-V, find the cheapest gas, Bob's $30.00 pump, then the snack stop for Alex. Car color in `CAR_COLOR`, fuel/speeds in `FUEL` |
 | `js/sound.js` | All the sounds (made with Web Audio, no files): `sfx('name')` plays one from `SFX`. Background music in `SONGS`: one little loop per place (farm hoedown, breezy Wylee Woods, Hall of the Mountain King for the Birkie, sneaky heist, Fargo road trip, Deck the Halls at home, Jingle Bells for the Cookie Dance). Loudness in `SOUND` (`MUSIC` for the music); Sound and Music on/off in ⚙ Settings |
-| `js/crossword.js` + `CROSSWORD` in story.js | The smudged recipe card: a crossword you solve before the baking. Change the words and clues in `CROSSWORD`; the grid arranges itself |
+| `js/password.js` + `PASSWORD` in story.js | The locked recipe card: before baking, Joe types the secret word from Alex's paper crossword. Set the real word in `PASSWORD.word` (capitals and spaces don't matter) |
 | `js/extras.js` | Exits (walk into them to leave, with a bouncing EXIT arrow: `EXITS`), the arrow over Joe's head when he can do something, Joe's hidden gear (`GEAR`: where the Oakleys, headband and carbon shoes are), and the sign in front of each land (`LAND_SIGNS`). Gear text: `GEAR_TEXT` in story.js |
 | `js/people.js` | Ethan (Joe's brother) and Maureen (Joe's mom); Jackie (Fargo, after Alex kicks Joe out of the shop; `JACKIE`), Logan in the clover patch (`LOGAN_TEXT`), the Vikings and Lil Q passing on the road, and Alex's "where to next?" hints when Joe stands still (`HINTS`) |
 | `js/ending.js` | The ending: credits, Joe's stats, secrets found (find all 7 for the Cookie Legend crown + a secret note), the photo album, then the note. All its words are in `ENDING` in story.js; the note is `KITCHEN.note`. The album is also in ⚙ Settings |
@@ -45,9 +45,9 @@ Needs Node and Playwright (`npm install && npx playwright install chromium`).
 **Run everything:** `npm test` (or `node tests/run-all.js`). It first checks every `.js` file for typos that would stop the game loading (a stray quote in `story.js` is the usual one), then runs every suite below and prints a summary. It also runs automatically on GitHub every time anything is pushed, including edits made on github.com: a green check next to the commit means all good, a red X means something broke (click it to see what).
 
 - `tests/heist-bots.js`: bots that play the searchlights and the laser maze (used by the heist tests). Run it on its own for a difficulty report.
-- `tests/full-playthrough.js`: the whole game start to finish (welcome, every stop in an odd order, all seven secrets, the crossword typed on the keyboard, baking, the party, the ending, Play again), reloading after every step.
+- `tests/full-playthrough.js`: the whole game start to finish (welcome, every stop in an odd order, all seven secrets, the secret word typed on the keyboard, baking, the party, the ending, Play again), reloading after every step.
 - `tests/robustness.js`: every pop-up on desktop, phones and a phone held sideways; blocked or broken saves; ⚙ Settings opened over other pop-ups; walking away mid-task; in and out of every place; sound settings; Start over.
-- `tests/farm-scenarios.js`, `birkie-scenarios.js`, `golf-scenarios.js`, `heist-scenarios.js`, `fargo-scenarios.js`, `kitchen-scenarios.js`: each place in detail (the kitchen suite also covers the crossword, wardrobe, music, exits, gear, Logan, Jackie, hints and the ending).
+- `tests/farm-scenarios.js`, `birkie-scenarios.js`, `golf-scenarios.js`, `heist-scenarios.js`, `fargo-scenarios.js`, `kitchen-scenarios.js`: each place in detail (the kitchen suite also covers the secret word, wardrobe, music, exits, gear, Logan, Jackie, hints and the ending).
 - Difficulty simulators (not part of `npm test`): `node tests/farm-difficulty.js '{}'`, `node tests/birkie-difficulty.js '{}'`, `node tests/golf-difficulty.js '{}'` play hundreds of rounds with players of different skill. Pass JSON to try other settings.
 
 ## Adding a new place
@@ -57,7 +57,7 @@ Add an object to `SCENES` with `w`, `h`, `bounds`, `bg` (a canvas), `solids`, `t
 - [x] Farm: Keelan Q&A, hen chase, hidden cupcake (Keelan helps if you give it to him)
 - [ ] Farm: butter churning
 - [x] Birkie trailhead (flour): parking lot, yurt, American Birkebeiner arch, the race with the Vikings
-- [x] Crossword: the smudged recipe card, solved in the kitchen before baking (`CROSSWORD` in story.js)
+- [x] Secret word: the locked recipe card, unlocked with the answer to Alex's paper crossword (`PASSWORD` in story.js)
 - [x] Night city: rooftop chocolate heist with John and Lars
 - [x] Fargo: cheapest-gas hunt, stop the pump on $30.00, pick Alex's drink + snack
 - [x] Disc golf (milk): 5 holes vs Jack and Margie

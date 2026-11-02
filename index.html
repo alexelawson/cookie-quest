@@ -107,14 +107,12 @@
         <div class="brow"><button class="pbtn" id="bakeBtn"></button><button class="btn ghost" id="bakeAlt" hidden></button></div>
       </div>
     </div>
-    <div class="bake" id="xword" hidden role="dialog" aria-labelledby="xwTitle">
-      <div class="pcard bcard xcard">
-        <small id="xwTitle"></small>
-        <div class="bsay"><canvas id="xwFace" width="40" height="40" aria-hidden="true"></canvas><p id="xwMsg" aria-live="polite"></p></div>
-        <div class="xclue" id="xwClue"></div>
-        <div class="xgrid" id="xwGrid"></div>
-        <div class="brow"><button class="btn" id="xwCheck"></button><button class="btn ghost" id="xwHint"></button><button class="btn ghost" id="xwLater"></button></div>
-        <div class="xlists" id="xwLists"></div>
+    <div class="bake" id="xword" hidden role="dialog" aria-labelledby="pwTitle">
+      <div class="pcard bcard pwcard">
+        <small id="pwTitle"></small>
+        <div class="bsay"><canvas id="pwFace" width="40" height="40" aria-hidden="true"></canvas><p id="pwMsg" aria-live="polite"></p></div>
+        <input id="pwInput" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" aria-label="Secret word">
+        <div class="brow"><button class="btn" id="pwGo"></button><button class="btn ghost" id="pwLater"></button></div>
       </div>
     </div>
     <div class="alexhint radio" id="radio" hidden><canvas id="radioFace" width="40" height="40" aria-hidden="true"></canvas><div><b id="radioWho"></b><p id="radioText" aria-live="polite"></p></div></div>
@@ -172,7 +170,7 @@
 <script src="js/ui.js"></script>
 <script src="js/farm.js"></script>
 <script src="js/kitchen.js"></script>
-<script src="js/crossword.js"></script>
+<script src="js/password.js"></script>
 <script src="js/city.js"></script>
 <script src="js/fargo.js"></script>
 <script src="js/portraits.js"></script>

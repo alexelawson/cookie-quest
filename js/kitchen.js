@@ -15,7 +15,7 @@ function startBaking(){
   const missing=ITEMS.filter(i=>!have[i.key]).map(i=>i.label);
   if(missing.length) return say1(KITCHEN.missing+' '+missing.join(', ')+'.');
   if(have.baked) return finalNote();
-  showDialog({place:KITCHEN.place,speaker:KITCHEN.speaker,pages:KITCHEN.ready,actions:[{label:"Let's bake",fn:()=>{closeDialog(); if(have.crossword)openBake(); else openCrossword(openBake)}}]});   // the smudged recipe card (crossword.js) comes first
+  showDialog({place:KITCHEN.place,speaker:KITCHEN.speaker,pages:KITCHEN.ready,actions:[{label:"Let's bake",fn:()=>{closeDialog(); if(have.passwordOk)openBake(); else openPassword(openBake)}}]});   // the locked recipe card (password.js) comes first
 }
 function finalNote(){ openEnding() }   // credits, Joe's stats, the photo album, then Alex's note (ending.js)
 function playAgain(){ have={};save();renderBasket();farmReset();fargo.won=false;Object.assign(kit,{party:false,dance:false,alex:null,hugged:false,hugSound:false});stopMusic();closeDialog();goTo('world','start') }
