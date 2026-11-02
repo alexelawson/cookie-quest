@@ -47,7 +47,7 @@ const GEAR={
   shoes:   {x:228,y:232},    // out past the Fargo gas station
   clover:  {give:true},      // Logan gives Joe this one (people.js)
   // keepsakes: one from each stop, handed over right after that stop's reward (KEEPSAKES in story.js)
-  hen:     {give:true, from:'farm'},     // Henrietta, the slowest hen: follows Joe around the map and the kitchen
+  hen:     {give:true, from:'farm'},     // Grp ("G"), Joe's rooster: follows him everywhere
   goggles: {give:true, from:'city'},     // Dr. Alex's spare goggles, pushed up on his head
   disc:    {give:true, from:'golf'},     // Margie's "lucky" disc, on his back
   hat:     {give:true, from:'fargo'},    // a Lil Q's Gas & Go trucker hat
@@ -128,7 +128,7 @@ solids.push(R(226,183,2,3),R(242,183,2,3));
   SCENES.world.ents=function(list){ ents.call(this,list);
     for(const k in GEAR)if(!GEAR[k].give&&!(have.gear&&k in have.gear))list.push({y:GEAR[k].y,draw:()=>drawGearItem(k,GEAR[k].x,GEAR[k].y)}) }}
 
-// the lucky clover sheds little green sparkles as Joe walks; Henrietta the hen trots along behind him
+// the lucky clover sheds little green sparkles as Joe walks; Grp the rooster trots along behind him
 const sparkles=[], henTrail=[]; let sparkleT=0, henScene=null;
 function cloverTick(dt){
   if(gearWorn('clover')&&P.moving&&scene!==SCENES.birkie){ sparkleT-=dt; if(sparkleT<=0){ sparkleT=110; sparkles.push({x:P.x+(Math.random()*8-4),y:P.y-10+(Math.random()*6-3),vx:(Math.random()-.5)*.01,vy:-.012-Math.random()*.01,t:0,c:['#7fe08a','#c9f5a0','#fff3a8'][Math.floor(Math.random()*3)]}) } }
@@ -139,24 +139,60 @@ function cloverTick(dt){
 }
 function henPos(){ if(!henTrail.length)return {x:P.x-10,y:P.y+2}; const k=Math.max(0,henTrail.length-12); return henTrail[k] }
 function drawSparkles(){ for(const s of sparkles){ const a=1-s.t/900; ctx.globalAlpha=Math.max(0,a); ctx.fillStyle=s.c; ctx.fillRect(Math.round(s.x),Math.round(s.y),1,1); if(s.t<300){ctx.fillRect(Math.round(s.x)-1,Math.round(s.y),3,1); ctx.fillRect(Math.round(s.x),Math.round(s.y)-1,1,3)} } ctx.globalAlpha=1 }
-// Henrietta comes everywhere once Keelan gives her to Joe (after the farm), in an outfit for each place
-const henHere=()=>gearWorn('hen')&&!(scene===SCENES.world&&farm.carrying)&&!(scene===SCENES.fargo&&!fargo.onFoot);   // (not while Joe's carrying a farm hen, or driving)
+// Grp ("G" for short: Green Red Poultry) comes everywhere once Keelan gives him to Joe (after the farm), dressed for each place.
+// Drawn from Joe's own sketch: red comb and wattle, yellow beak, a white body streaked blue, purple and green, a yellow wing, a big red-brown and dark tail.
+const henHere=()=>gearWorn('hen');
 function henEnt(){
   if(!henHere())return null;
+  if(scene===SCENES.fargo&&!fargo.onFoot){ const d=P.dir==='left'?-1:1; return {y:P.y+1, draw:()=>drawGrp(P.x-1-3*d,P.y+11,d,'fargo',true)} }   // riding shotgun
   const h=henPos(), f=h.x<P.x?1:h.x>P.x?-1:(P.dir==='left'?-1:1), hop=P.moving&&Math.floor(time/150)%2?1:0;
-  return {y:h.y, draw:()=>drawHenrietta(h.x,h.y-hop,f,sceneName())};
+  return {y:h.y, draw:()=>drawGrp(h.x,h.y-hop,f,sceneName())};
 }
-function drawHenrietta(x,y,f,where){
-  x=Math.round(x); y=Math.round(y); const F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x+dx,y+dy,w,h)}, hx=f>0?1:-3;   // hx: where her head is
-  if(where==='birkie'){F('#2f6db0',-5,1,11,1); F('#2f6db0',f>0?5:-6,0,1,1)}                          // tiny skis
-  drawHen(x,y,f);
-  if(where==='kitchen'){F('#ffffff',hx-1,-11,4,3); F('#ffffff',hx,-8,2,1); F('#e3e3dc',hx-1,-9,4,1)}                       // chef's hat
-  else if(where==='city'){F('#1d1d22',hx,-8,2,2); F('#3a3a44',hx,-7,2,1); F('#0b0c12',hx,-6,2,1)}                           // black beanie and a mask
-  else if(where==='birkie'){F('#c8322b',hx,-8,2,2); F('#ffffff',hx+(f>0?0:1),-9,1,1); F('#ffffff',-2,-3,3,2); F('#1d1d22',-1,-3,1,1)}   // knit hat with a pompom, race bib
-  else if(where==='golf'){F('#2f8a4a',hx,-7,2,1); F('#2f8a4a',f>0?hx+2:hx-1,-7,1,1); F('#ffffff',hx,-7,1,1)}                // a golf visor
-  else if(where==='fargo'){F('#7a4a2a',hx-1,-9,4,2); F('#e9dcc4',hx-1,-7,4,1); F('#7a4a2a',hx-1,-6,1,2); F('#7a4a2a',hx+2,-6,1,2)}   // fur trapper hat with earflaps
-  else F('#e54b7a',-1,-3,2,1);                                                                                                // the main map: her little pink bow
+function drawGrp(x,y,f,where,headOnly){
+  x=Math.round(x); y=Math.round(y);
+  // P: draw a rect given for facing right; mirrored when he faces left
+  const P=(c,dx,dy,w,h)=>{ctx.fillStyle=c; ctx.fillRect(f>0?x+dx:x-dx-w+1,y+dy,w,h)};
+  const W='#f4f1ea', WS='#d9d3c8', RED='#d43b2f', BEAK='#e8b04a', LEG='#e0a43a';
+  if(!headOnly){
+    if(where==='birkie'){P('#2f6db0',-7,1,15,1); P('#2f6db0',8,0,1,1); P('#2f6db0',-8,0,1,1)}                       // tiny skis
+    P('rgba(0,0,0,.2)',-5,1,11,1);
+    P(LEG,-1,-3,1,3); P(LEG,2,-3,1,3); P(LEG,-2,0,2,1); P(LEG,2,0,3,1);                                               // legs and toes
+    // the tail: big sweeping feathers, red-brown with dark blue-green sickles
+    P('#b5532f',-7,-10,3,5); P('#c46b4a',-6,-11,2,2); P('#8a3a22',-7,-6,2,1);
+    P('#24365e',-9,-14,2,7); P('#2e7d4f',-8,-15,2,3); P('#24365e',-10,-12,1,4); P('#3a8f5f',-6,-13,1,3); P('#5d6fb3',-9,-8,1,2);
+    // body
+    P(W,-4,-9,8,6); P(WS,-4,-4,8,1); P('#c46b4a',-4,-9,2,2);
+    P('#5d6fb3',-3,-7,1,2); P('#7a5ea8',-2,-6,1,2); P('#4fae6a',0,-8,1,2); P('#5d6fb3',3,-6,1,2);                       // the colored streaks
+    P('#e8c84a',-1,-7,3,2); P('#3f9a5a',-1,-5,3,1);                                                                   // yellow wing, green edge
+    // neck hackles
+    P('#efe9df',1,-13,3,5); P('#6b6fb0',1,-12,1,3); P('#8a6fb0',3,-11,1,2);
+  }
+  // head: comb, eye, beak, wattle
+  P(W,2,-16,3,3); P(RED,4,-15,1,1); P('#1d1d22',3,-15,1,1); P(BEAK,5,-15,2,1); P('#c98a2a',5,-14,1,1); P(RED,4,-13,1,2); P(RED,5,-13,1,1);
+  const hatless=!['city','birkie','golf','fargo','kitchen'].includes(where)||where==='golf';
+  if(hatless){P(RED,2,-18,1,2); P(RED,3,-19,1,3); P(RED,4,-18,1,2)}
+  if(headOnly&&where!=='fargo')return;
+  if(where==='kitchen'){   // chef's toque with pleats, and a little apron with a heart
+    P('#ffffff',1,-21,6,3); P('#ffffff',2,-22,4,1); P('#e3e3dc',2,-18,4,2); P('#cfcfc6',3,-18,1,2); P('#cfcfc6',5,-18,1,2);
+    if(!headOnly){P('#ffffff',-1,-8,4,5); P('#e3e3dc',-1,-4,4,1); P('#e3e3dc',1,-11,1,3); P('#e54b4b',0,-7,1,1); P('#e54b4b',2,-7,1,1); P('#e54b4b',1,-6,1,1)} }
+  else if(where==='city'){  // stealth: black beanie with a cuff, a mask, a black turtleneck
+    P('#1d1d22',1,-19,5,3); P('#3a3a44',1,-17,5,1); P('#1d1d22',3,-20,1,1);
+    P('#0b0c12',2,-15,4,1); P('#ffffff',3,-15,1,1);
+    if(!headOnly){P('#1d1d22',1,-12,3,3); P('#2b2b33',1,-10,3,1)} }
+  else if(where==='birkie'){   // red knit hat with a stripe and pompom, race bib, poles
+    P('#c8322b',1,-19,5,3); P('#ffffff',1,-17,5,1); P('#ffffff',3,-21,2,2);
+    if(!headOnly){P('#ffffff',-2,-9,5,4); P('#c8322b',-2,-9,5,1); P('#1d1d22',0,-7,1,2); P('#1d1d22',-1,-7,1,1);    // bib, number 1
+      P('#8a8f9a',6,-9,1,9); P('#1d1d22',6,-10,1,1); P('#8a8f9a',5,-1,3,1)} }                                           // a pole
+  else if(where==='golf'){   // green visor, and an orange disc tucked under his wing
+    P('#2f8a4a',2,-17,3,1); P('#2f8a4a',5,-17,3,1); P('#9fe39f',5,-17,2,1);
+    if(!headOnly){P('#ff7a1a',-3,-5,5,2); P('#d65a00',-3,-4,5,1); P('#ffb066',-2,-5,2,1)} }
+  else if(where==='fargo'){   // fur trapper hat with earflaps, buffalo-plaid scarf
+    P('#7a4a2a',1,-19,5,3); P('#e9dcc4',1,-17,5,1); P('#7a4a2a',1,-16,1,3); P('#5a3a22',2,-19,3,1);
+    P('#c8322b',1,-12,4,2); P('#1d1d22',2,-12,1,1); P('#1d1d22',4,-11,1,1); if(!headOnly){P('#c8322b',0,-11,1,3); P('#1d1d22',0,-10,1,1)} }
+  else {   // the main map: a green-and-red neckerchief (Green Red Poultry colors)
+    if(!headOnly){P('#2e9a45',1,-11,4,1); P('#2e9a45',2,-10,2,1); P('#c8322b',1,-11,1,1); P('#c8322b',4,-11,1,1); P('#2e9a45',3,-9,1,1)} }
 }
+const drawHenrietta=drawGrp;   // (older name)
 
 // called from game.js every frame
 function extrasTick(){ sceneExitTick(); gearTick() }

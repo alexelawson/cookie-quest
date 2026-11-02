@@ -155,15 +155,15 @@ r=await p.evaluate(()=>{const sp=$('dspeaker').textContent, t=$('dtext').textCon
   const g=STATIONS[fargo.bob]; P.x=g.door.x+8; P.y=g.door.y+4; T.run(1); const door=prompt.textContent; return {sp,t,lbl,h1,h2,door,met:have.metJackie,tryAgain:JACKIE.tryAgain}});
 ok('R kicked out: Jackie comes over and says to think, then go back in',r.sp==='Jackie'&&r.t.includes('kicked out')&&r.met,r.t);
 ok('R talking to Jackie gives a hint each time; the door says try again',r.lbl==='Talk to Jackie'&&r.h1!==r.h2&&r.door===r.tryAgain,r.h1.slice(0,40)+' / '+r.door);
-// P. Henrietta: only after the farm (Keelan's keepsake), then she follows Joe everywhere, dressed for each place
+// P. Grp the rooster: only after the farm (Keelan's keepsake), then he follows Joe everywhere, dressed for each place
 await fresh({});
 r=await p.evaluate(()=>{const before=!!henEnt(); have.gear={hen:1}; const keep=scene; const out={};
   for(const n of ['world','city','birkie','golf','fargo','kitchen']){scene=SCENES[n]; fargo.onFoot=true; const e=henEnt(); out[n]=!!e; if(e)e.draw()}
   scene=SCENES.fargo; fargo.onFoot=false; out.driving=!!henEnt(); scene=keep;
-  const px=(n)=>{scene=SCENES[n]; ctx.setTransform(1,0,0,1,0,0); ctx.fillStyle='#000'; ctx.fillRect(0,0,30,30); drawHenrietta(15,25,1,n); const d=ctx.getImageData(6,10,18,18).data; let h=0; for(let i=0;i<d.length;i+=4)h=(h*31+d[i]+d[i+1]*7+d[i+2]*13)%1e9; return h};
+  const px=(n)=>{scene=SCENES[n]; ctx.setTransform(1,0,0,1,0,0); ctx.fillStyle='#000'; ctx.fillRect(0,0,30,30); drawGrp(15,28,1,n); const d=ctx.getImageData(0,0,30,30).data; let h=0; for(let i=0;i<d.length;i+=4)h=(h*31+d[i]+d[i+1]*7+d[i+2]*13)%1e9; return h};
   const looks=new Set(['world','city','birkie','golf','fargo','kitchen'].map(px)).size; scene=keep;
   return {before,out,looks}});
-ok('P no Henrietta before the farm',!r.before);
-ok('P after the farm she follows Joe in every world (not while he drives)',Object.entries(r.out).every(([k,v])=>k==='driving'?!v:v),JSON.stringify(r.out));
+ok('P no Grp before the farm',!r.before);
+ok('P after the farm he follows Joe in every world, and rides along in the car in Fargo',Object.values(r.out).every(v=>v),JSON.stringify(r.out));
 ok('P a different outfit in each world',r.looks===6,r.looks+' looks');
 console.log(R.join('\n')); console.log('page errors:',errs.length?errs:'none'); await b.close()})();

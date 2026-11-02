@@ -102,7 +102,7 @@ function draw(){
   // people, hens and furniture, back to front
   const ents=[]; scene.ents&&scene.ents(ents);
   ents.push({y:P.y,draw:()=>{(scene.drawPlayer||drawPlayer)(P.x,P.y); if(farm.carrying&&scene===SCENES.world)drawHen(P.x,P.y-20,P.dir==='left'?-1:1)}});
-  const hen=henEnt(); if(hen)ents.push(hen);   // Henrietta, dressed for wherever Joe is (extras.js)
+  const hen=henEnt(); if(hen)ents.push(hen);   // Grp the rooster, dressed for wherever Joe is (extras.js)
   ents.sort((a,b)=>a.y-b.y).forEach(e=>e.draw());
   scene.over&&scene.over();
   extrasDraw();

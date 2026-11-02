@@ -408,7 +408,7 @@ const GEAR_TEXT = {
   headband:{name:"Headband", found:"A ski headband in the snow! It smells faintly of klister. Perfect.", wear:"Put it on"},
   shoes:   {name:"Carbon racing shoes", found:"Carbon-plated racing shoes! Joe could run a marathon in these. Or at least to the mailbox.", wear:"Lace them up"},
   clover:  {name:"Lucky clover"},
-  hen:     {name:"Henrietta (pet hen)", found:"Henrietta the hen is coming with you! She'll follow Joe around the farm and the kitchen.", wear:"Come on, Henrietta"},
+  hen:     {name:"Grp the rooster", found:"Grp (G for short) is coming with you! He'll follow Joe everywhere, dressed for the occasion.", wear:"Come on, G"},
   goggles: {name:"Lab goggles", found:"Dr. Alex's spare goggles. Joe pushes them up on his head. Very scientific.", wear:"Put them on"},
   disc:    {name:"Margie's lucky disc", found:"Margie's lucky disc. Joe slings it on his back.", wear:"Take it"},
   hat:     {name:"Trucker hat", found:"A Lil Q's Gas & Go trucker hat. Limited edition (there's one).", wear:"Put it on"},
@@ -478,7 +478,7 @@ const ENDING = {
 // ---------- Keepsakes: one from each stop, handed over right after its reward ----------
 // [speaker, line] (or [speaker, line, portrait]). The gear itself: GEAR in extras.js; names and found lines: GEAR_TEXT above.
 const KEEPSAKES = {
-  hen:[['Keelan',"Oh, one more thing. This is Henrietta. Slowest hen I've got."],['Keelan',"She's not built for farm life. She's built for adventure. Take her."]],
+  hen:[['Keelan',"Oh, one more thing. This is Grp. G for short."],['Keelan',"Stands for Green Red Poultry. Don't ask me, he came with the name."],['Keelan',"He's not built for farm life. He's built for adventure. Take him."]],
   goggles:[['Dr. Alex',"Wait! Before you go. Take these: my spare goggles."],['Dr. Alex',"Every great scientist needs eye protection. And style. Mostly style."]],
   disc:[['Margie',"Here. My lucky disc. I've never lost with it."],['Jack',"She has lost with it forty-one times. I have the spreadsheet."],['Margie',"Lucky. Disc."]],
   hat:[['Lil Q',"Yo, rookie. One more thing. For the road."],['Lil Q',"Official Lil Q's Gas & Go trucker hat. Wear it with pride. Or at least wear it."]],
