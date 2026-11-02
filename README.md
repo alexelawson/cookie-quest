@@ -12,7 +12,7 @@ For live reload while editing: `python3 -m http.server` and visit http://localho
 | `js/story.js` | All dialogue, character names, the ending note. Keelan is in `KEELAN`; Jack + Margie in `GOLF_TEXT`; Bryan (the pond, sprinkles) in `BRYAN`; the heist crew + The Confectioner in `HEIST`; Lil Q (the gas station owner), Alex's snack reactions and the correct drink/snack are in `FARGO` |
 | `js/world.js` | Overworld map: collision rects (`solids`), doors (`triggers`), painting. Also defines the scene system (`SCENES`) |
 | `js/kitchen.js` | Kitchen interior scene; baking starts at the counter, recipe card on the fridge |
-| `js/city.js` | The chocolate heist: crew switching (you/Lars/John), sonar, sprint, lift, searchlights, guard, lasers, vault, cookie signal |
+| `js/city.js` | The chocolate heist at night: walk up to Dr. Alex (Alex as a mad scientist) at her rooftop lab for the briefing; John carries the log (turn it upright to fit past the tank, sideways to lay it across); Lars dashes shadow to shadow under the searchlights to the LIGHT POWER switch; the laser maze (hidden tripwires the sonar chalk-marks, a blinking row, a sliding gate, a guard); the vault; anagrams with Lars. Layout and difficulty at the top (`LIGHTS`, `COVERS`, `LASERS`, `BLINK`, `SLIDER`, `GUARD`) |
 | `js/portraits.js` | Faces shown beside dialog text, one painter per speaker name |
 | `js/larsgames.js` | Lars's anagram challenge at the end of the heist, and the crew's how-to-play card |
 | `js/anagrams.js` | Anagrams vs. Lars: 14 letter sets (one picked at random each game) + accepted words, scoring, Lars's difficulty in `ANAGRAM.LARS` |
@@ -44,6 +44,7 @@ Needs Node and Playwright (`npm install && npx playwright install chromium`).
 
 **Run everything:** `npm test` (or `node tests/run-all.js`). It first checks every `.js` file for typos that would stop the game loading (a stray quote in `story.js` is the usual one), then runs every suite below and prints a summary. It also runs automatically on GitHub every time anything is pushed, including edits made on github.com: a green check next to the commit means all good, a red X means something broke (click it to see what).
 
+- `tests/heist-bots.js`: bots that play the searchlights and the laser maze (used by the heist tests). Run it on its own for a difficulty report.
 - `tests/full-playthrough.js`: the whole game start to finish (welcome, every stop in an odd order, all seven secrets, the crossword typed on the keyboard, baking, the party, the ending, Play again), reloading after every step.
 - `tests/robustness.js`: every pop-up on desktop, phones and a phone held sideways; blocked or broken saves; ⚙ Settings opened over other pop-ups; walking away mid-task; in and out of every place; sound settings; Start over.
 - `tests/farm-scenarios.js`, `birkie-scenarios.js`, `golf-scenarios.js`, `heist-scenarios.js`, `fargo-scenarios.js`, `kitchen-scenarios.js`: each place in detail (the kitchen suite also covers the crossword, wardrobe, music, exits, gear, Logan, Jackie, hints and the ending).
@@ -77,7 +78,7 @@ Oakleys on the Vancouver beach (bottom left), a headband in the snow by the Birk
 Bob's station (always $2.79) moves each attempt. Alex wants ginger ale + Mott's berry gummies. Two wrong picks and she sends you back outside.
 
 ## Spoilers: the heist
-Switch to John to lift the log (or let Lars try to long-jump it first, for fun). Set the crew to Hold, switch to Lars, and sprint through a gap in the searchlights to the fuse box. On the last roof, wait for the guard to walk away, ping sonar, and follow the gaps in the lasers: bottom row left of center, middle row on the right, top row in the middle. Switch to John for the grate. In the vault, solve the label puzzle (Lars gives a hint). Then beat Lars at anagrams (he usually scores ~3,600).
+Talk to Dr. Alex at the lab bench first. Switch to John, pick up the log, walk it to the gap between the water tank and the vents, tap A to turn it upright, go through, tap A again to turn it sideways, and lay it across the gap (or let Lars try to long-jump it first, for fun, and get the ice cream). Set the crew to Hold, switch to Lars, and dash between the shadows next to the AC units, the vent and the blue tank to the switch. On roof C, ping the sonar once to chalk-mark the hidden tripwires, wait for the guard to walk away, go through the bottom gap, wait for the blinking row to switch off, go through the middle gap, then slip up through the sliding gap. Switch to John for the grate. In the vault, solve the label puzzle (Lars gives a hint). Then beat Lars at anagrams (he usually scores ~3,600).
 
 ## Rewards
 Finishing a land shows a pop-up with the item's pixel art; tapping it flies it into the basket. Add the art for a new item to `ART` and its text to `REWARDS` in `js/ui.js`, then call `showReward('key')`.

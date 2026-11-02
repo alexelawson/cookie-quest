@@ -49,7 +49,7 @@ ok('D 10:00 on the dot: golden brown',r.state==='done'&&r.good.includes('PERFECT
 r=await p.evaluate(()=>{bakePress(); const party=kit.party, closed=$('bake').hidden; const A=CROWD.find(c=>c.name==='Alex'); const start={...kit.alex}; T.tick(PARTY.WALK+400); const near=Math.hypot(kit.alex.x-P.x,kit.alex.y-P.y), hugging=kit.hugging, noDlg=dlg.hidden; T.tick(PARTY.HUG+200);
   const lines=T.through(); T.tick(1700); const dance=kit.dance; return new Promise(res=>setTimeout(()=>res({party,closed,start,near,hugging,noDlg,lines,dance,crown:!!have.crown,baked:!!have.baked,ending:!$('ending').hidden,credits:!$('credits').hidden}),PARTY.BEAT*16+300))});
 ok('E Alex walks over and hugs Joe first',r.hugging&&r.noDlg&&r.near<10&&Math.hypot(r.start.x-112,r.start.y-134)>30,'gap '+r.near.toFixed(1));
-ok('E party: everyone has a line, and they bounce',r.party&&r.closed&&['Alex','Keelan','Lil Q','Lars','John','The Stranger','Margie','Jack'].every(n=>r.lines.some(l=>l.startsWith(n+':'))),r.lines.length+' lines');
+ok('E party: everyone has a line, and they bounce',r.party&&r.closed&&['Alex','Keelan','Lil Q','Lars','John','Margie','Jack'].every(n=>r.lines.some(l=>l.startsWith(n+':'))),r.lines.length+' lines');
 ok('E Joe gets a crown, everyone does THE COOKIE DANCE, then the credits roll',r.dance&&r.crown&&r.baked&&r.ending&&r.credits);
 r=await p.evaluate(()=>{const names=[...document.querySelectorAll('.crow b')].map(b=>b.textContent); $('endSkip').click(); const stats=$('ecard').textContent; $('endNext').click(); const album=$('ecard').querySelector('small').textContent, cv=!!$('ecard').querySelector('.polaroid canvas');
   for(let i=0;i<5;i++)$('ecard').querySelectorAll('.pnav button')[1].click(); const last=$('ecard').querySelector('.polaroid p').textContent; $('endNext').click(); const note=$('ecard').textContent, again=[...$('ecard').querySelectorAll('button')].some(b=>b.textContent==='Play again'), keep=$('endNext').textContent;
@@ -119,7 +119,7 @@ ok('L the Cookie Dance switches to Jingle Bells; Settings > Music turns it off a
 await fresh(ALL);
 r=await p.evaluate(()=>{const out={}; goTo('kitchen','fromDoor'); T.run(40); out.stay=scene===SCENES.kitchen; P.x=112;P.y=162; T.run(40); out.kitchen=scene===SCENES.world;
   goTo('fargo','fromHighway'); T.run(40); try{closeDialog()}catch(e){} paused=false; P.x=3;P.y=180; T.run(40); out.fargo=scene===SCENES.world;
-  have.heistBriefed=true; have.heistHowTo=true; goTo('city','fromStreet'); T.run(40); try{closeDialog()}catch(e){} paused=false; P.x=20;P.y=172; T.run(40); out.city=scene===SCENES.world; return out});
+  have.heistBriefed=true; have.heistHowTo=true; goTo('city','fromStreet'); T.run(90); try{closeDialog()}catch(e){} paused=false; T.run(2); P.x=20;P.y=172; T.run(40); out.city=scene===SCENES.world; return out});
 ok('M exits: kitchen door, Fargo highway and the rooftop ladder all just take you out',r.stay&&r.kitchen&&r.fargo&&r.city,JSON.stringify(r));
 // N. gear: find it on the map, Joe wears it, Settings can take it off
 await fresh({});

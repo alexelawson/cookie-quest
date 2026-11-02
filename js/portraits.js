@@ -117,6 +117,12 @@ PORTRAITS['Bryan']={size:32, bg:'#cfe6f2', draw(g){ const F=px(g);
 PORTRAITS['You']=PORTRAITS['Joe'];   // old name, just in case
 // Alex: same face as the shop
 PORTRAITS['Alex']={size:40, bg:'#e3d6bd', draw(g){ drawAlexFace(g,'ok') }};
+// Dr. Alex: Alex in her mad-scientist costume (the client in the city heist): frizzed hair, goggles up, lab coat
+PORTRAITS['Dr. Alex']={size:40, bg:'#1d2a24', draw(g){ drawAlexFace(g,'happy'); const F=(c,x,y,w=1,h=1)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};
+  for(const [x,y,w,h] of [[4,4,5,4],[2,10,4,5],[31,4,5,4],[34,10,4,5],[9,1,5,3],[25,1,5,3],[16,0,7,2]])F(ALEX.hair,x,y,w,h);   // gone wild
+  F('#2b2b2b',9,9,22,3); F('#7fd3ff',11,9,7,3); F('#7fd3ff',22,9,7,3); F('#d6f2ff',12,9,2,1); F('#d6f2ff',23,9,2,1);         // goggles pushed up
+  F('#f4f4f0',4,34,9,6); F('#f4f4f0',27,34,9,6); F('#dcdcd6',12,35,2,5); F('#dcdcd6',26,35,2,5);                                // lab coat lapels
+  F('#cfe6f2',32,22,5,9); F('#5fff8a',32,26,5,5); F('#9fffbf',34,19,1,2) }};
 
 function showPortrait(speaker){
   const c=$('dportrait'), p=PORTRAITS[speaker];

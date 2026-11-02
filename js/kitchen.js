@@ -26,7 +26,6 @@ const CROWD=[
   {name:'Keelan',x:30,y:86, draw:(x,y,d)=>drawKeelan({x,y,dir:d||'down',moving:false,step:0})},
   {name:'Alex',x:84,y:68,  draw:(x,y)=>drawAlex(x,y,kit.party?'happy':'ok')},   // she walks over to hug Joe at the end (kit.alex)
   {name:'Lars',x:58,y:128, draw:(x,y,d)=>drawLars({x,y,dir:d||'right',moving:false,step:0})},
-  {name:'The Stranger',x:22,y:132, draw:(x,y)=>drawStranger(x,y)},
   {name:'Jack',x:150,y:86, draw:(x,y)=>drawJack(x,y)},
   {name:'Margie',x:168,y:92, draw:(x,y)=>drawMargie(x,y)},
   {name:'John',x:166,y:130, draw:(x,y,d)=>drawJohn({x,y,dir:d||'left',moving:false,step:0})},
