@@ -205,6 +205,7 @@ const BIRKIE = {
     "Packs of slow skiers take up two lanes. Go around them.",
     "Feed stations: a volunteer swings a cup of flat Coke between two lanes. Be in the cup's lane right when you get there to grab it, then hold steady while you drink. Jump or change lanes and it spills.",
     "Your energy drains as you go (faster uphill). Low energy is slow. Flat Coke fills it back up.",
+    "On Lake Hayward the wind gusts. Watch for the blowing snow: it shoves you a lane, so steer back.",
     "Stay ahead of the sweep snowmobile (the red dot on the left). If it catches you, you're out. It reaches Main Street at 3:00:00."],
   howToOk:"Let's ski",
   // John talks to you over the radio for the whole race. Short lines fit best (they wrap onto up to 3 lines).
@@ -219,7 +220,9 @@ const BIRKIE = {
   feedMissed:"Missed the cup! The next one's further on.",
   feed:"Flat Coke! The real fuel of the Birkie. Energy's full.",
   bridge:"The International Bridge! All the flags! Main Street's right there. Bring it home!",
-  onRadio:"(on the radio)", vikingName:"A Viking",
+  onRadio:"(on the radio)", vikingName:"A Viking", footballName:"A football Viking",
+  gust:"Gusts on the lake! Watch the snow blow. It'll shove you a lane. Steer back.",
+  alexCheer:"GO JOE!!! THAT'S MY BOYFRIEND!!!",
   // the Vikings pipe up every so often. Add as many as you like.
   vikings:{
     feed:["Flat Coke?! Are you kidding me? Where's the mead?","Flat Coke. FLAT. Coke. We sailed here for this?","I asked for a turkey leg. They gave me a cup."],
@@ -228,13 +231,21 @@ const BIRKIE = {
     lake:["This lake is colder than the fjords back home.","Should've brought the longship."],
     finish:["FLAGS! I LOVE FLAGS!","SKOL!!! SKOL!!!","Is that the finish? I'm going to cry into my beard."],
   },
+  // ...and the football Vikings (purple and gold, pads, cleats... on skis)
+  footballVikings:{
+    feed:["Flat Coke? Coach would never.","Where's the Gatorade bucket? I had plans for that bucket."],
+    tired:["I've run 40-yard dashes. This is a 50K dash.","Coach said this counts as cardio.","These pads were not made for skiing.","Is this a two-minute drill? It's been two hours."],
+    climb:["This hill is a fourth-and-long.","Uphill? In cleats? Respect the Vikings."],
+    lake:["Frozen lake. Feels like a home game.","Wind's worse than a December road game."],
+    finish:["TOUCHDOWN! ...wait, wrong sport.","SKOL!!! Somebody get me a Gatorade bath."],
+  },
   sweepClose:"The sweep snowmobile is right behind you. Pick it up!",
   climb:"Climb coming. It'll eat your energy. Stay smooth.",
   halfway:"Halfway! OO is behind you. Keep it steady.",
   lake:"Lake Hayward. It's windy out there. The bridge is on the other side. Keep pushing.",
   finishWin:t=>[`Main Street, Hayward! You finished in ${t}.`,"The crowd is going nuts. The flour made it."],
   finishLate:t=>[`The sweep snowmobile caught you at ${t}.`,"The Vikings are sitting in the snow eating the flour. Want to try again?"],
-  elite:"Under 2:30?! That's elite wave. The crowd is losing it.",
+  elite:"Under 2:24?! That's elite wave. The crowd is losing it.",
   vikingsWin:"The Vikings are yelling SKOL at everyone on Main Street. Come see me for the flour.",
   againAsk:"Back to the start?",
   again:"Try again",

@@ -118,11 +118,17 @@ PORTRAITS['You']=PORTRAITS['Joe'];   // old name, just in case
 // Alex: same face as the shop
 PORTRAITS['Alex']={size:40, bg:'#e3d6bd', draw(g){ drawAlexFace(g,'ok') }};
 // a Viking (they ski the Birkie and come to the party): horned purple helmet, big blond beard, purple and gold
-PORTRAITS['Viking']={size:32, bg:'#e8dcf4', draw(g){ const F=px(g);
-  F('#4f2683',4,24,24,8); F('#ffc62f',4,24,6,3); F('#ffc62f',22,24,6,3); F('#ffffff',14,26,4,6);
-  F('#f0c6a0',10,9,12,12); F('#e6c46a',9,17,14,8); F('#e6c46a',11,25,10,3); F('#d9b04a',13,21,6,1); F('#c9a24a',15,27,2,3);   // beard
-  F('#2b2b2b',12,13,2,2); F('#2b2b2b',18,13,2,2); F('#b5654f',14,19,4,1);
-  F('#4f2683',8,3,16,7); F('#3d1d66',8,9,16,1); F('#ffc62f',15,3,2,7); F('#f6f2e4',4,2,4,3); F('#f6f2e4',3,0,2,3); F('#f6f2e4',24,2,4,3); F('#f6f2e4',27,0,2,3);   // horned helmet
+PORTRAITS['Viking']={size:32, bg:'#e3d8c8', draw(g){ const F=px(g);   // the old Norse kind: iron horned helmet, red braided beard, fur
+  F('#7a5a3a',2,24,28,8); F('#9a7a54',4,24,24,2); F('#8a8f9a',10,27,12,5); F('#c8322b',0,26,5,6); F('#efe2c4',1,27,3,4);
+  F('#f0c6a0',10,8,12,12); F('#2b2b2b',12,12,2,2); F('#2b2b2b',18,12,2,2);
+  F('#c8642a',8,15,16,9); F('#c8642a',10,24,4,5); F('#c8642a',18,24,4,5); F('#a8501f',11,28,2,2); F('#a8501f',19,28,2,2); F('#e08a4a',11,16,4,2); F('#b5654f',14,18,4,1);
+  F('#9aa3b0',8,3,16,7); F('#c9ced4',10,3,6,1); F('#6f7686',15,9,2,5); F('#f6f2e4',3,4,5,3); F('#f6f2e4',2,0,2,5); F('#f6f2e4',24,4,5,3); F('#f6f2e4',28,0,2,5);
+}};
+PORTRAITS['Football Viking']={size:32, bg:'#efe6c8', draw(g){ const F=px(g);   // the football kind: purple helmet with a gold stripe, facemask, pads
+  F('#4f2683',0,23,32,9); F('#ffc62f',0,24,7,3); F('#ffc62f',25,24,7,3); F('#ffffff',13,26,6,6);
+  F('#8a5a3a',11,10,10,12); F('#2b2b2b',13,14,2,2); F('#2b2b2b',18,14,2,2); F('#1d1d22',12,17,3,1); F('#1d1d22',18,17,3,1); F('#ffffff',14,20,4,1);
+  F('#4f2683',7,3,18,9); F('#6a3ea8',9,3,8,2); F('#ffc62f',15,2,2,10); F('#3d1d66',7,11,4,10); F('#3d1d66',21,11,4,10);
+  F('#c9ced4',9,15,14,1); F('#c9ced4',9,19,14,1); F('#c9ced4',15,13,2,9);
 }};
 // Dr. Alex: Alex in her mad-scientist costume (the client in the city heist): frizzed hair, goggles up, lab coat
 PORTRAITS['Dr. Alex']={size:40, bg:'#1d2a24', draw(g){ drawAlexFace(g,'happy'); const F=(c,x,y,w=1,h=1)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};

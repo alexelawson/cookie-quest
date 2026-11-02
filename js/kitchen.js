@@ -32,18 +32,31 @@ const CROWD=[
   {name:'Lil Q',x:184,y:146, draw:(x,y)=>drawBob(x,y)},
   {name:'Trail John',x:140,y:150, draw:(x,y,d)=>drawTrailJohn(x,y,d||'down')},
   {name:'Bryan',x:72,y:150, draw:(x,y)=>drawBryan(x,y,'down')},
-  {name:'Viking',x:204,y:136, draw:(x,y)=>drawVikingStanding(x,y)},
-  {name:'Viking',x:212,y:152, draw:(x,y)=>drawVikingStanding(x,y)},
+  {name:'Viking',x:204,y:136, draw:(x,y)=>drawVikingStanding(x,y,'norse')},
+  {name:'Football Viking',x:212,y:152, draw:(x,y)=>drawVikingStanding(x,y,'football','21')},
   {name:'Logan',x:40,y:110, draw:(x,y)=>drawLogan(x,y,true)},
   {name:'Jackie',x:120,y:72, draw:(x,y,d)=>drawJackie(x,y,d||'down'), needs:'metJackie'},
 ];
-function drawVikingStanding(x,y){
+// two kinds of Vikings: the old Norse kind (iron helmet, fur, beard, shield) and the football kind (purple and gold, pads, facemask)
+function drawVikingStanding(x,y,kind='norse',num='7'){
   const F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(Math.round(x)-6+dx,Math.round(y)-20+dy,w,h)};
-  F('rgba(0,0,0,.2)',1,19,10,2); F('#ffc62f',3,14,2,5); F('#ffc62f',7,14,2,5); F('#3b2a1e',2,18,4,2); F('#3b2a1e',6,18,4,2);
-  F('#4f2683',1,7,10,8); F('#ffc62f',1,7,10,1); F('#ffc62f',5,8,2,6); F('#f0c6a0',0,8,1,5); F('#f0c6a0',11,8,1,5);
-  F('#f0c6a0',3,3,6,4); F('#e6c46a',3,6,6,3); F('#e6c46a',4,9,4,1);              // big blond beard
-  F('#2b2b2b',4,4,1,1); F('#2b2b2b',7,4,1,1);
-  F('#8a8f9a',2,0,8,3); F('#c9ced4',3,0,3,1); F('#f6f2e4',0,-2,2,3); F('#f6f2e4',10,-2,2,3);   // horned helmet
+  F('rgba(0,0,0,.25)',0,19,13,2);
+  if(kind==='football'){
+    F('#ffc62f',3,13,3,5); F('#ffc62f',7,13,3,5); F('#4f2683',3,13,1,5); F('#9a86c8',9,13,1,5); F('#4f2683',3,17,3,1); F('#4f2683',7,17,3,1); F('#ffffff',2,18,4,2); F('#ffffff',7,18,4,2);   // gold pants, purple socks, cleats
+    F('#4f2683',0,6,13,8); F('#3d1d66',0,6,13,1); F('#ffc62f',0,7,3,2); F('#ffc62f',10,7,3,2); F('#ffffff',0,12,2,1); F('#ffffff',11,12,2,1);   // jersey, huge shoulder pads
+    pixText(ctx,num,Math.round(x)-6+5,Math.round(y)-20+8,'#ffffff'); F('#6b4a2f',-1,10,1,4); F('#6b4a2f',13,10,1,4);
+    F('#8a5a3a',4,4,5,3);                                                                     // neck
+    F('#4f2683',2,-2,9,7); F('#6a3ea8',3,-2,4,1); F('#ffc62f',6,-2,1,7); F('#3d1d66',2,4,9,1);   // helmet with a gold stripe
+    F('#8a5a3a',4,1,5,3); F('#2b2b2b',5,2,1,1); F('#2b2b2b',7,2,1,1); F('#1d1d22',4,3,1,1); F('#1d1d22',8,3,1,1);   // face, eye black
+    F('#c9ced4',3,2,7,1); F('#c9ced4',3,4,7,1); F('#c9ced4',6,1,1,4);                        // facemask bars
+    return }
+  F('#6b4a2f',3,14,3,4); F('#6b4a2f',7,14,3,4); F('#8a6a4a',2,17,4,3); F('#8a6a4a',7,17,4,3); F('#a8875f',2,17,4,1); F('#a8875f',7,17,4,1);   // leather trousers, fur boots
+  F('#8a8f9a',1,7,11,8); for(let k=0;k<11;k+=2)for(let j=7;j<15;j+=2)F('#6f7480',1+k+((j/2|0)%2),j,1,1); F('#4a3020',1,13,11,1); F('#c9a24a',6,13,1,1);   // chainmail, belt
+  F('#7a5a3a',0,6,13,3); F('#9a7a54',1,6,11,1); F('#5a4028',0,8,13,1);                     // fur cloak over the shoulders
+  F('#c8322b',-2,8,4,7); F('#efe2c4',-1,9,2,5); F('#c9a24a',-1,11,2,1);                    // round shield on his arm
+  F('#f0c6a0',3,1,7,5); F('#2b2b2b',4,3,1,1); F('#2b2b2b',8,3,1,1);
+  F('#c8642a',2,4,9,4); F('#c8642a',3,8,7,2); F('#a8501f',5,10,3,1); F('#e08a4a',4,5,2,1);   // huge red beard, braided
+  F('#9aa3b0',2,-2,9,4); F('#c9ced4',3,-2,4,1); F('#6f7686',6,1,1,3); F('#f6f2e4',0,-4,2,4); F('#f6f2e4',11,-4,2,4); F('#e8e2d6',-1,-5,1,2); F('#e8e2d6',13,-5,1,2);   // iron helmet, nose guard, horns
 }
 const crowdFace=n=>n==='Trail John'?{speaker:'John',face:'Trail John'}:{speaker:n};
 function crowdNear(){ if(!(allIn()||have.baked))return null; let best=null,bd=16; for(const c of CROWD){if(c.needs&&!have[c.needs])continue; const d=Math.hypot(P.x-c.x,P.y-c.y); if(d<bd){bd=d;best=c}} return best }
