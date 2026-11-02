@@ -9,7 +9,8 @@ const CW=520, CH=200;
 const ROOF_A=R(6,30,112,156), ROOF_B=R(150,20,170,166), ROOF_C=R(352,26,160,160);
 const BEAM_SLOT=R(116,96,36,12);          // where the log bridges A -> B
 const PLANK_BC=R(318,140,36,12);          // fixed plank B -> C
-const PLANK_GATE=R(336,138,3,16);               // a locked gate across that plank: John lifts it off its hinges
+const PLANK_GATE=R(336,138,3,16);               // a locked gate across that plank: it takes the key
+const KEY_SPOT={x:230,y:176};             // the gate key, on a hook under a parked spotlight: only reachable while the lights are out
 const gateOpen=()=>!!have.plankGate||heistStage()>=2;
 const LIGHTS_OUT_MS=20000;                 // Lars's switch only kills the searchlights for this long; they stay off once the whole crew is on roof C
 const DEFUSE_MS=4000;                      // hold A this long at the laser panel (it keeps half if you let go past halfway)
@@ -36,7 +37,8 @@ const lasersOff=()=>!!have.lasersOff;
 // searchlights on roof B: some sweep up and down, some swing in loops. Lamps sit on the roof's top edge.
 const LIGHTS=[{x:200,kind:'sweep',speed:.15,phase:0},{x:228,kind:'orbit',cx:228,cy:104,r:46,speed:.09,phase:0},
               {x:258,kind:'sweep',speed:.21,phase:2.2},{x:286,kind:'orbit',cx:286,cy:100,r:52,speed:-.11,phase:1.3},
-              {x:246,kind:'across',y:100,x1:196,x2:296,speed:.07,phase:1}];   // and one that sweeps side to side across the middle
+              {x:246,kind:'across',y:100,x1:196,x2:296,speed:.07,phase:1},    // and one that sweeps side to side across the middle
+              {x:KEY_SPOT.x,kind:'fixed',y:KEY_SPOT.y-5,speed:0,phase:0}];     // and one parked on the key that never moves
 const LIGHT_R=16;
 // cover on roof B: crouch in the shadow right next to these and the lights can't see you
 const COVERS=[R(204,118,16,10),R(238,66,10,12),R(262,130,14,14),R(170,32,10,10)];
@@ -328,6 +330,7 @@ function flashPrompt(text){prompt.textContent=text; prompt.hidden=false; heist.p
 function lightPosAt(L,t){ const a=t*L.speed/60+L.phase;
   if(L.kind==='orbit')return {x:L.cx+Math.cos(a)*L.r*.38, y:L.cy+Math.sin(a)*L.r};
   if(L.kind==='across')return {x:L.x1+((Math.sin(a)+1)/2)*(L.x2-L.x1), y:L.y};
+  if(L.kind==='fixed')return {x:L.x, y:L.y};
   return {x:L.x, y:ROOF_B.y+LIGHT_R+((Math.sin(a)+1)/2)*(ROOF_B.h-LIGHT_R*2)} }
 const lightPos=L=>lightPosAt(L,time);
 const inCover=(x,y)=>COVERS.some(o=>hit(R(x-3,y-3,6,4),coverZone(o)));
@@ -449,10 +452,20 @@ function lightsTick(dt){
   if(gateOpen()&&heist.crew.every(c=>c.x>ROOF_C.x+2)){ heist.lightsOutT=0; have.heistStage=2; save(); sfx('fanfare'); return say([['Lars',HEIST.allAcross]],()=>roundWon(2)) }   // everyone made it: the lights stay off
   if(heist.lightsOutT>0){ heist.lightsOutT-=dt; if(heist.lightsOutT<=0){ heist.lightsOutT=0; sfx('bad'); say([['Lars',HEIST.lightsBack]]) } }
 }
-function liftGate(){
-  if(lead().id!=='john')return flashPrompt(HEIST.onlyJohn);
-  have.plankGate=true; save(); sfx('thud'); say([['John',HEIST.gateDone]]);
+// the gate on the plank is locked; the key hangs under the parked spotlight (no one mentions it: you find out at the gate)
+function grabKey(){ heist.keyHolder=lead().id; sfx('pickup'); flashPrompt(HEIST.gotKey) }
+function checkGate(){
+  const me=lead().id, name=HEIST.crew[me];
+  if(heist.keyHolder===me){ have.plankGate=true; heist.keyHolder=null; save(); sfx('chunk'); return say([[name,HEIST.gateUnlocked]]) }
+  if(heist.keyHolder)return say([[name,HEIST.gateHasKey.replace('{who}',HEIST.crew[heist.keyHolder])]]);
+  say([[name,HEIST.gateLocked]]);
 }
+function drawKey(){
+  if(gateOpen()||heist.keyHolder)return; const F=(c,x,y,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,h)}, x=KEY_SPOT.x-3, y=KEY_SPOT.y-4;
+  if(lightsOn()){ if(Math.floor(time/700)%5===0)F('#fff3a8',x+2,y+1,1,1); return }   // hidden in the glare: just a glint now and then
+  F('#5a3a22',x+2,y-3,1,3); F('#e0b030',x,y,3,3); F('#1d2130',x+1,y+1,1,1); F('#e0b030',x+3,y+1,4,1); F('#e0b030',x+5,y+2,1,1); F('#e0b030',x+6,y+2,1,1);   // hook + key
+  if(Math.floor(time/250)%3===0){F('#fff3a8',x+8,y-2,1,3); F('#fff3a8',x+7,y-1,3,1)} }
+function drawHeldKey(c){ if(heist.keyHolder!==c.id)return; const x=Math.round(c.x)+5, y=Math.round(c.y)-9; ctx.fillStyle='#e0b030'; ctx.fillRect(x,y,2,2); ctx.fillRect(x+2,y+1,2,1) }
 function drawGate(){ const F=(c,x,y,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,h)};
   if(gateOpen()){F('#5f6676',PLANK_BC.x+2,PLANK_BC.y+PLANK_BC.h,12,3); F('#8b93a3',PLANK_BC.x+2,PLANK_BC.y+PLANK_BC.h,12,1); return}   // lifted off, lying by the plank
   const g=PLANK_GATE; F('rgba(0,0,0,.35)',g.x+1,g.y+g.h,g.w+1,2); F('#8b93a3',g.x,g.y-6,g.w,g.h+6); F('#5f6676',g.x+1,g.y-6,1,g.h+6);
@@ -534,7 +547,8 @@ function heistTrigger(){
   if(st<1&&hit(feet,LOG_DROP))return {label:HEIST.gapLabel, act:gapChoice};
   if(st<1&&!heist.carry&&hit(feet,R(LOOSE_BEAM.x-10,LOOSE_BEAM.y-6,LOOSE_BEAM.w+20,LOOSE_BEAM.h+12)))return {label:'Look at the log', act:beamChoice};
   if(st===1&&hit(feet,R(FUSE.x-14,FUSE.y-14,28,28)))return {label:heist.lightsOutT>0?HEIST.lightsAlreadyOut:HEIST.fuse, act:cutFuse};
-  if(!gateOpen()&&hit(feet,R(PLANK_GATE.x-12,PLANK_GATE.y-2,PLANK_GATE.w+24,PLANK_GATE.h+4)))return {label:HEIST.gateLift, act:liftGate};
+  if(!gateOpen()&&hit(feet,R(PLANK_GATE.x-12,PLANK_GATE.y-2,PLANK_GATE.w+24,PLANK_GATE.h+4)))return {label:heist.keyHolder===lead().id?HEIST.gateUnlock:HEIST.gateCheck, act:checkGate};
+  if(st===1&&!gateOpen()&&!heist.keyHolder&&!lightsOn()&&Math.hypot(P.x-KEY_SPOT.x,P.y-KEY_SPOT.y)<12)return {label:HEIST.grabKey, act:grabKey};
   if(st>=2&&st<4&&!lasersOff()&&hit(feet,R(LASER_PANEL.x-4,LASER_PANEL.y,LASER_PANEL.w+6,16)))return {label:heist.defuse?HEIST.defuseKeep:HEIST.defuseLabel, btn:'Hold', act:startDefuse};
   if(st===2&&hit(feet,R(SKYLIGHT.x-4,SKYLIGHT.y+SKYLIGHT.h,SKYLIGHT.w+8,12)))return {label:HEIST.grate+' ('+stacked()+'/3 stacked)', act:ripGrate};
   if(st===3&&hit(feet,R(SKYLIGHT.x-4,SKYLIGHT.y+SKYLIGHT.h,SKYLIGHT.w+8,12)))return {label:HEIST.dropIn, act:openVault};
@@ -569,7 +583,7 @@ SCENES.city={ music:'heist',
     ...(heistStage()<1&&!heist.carry?[LOOSE_BEAM]:[]),...(gateOpen()?[]:[PLANK_GATE])] },
   entries:{start:{x:40,y:156,dir:'up'}, fromStreet:{x:40,y:156,dir:'up'}},
   enter(){
-    heist.lead=0; heist.follow=true; heist.hinted={}; heist.sonarT=0; heist.sprintT=0; heist.marked=false;
+    heist.lead=0; heist.follow=true; heist.hinted={}; heist.keyHolder=null; heist.sonarT=0; heist.sprintT=0; heist.marked=false;
     placeAtCheckpoint(); $('crewbar').hidden=false; buildCrewBar(); banner.q=[]; banner.t=0; $('roundBanner').hidden=true;
     if(heistStage()<3)roundStart(heistStage()+1);   // (Dr. Alex waits at her lab bench: walk up to her for the briefing)
   },
@@ -605,13 +619,13 @@ SCENES.city={ music:'heist',
     else if(st===1&&P.x>160)hintOnce('lights','Lars',HEIST.larsLights);
     else if(st>=2&&st<3&&P.x>356)hintOnce('lasers',HEIST.crew.hero,HEIST.heroLasers);
   },
-  drawPlayer:(x,y)=>{syncLeadFromP(); crewSprite(lead()); drawCarriedLog(lead())},
+  drawPlayer:(x,y)=>{syncLeadFromP(); crewSprite(lead()); drawCarriedLog(lead()); drawHeldKey(lead())},
   under(){
     for(const c of cars){const x=c.x+(c.lane?18:6); ctx.fillStyle=c.v>0?'#ffe9a0':'#ff4a3a'; ctx.fillRect(x,c.y|0,1,1); ctx.fillRect(x+3,c.y|0,1,1)}
-    drawBeam(); drawGate(); drawGrate(); drawPowerSwitch(); drawLaserPanel();
+    drawBeam(); drawGate(); drawKey(); drawGrate(); drawPowerSwitch(); drawLaserPanel();
   },
   ents(list){
-    heist.crew.forEach((c,i)=>{if(i!==heist.lead)list.push({y:c.y,draw:()=>{crewSprite(c); drawCarriedLog(c)}})});
+    heist.crew.forEach((c,i)=>{if(i!==heist.lead)list.push({y:c.y,draw:()=>{crewSprite(c); drawCarriedLog(c); drawHeldKey(c)}})});
     list.push({y:STRANGER.y,draw:drawStranger});
     if(heistStage()<4)list.push({y:heist.guardY,draw:drawGuard});
   },

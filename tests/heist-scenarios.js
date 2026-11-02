@@ -72,12 +72,17 @@ ok('C crew holds while Lars dashes shadow to shadow and flips the switch: 20 sec
 // C2. the lights come back on if you're too slow; Lars can flip it again
 r=await p.evaluate(()=>{const hud=$('hud').textContent; const off=!lightsOn(); heist.lightsOutT=40; T.run(5); const back=dlg.hidden?'':$('dtext').textContent; T.clickThrough(); const on=lightsOn(); update(16.7); action(); T.clickThrough(); return {hud,off,back,on,again:heist.lightsOutT>0}});
 ok('C the HUD counts down; when it runs out the lights come back on; Lars can flip it again',/Lights back in 0:\d\d/.test(r.hud)&&r.off&&r.back.includes('back up')&&r.on&&r.again,r.hud+' | '+r.back);
-// D. the gate on the plank: only John can lift it; then the whole crew crosses before the lights come back
-r=await p.evaluate(()=>{switchTo(0); const k={x:P.x,y:P.y}; P.x=326; P.y=146; update(16.7); const lbl=prompt.textContent; action(); const msg=prompt.textContent; P.x=k.x; P.y=k.y; heist.lightsOutT=LIGHTS_OUT_MS;
-  T.hints=[]; const res=heistBots.across(); window.ACROSS=res.said; const said=T.clickThrough(); T.run(40); window.ACROSS=[...res.said,...T.clickThrough()];
-  return {lbl,msg,res,lit:lightsOn(),st:have.heistStage,gate:!!have.plankGate,crew:heist.crew.map(c=>c.id+':'+(c.x|0)+','+(c.y|0)).join(' '),banner:$('roundTitle').textContent}});
-ok('D a locked gate blocks the plank; only John can lift it',r.lbl==='Lift the gate off its hinges'&&r.msg.includes('Only John'),r.lbl+' / '+r.msg);
-ok('D John lifts the gate and the crew all get onto roof C in time; the lights stay off',r.res.ok&&r.gate&&r.st===2&&!r.lit,JSON.stringify(r.res)+' '+r.crew);
+// D. the gate on the plank is locked; the key's under the parked spotlight (only reachable in the dark); nobody mentions it until you try the gate
+r=await p.evaluate(()=>{const saidOut=heist.lightsOutT; heist.lightsOutT=0; const keyLit=lightsOn(); switchTo(0); const k={x:P.x,y:P.y};
+  P.x=KEY_SPOT.x; P.y=KEY_SPOT.y; const hz=checkHazards(); const trigLit=(heistTrigger()||{}).label||'';
+  P.x=326; P.y=146; update(16.7); const lbl=prompt.textContent; action(); const locked=T.clickThrough().join(' / ');
+  P.x=k.x; P.y=k.y; heist.lightsOutT=LIGHTS_OUT_MS; P.x=KEY_SPOT.x; P.y=KEY_SPOT.y; const trigDark=(heistTrigger()||{}).label||''; P.x=k.x; P.y=k.y; syncLeadFromP();
+  T.hints=[]; const res=heistBots.across(); window.ACROSS=res.said; T.clickThrough(); T.run(40); window.ACROSS=[...res.said,...T.clickThrough()];
+  return {keyLit,spotted:!!hz,trigLit,lbl,locked,trigDark,res,lit:lightsOn(),st:have.heistStage,gate:!!have.plankGate,crew:heist.crew.map(c=>c.id+':'+(c.x|0)+','+(c.y|0)).join(' '),banner:$('roundTitle').textContent}});
+ok('D with the lights on, the key sits in a parked spotlight (step in and you\'re spotted; can\'t grab it)',r.keyLit&&r.spotted&&r.trigLit!=='Grab the key',r.trigLit);
+ok('D at the gate: "it\'s locked, there\'s got to be a key"',r.lbl==='Check the gate'&&r.locked.includes('key around here'),r.locked);
+ok('D in the dark you can grab the key',r.trigDark==='Grab the key',r.trigDark);
+ok('D Lars grabs the key, unlocks the gate, and the crew all get onto roof C in time; the lights stay off',r.res.ok&&r.gate&&r.st===2&&!r.lit&&r.res.said.join().includes("It's open"),JSON.stringify(r.res)+' '+r.crew);
 ok('D ROUND WON, then ROUND 3',['ROUND WON','ROUND 3'].includes(r.banner),r.banner);
 r=await p.evaluate(()=>{switchTo(0); T.hints=[]; const w=T.walkTo(361,178); T.run(2); return {w,hint:T.hints,said:(window.ACROSS||[]).join(' / ')}});
 ok('D you mention the tripwires and the sonar',(r.hint.join()+r.said).includes('sonar'),r.hint[0]);
