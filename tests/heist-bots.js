@@ -11,8 +11,8 @@
         if(lit(x,y,t0+t)||lit(x,y,t0+t+60))return false } return false};
     let i=0, waited=0, tries=0;
     for(let f=0;f<maxMs/16.7;f++){
+      if(heistStage()>=2||heist.lightsOutT>0)return {ok:true,ms:Math.round(f*16.7),waited};
       if(!dlg.hidden){ if($('dspeaker').textContent!=='Spotted!'){closeDialog(); continue} return {ok:false,why:$('dtext').textContent+' '+heist.caughtWho+' '+heist.crew.map(c=>c.id+':'+(c.x|0)+','+(c.y|0)).join(' ')+' g'+(heist.guardY|0),at:i} }
-      if(heistStage()>=2)return {ok:true,ms:Math.round(f*16.7),waited};
       const here=spots[i], next=spots[Math.min(i+1,spots.length-1)];
       if(Math.hypot(P.x-next[0],P.y-next[1])<2.5){ i++; for(const k in dirs)dirs[k]=false; if(i===spots.length-1){update(16.7); action(); continue} continue }
       const moving=dirs.left||dirs.right||dirs.up||dirs.down;
@@ -23,8 +23,23 @@
     return {ok:false,why:'timeout',at:i};
   },
   // someone who ignores the lights and just walks to the switch
-  naive(){ for(let f=0;f<1500;f++){ if(!dlg.hidden){ if($('dspeaker').textContent!=='Spotted!'){closeDialog(); continue} return {ok:false} } if(Math.hypot(P.x-304,P.y-100)<2){action(); return {ok:heistStage()>=2}}
+  naive(){ for(let f=0;f<1500;f++){ if(!dlg.hidden){ if($('dspeaker').textContent!=='Spotted!'){closeDialog(); continue} return {ok:false} } if(Math.hypot(P.x-304,P.y-100)<2){action(); return {ok:heistStage()>=2||heist.lightsOutT>0}}
     for(const k in dirs)dirs[k]=false; if(304-P.x>1)dirs.right=true; if(304-P.x<-1)dirs.left=true; if(100-P.y>1)dirs.down=true; if(100-P.y<-1)dirs.up=true; update(16.7)} return {ok:false} },
+  // with the lights out: John leads everyone (crew on Follow) to the gate on the plank, lifts it, and they all cross onto roof C
+  across(maxMs=20000){
+    if(!heist.follow)toggleFollow(); switchTo(2);
+    const route=[[240,100],[300,100],[300,146],[326,146],'gate',[358,146],[360,172]]; let i=0, left=0; const said=[];
+    for(let f=0;f<maxMs/16.7;f++){
+      if(!dlg.hidden){ if($('dspeaker').textContent==='Spotted!')return {ok:false,why:$('dtext').textContent,at:i,said}; said.push($('dspeaker').textContent+': '+$('dtext').textContent); [...$('dbtns').querySelectorAll('button')][0].click(); continue }
+      if(heistStage()>=2)return {ok:true,ms:Math.round(f*16.7),left,said};
+      left=Math.ceil(heist.lightsOutT/1000);
+      if(i>=route.length){for(const k in dirs)dirs[k]=false; update(16.7); continue}
+      if(route[i]==='gate'){for(const k in dirs)dirs[k]=false; update(16.7); action(); i++; continue}
+      const [tx,ty]=route[i]; for(const k in dirs)dirs[k]=false; const dx=tx-P.x, dy=ty-P.y; if(Math.hypot(dx,dy)<1.5){i++; continue}
+      if(dx>1)dirs.right=true; if(dx<-1)dirs.left=true; if(dy>1)dirs.down=true; if(dy<-1)dirs.up=true; update(16.7);
+    }
+    return {ok:false,why:'timeout',at:i};
+  },
   // through the laser maze to the grate: wait for the guard, pick the gaps, time the blink and the slider
   lasers(maxMs=90000){
     const box=(x,y)=>R(x-3,y-3,6,4), hits=(x,y,t)=>laserSegs(t).some(([a,b,c,d])=>segHitsBox(a,b,c,d,box(x,y)));

@@ -27,15 +27,16 @@ let r=await p.evaluate(()=>{T.enter(); const auto=!dlg.hidden&&$('dspeaker').tex
   const joe=look(), lars=(switchTo(1),look()), john=(switchTo(2),look());
   const carrying=!!heist.carry; switchTo(0); const switched=heist.lead===0;
   const w=T.path([[58,100],[46,78]]); const J=heist.crew.find(c=>c.id==='john'), johnNear=Math.hypot(J.x-P.x,J.y-P.y)<40;
-  update(16.7); const lbl=prompt.textContent; action(); const face=!$('dportrait').hidden; const lines=T.clickThrough(); const how=!$('howto').hidden, rows=$('howRows').children.length, ctl=$('howControls').textContent; $('howOk').click(); update(16.7); T.walkTo(58,100);
-  return {auto,blockedW,stuckY,hint,joe,lars,john,carrying,switched,w,johnNear,lbl,face,lines,how,rows,ctl,bar:!$('crewbar').hidden,hud:$('hud').textContent,lab:$('alabel').textContent}});
+  update(16.7); const lbl=prompt.textContent; action(); const face=!$('dportrait').hidden; const lines=T.clickThrough(); const how=!$('howto').hidden, rows=$('howRows').children.length, ctl=$('howControls').textContent, sel=$('howTitle').textContent+'|'+$('howOk').textContent+'|'+[...$('howRows').children].map(r=>r.querySelector('i').textContent).join(','), onOne=$('howRows').querySelectorAll('.on').length; $('howRows').children[0].click(); $('howOk').click(); update(16.7); T.walkTo(58,100);
+  return {auto,blockedW,stuckY,hint,joe,lars,john,carrying,switched,w,johnNear,lbl,face,lines,how,rows,ctl,sel,onOne,lead:heist.lead,banner:$('roundTitle').textContent,bar:!$('crewbar').hidden,hud:$('hud').textContent,lab:$('alabel').textContent}});
 ok('A no briefing pops up on its own',!r.auto);
 ok('A the log blocks the way to Dr. Alex; John says so',r.blockedW!=='ok'&&r.stuckY>125&&r.hint.includes('blocking'),r.blockedW+' | '+r.hint);
 ok('A the log: Lift it / Leave it',r.joe.l==='Look at the log'&&r.joe.menu.join()==='Lift it,Leave it',r.joe.menu.join(' | '));
 ok('A Joe and Lars can\'t lift it; John can',r.joe.said.includes('Switch to me')&&r.lars.said.includes('forklift')&&r.john.said.includes('right behind you')&&r.carrying,r.john.said);
 ok('A John keeps carrying the log; you can switch back and walk to Dr. Alex with him following',r.switched&&r.w==='ok'&&r.johnNear,r.w);
 ok('A walk up to Dr. Alex (Alex as a mad scientist) and she briefs the crew',r.lbl==='Talk to Dr. Alex'&&r.face&&r.lines[0].startsWith('Dr. Alex')&&r.lines.join().includes('formula')&&r.lines.some(l=>l.startsWith('John'))&&r.lines.some(l=>l.startsWith('Lars')),r.lines.length+' lines');
-ok('A how-to card lists all 3 powers + controls',r.how&&r.rows===3&&r.ctl.includes('Space')&&r.ctl.includes('press F'),r.rows+' rows');
+ok('A agent select: 3 agents with roles + powers + controls, LOCK IN',r.how&&r.rows===3&&r.ctl.includes('Space')&&r.ctl.includes('press F')&&r.sel==='Agent select|LOCK IN|Initiator,Duelist,Sentinel'&&r.onOne===1&&r.lead===0,r.sel);
+ok('A Dr. Alex hands Joe the defuser',r.lines.join().includes('defuser'));
 ok('A crew bar + objective + skill label',r.bar&&r.hud.includes('Bridge')&&r.lab==='Sonar',r.hud+' / '+r.lab);
 // B. the gap: Lars tries the long jump (and finds ice cream), then John lays the log across
 r=await p.evaluate(()=>{T.hints=[]; const w=T.walkTo(98,102); update(16.7); const lbl=prompt.textContent; action(); const menu=T.btns();
@@ -47,8 +48,10 @@ ok('B John points out the gap',r.hint.includes('gap'),r.hint);
 ok('B at the gap: Lars / the log / not yet',r.w==='ok'&&r.lbl==='Cross the gap'&&r.menu.join()==='Lars: long-jump it,John: lay the log across,Not yet',r.lbl+' | '+r.menu.join(' | '));
 ok('B Lars really runs and jumps, boings back, John is annoyed',r.cut.includes('Headwind')&&/JUMP 12\d air 1\d land 112 annoyed true/.test(r.cut)&&!r.st1,r.cut);
 ok('B ...and Lars lands next to a pint of Maple Rosemary ice cream',r.ice==='Maple Rosemary ice cream'&&r.cut.includes('Maple Rosemary'),r.ice);
-r=await p.evaluate(()=>{T.clickThrough(); paused=false; T.walkTo(98,102); update(16.7); action(); [...$('dbtns').querySelectorAll('button')].find(b=>b.textContent==='John: lay the log across').click(); const done=T.clickThrough()[0]; return {done,st:have.heistStage,carrying:!!heist.carry}});
+r=await p.evaluate(()=>{T.clickThrough(); paused=false; T.walkTo(98,102); update(16.7); action(); [...$('dbtns').querySelectorAll('button')].find(b=>b.textContent==='John: lay the log across').click(); const done=T.clickThrough()[0]; return {done,st:have.heistStage,carrying:!!heist.carry}}); await p.evaluate(()=>T.clickThrough());
 ok('B John lays the log across the gap',r.st===1&&!r.carrying&&r.done.includes('Log bridge'),r.done);
+r=await p.evaluate(()=>{const seen=new Set(); for(let i=0;i<300;i++){if(!$('roundBanner').hidden)seen.add($('roundTitle').textContent); update(16.7)} return [...seen]});
+ok('B ROUND WON, then ROUND 2',r.includes('ROUND WON')&&r.includes('ROUND 2'),r.join(', '));
 r=await p.evaluate(()=>{T.hints=[]; const w=T.path([[110,102],[170,102]]); return {w,hint:T.hints,x:P.x}});
 ok('B the crew crosses the log to roof B',r.w==='ok',r.w); ok('B Lars calls the searchlights (and the shadows)',r.hint.join().includes('Searchlights')&&r.hint.join().includes('shadows'),r.hint[0]);
 // C. searchlights
@@ -65,10 +68,19 @@ r=await p.evaluate(()=>{let n=0; for(let k=0;k<10;k++){have.heistStage=1; placeA
 ok('C walking straight to the switch (no cover, no timing) basically never works',r<=1,r+'/10 made it');
 r=await p.evaluate(()=>{have.heistStage=1; placeAtCheckpoint(); switchTo(0); if(heist.follow)toggleFollow(); switchTo(1); const res=heistBots.lights(); const said=T.clickThrough();
   return {res,said,st:have.heistStage,others:heist.crew.filter(c=>c.id!=='lars').map(c=>(c.x|0)+','+(c.y|0))}});
-ok('C crew holds while Lars dashes shadow to shadow and flips the switch',r.res.ok&&r.st===2,JSON.stringify(r.res)+' '+(r.said[0]||''));
-// D. regroup, cross to roof C
-r=await p.evaluate(()=>{switchTo(0); T.walkTo(166,104); toggleFollow(); T.hints=[]; const w=T.path([[196,156],[300,156],[316,146],[356,146],[361,178]]); return {w,hint:T.hints,hud:$('hud').textContent}});
-ok('D everyone crosses roof B with the lights off and gets to roof C',r.w==='ok',r.w); ok('D you mention the tripwires and the sonar',r.hint.join().includes('sonar'),r.hint[0]);
+ok('C crew holds while Lars dashes shadow to shadow and flips the switch: 20 seconds of dark',r.res.ok&&r.st===1&&r.said.join().includes('Twenty seconds'),JSON.stringify(r.res)+' '+(r.said.join(' / ')||''));
+// C2. the lights come back on if you're too slow; Lars can flip it again
+r=await p.evaluate(()=>{const hud=$('hud').textContent; const off=!lightsOn(); heist.lightsOutT=40; T.run(5); const back=dlg.hidden?'':$('dtext').textContent; T.clickThrough(); const on=lightsOn(); update(16.7); action(); T.clickThrough(); return {hud,off,back,on,again:heist.lightsOutT>0}});
+ok('C the HUD counts down; when it runs out the lights come back on; Lars can flip it again',/Lights back in 0:\d\d/.test(r.hud)&&r.off&&r.back.includes('back up')&&r.on&&r.again,r.hud+' | '+r.back);
+// D. the gate on the plank: only John can lift it; then the whole crew crosses before the lights come back
+r=await p.evaluate(()=>{switchTo(0); const k={x:P.x,y:P.y}; P.x=326; P.y=146; update(16.7); const lbl=prompt.textContent; action(); const msg=prompt.textContent; P.x=k.x; P.y=k.y; heist.lightsOutT=LIGHTS_OUT_MS;
+  T.hints=[]; const res=heistBots.across(); window.ACROSS=res.said; const said=T.clickThrough(); T.run(40); window.ACROSS=[...res.said,...T.clickThrough()];
+  return {lbl,msg,res,lit:lightsOn(),st:have.heistStage,gate:!!have.plankGate,crew:heist.crew.map(c=>c.id+':'+(c.x|0)+','+(c.y|0)).join(' '),banner:$('roundTitle').textContent}});
+ok('D a locked gate blocks the plank; only John can lift it',r.lbl==='Lift the gate off its hinges'&&r.msg.includes('Only John'),r.lbl+' / '+r.msg);
+ok('D John lifts the gate and the crew all get onto roof C in time; the lights stay off',r.res.ok&&r.gate&&r.st===2&&!r.lit,JSON.stringify(r.res)+' '+r.crew);
+ok('D ROUND WON, then ROUND 3',['ROUND WON','ROUND 3'].includes(r.banner),r.banner);
+r=await p.evaluate(()=>{switchTo(0); T.hints=[]; const w=T.walkTo(361,178); T.run(2); return {w,hint:T.hints,said:(window.ACROSS||[]).join(' / ')}});
+ok('D you mention the tripwires and the sonar',(r.hint.join()+r.said).includes('sonar'),r.hint[0]);
 // E. the laser maze
 r=await p.evaluate(()=>{const w=T.path([[384,184],[443,184],[443,165]]); if(w!=='ok')return {w,pre:true};
   const w2=T.walkTo(443,140); const w3=T.walkTo(443,100); const msg=dlg.hidden?'':$('dtext').textContent; T.clickThrough(); return {w,w2,w3,msg,pos:(P.x|0)+','+(P.y|0)}});
@@ -78,15 +90,23 @@ r=await p.evaluate(()=>{const on=t=>laserSegs(t).some(([a,b,c,d,v])=>v&&b===BLIN
 ok('E a visible row blinks on and off; the top row\'s gap slides back and forth',r.blink&&r.slides);
 ok('E one sonar ping near the maze chalk-marks the hidden tripwires',!r.marked0&&r.marked);
 r=await p.evaluate(()=>{placeAtCheckpoint(); heist.marked=true; if(heist.follow)toggleFollow(); switchTo(0); const res=heistBots.lasers();
-  T.walkTo(500,64); update(16.7); const lbl=prompt.textContent; action(); const said=T.clickThrough(); return {res,lbl,said,off:!!have.lasersOff,pos:(P.x|0)+','+(P.y|0)}});
+  T.walkTo(500,64); update(16.7); const lbl=prompt.textContent;
+  actionHeld=true; action(); T.run(150); actionHeld=false; T.run(1); const half=heist.defuse&&heist.defuse.p, halfMsg=prompt.textContent, offEarly=!!have.lasersOff;
+  switchTo(2); startDefuse(); const notJohn=prompt.textContent; switchTo(0); update(16.7);
+  actionHeld=true; action(); T.run(150); actionHeld=false; const said=T.clickThrough(); return {res,lbl,half,halfMsg,offEarly,notJohn,said,off:!!have.lasersOff,pos:(P.x|0)+','+(P.y|0)}});
 ok('E Joe (crew on Hold) times the blink and the slider, dodges the guard, and gets through the maze',r.res.ok,JSON.stringify(r.res)+' at '+r.pos);
-ok('E past the maze, a panel shuts every laser off',r.lbl==='Shut off the lasers'&&r.off&&r.said[0].includes('Lasers off'),r.said[0]);
+ok('E past the maze: hold to defuse the laser panel; let go past halfway and it keeps half',r.lbl==='Defuse the lasers (hold)'&&r.half===.5&&r.halfMsg.includes('Half')&&!r.offEarly,r.lbl+' / '+r.half+' / '+r.halfMsg);
+ok('E only Joe has the defuser; holding to the end shuts every laser off',r.notJohn.includes('Only Joe')&&r.off&&r.said[0].includes('Lasers off'),r.notJohn+' / '+r.said[0]);
 r=await p.evaluate(()=>{switchTo(2); let w=0; while(!(heist.guardDir<0&&heist.guardY<110&&heist.guardWait<=0)&&w<1500){update(16.7);w++}
   const route=T.path([[384,184],[443,184],[443,100],[474,66]]); const msg=dlg.hidden?'':$('dtext').textContent; T.clickThrough(); update(16.7); return {route,msg,lbl:prompt.textContent}});
 ok('E with the lasers off, John walks straight up to the grate',r.route==='ok'&&r.lbl.includes('grate'),r.route+' '+r.msg);
 // F. only John can open the grate
-r=await p.evaluate(()=>{switchTo(0); const keep={x:P.x,y:P.y}; ripGrate(); const msg=prompt.textContent; switchTo(2); update(16.7); action(); const said=T.clickThrough(); update(16.7); return {msg,said,st:have.heistStage,next:prompt.textContent}});
-ok('F only John can rip the grate',r.msg.includes('Only John')&&r.st===3,`${r.msg} / ${r.said[0]}`);
+r=await p.evaluate(()=>{switchTo(0); ripGrate(); const msg=prompt.textContent; switchTo(2); update(16.7); const lbl1=(heistTrigger()||{}).label||''; action(); const early=T.clickThrough(); const st1=have.heistStage;
+  switchTo(1); let w=0; while(!(heist.guardDir<0&&heist.guardY<110&&heist.guardWait<=0)&&w<1500){update(16.7);w++} const lw=T.path([[384,184],[443,184],[443,100],[456,68]]); T.clickThrough();
+  switchTo(2); update(16.7); const lbl=prompt.textContent; action(); const said=T.clickThrough(); update(16.7); return {msg,lbl1,early,st1,lw,lbl,said,st:have.heistStage,next:prompt.textContent}});
+ok('F only John can rip the grate',r.msg.includes('Only John'),r.msg);
+ok('F stack up first: the whole crew has to be on the skylight',r.lbl1.includes('/3 stacked')&&r.early.join().includes('Stack up')&&r.st1===2,r.lbl1+' / '+r.early[0]);
+ok('F all three stacked: John breaches',r.lw==='ok'&&r.lbl.includes('3/3')&&r.said.join().includes('Breaching')&&r.st===3,r.lw+' / '+r.lbl+' / '+r.said.join(' | '));
 ok('F then you can drop in',r.next==='Drop through the skylight',r.next);
 // G. vault: three crates and a logic puzzle; raisins first, then the real thing
 r=await p.evaluate(()=>{action(); const open=!$('vault').hidden; const rule=$('vaultRule').textContent, labels=[0,1,2].map(i=>$('crateLabel'+i).textContent);
