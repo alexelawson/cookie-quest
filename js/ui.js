@@ -131,7 +131,7 @@ const REWARDS={
   city:{from:'From a grateful city', name:'Chocolate', hint:'Tap it to put it in your basket.'},
   golf:{from:'From Margie, Jack and the creamery', name:'Milk', hint:'Tap it to put it in your basket.'},
   mill:{from:'From John (and the Vikings)', name:'Flour', hint:'Tap it to put it in your basket.'},
-  icecream:{from:'From Lars (and a rooftop gutter)', name:'Maple Rosemary ice cream', hint:'A bonus! Tap it to put it in your basket.'},
+  icecream:{from:'From Lars (and a rooftop gutter)', name:'Rosemary Maple ice cream', hint:'A bonus! Tap it to put it in your basket.'},
   sprinkles:{from:'From Bryan', name:'Sprinkles', hint:'A bonus! Tap them to put them in your basket.'},
 };
 let rewardKey=null, rewardThen=null;

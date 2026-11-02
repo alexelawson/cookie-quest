@@ -32,7 +32,7 @@ let r=await p.evaluate(()=>{T.enter(); const auto=!dlg.hidden&&$('dspeaker').tex
 ok('A no briefing pops up on its own',!r.auto);
 ok('A the log blocks the way to Dr. Alex; John says so',r.blockedW!=='ok'&&r.stuckY>125&&r.hint.includes('blocking'),r.blockedW+' | '+r.hint);
 ok('A the log: Lift it / Leave it',r.joe.l==='Look at the log'&&r.joe.menu.join()==='Lift it,Leave it',r.joe.menu.join(' | '));
-ok('A Joe and Lars can\'t lift it; John can',r.joe.said.includes('Switch to me')&&r.lars.said.includes('forklift')&&r.john.said.includes('right behind you')&&r.carrying,r.john.said);
+ok('A Joe and Lars can\'t lift it; John can',r.joe.said.includes('Step aside Joe')&&r.lars.said.includes('forklift')&&r.john.said.includes('right behind you')&&r.carrying,r.john.said);
 ok('A John keeps carrying the log; you can switch back and walk to Dr. Alex with him following',r.switched&&r.w==='ok'&&r.johnNear,r.w);
 ok('A walk up to Dr. Alex (Alex as a mad scientist) and she briefs the crew',r.lbl==='Talk to Dr. Alex'&&r.face&&r.lines[0].startsWith('Dr. Alex')&&r.lines.join().includes('formula')&&r.lines.some(l=>l.startsWith('John'))&&r.lines.some(l=>l.startsWith('Lars')),r.lines.length+' lines');
 ok('A agent select: 3 agents with roles + powers + controls, LOCK IN',r.how&&r.rows===3&&r.ctl.includes('Space')&&r.ctl.includes('press F')&&r.sel==='Agent select|LOCK IN|Initiator,Duelist,Sentinel'&&r.onOne===1&&r.lead===0,r.sel);
@@ -47,13 +47,13 @@ await p.waitForTimeout(1000);
 ok('B John points out the gap',r.hint.includes('gap'),r.hint);
 ok('B at the gap: Lars / the log / not yet',r.w==='ok'&&r.lbl==='Cross the gap'&&r.menu.join()==='Lars: long-jump it,John: lay the log across,Not yet',r.lbl+' | '+r.menu.join(' | '));
 ok('B Lars really runs and jumps, boings back, John is annoyed',r.cut.includes('Headwind')&&/JUMP 12\d air 1\d land 112 annoyed true/.test(r.cut)&&!r.st1,r.cut);
-ok('B ...and Lars lands next to a pint of Maple Rosemary ice cream',r.ice==='Maple Rosemary ice cream'&&r.cut.includes('Maple Rosemary'),r.ice);
+ok('B ...and Lars lands next to a pint of Rosemary Maple ice cream',r.ice==='Rosemary Maple ice cream'&&r.cut.includes('Rosemary Maple'),r.ice);
 r=await p.evaluate(()=>{T.clickThrough(); paused=false; T.walkTo(98,102); update(16.7); action(); [...$('dbtns').querySelectorAll('button')].find(b=>b.textContent==='John: lay the log across').click(); const done=T.clickThrough()[0]; return {done,st:have.heistStage,carrying:!!heist.carry}}); await p.evaluate(()=>T.clickThrough());
 ok('B John lays the log across the gap',r.st===1&&!r.carrying&&r.done.includes('Log bridge'),r.done);
 r=await p.evaluate(()=>{const seen=new Set(); for(let i=0;i<300;i++){if(!$('roundBanner').hidden)seen.add($('roundTitle').textContent); update(16.7)} return [...seen]});
 ok('B ROUND WON, then ROUND 2',r.includes('ROUND WON')&&r.includes('ROUND 2'),r.join(', '));
 r=await p.evaluate(()=>{T.hints=[]; const w=T.path([[110,102],[170,102]]); return {w,hint:T.hints,x:P.x}});
-ok('B the crew crosses the log to roof B',r.w==='ok',r.w); ok('B Lars calls the searchlights (and the shadows)',r.hint.join().includes('Searchlights')&&r.hint.join().includes('shadows'),r.hint[0]);
+ok('B the crew crosses the log to roof B',r.w==='ok',r.w); ok('B Lars calls the searchlights',r.hint.join().includes('Searchlights')&&r.hint.join().includes('signal'),r.hint[0]);
 // C. searchlights
 r=await p.evaluate(()=>{switchTo(0); const w=T.walkTo(304,100); const msg=dlg.hidden?'':$('dtext').textContent; T.clickThrough(); return {w,msg,back:Math.round(P.x)+','+Math.round(P.y)}});
 ok('C walking into the lights gets you caught and reset',r.w==='dialog'&&r.msg.includes('searchlight'),r.msg+' -> '+r.back);
