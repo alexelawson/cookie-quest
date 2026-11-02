@@ -60,7 +60,8 @@ await p.waitForFunction(()=>!dlg.hidden&&T.btns().join().includes('Next'),null,{
 r=await p.evaluate(()=>{const line=$('dtext').textContent; T.pages(); T.click('Thanks, Lil Q!'); return {line,reward:!$('reward').hidden,name:$('rewardName').textContent,onFoot:fargo.onFoot,stage:have.fargoStage}});
 ok('F Bob hands over the sugar',r.reward&&r.name==='Sugar'&&r.stage==='reward',r.line); ok('F back in the car',!r.onFoot);
 await p.click('#rewardArt',{force:true}); await p.waitForTimeout(900);
-r=await p.evaluate(()=>({fargo:!!have.fargo,basket:$('basket').textContent,paused}));
+r=await p.evaluate(()=>{const ks=()=>{const l=[];for(let i=0;i<15&&!dlg.hidden&&!l.join().includes('Settings');i++){l.push($('dspeaker').textContent+': '+$('dtext').textContent);const b=T.btns();T.click(b.includes('Next')?'Next':b[0])}return {l,gear:Object.keys(have.gear||{}).join()}};const k=ks(); return {k,fargo:!!have.fargo,basket:$('basket').textContent,paused}});
+ok('F Lil Q hands over the trucker hat',r.k.l[0].startsWith('Lil Q')&&r.k.gear.includes('hat'),r.k.l[0]);
 ok('F sugar goes in the basket',r.fargo&&r.basket.includes('✓ Sugar')&&!r.paused,r.basket);
 r=await p.evaluate(()=>{T.toLot(fargo.bob); action(); return $('dtext').textContent}); ok('F Bob after: goodbye line',r.includes('Lil Q out'),r);
 // G. reload in the middle of the shop errand

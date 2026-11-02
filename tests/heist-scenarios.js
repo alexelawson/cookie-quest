@@ -127,7 +127,8 @@ await p.click('#rewardArt',{force:true}); await p.waitForTimeout(900);
 r=await p.evaluate(()=>({city:!!have.city,basket:$('basket').textContent}));
 ok('G chocolate in the basket',r.city&&r.basket.includes('Chocolate'));
 // H. the way home: just a quick word (no long cutscene), then back on the main map
-r=await p.evaluate(()=>{const lines=T.clickThrough(); T.run(60); return {lines,world:scene===SCENES.world,bar:$('crewbar').hidden}});
+r=await p.evaluate(()=>{const ks=()=>{const l=[];for(let i=0;i<15&&!dlg.hidden&&!l.join().includes('Settings');i++){l.push($('dspeaker').textContent+': '+$('dtext').textContent);const bs=[...$('dbtns').querySelectorAll('button')];(bs.find(x=>x.textContent==='Next')||bs[0]).click()}return {l,gear:Object.keys(have.gear||{}).join()}};window.K=ks(); const lines=T.clickThrough(); T.run(60); return {k:K,lines,world:scene===SCENES.world,bar:$('crewbar').hidden}});
+ok('H Dr. Alex hands Joe her spare goggles',r.k.l[0].startsWith('Dr. Alex')&&r.k.gear.includes('goggles'),r.k.l[0]);
 ok('H a few lines from Lars and John, then you\'re back on the map',r.lines.join().includes('rolls eyes')&&r.lines.length<=5&&r.world&&r.bar,JSON.stringify(r));
 // I. reload mid-heist resumes at the right checkpoint
 await fresh(); await p.evaluate(()=>{have.heistStage=2; have.heistBriefed=true; save()}); await p.reload(); await p.click('#startBtn'); await p.evaluate(()=>skipWelcome()); await p.evaluate(helpers);

@@ -138,7 +138,7 @@ ok('N Settings lists the gear and can take it off',r.rows===3&&r.off===0);
 // O. the signpost, the Fargo signs, and the ice cream served with the cookies
 // O. Logan: talk, help him look, and he gives Joe a lucky clover
 r=await p.evaluate(()=>{P.x=LOGAN.x+6;P.y=LOGAN.y+2; T.run(1); const lbl=prompt.textContent; action(); const pages=[]; while(T.btns().includes('Next')){pages.push($('dtext').textContent);T.click('Next')} T.click('Help him look'); T.run(130); const found=$('dspeaker').textContent+': '+$('dtext').textContent; while(T.btns().includes('Next'))T.click('Next'); T.click('Pin it on'); return {lbl,pages,found,clover:have.gear&&have.gear.clover}});
-ok('O Logan is looking for four-leaf clovers and gives Joe one',r.lbl==='Talk to Logan'&&r.pages[0].includes('four-leaf')&&r.found.startsWith('Logan')&&r.clover===1,r.found);
+ok('O Logan is looking for four-leaf clovers and gives Joe one',r.lbl==='Talk to Logan'&&r.pages.join().includes('rollerski workout')&&r.found.startsWith('Logan')&&r.clover===1,r.found);
 // P. Alex's hint when Joe stands still, gone once he moves
 r=await p.evaluate(()=>{goTo('world','start'); T.run(40); closeDialog(); paused=false; P.x=60;P.y=150; T.run(Math.ceil(HINTS.AFTER_MS/16.7)+5); const shown=!$('hint').hidden, text=$('hintText').textContent; dirs.right=true; T.run(3); dirs.right=false; return {shown,text,gone:$('hint').hidden}});
 ok('P standing still: Alex says where to go next; moving hides it',r.shown&&r.text.includes('Keelan')&&r.gone,r.text);

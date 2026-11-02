@@ -206,7 +206,7 @@ function openWardrobe(then,mode='heist',fromSettings=false){   // mode 'look' = 
 // Lars: tall runner, short blond hair, singlet with a race bib, split shorts, neon shoes
 function drawLars(c,g=ctx){
   const x=Math.round(c.x)-5, y=Math.round(c.y)-23, F=(col,dx,dy,w,h)=>{g.fillStyle=col;g.fillRect(x+dx,y+dy,w,h)};
-  const skin='#f3cba8', hair='#e6c46a', singlet='#2f6db0', shorts='#1c1c22', shoe='#b6ff3b';
+  const skin='#f3cba8', hair='#e6c46a', singlet='#2f6db0', shorts='#1c1c22', shoe='#ff3fae';   // bright pink racing shoes
   const [a,b]=legs(c);
   F('rgba(0,0,0,.25)',1,22,8,2);
   F(skin,2,14,2,7-a); F(skin,6,14,2,7-b); F('#ffffff',2,20-a,2,1); F('#ffffff',6,20-b,2,1);   // long legs, white socks

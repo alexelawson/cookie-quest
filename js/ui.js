@@ -148,7 +148,7 @@ function collectReward(){
   have[key]=true; save(); sfx('pop');
   const art=$('rewardArt'), i=ITEMS.findIndex(it=>it.key===key);
   const slot=$('basket').querySelector(`[data-key="${key}"]`), a=art.getBoundingClientRect(), b=slot?slot.getBoundingClientRect():a;
-  const done=()=>{$('reward').hidden=true; renderBasket(); const sl=$('basket').querySelector(`[data-key="${key}"]`); sl&&sl.classList.add('pop'); paused=false; if(rewardThen){const f=rewardThen; rewardThen=null; f()}};
+  const done=()=>{$('reward').hidden=true; renderBasket(); const sl=$('basket').querySelector(`[data-key="${key}"]`); sl&&sl.classList.add('pop'); paused=false; const f=rewardThen; rewardThen=null; giveKeepsake(key,f)};   // each stop's keepsake (extras.js), then whatever comes next
   const still=matchMedia('(prefers-reduced-motion: reduce)').matches;
   if(still||!art.animate)return done();
   art.style.animation='none';

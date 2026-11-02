@@ -25,6 +25,7 @@ function blocked(nx,ny,sc=scene){
 function update(dt){
   time+=dt;
   scene.ambient&&scene.ambient(dt);   // ambient things run even while paused
+  extrasAlways(dt);
   if(fade.next){
     const was=fade.t; fade.t+=dt;
     if(was<fade.dur&&fade.t>=fade.dur)finishSwap();

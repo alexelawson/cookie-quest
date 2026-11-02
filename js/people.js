@@ -67,38 +67,64 @@ PORTRAITS['Maureen']={size:32, bg:'#ece4f4', draw(g){ const F=px(g);
   F('#e3b898',15,15,2,2); F('#c06a60',13,18,6,1); F('#c06a60',12,17,1,1); F('#c06a60',19,17,1,1);
 }};
 
-// ---------- Logan: short, medium brown hair, looking for four-leaf clovers ----------
-const LOGAN={x:34, y:122};
-function drawLogan(x,y,lookUp=false){
-  const F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(Math.round(x)-5+dx,Math.round(y)-16+dy,w,h)};
-  const skin='#f0c6a0', hair='#7a5232', hairL='#8f6440', top='#4f9a50', pants='#6b5a44';
-  const crouch=lookUp?0:2;   // bent over, staring at the grass
+// ---------- Logan: short, medium brown hair, in his rollerski gear, "taking a break from his workout" to look for four-leaf clovers ----------
+const LOGAN={x:36, y:122};   // his own quiet corner, left of the farm path
+const LOGAN_KIT={suit:'#1fa3a3', suitD:'#16807f', stripe:'#ff8a2a', helmet:'#f4f4f0', helmetD:'#c9ced4', hair:'#7a5232', skin:'#f0c6a0'};
+// pose 'sit': on the grass, legs out, magnifying glass over the clovers. Otherwise standing (at the party, at the Birkie finish).
+function drawLogan(x,y,pose){
+  const F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(Math.round(x)-5+dx,Math.round(y)-16+dy,w,h)}, K=LOGAN_KIT;
+  if(pose==='sit'){   // side-on, sitting in the grass facing left: legs out in front, glass held over the clovers
+    F('rgba(0,0,0,.16)',-5,14,14,2);
+    F(K.suit,-3,11,7,3); F(K.suitD,-3,13,7,1); F(K.stripe,-3,11,7,1);                     // legs stretched out
+    F('#2b2b33',-5,10,2,4); F('#ffffff',-5,13,2,1);                                       // race shoes, toes up
+    F(K.suit,3,4,5,10); F(K.suitD,7,4,1,10); F(K.stripe,3,7,5,1);                         // upright back
+    F(K.suit,7,7,2,5); F(K.skin,8,12,2,1);                                                // back arm, propped on the grass
+    F(K.suit,0,7,3,2); F(K.skin,-1,7,1,2); F('#8a5a34',-2,8,1,3);                         // front arm, holding the magnifying glass
+    F('#c9a24a',-7,9,5,5); F('#e8f4f8',-6,10,3,3); F('#ffffff',-6,10,1,1);
+    F(K.skin,2,-1,5,5); F(K.hair,6,-1,2,2); F(K.hair,7,1,1,1); F('#e3b08c',5,1,1,1);                             // head, looking down at the clovers
+    F(K.helmet,1,-3,7,3); F(K.helmetD,1,-1,7,1); F('#2f6db0',3,-3,3,1); F('#1d1d22',0,-2,3,1);   // helmet, sunglasses pushed up
+    F('#2b2b2b',2,1,1,1); F('#b5654f',2,3,2,1);
+    return }
   F('rgba(0,0,0,.25)',1,15,10,2);
-  F(pants,3,11+crouch,2,4-crouch); F(pants,6,11+crouch,2,4-crouch); F('#3b2a1e',2,15,3,1); F('#3b2a1e',6,15,3,1);
-  F(top,2,6+crouch,7,5); F(top,1,7+crouch,1,3); F(top,9,7+crouch,1,3); F(skin,1,10+crouch,1,1); F(skin,9,10+crouch,1,2);
-  F(skin,3,1+crouch,5,5);
-  F(hair,2,crouch,7,2); F(hair,2,2+crouch,1,3); F(hair,8,2+crouch,1,3); F(hairL,4,crouch,3,1); F(hair,3,2+crouch,2,1);   // medium, a bit shaggy
-  if(lookUp){F('#2b2b2b',4,3,1,1); F('#2b2b2b',6,3,1,1); F('#b5654f',4,5,3,1)} else F('#2b2b2b',4,4+crouch,3,1);   // eyes down
-  if(!lookUp){F('#c9a24a',10,10+crouch,2,1); F('#c9a24a',11,8+crouch,3,3); F('#e8f4f8',12,9+crouch,1,1)}   // a magnifying glass
+  F(K.suit,3,10,2,5); F(K.suit,6,10,2,5); F(K.stripe,3,10,1,5); F(K.stripe,7,10,1,5); F('#2b2b33',2,15,3,1); F('#2b2b33',6,15,3,1);
+  F(K.suit,2,5,7,6); F(K.stripe,2,7,7,1); F(K.skin,1,6,1,4); F(K.skin,9,6,1,4);
+  F(K.skin,3,0,5,5); F(K.hair,2,3,1,2); F(K.hair,8,3,1,2);
+  F(K.helmet,2,-2,7,3); F(K.helmetD,2,0,7,1); F('#2f6db0',4,-2,3,1); F('#1d1d22',3,0,5,1);
+  F('#2b2b2b',4,2,1,1); F('#2b2b2b',6,2,1,1); F('#b5654f',4,4,3,1);
+}
+// his spot: rollerskis and poles lying in the grass, a few clearly drawn clovers, and butterflies that stay right here
+const LOGAN_CLOVERS=[[-25,-6,3],[-14,0,4],[-31,3,3],[-22,5,3]];   // [dx, dy, leaves] from Logan: the one under his glass has four
+function drawClover(x,y,n){ const F=(c,a,b,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x+a,y+b,w,h)};
+  const leaf=(a,b)=>{F('#2e7d32',a,b,3,3); F('#5fbf5f',a,b,2,2); F('#a8ecb0',a,b,1,1)};
+  F('#2e7d32',3,5,1,3); F('#2e7d32',4,7,1,1);                                             // stem
+  if(n===4){ leaf(0,0); leaf(4,0); leaf(0,4); leaf(4,4); F('#1d5a2a',3,3,1,1) }
+  else { leaf(0,1); leaf(4,1); leaf(2,-2); F('#1d5a2a',3,3,1,1) } }
+// his spot: rollerskis and poles in the grass behind him, a few clearly drawn clovers, and butterflies that stay right here
+function drawLoganSpot(){
+  const F=(c,x,y,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,h)}, x0=LOGAN.x, y0=LOGAN.y;
+  for(const dy of [3,6]){F('#1d1d22',x0-6,y0+dy,14,1); F('#8a8f9a',x0-5,y0+dy+1,2,1); F('#8a8f9a',x0+5,y0+dy+1,2,1); F('#c8322b',x0-1,y0+dy-1,4,1)}   // rollerskis
+  F('#3b3b44',x0+5,y0-18,1,17); F('#3b3b44',x0+8,y0-17,1,16); F('#c8322b',x0+5,y0-19,1,2); F('#c8322b',x0+8,y0-18,1,2);          // poles, planted
+  for(const [dx,dy,n] of LOGAN_CLOVERS){ drawClover(x0+dx,y0+dy,n);
+    if(n===4&&Math.floor(time/300)%4===0){F('#fff3a8',x0+dx+8,y0+dy-3,1,3); F('#fff3a8',x0+dx+7,y0+dy-2,3,1)} }
+  for(const [k,c] of [[0,'#f4d35e'],[1,'#f2a7c8'],[2,'#9fd2f0']]){                       // butterflies, only around his spot
+    const t=time/700+k*2.1, bx=Math.round(x0-12+Math.sin(t)*14+Math.sin(t*2.3)*3), by=Math.round(y0-14+Math.sin(t*1.6+k)*7), open=Math.floor(time/110+k)%2;
+    F(c,bx-(open?2:1),by,open?2:1,2); F(c,bx+1,by,open?2:1,2); F('#3a3a3a',bx,by,1,2) }
 }
 PORTRAITS['Logan']={size:32, bg:'#d6eec4', draw(g){ const F=px(g);
-  F('#4f9a50',6,25,20,7); F('#3f7a45',14,25,4,2); F('#f0c6a0',13,21,6,4);
-  F('#f0c6a0',10,7,12,15); F('#e3b08c',10,18,1,3); F('#e3b08c',21,18,1,3);
-  F('#7a5232',9,4,14,5); F('#7a5232',8,7,3,8); F('#7a5232',21,7,3,8); F('#8f6440',12,4,6,1); F('#7a5232',11,9,4,1); F('#7a5232',17,9,3,1);   // medium shaggy hair
+  F('#1fa3a3',5,25,22,7); F('#ff8a2a',5,28,22,2); F('#f0c6a0',13,21,6,4);
+  F('#f0c6a0',10,8,12,14); F('#e3b08c',10,19,1,3); F('#e3b08c',21,19,1,3); F('#7a5232',9,11,2,7); F('#7a5232',21,11,2,7);   // medium brown hair under the helmet
+  F('#f4f4f0',8,2,16,8); F('#c9ced4',8,8,16,2); F('#2f6db0',13,2,6,2); F('#1d1d22',10,9,12,2); F('#ff8a2a',11,9,4,1); F('#ff8a2a',17,9,4,1);   // helmet, sunglasses pushed up
   F('#ffffff',12,13,3,2); F('#ffffff',17,13,3,2); F('#3d6b8a',13,13,2,2); F('#3d6b8a',18,13,2,2);
   F('#d9a37f',15,16,2,2); F('#b5654f',13,19,6,1); F('#b5654f',19,18,1,1);
-  F('#3d8443',24,2,3,3); F('#3d8443',27,2,3,3); F('#3d8443',24,5,3,3); F('#3d8443',27,5,3,3); F('#2f6b36',26,7,1,4);   // a four-leaf clover
+  F('#2e7d32',25,6,1,5); F('#5fbf5f',23,2,3,3); F('#5fbf5f',26,2,3,3); F('#5fbf5f',23,5,3,3); F('#5fbf5f',26,5,3,3);   // a four-leaf clover
 }};
-// the clover patch (painted onto the map once)
-{const g=bg.getContext('2d'); for(let i=0;i<34;i++){const a=rnd()*Math.PI*2, r=Math.sqrt(rnd())*11, x=LOGAN.x+Math.cos(a)*r*1.4|0, y=LOGAN.y+1+Math.sin(a)*r*.6|0;
-  g.fillStyle=i%3?'#3f8f45':'#5aa85a'; g.fillRect(x,y,2,1); g.fillRect(x,y+1,1,1); g.fillRect(x+1,y-1,1,1)}}
 function talkLogan(){
   const T=LOGAN_TEXT;
   if(have.gear&&'clover' in have.gear) return showDialog({place:T.place,speaker:'Logan',pages:[T.after[Math.floor(Math.random()*T.after.length)]],actions:[CLOSE]});
   showDialog({place:T.place,speaker:'Logan',pages:T.hello,actions:[{label:T.help,fn:()=>{ closeDialog(); logan.searchT=1800; P.dir='left' }},{label:T.later,ghost:true,fn:closeDialog}]});
 }
 const logan={searchT:0};
-triggers.push({z:R(LOGAN.x-11,LOGAN.y-8,22,14), label:'Talk to Logan', btn:'Talk', act:talkLogan});
+triggers.push({z:R(LOGAN.x-30,LOGAN.y-10,40,18), label:'Talk to Logan', btn:'Talk', act:talkLogan});
 
 // ---------- the Vikings jogging, and Lil Q scooting by, on the main road ----------
 function roadWalkers(list){
@@ -150,5 +176,5 @@ function drawThink(){
   const n=1+Math.floor(time/300)%3; for(let i=0;i<n;i++)F('#1d2130',2+i*4,3,2,2);
 }
 {const ents=SCENES.world.ents; SCENES.world.ents=function(list){ ents.call(this,list);
-  list.push({y:LOGAN.y,draw:()=>drawLogan(LOGAN.x,LOGAN.y,Math.hypot(P.x-LOGAN.x,P.y-LOGAN.y)<20||Math.floor(time/2600)%4===0)});
+  list.push({y:LOGAN.y-12,draw:drawLoganSpot},{y:LOGAN.y,draw:()=>drawLogan(LOGAN.x,LOGAN.y,'sit')});
   roadWalkers(list) }}

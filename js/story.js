@@ -383,6 +383,11 @@ const GEAR_TEXT = {
   headband:{name:"Headband", found:"A ski headband in the snow! It smells faintly of klister. Perfect.", wear:"Put it on"},
   shoes:   {name:"Carbon racing shoes", found:"Carbon-plated racing shoes! Joe could run a marathon in these. Or at least to the mailbox.", wear:"Lace them up"},
   clover:  {name:"Lucky clover"},
+  hen:     {name:"Henrietta (pet hen)", found:"Henrietta the hen is coming with you! She'll follow Joe around the farm and the kitchen.", wear:"Come on, Henrietta"},
+  goggles: {name:"Lab goggles", found:"Dr. Alex's spare goggles. Joe pushes them up on his head. Very scientific.", wear:"Put them on"},
+  disc:    {name:"Margie's lucky disc", found:"Margie's lucky disc. Joe slings it on his back.", wear:"Take it"},
+  hat:     {name:"Trucker hat", found:"A Lil Q's Gas & Go trucker hat. Limited edition (there's one).", wear:"Put it on"},
+  jersey:  {name:"Vikings jersey (#18)", found:"A purple #18 Vikings jersey. Joe throws it on over his outfit.", wear:"Put it on"},
   tip:"(Take it off or put it back on any time in ⚙ Settings.)",
 };
 // ---------- Jackie (Fargo): shows up when Alex kicks Joe out of the shop. Very direct. ----------
@@ -397,11 +402,11 @@ const JACKIE = {
 // ---------- Logan (the clover field on the farm, by the barn path) ----------
 const LOGAN_TEXT = {
   place:"The clover patch",
-  hello:["Shh. I'm looking for four-leaf clovers.","I've found three so far this year. Statistically, there's one right... somewhere."],
+  hello:["Oh, hey. Taking a quick break from my rollerski workout.","Interval six of twelve. Coach said rest is part of training. Probably.","Anyway. Four-leaf clovers. I've found three this year. Statistically, there's one right... here somewhere."],
   help:"Help him look", later:"Leave him to it",
   found:["...","Wait. WAIT. Right by your foot. You found one!","Here. You keep it. Pin it on. You're gonna need the luck."],
   wear:"Pin it on",
-  after:["Still looking. You're welcome to stay, but it's a quiet sport.","Found a three-leaf. Doesn't count.","Clovers are about patience. And crouching."],
+  after:["Still on my break. Interval seven can wait.","Found a three-leaf. Doesn't count.","Clovers are about patience. Rollerskiing is about not falling. I'm better at clovers."],
 };
 // ---------- Alex's "where to next?" hints: shown if Joe stands still on the map for a bit ----------
 const HINTS = {
@@ -444,6 +449,17 @@ const ENDING = {
     kitchen:"The Cookie King and his head baker.",
   },
   noteTitle:"A note from Alex",
+};
+// ---------- Keepsakes: one from each stop, handed over right after its reward ----------
+// [speaker, line] (or [speaker, line, portrait]). The gear itself: GEAR in extras.js; names and found lines: GEAR_TEXT above.
+const KEEPSAKES = {
+  hen:[['Keelan',"Oh, one more thing. This is Henrietta. Slowest hen I've got."],['Keelan',"She's not built for farm life. She's built for adventure. Take her."]],
+  goggles:[['Dr. Alex',"Wait! Before you go. Take these: my spare goggles."],['Dr. Alex',"Every great scientist needs eye protection. And style. Mostly style."]],
+  disc:[['Margie',"Here. My lucky disc. I've never lost with it."],['Jack',"She has lost with it forty-one times. I have the spreadsheet."],['Margie',"Lucky. Disc."]],
+  hat:[['Lil Q',"Yo, rookie. One more thing. For the road."],['Lil Q',"Official Lil Q's Gas & Go trucker hat. Wear it with pride. Or at least wear it."]],
+  jersey:[['Football Viking',"Hey. Joe. Real talk."],['Football Viking',"That flat Coke? Worst thing I have ever tasted. And I've eaten lutefisk."],
+    ['Football Viking',"But somewhere around Hatchery Hill it hit me like a blitz. Second wind. Third wind. I had ALL the winds."],
+    ['Football Viking',"You earned this. Number 18. Wear it with pride. Never wash it."]],
 };
 const KITCHEN = {place:'Home', speaker:'Your kitchen',
   recipeTitle:"Chocolate Chip Cookies",

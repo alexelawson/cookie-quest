@@ -330,7 +330,7 @@ SCENES.birkie={ place:BIRKIE.place, music:'birkie',
     if(P.y>BRIDGE.y1-160){const by=Math.sin(time/130)>0?-2:0, Y=BRIDGE.y1;
       const L=(x,y,f)=>[x,y,f], left=[L(22,Y+34,()=>drawKeelan({x:22,y:Y+34+by,dir:'right',moving:false,step:0})),L(36,Y+50,()=>drawLars({x:36,y:Y+50+by,dir:'right',moving:false,step:0})),
         L(20,Y+66,()=>drawJohn({x:20,y:Y+66+by,dir:'right',moving:false,step:0})),L(36,Y+84,()=>drawMargie(36,Y+84+by)),L(22,Y+102,()=>drawJack(22,Y+102+by))];
-      const right=[L(202,Y+34,()=>drawBob(202,Y+34+by)),L(188,Y+52,()=>drawBryan(188,Y+52+by,'left')),L(204,Y+70,()=>drawLogan(204,Y+70+by,true)),...(have.metJackie?[L(190,Y+88,()=>drawJackie(190,Y+88+by,'left'))]:[])];
+      const right=[L(202,Y+34,()=>drawBob(202,Y+34+by)),L(188,Y+52,()=>drawBryan(188,Y+52+by,'left')),L(204,Y+70,()=>drawLogan(204,Y+70+by)),...(have.metJackie?[L(190,Y+88,()=>drawJackie(190,Y+88+by,'left'))]:[])];
       for(const [,,d] of [...left,...right])d();
       const ax=192, ay=FINISH_Y-12+by; drawAlex(ax,ay,'ok');   // Alex, right at the finish line, holding up a GO JOE! sign
       ctx.fillStyle='#8a5a34'; ctx.fillRect(ax,ay-30,1,12); ctx.fillStyle='#fffdf6'; ctx.fillRect(ax-14,ay-40,29,11); ctx.fillStyle='#2e9a45'; ctx.fillRect(ax-14,ay-40,29,1); ctx.fillRect(ax-14,ay-30,29,1); pixText(ctx,'GO JOE',ax-12,ay-37,'#c8322b')}
