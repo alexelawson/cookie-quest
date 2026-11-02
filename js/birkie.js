@@ -10,12 +10,13 @@ const BIRK={
   DRAIN:{up:.0016, other:.0007},         // energy lost per ms
   JUMP_LEN:28, JUMP_H:9,                 // a jump carries you this far down the trail (px), this high (so it feels the same uphill or down)
   CRASH_MS:1500, CRASH_COST:14,          // a crash: how long you're down, and the energy it costs
-  DRINK_MS:1500, SPILL_KEEP:20,          // feed stations: hold steady this long to drink; a spill still gives you a little
+  DRINK_MS:2000, SPILL_KEEP:15,          // feed stations: hold steady this long to drink; a spill still gives you a little
+  CUP_SWING:650,                         // the volunteer swings the cup between two lanes this often (ms)
   CLOCK:170,                             // the race clock runs 170x real time
   CUTOFF:3*3600,                         // the sweep snowmobile reaches the finish at 3:00:00
   SWEEP_START:15*60,                     // ...and leaves the start at 0:15:00, at a steady pace
   ELITE:2*3600+30*60,                    // under 2:30 gets a shout-out
-  // simulated (tests/birkie-difficulty.js): sharp ~2:22, good ~2:28, casual ~2:36 (all finish), distracted 16/20 finish, never dodging 0/20
+  // simulated (tests/birkie-difficulty.js): sharp ~2:21, good ~2:27, casual ~2:30 (all finish), distracted 14/20 finish, never dodging 0/20
 };
 // course sections, top to bottom (the landmarks)
 const BIRK_SECTIONS=[
@@ -29,21 +30,22 @@ const BIRK_SECTIONS=[
   {y:1420, type:'roll', name:''},
   {y:1760, type:'up',   name:'"That" hill (you know the one)'},
   {y:1960, type:'roll', name:'Sunset & Duffy Hills'},
-  {y:2140, type:'flat', name:'Bridge over Highway 77', bridge:true},
-  {y:2240, type:'lake', name:'Lake Hayward (windy!)'},
-  {y:2560, type:'finish', name:'Main Street · Hayward'},
+  {y:2140, type:'lake', name:'Lake Hayward (windy!)'},
+  {y:2400, type:'flat', name:'The International Bridge', bridge:true},
+  {y:2500, type:'finish', name:'Main Street · Hayward'},
 ];
-const FEEDS=[{y:820},{y:1500},{y:2390}];
+const FEEDS=[{y:820},{y:1500},{y:2270}];
 const FINISH_Y=2620;
-// trail centerline wanders; Bobblehead has a sharp left turn; the bridge and Main Street are straight
+// trail centerline wanders; Bobblehead has a sharp left turn; the lake, the bridge and Main Street are straight
 function trailX(y){
   if(y>2140)return 112;
   let x=112+44*Math.sin(y/260)+18*Math.sin(y/97);
   if(y>1060&&y<1260)x-=Math.min(40,(y-1060)*.5);            // Bobblehead's left turn
-  if(y>2040)x=x+(112-x)*Math.min(1,(y-2040)/100);           // straighten out toward the bridge
+  if(y>2040)x=x+(112-x)*Math.min(1,(y-2040)/100);           // straighten out toward the lake
   return x;
 }
-const trailHalf=y=>y>=2140&&y<2240?16:y>=2560?60:34;
+const BRIDGE={y0:2400,y1:2500};
+const trailHalf=y=>y>=BRIDGE.y0&&y<BRIDGE.y1?18:y>=BRIDGE.y1+20?60:34;
 const laneScale=y=>Math.min(1,trailHalf(y)/34);              // lanes squeeze together on the narrow bridge
 const laneX=(y,lane)=>trailX(y)+lane*BIRK.LANE*laneScale(y);
 function sectionAt(y){let s=BIRK_SECTIONS[0]; for(const t of BIRK_SECTIONS)if(y>=t.y)s=t; return s}
@@ -52,7 +54,7 @@ function terrainAt(y){const s=sectionAt(y); if(s.type!=='roll')return s.type; re
 // Never on the bridge, never right at a feed station; there's always a way through.
 const OBSTACLES=(()=>{const out=[], lanes=[0,-1,1,0,1,-1,-1,0,1], gaps=[130,105,150,95,120,140,110];
   let y=230, k=0; while(y<2540){
-    if(!FEEDS.some(f=>y>f.y-90&&y<f.y+70)&&!(y>2110&&y<2260)){
+    if(!FEEDS.some(f=>y>f.y-90&&y<f.y+70)&&!(y>BRIDGE.y0-40&&y<BRIDGE.y1+40)){
       const lane=lanes[k%lanes.length];
       if(k%4===3)out.push({kind:'pack',y,lanes:lane===1?[0,1]:lane===-1?[-1,0]:[-1,0]});
       else out.push({kind:'fallen',y,lanes:[lane]});
@@ -69,14 +71,16 @@ const birkBg=document.createElement('canvas'); birkBg.width=BIRK.W; birkBg.heigh
   for(let y=0;y<BIRK.L;y+=2){const cx=trailX(y), hw=trailHalf(y);                      // a wide groomed skate trail, corduroy
     F('#f6f9fb',cx-hw,y,hw*2,2); if(y%4===0)F('#ebf1f6',cx-hw+1,y,hw*2-2,1); F('#dde6ee',cx-hw,y,1,2); F('#dde6ee',cx+hw-1,y,1,2)}
   // the lake: flat and icy-blue
-  F('#d4e5f1',0,2240,BIRK.W,320); for(let i=0;i<300;i++)F('#c3d8e8',rnd()*BIRK.W|0,2240+rnd()*320|0,6,1);
-  for(let y=2240;y<2560;y+=2){F('#f6f9fb',112-34,y,68,2); if(y%4===0)F('#ebf1f6',112-33,y,66,1)}
-  // the bridge over Highway 77: road underneath, rails on the sides
-  F('#5f6676',0,2160,BIRK.W,50); F('#f4d35e',0,2184,BIRK.W,2); for(let x=0;x<BIRK.W;x+=14)F('#ffffff',x,2172,6,1);
-  F('#f6f9fb',96,2140,32,100); F('#8a5a34',94,2140,2,100); F('#8a5a34',128,2140,2,100);
+  F('#d4e5f1',0,2140,BIRK.W,BRIDGE.y0-2140); for(let i=0;i<260;i++)F('#c3d8e8',rnd()*BIRK.W|0,2140+rnd()*(BRIDGE.y0-2140)|0,6,1);
+  for(let y=2140;y<BRIDGE.y0;y+=2){F('#f6f9fb',112-34,y,68,2); if(y%4===0)F('#ebf1f6',112-33,y,66,1)}
+  // the International Bridge over Highway 63 into town: the highway underneath, railings, flags of every country along both sides (drawn live so they wave)
+  F('#d8dfe6',0,BRIDGE.y0-6,BIRK.W,BRIDGE.y1-BRIDGE.y0+12);
+  F('#4a505e',0,BRIDGE.y0+30,BIRK.W,40); F('#f4d35e',0,BRIDGE.y0+49,BIRK.W,2); for(let x=0;x<BIRK.W;x+=14)F('#ffffff',x,BRIDGE.y0+39,6,1),F('#ffffff',x+7,BRIDGE.y0+60,6,1);
+  F('#9aa3b0',92,BRIDGE.y0,40,BRIDGE.y1-BRIDGE.y0); F('#f6f9fb',94,BRIDGE.y0,36,BRIDGE.y1-BRIDGE.y0); for(let y=BRIDGE.y0;y<BRIDGE.y1;y+=4)F('#ebf1f6',95,y,34,1);
+  F('#5f6676',90,BRIDGE.y0,3,BRIDGE.y1-BRIDGE.y0); F('#5f6676',131,BRIDGE.y0,3,BRIDGE.y1-BRIDGE.y0); for(let y=BRIDGE.y0;y<BRIDGE.y1;y+=8){F('#8a8f9a',89,y,5,2); F('#8a8f9a',130,y,5,2)}
   // Main Street: buildings, crowd barriers
-  for(let x=0;x<BIRK.W;x+=28){if(x>40&&x<170)continue; F(['#b5654f','#7a8aa0','#c49a6a','#6b8f71'][(x/28)%4],x,2580,24,120); F('#ffd98a',x+4,2590,5,6); F('#ffd98a',x+14,2590,5,6)}
-  F('#c8322b',48,2570,2,140); F('#c8322b',174,2570,2,140);
+  for(let x=0;x<BIRK.W;x+=28){if(x>40&&x<170)continue; F(['#b5654f','#7a8aa0','#c49a6a','#6b8f71'][(x/28)%4],x,BRIDGE.y1+30,24,170); F('#ffd98a',x+4,BRIDGE.y1+40,5,6); F('#ffd98a',x+14,BRIDGE.y1+40,5,6)}
+  F('#c8322b',48,BRIDGE.y1+20,2,180); F('#c8322b',174,BRIDGE.y1+20,2,180);
   // feed stations: an orange tent and a table of flat Coke on each side, and a FEED banner over the trail (drawn in under())
   for(const f of FEEDS){const cx=trailX(f.y);
     for(const x of [cx+34+2, cx-34-24]){
@@ -84,7 +88,7 @@ const birkBg=document.createElement('canvas'); birkBg.width=BIRK.W; birkBg.heigh
       F('#8a5a34',x,f.y-6,22,8); F('#c49a6a',x,f.y-6,22,2);
       for(let i=0;i<5;i++){F('#ffffff',x+1+i*4,f.y-10,3,4); F('#4a2412',x+1+i*4,f.y-10,3,2)}}}   // cups of flat Coke
   // pines along the trail edges
-  for(let n=0;n<520;n++){const y=rnd()*(2140)|0, side=rnd()<.5?-1:1, x=trailX(y)+side*(trailHalf(y)+8+rnd()*60);
+  for(let n=0;n<520;n++){const y=rnd()*(2130)|0, side=rnd()<.5?-1:1, x=trailX(y)+side*(trailHalf(y)+8+rnd()*60);
     if(x<2||x>BIRK.W-2)continue; F('#5a3a22',x,y,2,3); F('#2f5e3a',x-4,y-8,10,8); F('#356b42',x-3,y-12,8,5); F('#ffffff',x-3,y-12,7,1); F('#ffffff',x-4,y-8,4,1)}
 })();
 function drawSkier(x,y,o={}){ // generic skier: o.jersey, o.helmet, o.horns, o.down (fallen), o.hair
@@ -98,17 +102,24 @@ function drawSkier(x,y,o={}){ // generic skier: o.jersey, o.helmet, o.horns, o.d
   F(o.pants||'#1d1d22',2,10,6,4); F(o.jersey||'#fbfbf7',2,4,6,6); if(o.trim)F(o.trim,2,4,6,1);
   F('#f0c6a0',3,0,4,4); F(o.hair||'#b08355',3,0,4,2);
   if(o.helmet){F(o.helmet,2,-1,6,3); if(o.horns){F('#f6f2e4',1,-3,1,3); F('#f6f2e4',8,-3,1,3)}}
+  if(o.headband)F(o.headband,3,1,4,1); if(o.glasses){F(o.glasses,2,2,6,1); F('#5a5f6a',3,2,1,1)}   // headband; wraparound sunglasses with a little shine
+  if(o.trim&&o.pants===o.trim)F('#ffffff',2,12,6,1);   // a white stripe on the race tights
 }
+const JOE_RACE_KIT=()=>({jersey:'#fbfbf7',trim:'#2f8a4a',pants:'#2f8a4a',hair:'#b08355',headband:'#2f8a4a',glasses:'#111114',step:P.step});
 const VIKING_LOOK={jersey:'#4f2683', trim:'#ffc62f', pants:'#ffc62f', helmet:'#4f2683', horns:true};
 
 // ---------- race ----------
 function birkStart(){
-  Object.assign(birk,{running:true,v:.03,energy:100,lane:0,lx:0,jumpD:0,crashT:0,t:0,trail:[],msg:'',msgT:0,drink:null,said:{},hit:new Set(),prev:{}});
-  FEEDS.forEach(f=>{f.used=false; f.cup=[-1,0,1][Math.floor(Math.random()*3)]}); birkSay(BIRKIE.radioStart[1]);
+  Object.assign(birk,{vikingT:9000,afterFeed:0,msgWho:'John',running:true,v:.03,energy:100,lane:0,lx:0,jumpD:0,crashT:0,t:0,trail:[],msg:'',msgT:0,drink:null,said:{},hit:new Set(),prev:{}});
+  FEEDS.forEach(f=>{f.used=false; f.cup=[-1,0,1][Math.floor(Math.random()*3)]; f.cup2=f.cup===0?(Math.random()<.5?-1:1):0}); birkSay(BIRKIE.radioStart[1]);
   P.x=trailX(30); P.y=30; P.dir='down';
   birk.vikings=[0,1,2,3].map(i=>({x:P.x,y:P.y-14*(i+1)}));
 }
-function birkSay(m){birk.msg=m; birk.msgT=1800+m.length*35}
+// which lane the cup is over right now (the volunteer swings it back and forth between two lanes)
+const cupLane=(f,t=time)=>Math.floor(t/BIRK.CUP_SWING)%2?f.cup2:f.cup;
+// messages from John on the radio (or a Viking, piping up), shown in a pop-up like the rest of the game
+function birkSay(m,who='John'){birk.msg=m; birk.msgWho=who; birk.msgT=2200+m.length*45; birk.vikingT=Math.max(birk.vikingT||0,4000)}
+const vikingSays=k=>{const a=BIRKIE.vikings[k]; birkSay(a[Math.floor(Math.random()*a.length)],'Viking')};
 function birkOnce(k,m){if(!birk.said[k]){birk.said[k]=true; birkSay(m)}}
 const birkAir=()=>birk.jumpD>0?Math.sin(Math.PI*Math.min(1,birk.jumpD/BIRK.JUMP_LEN))*BIRK.JUMP_H:0;
 function spill(){ const d=birk.drink; if(!d)return; birk.drink=null; sfx('splash'); birk.energy=Math.min(100,birk.energy+BIRK.SPILL_KEEP); birkSay(BIRKIE.spill[Math.floor(Math.random()*BIRKIE.spill.length)]) }
@@ -151,11 +162,24 @@ function birkUpdate(dt){
   // feed stations: be in the cup's lane to grab it, then hold steady (no jumping, no lane changes) until it's down
   for(const f of FEEDS){ if(!f.used&&f.y-P.y<150&&f.y>P.y)birkOnce('feedAhead'+f.y,BIRKIE.feedAhead);
     if(!f.used&&P.y>=f.y){ f.used=true;
-      if(lane===f.cup&&birkAir()<2){ birk.drink={t:0}; sfx('pickup'); birkSay(BIRKIE.grab) } else birkSay(BIRKIE.feedMissed) } }
-  if(birk.drink){ birk.drink.t+=dt; if(birk.drink.t>=BIRK.DRINK_MS){ birk.drink=null; birk.energy=100; birkSay(BIRKIE.feed); sfx('glug'); setTimeout(()=>sfx('glug'),120); setTimeout(()=>sfx('glug'),240) } }
+      if(lane===cupLane(f)&&birkAir()<2){ birk.drink={t:0}; sfx('pickup'); birkSay(BIRKIE.grab) } else birkSay(BIRKIE.feedMissed) } }
+  if(birk.drink){ birk.drink.t+=dt; if(birk.drink.t>=BIRK.DRINK_MS){ birk.drink=null; birk.energy=100; birkSay(BIRKIE.feed); birk.afterFeed=1500; sfx('glug'); setTimeout(()=>sfx('glug'),120); setTimeout(()=>sfx('glug'),240) } }
   if(P.y>440&&P.y<480)birkOnce('climb1',BIRKIE.climb); if(P.y>1720&&P.y<1760)birkOnce('climb2',BIRKIE.climb);
-  if(P.y>1260&&P.y<1300)birkOnce('half',BIRKIE.halfway); if(P.y>2140&&P.y<2180)birkOnce('bridge',BIRKIE.bridge); if(P.y>2250&&P.y<2290)birkOnce('lake',BIRKIE.lake);
+  if(P.y>1260&&P.y<1300)birkOnce('half',BIRKIE.halfway); if(P.y>2150&&P.y<2190)birkOnce('lake',BIRKIE.lake); if(P.y>BRIDGE.y0-30&&P.y<BRIDGE.y0)birkOnce('bridge',BIRKIE.bridge);
+  // the Vikings pipe up now and then (and always have something to say about the flat Coke)
+  if(birk.afterFeed>0){birk.afterFeed-=dt; if(birk.afterFeed<=0)vikingSays('feed')}
+  birk.vikingT=(birk.vikingT||9000)-dt;
+  if(birk.vikingT<=0&&birk.msgT<=0){ vikingSays(P.y>BRIDGE.y0-40?'finish':terrainAt(P.y)==='up'?'climb':terrainAt(P.y)==='lake'?'lake':'tired'); birk.vikingT=9000+Math.random()*6000 }
   if(P.y>=FINISH_Y)birkFinish(true);
+}
+let radioShown=null;
+function birkRadio(){
+  const show=birk.running&&birk.msgT>0&&!paused, el=$('radio');
+  if(!show){ if(!el.hidden)el.hidden=true; radioShown=null; return }
+  const key=birk.msgWho+'|'+birk.msg; if(radioShown===key&&!el.hidden)return; radioShown=key;
+  const who=birk.msgWho==='Viking'?'Viking':'Trail John', p=PORTRAITS[who], g=$('radioFace').getContext('2d');
+  g.fillStyle=p.bg; g.fillRect(0,0,40,40); g.save(); g.scale(40/p.size,40/p.size); p.draw(g); g.restore();
+  $('radioWho').textContent=birk.msgWho==='Viking'?BIRKIE.vikingName:BIRKIE.john+' '+BIRKIE.onRadio; $('radioText').textContent=birk.msg; el.hidden=false;
 }
 // on a phone: swipe left/right on the game to change lanes, swipe up (or tap) to jump
 {let sw=null; cv.addEventListener('pointerdown',e=>{ if(scene===SCENES.birkie&&birk.running)sw={x:e.clientX,y:e.clientY} });
@@ -167,7 +191,7 @@ const obstacleY=o=>o.y;   // (packs used to creep along; it made unfair pile-ups
 const J=t=>[BIRKIE.john,t,'Trail John'];   // a line from John, with his face
 function birkFinish(made){
   sfx(made?'fanfare':'buzz');
-  birk.running=false; birk.drink=null; const tm=clockStr(birk.t); FEEDS.forEach(f=>f.used=false);
+  birk.running=false; birk.drink=null; $('radio').hidden=true; const tm=clockStr(birk.t); FEEDS.forEach(f=>f.used=false);
   if(made){ have.birkie=true; have.birkieTime=tm; save(); const elite=birk.t*BIRK.CLOCK/1000<BIRK.ELITE;
     say([J(BIRKIE.finishWin(tm)[0]),J(elite?BIRKIE.elite:BIRKIE.finishWin(tm)[1]),J(BIRKIE.vikingsWin),J(BIRKIE.johnDone)],()=>showReward('mill',()=>goTo('world','fromMill'))) }   // John hands you the flour right there
   else say([J(BIRKIE.finishLate(tm)[0]),J(BIRKIE.finishLate(tm)[1])],()=>showDialog({place:BIRKIE.place,speaker:BIRKIE.john,face:'Trail John',pages:[BIRKIE.againAsk],actions:[{label:BIRKIE.again,fn:()=>{closeDialog();birkStart()}},{label:BIRKIE.leave,ghost:true,fn:()=>{closeDialog();goTo('world','fromMill')}}]}));
@@ -217,6 +241,7 @@ const birkStartArch=archSprite(60,24,g=>{const F=(c,x,y,w,h)=>{g.fillStyle=c;g.f
 SCENES.birkie={ place:BIRKIE.place, music:'birkie',
   w:BIRK.W, h:BIRK.L, bounds:R(0,0,BIRK.W,BIRK.L), bg:birkBg, solids:[], triggers:[],
   entries:{start:{x:112,y:30,dir:'down'}},
+  leave(){ $('radio').hidden=true },
   enter(){ birk.running=false; P.x=trailX(30); P.y=30; birk.vikings=[0,1,2,3].map(i=>({x:P.x,y:16-i*14})); birk.introPending=true },
   speed:()=>0,                                  // you don't walk here; birkUpdate moves you
   ability:()=>birkTap(),
@@ -225,9 +250,9 @@ SCENES.birkie={ place:BIRKIE.place, music:'birkie',
     if(birk.introPending){birk.introPending=false; return birkHowTo(()=>say([J(BIRKIE.radioStart[0])],()=>birkStart()))}
     birkUpdate(dt);
   },
-  drawPlayer:(x,y)=>{ if(birk.crashT>0)return drawSkier(x,y,{down:true,jersey:'#fbfbf7'}); const h=birkAir();
+  drawPlayer:(x,y)=>{ if(birk.crashT>0)return drawSkier(x,y,{down:true,jersey:'#fbfbf7'}); const h=birkAir();   // Joe's race kit: white and green, black Oakleys, a headband
     if(h>0){ctx.fillStyle='rgba(0,0,0,.15)'; ctx.fillRect(Math.round(x)-5,Math.round(y)-1,10,2)}                       // shadow stays on the snow
-    drawSkier(x,y-h,{jersey:'#fbfbf7',trim:'#c8322b',hair:'#b08355',step:P.step});
+    drawSkier(x,y-h,JOE_RACE_KIT());
     if(birk.drink){const X=Math.round(x)+5, Y=Math.round(y-h)-12; ctx.fillStyle='#ffffff'; ctx.fillRect(X,Y,3,4); ctx.fillStyle='#4a2412'; ctx.fillRect(X,Y,3,2)} },
   under(){
     for(const o of OBSTACLES){const oy=obstacleY(o); if(Math.abs(oy-P.y)>200)continue;
@@ -237,7 +262,7 @@ SCENES.birkie={ place:BIRKIE.place, music:'birkie',
     for(const f of FEEDS){const cx=Math.round(trailX(f.y)), hw=34; ctx.fillStyle='#8a8f9a'; ctx.fillRect(cx-hw-2,f.y-20,2,22); ctx.fillRect(cx+hw,f.y-20,2,22);
       ctx.fillStyle='#e8742a'; ctx.fillRect(cx-hw-2,f.y-24,hw*2+4,9); ctx.fillStyle='#ffffff'; ctx.fillRect(cx-hw-2,f.y-24,hw*2+4,1); pixText(ctx,'FEED',cx-7,f.y-22,'#ffffff')}
     // the cup of flat Coke, held out over one lane by a volunteer at the trail edge (with a bouncing arrow over it)
-    for(const f of FEEDS){ if(f.used||f.cup==null||Math.abs(f.y-P.y)>200)continue; const x=Math.round(laneX(f.y,f.cup)), y=f.y+6, side=f.cup<0?-1:1, ex=Math.round(trailX(f.y)+side*37);
+    for(const f of FEEDS){ if(f.used||f.cup==null||Math.abs(f.y-P.y)>200)continue; const cl=cupLane(f), x=Math.round(laneX(f.y,cl)), y=f.y+6, side=(f.cup+f.cup2)<0?-1:1, ex=Math.round(trailX(f.y)+side*37);
       ctx.fillStyle='#e8742a'; for(let k=0;k<16;k+=3){ctx.fillRect(x-7,y-12+k,1,2); ctx.fillRect(x+7,y-12+k,1,2)}   // dashed lines marking the lane to aim for
       ctx.fillStyle='#e8742a'; ctx.fillRect(ex-3,y-12,7,10); ctx.fillStyle='#f0c6a0'; ctx.fillRect(ex-2,y-17,5,5); ctx.fillStyle='#6b4428'; ctx.fillRect(ex-2,y-17,5,2);   // the volunteer
       ctx.fillStyle='#f0c6a0'; ctx.fillRect(Math.min(ex,x),y-8,Math.abs(ex-x),2);                              // a looong arm
@@ -252,9 +277,13 @@ SCENES.birkie={ place:BIRKIE.place, music:'birkie',
     // section signs
     ctx.font='7px monospace'; for(const s of BIRK_SECTIONS){ if(!s.name)continue; const sx=Math.round(trailX(s.y+10)+34+4), w=Math.ceil(ctx.measureText(s.name).width)+6, x=Math.max(2,Math.min(sx,BIRK.W-w-2));
       ctx.fillStyle='#8a5a34'; ctx.fillRect(x+4,s.y+10,2,8); ctx.fillStyle='#1d3f73'; ctx.fillRect(x,s.y,w,10); ctx.fillStyle='#ffffff'; ctx.fillText(s.name,x+3,s.y+7) }
+    // flags of every country along both sides of the International Bridge, waving
+    {const C=[['#c8322b','#ffffff','#c8322b'],['#2f6db0','#ffffff','#2f6db0'],['#2f8a4a','#ffffff','#c8322b'],['#ffc62f','#2f6db0','#ffc62f'],['#1d1d22','#c8322b','#ffc62f'],['#ffffff','#c8322b','#ffffff'],['#2f6db0','#ffc62f','#2f6db0'],['#c8322b','#ffc62f','#2f8a4a']];
+      let k=0; for(let y=BRIDGE.y0+4;y<BRIDGE.y1;y+=12)for(const side of [-1,1]){const px=side<0?88:135, c=C[k++%C.length], w=Math.round(Math.sin(time/160+y/9+side)*1);
+        ctx.fillStyle='#8a8f9a'; ctx.fillRect(px,y-10,1,12); for(let i=0;i<3;i++){ctx.fillStyle=c[i]; ctx.fillRect(px+(side<0?-7:1),y-10+i*2+(i===1?w:0),6,2)}}}
     // finish banner + crowd
     ctx.fillStyle='#4f2683'; ctx.fillRect(40,FINISH_Y-8,144,9); ctx.fillStyle='#ffc62f'; ctx.font='7px monospace'; ctx.fillText('FINISH · HAYWARD',76,FINISH_Y-1);
-    for(let i=0;i<30;i++){const x=i<15?30+((i*7)%18):176+((i*7)%18), y=2590+(i%15)*8, j=Math.sin(time/150+i)>.6?-1:0; ctx.fillStyle=['#c8322b','#2f6db0','#ffc62f','#4f2683','#2f8a4a'][i%5]; ctx.fillRect(x,y+j,4,5); ctx.fillStyle='#f0c6a0'; ctx.fillRect(x+1,y-2+j,2,2)}
+    for(let i=0;i<30;i++){const x=i<15?30+((i*7)%18):176+((i*7)%18), y=BRIDGE.y1+30+(i%15)*8, j=Math.sin(time/150+i)>.6?-1:0; ctx.fillStyle=['#c8322b','#2f6db0','#ffc62f','#4f2683','#2f8a4a'][i%5]; ctx.fillRect(x,y+j,4,5); ctx.fillStyle='#f0c6a0'; ctx.fillRect(x+1,y-2+j,2,2)}
   },
   ents(list){ birk.vikings.forEach((v,i)=>list.push({y:v.y,draw:()=>{const y=v.y-(v.air||0); drawSkier(v.x,y,{...VIKING_LOOK,step:P.step+i}); if(i===0){ctx.fillStyle='#efe2c4'; ctx.fillRect(Math.round(v.x)-3,Math.round(y)-14,6,5); ctx.fillStyle='#c94a3a'; ctx.fillRect(Math.round(v.x)-2,Math.round(y)-12,4,1)}}})) },
   over(){
@@ -267,11 +296,7 @@ SCENES.birkie={ place:BIRKIE.place, music:'birkie',
     // falling snow + messages
     ctx.fillStyle='rgba(255,255,255,.9)'; for(let i=0;i<40;i++){const sx=(i*53+time*.02*(1+i%3))%BIRK.W, sy=cy+(i*37+time*.04*(1+i%2))%168; ctx.fillRect(sx|0,sy|0,1,1)}
     if(terrainAt(P.y)==='lake'){ctx.fillStyle='rgba(255,255,255,.5)'; for(let i=0;i<20;i++){const x=(i*61+time*.25)%BIRK.W; ctx.fillRect(x|0,(cy+(i*29)%168)|0,6,1)}}
-    // John on the radio: his face and the message, wrapped so nothing gets cut off
-    if(birk.msgT>0&&birk.running){ctx.font='7px monospace'; const lines=[]; let cur='';
-      for(const w of birk.msg.split(' ')){const t=cur?cur+' '+w:w; if(ctx.measureText(t).width>176&&cur){lines.push(cur);cur=w}else cur=t} lines.push(cur);
-      const h=Math.max(22,lines.length*9+6), bx=cx+16, by=cy+4; ctx.fillStyle='rgba(29,33,48,.9)'; ctx.fillRect(bx,by,204,h); ctx.fillStyle='#ffc62f'; ctx.fillRect(bx,by,204,1);
-      ctx.drawImage(johnFace,bx+3,by+3,16,16); ctx.fillStyle='#ffffff'; lines.forEach((l,i)=>ctx.fillText(l,bx+23,by+9+i*9))}
+    birkRadio();   // John (or a Viking) on the radio: a pop-up like the rest of the game
     // the sweep tracker: a strip on the left edge from start (top) to finish (bottom)
     if(birk.running){const tx=cx+4, ty=cy+30, th=96, k=th/FINISH_Y; ctx.fillStyle='rgba(29,33,48,.55)'; ctx.fillRect(tx,ty,6,th);
       ctx.fillStyle='#4f2683'; ctx.fillRect(tx,ty+th-2,6,2);

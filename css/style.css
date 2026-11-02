@@ -305,3 +305,5 @@ canvas{border-radius:6px}
 .devskip{display:flex;flex-direction:column;gap:4px;width:100%;border-top:2px dashed #4d5a78;padding-top:6px;margin-top:2px}
 .devskip small{font-size:.7rem!important;color:#8a93a8!important}
 .devskip .btn{color:var(--paper);border-color:#4d5a78}
+.alexhint.radio{bottom:auto;top:6px;animation:none;pointer-events:none}
+.alexhint.radio b{display:block;font-family:var(--pixel);font-size:.72rem;color:var(--berry);margin-bottom:1px}

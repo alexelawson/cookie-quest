@@ -36,7 +36,7 @@ r=await p.evaluate(()=>{const o=OBSTACLES.find(o=>o.kind==='pack'); T.only=o; co
   const msg=birk.msg; T.setup(o.y-20,free); let clean=true; for(let i=0;i<30;i++){update(16.7); if(birk.crashT>0)clean=false} return {hitWhileJumping,msg,clean,known:BIRKIE.packCrash.includes(msg)}});
 ok('D a pack of slow skiers: jumping won\'t clear it, going around will',r.hitWhileJumping&&r.known&&r.clean,r.msg);
 // E. feed stations: grab the cup, hold steady, don't spill
-r=await p.evaluate(()=>{const f=FEEDS[0], out={};
+r=await p.evaluate(()=>{const f=FEEDS[0], out={}; f.cup2=f.cup;   // hold the cup still for these
   f.used=false; T.setup(f.y-10,f.cup); birk.energy=30; T.run(10); out.grab=birk.msg; out.drinking=!!birk.drink; T.run(Math.ceil(BIRK.DRINK_MS/16.7)+5); out.full=birk.energy; out.done=birk.msg;
   f.used=false; T.setup(f.y-10,f.cup); birk.energy=30; T.run(10); T.tap(f.cup===1?'left':'right'); out.spill=birk.msg; out.after=birk.energy; out.gone=!birk.drink;
   f.used=false; T.setup(f.y-10,f.cup); birk.energy=30; T.run(10); birkJump(); out.spillJump=birk.msg;
@@ -48,8 +48,17 @@ ok('E wrong lane: you miss the cup',r.missed.includes('Missed')&&r.missE<35,r.mi
 r=await p.evaluate(()=>{T.only=null; T.setup(500,0); birk.energy=100; birk.v=.03; T.run(200); const vFull=birk.v, eAfter=birk.energy; T.setup(500,0); birk.energy=0; birk.v=.03; T.run(200); return {vFull,eAfter,vEmpty:birk.v}});
 ok('F energy drains as you go, and running on empty is slow',r.eAfter<100&&r.vEmpty<r.vFull*.8,`${r.vFull.toFixed(3)} vs ${r.vEmpty.toFixed(3)}`);
 // G. the course is always passable
-r=await p.evaluate(()=>{const bad=OBSTACLES.filter(o=>o.lanes.length>=3||(o.y>2110&&o.y<2260)||FEEDS.some(f=>Math.abs(o.y-f.y)<60)); return {bad:bad.length,n:OBSTACLES.length,packs:OBSTACLES.filter(o=>o.kind==='pack').length,bridge:laneX(2180,1)-laneX(2180,0),trail:laneX(1000,1)-laneX(1000,0)}});
+r=await p.evaluate(()=>{const bad=OBSTACLES.filter(o=>o.lanes.length>=3||(o.y>BRIDGE.y0-40&&o.y<BRIDGE.y1+40)||FEEDS.some(f=>Math.abs(o.y-f.y)<60)); return {bad:bad.length,n:OBSTACLES.length,packs:OBSTACLES.filter(o=>o.kind==='pack').length,bridge:laneX(2450,1)-laneX(2450,0),trail:laneX(1000,1)-laneX(1000,0),order:sectionAt(2200).type==='lake'&&sectionAt(2450).bridge&&sectionAt(2560).type==='finish'}});
 ok('G every obstacle leaves a way through; none on the bridge or at a feed; lanes squeeze on the bridge',!r.bad&&r.n>12&&r.packs>2&&r.bridge<r.trail,JSON.stringify(r));
+ok('G the finish: across the lake, over the International Bridge, then Main Street',r.order);
+// K. the feed cup swings between two lanes; John and the Vikings talk in a pop-up like the rest of the game
+r=await p.evaluate(()=>{const f=FEEDS[1]; const lanes=new Set(); for(let t=0;t<BIRK.CUP_SWING*4;t+=100)lanes.add(cupLane(f,t));
+  T.only=null; T.setup(600,0); birkSay('Test from John'); draw(); const john=!$('radio').hidden&&$('radioWho').textContent.startsWith('John')&&$('radioText').textContent==='Test from John';
+  birk.t=0; birk.said={}; for(let y=0;y<3000;y+=400)birk.said['sweep'+Math.floor(y/400)]=1; birk.msgT=0; birk.vikingT=1; T.run(2); draw(); const vik=!$('radio').hidden&&$('radioWho').textContent==='A Viking', line=$('radioText').textContent;
+  const all=Object.values(BIRKIE.vikings).flat().includes(line); return {two:lanes.size===2,john,vik,line,all,fc:BIRKIE.vikings.feed.some(l=>/Flat Coke/.test(l))}});
+ok('K the volunteer swings the cup between two lanes',r.two);
+ok('K John\'s radio messages show in a pop-up with his face and name',r.john);
+ok('K the Vikings pipe up too (including about the flat Coke)',r.vik&&r.all&&r.fc,r.line);
 // H. lose: never dodging, the sweep catches you
 await fresh(); await start();
 r=await p.evaluate(()=>{T.ski(1); return {lines:T.through(),btns:T.btns(),done:!!have.birkie}});
