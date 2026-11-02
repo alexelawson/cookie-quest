@@ -146,7 +146,6 @@ const WARDROBE = {title:"Suit up, Joe", intro:"It's a stealth mission. What are 
     {id:'cape',    name:"The Classic",      line:"Dark suit, mask, dramatic cape. Very brooding."},
     {id:'ninja',   name:"All-Black Ninja",  line:"Head to toe in black. Only your eyes show."},
     {id:'burglar', name:"Cat Burglar",      line:"Striped shirt, beanie, eye mask, and a sack for the loot."},
-    {id:'hoodie',  name:"Hoodie & Sweats",  line:"Hood up. Mysterious. Mostly just comfy."},
     {id:'sweater', name:"Ugly Xmas Sweater",line:"Stealth: zero. Festive: maximum."},
     {id:'vikings', name:"Vikings Gameday",  line:"Purple jersey, gold pants, horned helmet. SKOL."},
     {id:'disco',   name:"70s Disco",        line:"White suit, gold chain, big hair. Stayin' alive."},
@@ -156,7 +155,7 @@ const WARDROBE = {title:"Suit up, Joe", intro:"It's a stealth mission. What are 
   changeOutfit:"Change outfit",   // the button in Settings
   changeIntro:"Change it up any time. What are you wearing?",
   react:{cape:[['Lars',"Very dramatic. The cape is a lot."],['John',"I love the cape."]], ninja:[['John',"I can't see you. That's the point, right?"]],
-         burglar:[['Lars',"You look like a cartoon robber."],['John',"It's perfect."]], hoodie:[['John',"Respect. Comfort first."]],
+         burglar:[['Lars',"You look like a cartoon robber."],['John',"It's perfect."]],
          sweater:[['Lars',"They're going to see you from space."],['John',"Festive though."]],
          vikings:[['John',"SKOL!!!"],['Lars',"We're breaking into a vault, not tailgating."],['John',"Why not both."]],
          avant:[['Lars',"Is that... art?"],['John',"He looks like a security guard from the year 3000."],['Lars',"Avant Guard. I get it. I hate that I get it."]],

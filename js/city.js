@@ -105,7 +105,6 @@ const OUTFIT_LOOK={
   cape:   {top:'#34405c', pants:'#14161f', boots:'#0b0c12', belt:'#5a3a22', cape:['#0e1017','#1d2130'], head:'hair', mask:'#0b0c12'},
   ninja:  {top:'#17181f', pants:'#17181f', boots:'#0b0c12', belt:'#2a2b36', head:'wrap'},
   burglar:{top:'stripes', pants:'#1d1d22', boots:'#0b0c12', head:'beanie', hat:'#1d1d22', mask:'#0b0c12', sack:true},
-  hoodie: {top:'#6b707c', pants:'#3a3f4a', boots:'#e8e8e0', head:'hood', hat:'#6b707c'},
   sweater:{top:'sweater', pants:'#3a5f9e', boots:'#3b2a1e', head:'santa'},
   vikings:{top:'jersey', pants:'#ffc62f', boots:'#f2f2ee', head:'helmet'},
   disco:  {top:'disco', pants:'#f2efe6', boots:'#e8b04a', head:'afro', flare:true},
