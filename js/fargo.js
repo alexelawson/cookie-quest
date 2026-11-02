@@ -181,18 +181,18 @@ function drawAttendant(x,y,i){
   drawSprite(ctx,X,Y,{down:["..CCCCCC..","..cccccc..","..SSSSSS..","..SESSES..","..sSMMSs..",".TTTSSTTT.",".TTTTTTTT.",".TWTTTTTT.",".STTTTTtS.",".STTTTTtS.",".tttttttt."]},pal,'down',3,9+i);
 }
 // Alex: dark brown hair just below the shoulders, brown eyes, a green tee. Her mood shows in a little bubble.
-// Alex, waiting in the car park: long dark-brown hair past her shoulders, side-swept fringe, green scoop-neck tee. mood: happy / frown / ok
-const ALEX_SPR={down:["..HHHHHHHH..",".HHhLLLHHHH.",".HHHHHSSSSH.",".HSSHSSSSSH.",".HSWESSEWSH.",".HSSSssSSSH.",".HSSSSSSSSH.",
+// Alex, waiting in the car park: long straight dark-brown hair swept back off her face, past her shoulders; big smile; green scoop-neck tee. mood: happy / frown / ok
+const ALEX_SPR={down:["..HHHHHHHH..",".HHLLhLLHHH.",".HHSSSSSSHH.",".HSBBSSBBSH.",".HSWESSEWSH.",".HSSSssSSSH.",".HSSSSSSSSH.",
   ".HHTTSSTTHH.",".HHTTTTTTHH.",".HTTTTTTTtH.",".STTTTTTTtS.",".STTTTTTTtS.",".sPPPPPPPPs.","..PPPPPPPP.."]};
 function drawAlex(x,y,mood){
   const X=Math.round(x)-6, Y=Math.round(y)-19, F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(X+dx,Y+dy,w,h)};
-  const pal={H:ALEX.hair,h:ALEX.hairD,L:ALEX.hairL,S:ALEX.skin,s:ALEX.skinS,W:'#ffffff',E:ALEX.eye,T:ALEX.top,t:ALEX.topD,P:ALEX.pants};
+  const pal={H:ALEX.hair,h:ALEX.hairD,L:ALEX.hairL,B:ALEX.hairD,S:ALEX.skin,s:ALEX.skinS,W:'#ffffff',E:ALEX.eye,T:ALEX.top,t:ALEX.topD,P:ALEX.pants};
   F('rgba(0,0,0,.2)',1,18,10,2);
   F(ALEX.pants,3,14,3,4); F(ALEX.pants,6,14,3,4); F('#22222a',5,14,1,4); F(ALEX.shoe,2,17,4,2); F(ALEX.shoe,6,17,4,2); F('#5a4030',2,17,1,1); F('#5a4030',6,17,1,1);
   drawSprite(ctx,X,Y,ALEX_SPR,pal,'down',4,10);
   if(mood==='happy'){F(ALEX.smile,5,6,2,1); F(ALEX.smile,4,5,1,1); F(ALEX.smile,7,5,1,1); F(ALEX.blush,2,5,1,1); F(ALEX.blush,9,5,1,1)}   // a big smile
-  else if(mood==='frown'){F(ALEX.frown,5,6,2,1); F(ALEX.hairD,3,3,2,1); F(ALEX.hairD,7,3,2,1)}   // cross brows
-  else {F(ALEX.mouth,5,6,2,1); F(ALEX.blush,2,5,1,1); F(ALEX.blush,9,5,1,1)}
+  else if(mood==='frown'){F(ALEX.frown,5,6,2,1); F(ALEX.skin,3,3,2,1); F(ALEX.skin,7,3,2,1); F(ALEX.hairD,3,3,1,1); F(ALEX.hairD,4,2,1,1); F(ALEX.hairD,8,3,1,1); F(ALEX.hairD,7,2,1,1)}   // cross brows
+  else {F(ALEX.smile,4,6,4,1); F('#ffffff',5,6,2,1); F(ALEX.blush,2,5,1,1); F(ALEX.blush,9,5,1,1)}   // her usual big smile
   if(mood!=='ok'){ // bubble
     const bx=Math.round(x)+5, by=Math.round(y)-30; ctx.fillStyle='#ffffff'; ctx.fillRect(bx,by,9,8); ctx.fillRect(bx+1,by+8,2,2);
     ctx.fillStyle=mood==='happy'?'#e54b7a':'#4a4a5a';
@@ -437,7 +437,7 @@ function drawAlexFace(g,mood){
   // long hair behind (falls past the shoulders, slightly wavy)
   // hair just below the shoulders (ends around y 36, curling in a little)
   for(let y=5;y<37;y++){let w; if(y<17){const t=(17-y)/12; w=Math.sqrt(Math.max(0,1-t*t))*13} else w=13-Math.max(0,y-31)*0.9;
-    const wave=Math.round(Math.sin(y/2.6)*0.8); F(hair,Math.round(20-w)+wave,y,Math.round(w*2)-wave*2,1)}
+    const wave=Math.round(Math.sin(y/3.4)*0.3); F(hair,Math.round(20-w)+wave,y,Math.round(w*2)-wave*2,1)}   // (straight)
   F(hairD,8,26,2,9); F(hairD,30,26,2,9);
   // shoulders in her light blue tee (same as her sprite), scoop neck
   F(ALEX.top,8,35,24,5); F(ALEX.top,6,37,28,3); F(skinS,17,30,6,5); F(skin,17,30,6,3); F(skin,17,35,6,1); F(skin,18,36,4,1); F(ALEX.topD,16,35,1,2); F(ALEX.topD,23,35,1,2); F(ALEX.topD,17,37,6,1);
@@ -446,8 +446,10 @@ function drawAlexFace(g,mood){
   F(skinS,11,24,1,2); F(skinS,28,24,1,2);   // jaw shading
   // hair in front
   // side part, sweeping across the forehead // side part, sweeping across the forehead
-    F(hair,11,6,18,4); F(hair,10,8,7,5); F(hair,16,9,9,2); F(hair,24,9,6,3); F(hair,9,12,3,18); F(hair,28,12,3,18); F(hair,14,11,4,1);
-    F(hairL,15,7,6,1); F(hairL,13,9,3,1); F(hairL,10,16,1,8); F(hairL,29,18,1,7);
+    // swept back off the face: a high, smooth hairline with a side part, long straight lengths framing the face
+    F(hair,11,5,18,4); F(hair,10,8,4,3); F(hair,26,8,4,3); F(hair,12,8,3,1); F(hair,25,8,3,1); F(hairD,16,5,1,3);
+    F(hair,9,11,3,19); F(hair,28,11,3,19); F(hairD,11,14,1,14); F(hairD,28,14,1,14);
+    F(hairL,12,6,4,1); F(hairL,18,6,8,1); F(hairL,20,7,4,1); F(hairL,10,15,1,11); F(hairL,29,15,1,11);
   
   // eyebrows
   if(mood==='frown'){F(hairD,14,15,4); F(hairD,17,16,1); F(hairD,22,16,1); F(hairD,22,15,4)}
@@ -469,7 +471,7 @@ function drawAlexFace(g,mood){
   // mouth
   if(mood==='happy'){F(ALEX.smile,17,25,6); F(ALEX.smile,16,24,1); F(ALEX.smile,23,24,1); F('#ffffff',18,25,4); F(ALEX.smile,18,26,4)}
   else if(mood==='frown'){F(ALEX.frown,17,26,6); F(ALEX.frown,16,27,1); F(ALEX.frown,23,27,1)}
-  else {F(ALEX.mouth,18,26,4); F('#d98a80',17,26,1); F('#d98a80',22,26,1)}
+  else {F(ALEX.smile,17,25,6); F(ALEX.smile,16,24,1); F(ALEX.smile,23,24,1); F('#ffffff',18,25,4); F(ALEX.smile,18,26,4)}   // her usual big smile
 }
 
 // pixel art for the shop items (16x20). Simple shapes and colors, no real packaging.
