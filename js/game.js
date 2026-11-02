@@ -71,25 +71,32 @@ function drawPlayer(x0,y0){
   drawGear(c,ctx,look||null);   // Oakleys, headband, racing shoes, if he found them
   if(have.crown&&scene!==SCENES.kitchen)drawCrown(x0,y0-25);   // the Cookie King
 }
+// ---------- pixel-grid sprites: rows of characters, one per pixel ('.' is see-through). flip mirrors left-right. ----------
+function blit(g,x,y,rows,pal,flip){
+  for(let r=0;r<rows.length;r++){const row=rows[r], w=row.length;
+    for(let c=0;c<w;c++){const k=row[c]; if(k==='.'||k===' ')continue; const col=pal[k]; if(!col)continue; g.fillStyle=col; g.fillRect(x+(flip?w-1-c:c),y+r,1,1)}}
+}
+const blinkNow=(seed=0)=>((time+seed*977)%3700)<130;   // everyone blinks now and then (seed staggers them)
+// Joe in his jersey: white with red trim, brown hair. 12 x 21 px; eyes on row 4, jersey from row 7, shoes on row 19 (the gear in extras.js lines up with those)
+const JOE_PAL={o:'#3b2a24',H:'#a8794c',L:'#c99a66',h:'#7d5636',S:'#f2c9a3',s:'#d9a583',B:'#6b4a2e',W:'#ffffff',E:'#3d7fc9',M:'#b5654f',J:'#fbfbf7',j:'#d6d6cc',R:'#c8322b',K:'#2a2a33',k:'#3e3e4a'};
+const JOE_ROWS={
+  down:["..oooooooo..",".oHHLLLHHHo.",".oHLHHHHhHo.",".oHBBSSBBHo.",".oSWESSEWSo.",".oSSSssSSSo.","..osSMMSso..",
+        "oJJJJSSJJJJo","oRJJJRRJJJRo","oSJJJJJJJjSo","oSJJJJJJJjSo","osjjjjjjjjso",".oKKKKKKKKo.",".oKKKkkKKKo."],
+  up:  ["..oooooooo..",".oHHLLLHHHo.",".oHHHHHHHHo.",".oHHHHHHHHo.",".oHHHHHHHHo.",".ohHHHHHHho.","..osSSSSso..",
+        "oJJJJJJJJJJo","oRJJJJJJJJRo","oSJJJJJJJjSo","oSJJJJJJJjSo","osjjjjjjjjso",".oKKKKKKKKo.",".oKKKKKKKKo."],
+  right:["..oooooooo..",".oHHHLLLHHo.",".oHHHHHHHHo.",".oHHHHSSBSo.",".oHHHSSSWEo.",".ohHsSSSSSSo","..ohSSSSMSo.",
+        ".oJJJJJRSSJo",".oJJJJJJRRJo",".oJJJJSJJJjo",".oJJJJSJJJjo",".ojjjjsjjjjo",".oKKKKKKKKo.",".oKKKkkKKKo."],
+};
 function drawJoeJersey(P,g=ctx){
-  const x=Math.round(P.x)-6, y=Math.round(P.y)-20;   // (20 px tall: a bit taller than everyone but Lars)
+  const x=Math.round(P.x)-6, y=Math.round(P.y)-20, pal=JOE_PAL, dir=P.dir||'down';
   const F=(c,dx,dy,w,h)=>{g.fillStyle=c;g.fillRect(x+dx,y+dy,w,h)};
-  const skin='#f0c6a0',hair='#b08355',hairD='#8d6440',shirt='#fbfbf7',red='#c8322b',blk='#1d1d22',eye='#3d8ad6';
   F('rgba(0,0,0,.25)',2,19,8,2);
   const a=P.moving&&P.step%2?1:0, b=P.moving&&!(P.step%2)?1:0;
-  F(skin,3,14,2,5-a); F(skin,7,14,2,5-b); F(blk,3,14,2,1); F(blk,7,14,2,1);
-  F(blk,2,19-a,3,1); F(blk,7,19-b,3,1);
-  F(blk,2,12,8,3);
-  F(shirt,2,7,8,5); F(shirt,1,7,1,2); F(shirt,10,7,1,2); F(red,1,8,1,1); F(red,10,8,1,1); F('#e2e2d8',8,8,2,4); F('#e2e2d8',2,11,8,1);   // a little shading on the jersey
-  F(skin,1,9,1,3); F(skin,10,9,1,3);
-  F(skin,3,2,6,5);
-  if(P.dir==='up'){F(hair,2,0,8,6); F(hairD,3,5,6,1); F(shirt,4,7,4,1)}
-  else{
-    F(hair,2,0,8,3); F('#c89a6a',3,0,3,1);   // hair highlight
-    if(P.dir==='down'){F(hair,2,3,1,2);F(hair,9,3,1,2);F(hairD,3,2,4,1);F(eye,4,4,1,1);F(eye,7,4,1,1);F('#b5654f',5,6,2,1);F(red,5,7,2,1)}
-    if(P.dir==='left'){F(hair,7,2,3,4);F(hairD,3,2,3,1);F(eye,3,4,1,1);F(red,3,7,2,1)}
-    if(P.dir==='right'){F(hair,2,2,3,4);F(hairD,6,2,3,1);F(eye,8,4,1,1);F(red,7,7,2,1)}
-  }
+  const leg=(x0,lift,outer)=>{F(pal.o,outer,14,1,6-lift); F(pal.K,x0,14,2,1); F(pal.S,x0,15,2,3-lift); F(pal.s,x0+1,15,1,3-lift); F(pal.W,x0,18-lift,2,1); F('#1d1d22',x0-1,19-lift,3,1); F('#4a4a55',x0-1,19-lift,1,1);};
+  leg(3,a,2); leg(7,b,9); F(pal.K,5,14,2,1);   // (the gap between his legs shows the ground)
+  let rows=dir==='left'?JOE_ROWS.right:(JOE_ROWS[dir]||JOE_ROWS.down);
+  if(blinkNow()&&dir!=='up')rows=rows.map((r,i)=>i===4?r.replace(/W/g,'s').replace(/E/g,'s'):r);
+  blit(g,x,y,rows,pal,dir==='left');
 }
 
 function draw(){
