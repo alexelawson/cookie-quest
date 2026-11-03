@@ -1,9 +1,9 @@
 // The city at night: the chocolate heist.
 // You play a crew of three and switch between them:
-//   you  = sonar pulse (lights up the dark, chalk-marks the invisible tripwires) and Dr. Alex's gadget (laser panel, the Confectioner)
+//   you  = sonar pulse (lights up the dark, chalk-marks the invisible tripwires) and Doc Alex's gadget (laser panel, the Confectioner)
 //   Lars = sprint (fast enough to dash between cover under the searchlights)
 //   John = lift (carries the log, rips off the grate)
-// Route: roof A (a log blocks the way to Dr. Alex's rooftop lab: John lifts it and carries it; the briefing; then the log bridges the gap) -> roof B (searchlights; Lars
+// Route: roof A (a log blocks the way to Doc Alex's rooftop lab: John lifts it and carries it; the briefing; then the log bridges the gap) -> roof B (searchlights; Lars
 //        hops cover to cover to the LIGHT POWER switch) -> roof C (a guard + a laser maze around the skylight) -> the Confectioner -> his riddle (the vault).
 const CW=520, CH=200;
 const ROOF_A=R(6,30,112,156), ROOF_B=R(150,20,170,166), ROOF_C=R(352,26,160,160);
@@ -15,7 +15,7 @@ const gateOpen=()=>!!have.plankGate||heistStage()>=2;
 const LIGHTS_OUT_MS=20000;                 // Lars's switch only kills the searchlights for this long; they stay off once the whole crew is on roof C
 const DEFUSE_MS=4000;                      // hold A this long at the laser panel (it keeps half if you let go past halfway)
 const STACK=R(448,52,52,22);               // the whole crew stands here before John rips the grate
-const LOOSE_BEAM=R(41,117,34,7);          // the log, wedged between the water tank and the vents: it blocks the only way to Dr. Alex until John lifts it
+const LOOSE_BEAM=R(41,117,34,7);          // the log, wedged between the water tank and the vents: it blocks the only way to Doc Alex until John lifts it
 // roof A: a water tank and a bank of vents split the roof; the only way through is a narrow gap between them
 const TANK=R(6,112,40,18), VENTS=R(70,112,48,14);
 const LAB={bench:R(16,46,32,8), coil:R(56,40,6,8)};
@@ -23,7 +23,7 @@ const LOG_DROP=R(90,92,28,22);            // the edge of roof A: walk up here to
 const FUSE={x:312,y:100};
 const SKYLIGHT=R(462,40,24,16);
 const LADDER=R(10,166,22,14);
-const STRANGER={x:40,y:66};               // Dr. Alex, at her lab bench (the client)
+const STRANGER={x:40,y:66};               // Doc Alex, at her lab bench (the client)
 // roof C laser maze. Invisible ones only show while the sonar's going (and stay chalk-marked after a ping).
 const LASERS=[
   [420,26,420,150],                        // wall on the left of the maze
@@ -84,7 +84,7 @@ const cityBg=document.createElement('canvas'); cityBg.width=CW; cityBg.height=CH
   plank(PLANK_BC);
   const ac=(r)=>{const {x,y,w,h}=r; F('rgba(0,0,0,.45)',x+2,y+h,w,3); F('#6f7686',x,y,w,h); F('#8b93a3',x,y,w,1); F('#4a5064',x+2,y+2,Math.min(8,w-4),h-4);
     for(let k=y+3;k<y+h-2;k+=2)F('#2e3346',x+2,k,Math.min(8,w-4),1); if(w>12){F('#5a6070',x+w-5,y+2,3,h-4); F('#c9ced4',x+w-4,y+3,1,1)}};
-  // roof A: Dr. Alex's rooftop lab (bench of bubbling flasks, a tesla coil), a water tank, a bank of vents
+  // roof A: Doc Alex's rooftop lab (bench of bubbling flasks, a tesla coil), a water tank, a bank of vents
   {const b=LAB.bench; F('rgba(0,0,0,.4)',b.x+1,b.y+b.h,b.w,3); F('#5a3a22',b.x,b.y,b.w,b.h); F('#7a5232',b.x,b.y,b.w,2);
     for(const [fx,c] of [[b.x+3,'#5fff8a'],[b.x+10,'#ff5fd2'],[b.x+18,'#5fd2ff'],[b.x+25,'#ffd75f']]){F('#cfe6f2',fx,b.y-5,4,6); F(c,fx,b.y-2,4,3); F('#cfe6f2',fx+1,b.y-7,2,2)}
     const c=LAB.coil; F('#3a3f52',c.x-1,c.y+6,8,3); F('#b87333',c.x+1,c.y,4,7); for(let k=c.y;k<c.y+7;k+=2)F('#8a5522',c.x+1,k,4,1); F('#c9ced4',c.x,c.y-3,6,3)}
@@ -250,13 +250,14 @@ function drawJohn(c,g=ctx){
   F('#3b2a1e',3,16-a,4,2); F('#3b2a1e',8,16-b,4,2); F('#5a4030',3,16-a,2,1); F('#5a4030',8,16-b,2,1);                                                       // boots
   drawSprite(g,x,y-2,JOHN_SPR,JOHN_PAL,c.dir||'down',4,12);   // (a bigger head: it starts two rows higher)
 }
-// Dr. Alex: Alex in a mad-scientist costume. Lab coat over her green tee, goggles, hair gone wild, a bubbling flask.
+// Doc Alex: Alex in a mad-scientist costume. Lab coat over her green tee, goggles, yellow rubber gloves, hair gone wild, a bubbling flask.
 function drawStranger(sx=STRANGER.x,sy=STRANGER.y){
   drawAlex(sx,sy,'ok');
   const F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(Math.round(sx)-6+dx,Math.round(sy)-21+dy,w,h)};
   F('#f4f4f0',1,8,3,10); F('#f4f4f0',8,8,3,10); F('#dcdcd6',3,8,1,10); F('#dcdcd6',8,8,1,10); F('#f4f4f0',2,16,2,2); F('#f4f4f0',8,16,2,2); F('#c9ced4',2,12,1,1);   // a long lab coat, open over the tee (and a pen in the pocket)
   F(ALEX.hair,0,0,2,2); F(ALEX.hair,10,0,2,2); F(ALEX.hair,1,-1,2,1); F(ALEX.hair,5,-2,2,2); F(ALEX.hair,9,-1,2,1); F(ALEX.hair,0,4,1,3); F(ALEX.hair,11,4,1,3);   // frizzed out
   F('#2b2b2b',3,1,6,1); F('#7fd3ff',3,1,2,1); F('#7fd3ff',7,1,2,1);                 // goggles pushed up
+  F('#f2c230',1,16,2,3); F('#d9a91f',1,18,2,1); F('#f2c230',9,16,2,3); F('#d9a91f',9,18,2,1); F('#fff0a0',1,16,1,1); F('#fff0a0',9,16,1,1);   // big yellow rubber lab gloves
   const b=Math.floor(time/300)%3; F('#cfe6f2',11,11,3,4); F('#5fff8a',11,13,3,2); F('#cfe6f2',12,10,1,1); F('#9fffbf',12,8-b,1,1);   // a bubbling flask
 }
 // the Confectioner's guard: cap with a badge, grey uniform, a flashlight
@@ -482,7 +483,7 @@ function drawGate(){ const F=(c,x,y,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,h)
   const g=PLANK_GATE; F('rgba(0,0,0,.35)',g.x+1,g.y+g.h,g.w+1,2); F('#8b93a3',g.x,g.y-6,g.w,g.h+6); F('#5f6676',g.x+1,g.y-6,1,g.h+6);
   for(let y=g.y-4;y<g.y+g.h;y+=4)F('#c9ced4',g.x,y,g.w,1);
   F('#e0b030',g.x-2,g.y+5,5,4); F('#8a6a1a',g.x-1,g.y+7,3,1); F('#c9ced4',g.x-1,g.y+3,3,2) }   // a big padlock
-// the laser panel: Joe holds A to defuse it (Dr. Alex's defuser); let go past halfway and it keeps half
+// the laser panel: Joe holds A to defuse it (Doc Alex's defuser); let go past halfway and it keeps half
 function startDefuse(){
   if(lead().id!=='hero')return flashPrompt(HEIST.onlyJoe);
   heist.defuse=heist.defuse||{p:0,beep:0}; heist.defusing=true;
@@ -549,12 +550,11 @@ $('vaultHint').onclick=vaultHint; [0,1,2].forEach(i=>$('crate'+i).onclick=()=>pi
 const nearCrew=(z,id)=>heist.crew.some(c=>(!id||c.id===id)&&hit(R(c.x-4,c.y-3,8,4),z));
 function heistTrigger(){
   const feet=R(P.x-4,P.y-3,8,4), st=heistStage();
-  if(Math.hypot(P.x-STRANGER.x,P.y-STRANGER.y)<16)return {label:'Talk to '+HEIST.stranger, btn:'Talk', act:()=>{
+  if(Math.hypot(P.x-STRANGER.x,P.y-STRANGER.y)<16&&(!have.heistBriefed||st>=4||have.city))return {label:'Talk to '+HEIST.stranger, btn:'Talk', act:()=>{
     if(have.city)return say([[HEIST.stranger,HEIST.after]]);
     if(st>=5)return showReward('city');
     if(st===4)return say([[HEIST.stranger,HEIST.strangerRematch],...HEIST.larsChallenge.slice(1,2)],()=>openLarsMenu());
-    if(!have.heistBriefed)return briefing();
-    say([[HEIST.stranger,HEIST.strangerAgain]])}};
+    briefing()}};
   if(st<1&&hit(feet,LOG_DROP))return {label:HEIST.gapLabel, act:gapChoice};
   if(st<1&&!heist.carry&&hit(feet,R(LOOSE_BEAM.x-10,LOOSE_BEAM.y-6,LOOSE_BEAM.w+20,LOOSE_BEAM.h+12)))return {label:'Look at the log', act:beamChoice};
   if(st===1&&hit(feet,R(FUSE.x-14,FUSE.y-14,28,28)))return {label:heist.lightsOutT>0?HEIST.lightsAlreadyOut:HEIST.fuse, act:cutFuse};
@@ -596,7 +596,7 @@ SCENES.city={ music:'heist',
   enter(){
     heist.lead=0; heist.follow=true; heist.hinted={}; heist.keyHolder=null; heist.sonarT=0; heist.sprintT=0; heist.marked=false;
     placeAtCheckpoint(); $('crewbar').hidden=false; buildCrewBar(); banner.q=[]; banner.t=0; $('roundBanner').hidden=true;
-    if(heistStage()<3)roundStart(heistStage()+1);   // (Dr. Alex waits at her lab bench: walk up to her for the briefing)
+    if(heistStage()<3)roundStart(heistStage()+1);   // (Doc Alex waits at her lab bench: walk up to her for the briefing)
   },
   leave(){ $('crewbar').hidden=true; banner.q=[]; banner.t=0; $('roundBanner').hidden=true },
   speed:()=>heist.sprintT>0?.19:(lead().id==='lars'?.09:lead().id==='john'&&heist.carry?.06:.07),
@@ -670,14 +670,14 @@ SCENES.city={ music:'heist',
     for(const c of crewPositions())hole(c.x,c.y-8,34);
     if(lightsOn())for(const L of LIGHTS){const l=lightPos(L); hole(l.x,l.y,24)}
     if(st<4)hole(GUARD.x,heist.guardY-6,26);
-    hole(STRANGER.x,STRANGER.y-8,24); hole(LAB.bench.x+16,LAB.bench.y,22);   // Dr. Alex's lab glows
+    hole(STRANGER.x,STRANGER.y-8,24); hole(LAB.bench.x+16,LAB.bench.y,22);   // Doc Alex's lab glows
     if(st<4&&!lasersOff()){hole((BLINK.x1+BLINK.x2)/2,BLINK.y,22); hole(sliderGap(time)+8,SLIDER.y,20)}
     hole(LASER_PANEL.x+6,LASER_PANEL.y+4,14);
     hole(436,30,26); hole(476,30,26);   // under the neon sign
     ctx.drawImage(darkMask,cx,cy);
-    // the old CANDY WORKS neon sign on roof C (one letter keeps flickering), and sparks off Dr. Alex's tesla coil
-    {const flick=Math.floor(time/90)%23===0; ctx.fillStyle='rgba(255,90,180,.18)'; ctx.fillRect(404,24,104,13);
-      const t='CANDY WORKS'; let x=410; for(let k=0;k<t.length;k++){const ch=t[k]; if(!(k===6&&flick))pixText(ctx,ch,x,28,'#ff7ad1'); x+=ch===' '?4:(GLYPH[ch]?GLYPH[ch].length/5:3)+1}}
+    // an old SWEETS neon sign on roof C (one letter keeps flickering), and sparks off Doc Alex's tesla coil
+    {const flick=Math.floor(time/90)%23===0; ctx.fillStyle='rgba(255,90,180,.18)'; ctx.fillRect(420,24,72,13);
+      const t='SWEETS'; let x=438; for(let k=0;k<t.length;k++){const ch=t[k]; if(!(k===3&&flick))pixText(ctx,ch,x,28,'#ff7ad1'); x+=ch===' '?4:(GLYPH[ch]?GLYPH[ch].length/5:3)+1}}
     if(Math.floor(time/120)%5<2){const c=LAB.coil; ctx.fillStyle='#bfefff'; let x=c.x+3, y=c.y-4; for(let k=0;k<5;k++){x+=Math.round(Math.sin(time/30+k*2)*2); y-=2; ctx.fillRect(x,y,1,2)}}
     // sonar ring
     if(heist.sprintT>0){const c=lead(); for(let i=0;i<4;i++){ctx.fillStyle=`rgba(190,210,255,${.5-i*.1})`; const back=P.dir==='left'?1:P.dir==='right'?-1:0, up=P.dir==='up'?1:P.dir==='down'?-1:0;

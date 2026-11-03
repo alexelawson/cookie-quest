@@ -132,8 +132,8 @@ PORTRAITS['Football Viking']={size:32, bg:'#efe6c8', draw(g){ const F=px(g);   /
   F('#4f2683',7,3,18,9); F('#6a3ea8',9,3,8,2); F('#ffc62f',15,2,2,10); F('#3d1d66',7,11,4,10); F('#3d1d66',21,11,4,10);
   F('#c9ced4',9,15,14,1); F('#c9ced4',9,19,14,1); F('#c9ced4',15,13,2,9);
 }};
-// Dr. Alex: Alex in her mad-scientist costume (the client in the city heist): frizzed hair, goggles up, lab coat
-PORTRAITS['Dr. Alex']={size:40, bg:'#1d2a24', draw(g){ drawAlexFace(g,'happy'); const F=(c,x,y,w=1,h=1)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};
+// Doc Alex: Alex in her mad-scientist costume (the client in the city heist): frizzed hair, goggles up, lab coat
+PORTRAITS['Doc Alex']={size:40, bg:'#1d2a24', draw(g){ drawAlexFace(g,'happy'); const F=(c,x,y,w=1,h=1)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};
   for(const [x,y,w,h] of [[4,4,5,4],[2,10,4,5],[31,4,5,4],[34,10,4,5],[9,1,5,3],[25,1,5,3],[16,0,7,2]])F(ALEX.hair,x,y,w,h);   // gone wild
   F('#2b2b2b',9,9,22,3); F('#7fd3ff',11,9,7,3); F('#7fd3ff',22,9,7,3); F('#d6f2ff',12,9,2,1); F('#d6f2ff',23,9,2,1);         // goggles pushed up
   F('#f4f4f0',4,34,9,6); F('#f4f4f0',27,34,9,6); F('#dcdcd6',12,35,2,5); F('#dcdcd6',26,35,2,5);                                // lab coat lapels

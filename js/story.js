@@ -40,16 +40,16 @@ const KEELAN = {
 // ---------- The city: the chocolate heist ----------
 // You, Lars and John vs. The Confectioner. Change any of these lines.
 const HEIST = {
-  place:'The City at Night', stranger:'Dr. Alex', villain:'The Confectioner',   // the client: Alex, in a mad-scientist costume
+  place:'The City at Night', stranger:'Doc Alex', villain:'The Confectioner',   // the client: Alex, in a mad-scientist costume
   crew:{hero:'Joe', lars:'Lars', john:'John'},
   briefing:["Ah. You came.",
             "For years I have perfected the ultimate chocolate chip cookie. The formula is complete... except...",
+            "It needs 1.21 GIGACOOKIES of pure chocolate!",
             "The chocolate's gone. Taken by someone calling himself The Confectioner?",
             "He's holed up three rooftops over.",
             "Bring me that chocolate. Science will thank you. (So will I.)",
             "Oh! Before you leave, Joe, take this. Laser panels hate it. So do villains. Maybe it will come in handy."],
   crewHello:[['John',"I got you bro."],['Lars',"Bet. I am ready."]],
-  strangerAgain:"REMOVE Three rooftops over. Go! Science waits for no one.",
   whoIsThat:"Who's that by the lab bench?",
   johnLog:"That log's blocking the way. Think you can lift it?",
   briefFirst:"Who's that by the lab bench?",
@@ -72,7 +72,7 @@ const HEIST = {
   jumpIceCream:[['Lars',"Wait. What's this?"],['Lars',"A pint of Rosemary Maple ice cream. In the gutter. Still frozen."],['John',"...Why is that up here."],['Lars',"Don't question the rooftops, John."]],
   beamLeave:"Leave it",
   beamTooHeavy:[['Joe',"Hnnngh. Nope."],['John',"Step aside Joe."]],
-  beamTooHeavyLars:[['Lars',"I'm a sprinter, not a forklift."],['John',"**rolls eyes**"],['Lars',"..."]],
+  beamTooHeavyLars:[['Lars',"I'm a sprinter, not a forklift."],['John',"*rolls eyes*"],['Lars',"..."]],
   onlyJohn:"Only John can lift that.",
   beamDone:"Log bridge is up. Watch your step.",
   carryHint:"Got it. I'll hang onto this. Lead the way, I'm right behind you.",
@@ -118,7 +118,7 @@ const HEIST = {
   raisins:[['John',"Raisins. In a cookie. I am by no means a picky eater... but... ABSOLUTELY not."],['Lars',"John IS a picky eater... but... raisins is still a crime."]],
   gotIt:"Chocolate. Lets GO!!",
   villainNote:"Fine. Keep your chocolate. Why so salty?",   // the gingerbread Confectioner says this
-  // the showdown under the skylight: the Confectioner is waiting. Hold A to zap him with Dr. Alex's gadget.
+  // the showdown under the skylight: the Confectioner is waiting. Hold A to zap him with Doc Alex's gadget.
   bossIntro:[['The Confectioner',"Well, well, well. Uninvited guests."],['The Confectioner',"You want my chocolate? Over my dead dessert."],['John',"Joe. The gadget."]],
   bossTitle:"The Confectioner",
   bossHold:"Hold A (or this button) to zap him. Don't let go!",
@@ -128,7 +128,7 @@ const HEIST = {
   bossZap:"*ZAP!*",
   bossWin:[['',"A puff of powdered sugar. Where the Confectioner stood, there's a tiny gingerbread man."],['The Confectioner',"...What did you DO to me?!"],['Lars',"He's so small."],['John',"He smells amazing."],
            ['The Confectioner',"Fine! The chocolate's in my vault. But you'll NEVER solve my riddle!"]],
-  finale:[['Dr. Alex',"(on the radio) You found it! The final ingredient!"],['Dr. Alex',"The formula is complete. Thank you. "],['John',"Can we go home now? I'm cold."]],
+  finale:[['Doc Alex',"(on the radio) Great Scone!"],['Doc Alex',"You found it! The final ingredient!"],['Doc Alex',"The formula is complete. Thank you. "],['John',"Can we go home now? I'm cold."]],
   thanks:"Let's go bake",
   larsChallenge:[['Lars',"Hold up. Before we go home..."],['Lars',"Anagrams. Right now. Loser carries the chocolate down the fire escape. "],['John',"Oh no. Not this again."]],
   larsPick:"Six letters, sixty seconds.",
@@ -136,7 +136,7 @@ const HEIST = {
   howToTitle:"Agent select",
   howToPick:"Tap who leads, then lock in.",
   roles:{hero:"Initiator", lars:"Duelist", john:"Sentinel"},
-  howToSkills:{hero:"Sonar shows hidden tripwires. Carries Dr. Alex's gadget.",
+  howToSkills:{hero:"Sonar shows hidden tripwires. Carries Doc Alex's gadget.",
                lars:"A burst of speed: dash shadow to shadow under the searchlights. Only he can reach the light switch.",
                john:"Carries heavy things: the log, the grate."},
   howToControls:["Switch who you control: tap their face below the screen, or press 1, 2, 3.",
@@ -151,7 +151,7 @@ const HEIST = {
   larsWins:[['Lars',"Ha! Again? New letters this time, if that helps."]],
   larsLoses:[['Lars',"...Best two out of three?"],['John',"No. You carry the chocolate, Lars."]],
   // after the chocolate: Lars lugs the crate back to the grate, John rolls his eyes, and everyone heads home
-  exitLines:[['Lars',"Who packed this?! It weighs as much as a Viking."],['John',"*rolls eyes*"],['Lars',"Best three out of five?"],['John',"Down the fire escape, Lars."]],
+  exitLines:[['Lars',"Who packed this?! It weighs as much as a Viking."],['John',"*rolls eyes*"],['Lars',"Best three out of five?"],['John',"Down the fire escape, Lars."],['Lars',"Stairs? Where we're going, we don't need stairs."],['John',"It's literally all stairs."]],
   strangerRematch:"Your friend wants his rematch.",
   after:"The cookie signal's up. The experiment can begin.",
   climbDown:"Climb down the fire escape",
@@ -406,7 +406,7 @@ const GEAR_TEXT = {
   shoes:   {name:"Carbon racing shoes", found:"Carbon-plated racing shoes! Joe could run a marathon in these. Or at least to the mailbox.", wear:"Lace them up"},
   clover:  {name:"Lucky clover", found:"A real four-leaf clover. Joe pins it on. Feeling lucky.", wear:"Pin it on", from:"From Logan"},
   hen:     {name:"Grp the rooster", found:"Grp (G for short) is coming with you!", wear:"Come on, G", from:"From Keelan"},
-  goggles: {name:"Lab goggles", found:"Dr. Alex's spare goggles. Joe pushes them up on his head. Very scientific.", wear:"Put them on", from:"From Dr. Alex"},
+  goggles: {name:"Lab goggles", found:"Doc Alex's spare goggles. Joe pushes them up on his head. Very scientific.", wear:"Put them on", from:"From Doc Alex"},
   disc:    {name:"Margie's lucky disc", found:"Margie's lucky disc. Joe slings it on his back.", wear:"Take it", from:"From Margie"},
   hat:     {name:"Trucker hat", found:"A Lil Q's Gas & Go trucker hat. Limited edition (there's one).", wear:"Put it on", from:"From Lil Q"},
   jersey:  {name:"Vikings jersey (#18)", found:"A purple #18 Vikings jersey. Joe throws it on over his outfit.", wear:"Put it on", from:"From a football Viking"},
@@ -461,7 +461,7 @@ const ENDING = {
   credits:[
     ['Joe','Joe','The Cookie King'],['Alex','Alex','Head Baker, Snack Critic'],['Keelan','Keelan','Eggs, Butter, Hen Wrangling'],
     ['Logan','Logan','Four-Leaf Clover Specialist'],['Maureen','Maureen','Head Taste Tester (very precise)'],['Ethan','Ethan','Designated Grill Master'],['Bryan','Bryan','Sprinkles. Very Chill.'],['Trail John','John (the other one)','Flour, 50 km'],
-    ['Lars','Lars','Long Jump (Attempted)'],['John','John','Heavy Lifting, Eye Rolling'],['Dr. Alex','Dr. Alex','Mad Scientist (Rooftop Division)'],
+    ['Lars','Lars','Long Jump (Attempted)'],['John','John','Heavy Lifting, Eye Rolling'],['Doc Alex','Doc Alex','Mad Scientist (Rooftop Division)'],
     ['Lil Q','Lil Q','Exactly $30.00 of Gas'],['Jackie','Jackie','Straight Talk','metJackie'],['Margie','Margie','The Main Character (self-appointed)'],
     ['Jack','Jack','2.1 Cookies Per Guest'],[null,'The Vikings','SKOL'],[null,'The Hens','Uncooperative'],
   ],
@@ -490,7 +490,7 @@ const ENDING = {
 // [speaker, line] (or [speaker, line, portrait]). The gear itself: GEAR in extras.js; names and found lines: GEAR_TEXT above.
 const KEEPSAKES = {
   hen:[['Keelan',"Oh, one more thing. This is Grp. G for short."],['Keelan',"Stands for Green Red Poultry. Don't ask me, he came with the name."],['Keelan',"He's not built for farm life. He's built for adventure. Take him with you."]],
-  goggles:[['Dr. Alex',"Wait! Before you go. Take these: my spare goggles."],['Dr. Alex',"Every great scientist needs eye protection. And style. Mostly style."]],
+  goggles:[['Doc Alex',"Wait! Before you go. Take these: my spare goggles."],['Doc Alex',"Every great scientist needs eye protection. And style. Mostly style."]],
   disc:[['Margie',"Here. My lucky disc. I've never lost with it."],['Jack',"She has lost with it forty-one times."],['Margie',"Lucky. Disc."]],
   hat:[['Lil Q',"Yo, rookie. One more thing. For the road."],['Lil Q',"Official Lil Q's Gas & Go trucker hat. Wear it with pride. Or at least wear it."]],
   jersey:[['Football Viking',"Hey. Joe. Real talk."],['Football Viking',"That flat Coke? Worst thing I have ever tasted. And I've eaten lutefisk."],

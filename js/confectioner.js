@@ -1,4 +1,4 @@
-// The Confectioner: waiting under the skylight. Joe holds A to zap him with Dr. Alex's gadget;
+// The Confectioner: waiting under the skylight. Joe holds A to zap him with Doc Alex's gadget;
 // he turns into a gingerbread man, then his riddle (the vault in city.js) guards the chocolate.
 // Words live in story.js (HEIST.boss...).
 const BOSS={ZAP_MS:3600, DRAIN:.18, ZAP_ANIM:1700};   // hold this long to win; lose 18% a second when you let go; the zap + puff takes this long
@@ -113,7 +113,7 @@ function drawBoss(now){
   if(!zap||boss.t<500){ drawConfectioner(g,86,feet,held?(Math.floor(now/60)%2?1:-1):0) }
   else { const hop=Math.floor(now/180)%2; drawGingerbread(g,86,feet,hop);
     const k=(boss.t-500)/1200; if(k<1)for(let i=0;i<14;i++){const a=i/14*Math.PI*2, r=4+k*18; g.globalAlpha=1-k; F('#ffffff',86+Math.cos(a)*r,feet-14+Math.sin(a)*r*.6,2,2); g.globalAlpha=1} }   // a puff of powdered sugar
-  if(held||(zap&&boss.t<500)){                                                                    // the beam from Dr. Alex's gadget
+  if(held||(zap&&boss.t<500)){                                                                    // the beam from Doc Alex's gadget
     const x0=53, x1=80, y0=feet-11, thick=zap?3:1+Math.round(boss.p*2);
     let py=y0; for(let x=x0;x<x1;x+=3){const ny=y0+Math.round((Math.random()-.5)*4*(.5+boss.p)); F('#7fe8ff',x,Math.min(py,ny)-1,3,Math.abs(ny-py)+thick+2); F('#ffffff',x,Math.min(py,ny),3,Math.abs(ny-py)+Math.max(1,thick-1)); py=ny}
     F('#e0b030',51,y0-1,3,3);                                                                  // the gadget's tip

@@ -19,7 +19,7 @@ const r=await p.evaluate(()=>{paused=true; const out=[]; const D=['down','left',
   const cases=[['Joe',d=>drawJoeJersey(at(d))],['Joe walking',d=>drawJoeJersey(at(d,true,1))],['Keelan',d=>drawKeelan(at(d,true,1))],['Bryan',d=>drawBryan(40,60,d)],['Jackie',d=>drawJackie(40,60,d)],
     ['Ethan',d=>drawEthan(40,60,d,1)],['Maureen',d=>drawMaureen(40,60,d,1)],['Jack',()=>drawJack(40,60)],['Margie',()=>drawMargie(40,60)],['Lil Q',()=>drawBob(40,60)],
     ['Alex',()=>{drawAlex(40,60,'happy');drawAlex(40,60,'frown');drawAlex(40,60,'ok')}],['attendant',()=>drawAttendant(40,60,2)],['Lars',d=>drawLars(at(d,true,1))],['John',d=>drawJohn(at(d,true,1))],
-    ['Dr. Alex',()=>drawStranger(40,60)],['guard',()=>{ctx.translate(40-GUARD.x,0); heist.guardY=60;heist.guardDir=1;drawGuard();heist.guardDir=-1;drawGuard()}],
+    ['Doc Alex',()=>drawStranger(40,60)],['guard',()=>{ctx.translate(40-GUARD.x,0); heist.guardY=60;heist.guardDir=1;drawGuard();heist.guardDir=-1;drawGuard()}],
     ...Object.keys(OUTFIT_LOOK).map(k=>['Joe as '+k,d=>drawHero(at(d,true,1),ctx,OUTFIT_LOOK[k])]),
     ['Vikings',()=>{drawVikingStanding(40,60,'norse','7');drawVikingStanding(40,60,'football','21');drawVikingSkier(40,60,{kind:'norse',sack:true},1);drawVikingSkier(40,60,{kind:'football',num:'52'},0)}],
     ['skiers',()=>{drawSkier(40,60,JOE_RACE_KIT());drawSkier(40,60,{down:true});drawTrailJohn(40,60,'down')}],['Grp',()=>{for(const w of ['world','city','birkie','golf','fargo','kitchen'])drawGrp(40,60,1,w)}]];

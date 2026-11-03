@@ -20,8 +20,8 @@ const fresh=async()=>{await p.goto(URL);await p.evaluate(()=>localStorage.clear(
 const R=[];const ok=(n,c,x='')=>R.push((c?'PASS ':'FAIL ')+n+(x?'  ('+x+')':''));
 await fresh();
 
-// A. the log blocks the way to Dr. Alex: only John can lift it, then he carries it and follows you
-let r=await p.evaluate(()=>{T.enter(); const auto=!dlg.hidden&&$('dspeaker').textContent==='Dr. Alex'; T.clickThrough(); T.hints=[];
+// A. the log blocks the way to Doc Alex: only John can lift it, then he carries it and follows you
+let r=await p.evaluate(()=>{T.enter(); const auto=!dlg.hidden&&$('dspeaker').textContent==='Doc Alex'; T.clickThrough(); T.hints=[];
   const blockedW=T.walkTo(58,100,400), stuckY=Math.round(P.y), hint=T.hints.join(' / ');
   const look=lbl=>{T.walkTo(58,132); update(16.7); const l=prompt.textContent; action(); const menu=T.btns(); [...$('dbtns').querySelectorAll('button')].find(b=>b.textContent==='Lift it').click(); return {l,menu,said:T.clickThrough().join(' / ')}};
   const joe=look(), lars=(switchTo(1),look()), john=(switchTo(2),look());
@@ -30,13 +30,13 @@ let r=await p.evaluate(()=>{T.enter(); const auto=!dlg.hidden&&$('dspeaker').tex
   update(16.7); const lbl=prompt.textContent; action(); const face=!$('dportrait').hidden; const lines=T.clickThrough(); const how=!$('howto').hidden, rows=$('howRows').children.length, ctl=$('howControls').textContent, sel=$('howTitle').textContent+'|'+$('howOk').textContent+'|'+[...$('howRows').children].map(r=>r.querySelector('i').textContent).join(','), onOne=$('howRows').querySelectorAll('.on').length; $('howRows').children[0].click(); $('howOk').click(); update(16.7); T.walkTo(58,100);
   return {auto,blockedW,stuckY,hint,joe,lars,john,carrying,switched,w,johnNear,lbl,face,lines,how,rows,ctl,sel,onOne,lead:heist.lead,banner:$('roundTitle').textContent,bar:!$('crewbar').hidden,hud:$('hud').textContent,lab:$('alabel').textContent}});
 ok('A no briefing pops up on its own',!r.auto);
-ok('A the log blocks the way to Dr. Alex; John says so',r.blockedW!=='ok'&&r.stuckY>125&&r.hint.includes('blocking'),r.blockedW+' | '+r.hint);
+ok('A the log blocks the way to Doc Alex; John says so',r.blockedW!=='ok'&&r.stuckY>125&&r.hint.includes('blocking'),r.blockedW+' | '+r.hint);
 ok('A the log: Lift it / Leave it',r.joe.l==='Look at the log'&&r.joe.menu.join()==='Lift it,Leave it',r.joe.menu.join(' | '));
 ok('A Joe and Lars can\'t lift it; John can',r.joe.said.includes('Step aside Joe')&&r.lars.said.includes('forklift')&&r.john.said.includes('right behind you')&&r.carrying,r.john.said);
-ok('A John keeps carrying the log; you can switch back and walk to Dr. Alex with him following',r.switched&&r.w==='ok'&&r.johnNear,r.w);
-ok('A walk up to Dr. Alex (Alex as a mad scientist) and she briefs the crew',r.lbl==='Talk to Dr. Alex'&&r.face&&r.lines[0].startsWith('Dr. Alex')&&r.lines.join().includes('formula')&&r.lines.some(l=>l.startsWith('John'))&&r.lines.some(l=>l.startsWith('Lars')),r.lines.length+' lines');
+ok('A John keeps carrying the log; you can switch back and walk to Doc Alex with him following',r.switched&&r.w==='ok'&&r.johnNear,r.w);
+ok('A walk up to Doc Alex (Alex as a mad scientist) and she briefs the crew',r.lbl==='Talk to Doc Alex'&&r.face&&r.lines[0].startsWith('Doc Alex')&&r.lines.join().includes('formula')&&r.lines.some(l=>l.startsWith('John'))&&r.lines.some(l=>l.startsWith('Lars')),r.lines.length+' lines');
 ok('A agent select: 3 agents with roles + powers + controls, LOCK IN',r.how&&r.rows===3&&r.ctl.includes('Space')&&r.ctl.includes('press F')&&r.sel==='Agent select|LOCK IN|Initiator,Duelist,Sentinel'&&r.onOne===1&&r.lead===0,r.sel);
-ok('A Dr. Alex hands Joe her gadget',r.lines.join().includes('My gadget'));
+ok('A Doc Alex hands Joe her gadget',r.lines.join().includes('Laser panels hate it')&&r.lines.join().includes('GIGACOOKIES'));
 ok('A crew bar + objective + skill label',r.bar&&r.hud.includes('Bridge')&&r.lab==='Sonar',r.hud+' / '+r.lab);
 // B. the gap: Lars tries the long jump (and finds ice cream), then John lays the log across
 r=await p.evaluate(()=>{T.hints=[]; const w=T.walkTo(98,102); update(16.7); const lbl=prompt.textContent; action(); const menu=T.btns();
@@ -53,7 +53,7 @@ ok('B John lays the log across the gap',r.st===1&&!r.carrying&&r.done.includes('
 r=await p.evaluate(()=>{const seen=new Set(); for(let i=0;i<300;i++){if(!$('roundBanner').hidden)seen.add($('roundTitle').textContent); update(16.7)} return [...seen]});
 ok('B ROUND WON, then ROUND 2',r.includes('ROUND WON')&&r.includes('ROUND 2'),r.join(', '));
 r=await p.evaluate(()=>{T.hints=[]; const w=T.path([[110,102],[170,102]]); return {w,hint:T.hints,x:P.x}});
-ok('B the crew crosses the log to roof B',r.w==='ok',r.w); ok('B Lars calls the searchlights',r.hint.join().includes('Searchlights')&&r.hint.join().includes('signal'),r.hint[0]);
+ok('B the crew crosses the log to roof B',r.w==='ok',r.w); ok('B Lars calls the searchlights',r.hint.join().includes('Searchlights')&&r.hint.join().includes('fast enough'),r.hint[0]);
 // C. searchlights
 r=await p.evaluate(()=>{switchTo(0); const w=T.walkTo(304,100); const msg=dlg.hidden?'':$('dtext').textContent; T.clickThrough(); return {w,msg,back:Math.round(P.x)+','+Math.round(P.y)}});
 ok('C walking into the lights gets you caught and reset',r.w==='dialog'&&r.msg.includes('searchlight'),r.msg+' -> '+r.back);
@@ -85,7 +85,7 @@ ok('D in the dark you can grab the key',r.trigDark==='Grab the key',r.trigDark);
 ok('D Lars grabs the key, unlocks the gate, and the crew all get onto roof C in time; the lights stay off',r.res.ok&&r.gate&&r.st===2&&!r.lit&&r.res.said.join().includes("It's open"),JSON.stringify(r.res)+' '+r.crew);
 ok('D ROUND WON, then ROUND 3',['ROUND WON','ROUND 3'].includes(r.banner),r.banner);
 r=await p.evaluate(()=>{switchTo(0); T.hints=[]; const w=T.walkTo(361,178); T.run(2); return {w,hint:T.hints,said:(window.ACROSS||[]).join(' / ')}});
-ok('D you mention the tripwires and the sonar',(r.hint.join()+r.said).includes('sonar'),r.hint[0]);
+ok('D you mention the tripwires (and that you need a way to see them)',(r.hint.join()+r.said).includes('Tripwires'),r.hint[0]);
 // E. the laser maze
 r=await p.evaluate(()=>{const w=T.path([[384,184],[443,184],[443,165]]); if(w!=='ok')return {w,pre:true};
   const w2=T.walkTo(443,140); const w3=T.walkTo(443,100); const msg=dlg.hidden?'':$('dtext').textContent; T.clickThrough(); return {w,w2,w3,msg,pos:(P.x|0)+','+(P.y|0)}});
@@ -113,7 +113,7 @@ ok('F only John can rip the grate',r.msg.includes('Only John'),r.msg);
 ok('F stack up first: the whole crew has to be on the skylight',r.lbl1.includes('/3 stacked')&&r.early.join().includes('Stack up')&&r.st1===2,r.lbl1+' / '+r.early[0]);
 ok('F all three stacked: John breaches',r.lw==='ok'&&r.lbl.includes('3/3')&&r.said.join().includes('Breaching')&&r.st===3,r.lw+' / '+r.lbl+' / '+r.said.join(' | '));
 ok('F then you can drop in',r.next==='Drop through the skylight',r.next);
-// G0. the Confectioner is waiting under the skylight: hold A to zap him with Dr. Alex's gadget; he turns into a gingerbread man
+// G0. the Confectioner is waiting under the skylight: hold A to zap him with Doc Alex's gadget; he turns into a gingerbread man
 r=await p.evaluate(()=>{const hud=$('hud').textContent; action(); const intro=T.clickThrough(); const open=!$('boss').hidden, vaultFirst=!$('vault').hidden;
   actionHeld=true; bossTick(BOSS.ZAP_MS*.5); const half=boss.p, taunt=$('bossMsg').textContent, isTaunt=HEIST.bossTaunts.includes(taunt); actionHeld=false; bossTick(1000); const drained=boss.p;
   actionHeld=true; bossTick(BOSS.ZAP_MS); actionHeld=false; const zap=boss.phase; bossTick(BOSS.ZAP_ANIM+20);
@@ -159,11 +159,11 @@ r=await p.evaluate(()=>({city:!!have.city,basket:$('basket').textContent}));
 ok('G chocolate in the basket',r.city&&r.basket.includes('Chocolate'));
 // H. the way home: just a quick word (no long cutscene), then back on the main map
 r=await p.evaluate(()=>{const ks=()=>{const l=[];for(let i=0;i<15&&!dlg.hidden&&!l.join().includes('Settings');i++){l.push($('dspeaker').textContent+': '+$('dtext').textContent);const bs=[...$('dbtns').querySelectorAll('button')];(bs.find(x=>x.textContent==='Next')||bs[0]).click()}if(!$('itemCard').hidden){l.push('CARD: '+$('itemName').textContent+' | '+$('itemLine').textContent+' '+$('itemTip').textContent); $('itemBtn').click()} return {l,gear:Object.keys(have.gear||{}).join()}};window.K=ks(); const lines=T.clickThrough(); T.run(60); return {k:K,lines,world:scene===SCENES.world,bar:$('crewbar').hidden}});
-ok('H Dr. Alex hands Joe her spare goggles',r.k.l[0].startsWith('Dr. Alex')&&r.k.gear.includes('goggles'),r.k.l[0]);
-ok('H a few lines from Lars and John, then you\'re back on the map',r.lines.join().includes('rolls eyes')&&r.lines.length<=5&&r.world&&r.bar,JSON.stringify(r));
+ok('H Doc Alex hands Joe her spare goggles',r.k.l[0].startsWith('Doc Alex')&&r.k.gear.includes('goggles'),r.k.l[0]);
+ok('H a few lines from Lars and John, then you\'re back on the map',r.lines.join().includes('rolls eyes')&&r.lines.join().includes("don't need stairs")&&r.lines.length<=7&&r.world&&r.bar,JSON.stringify(r));
 // I. reload mid-heist resumes at the right checkpoint
 await fresh(); await p.evaluate(()=>{have.heistStage=2; have.heistBriefed=true; save()}); await p.reload(); await p.click('#startBtn'); await p.evaluate(()=>skipWelcome()); await p.evaluate(helpers);
-r=await p.evaluate(()=>{T.enter(); const sp=dlg.hidden?'':$('dspeaker').textContent; return {sp,pos:(P.x|0)+','+(P.y|0),onC:hit(R(P.x-1,P.y-1,2,2),ROOF_C)}}); ok('I reload at stage 2 starts on roof C, no briefing',r.sp!=='Dr. Alex'&&r.onC,r.pos+' '+r.sp);
+r=await p.evaluate(()=>{T.enter(); const sp=dlg.hidden?'':$('dspeaker').textContent; return {sp,pos:(P.x|0)+','+(P.y|0),onC:hit(R(P.x-1,P.y-1,2,2),ROOF_C)}}); ok('I reload at stage 2 starts on roof C, no briefing',r.sp!=='Doc Alex'&&r.onC,r.pos+' '+r.sp);
 // J. checkpoints are safe to stand on
 r=await p.evaluate(()=>{const bad=[]; for(let st=0;st<3;st++){have.heistStage=st; placeAtCheckpoint(); T.clickThrough(); for(let i=0;i<900;i++){update(16.7); if(!dlg.hidden){if($('dspeaker').textContent==='Spotted!'){bad.push(st+': '+$('dtext').textContent); T.clickThrough(); break} T.clickThrough()}}} return bad});
 ok('J standing still at each checkpoint never gets you caught',r.length===0,r.join('; '));

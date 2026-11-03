@@ -48,7 +48,7 @@ const GEAR={
   clover:  {give:true},      // Logan gives Joe this one (people.js)
   // keepsakes: one from each stop, handed over right after that stop's reward (KEEPSAKES in story.js)
   hen:     {give:true, from:'farm'},     // Grp ("G"), Joe's rooster: follows him everywhere
-  goggles: {give:true, from:'city'},     // Dr. Alex's spare goggles, pushed up on his head
+  goggles: {give:true, from:'city'},     // Doc Alex's spare goggles, pushed up on his head
   disc:    {give:true, from:'golf'},     // Margie's "lucky" disc, on his back
   hat:     {give:true, from:'fargo'},    // a Lil Q's Gas & Go trucker hat
   jersey:  {give:true, from:'mill'},     // a purple #18 Vikings jersey, from a football Viking after the Birkie
@@ -98,7 +98,7 @@ function drawGear(c,g=ctx,look=null){
   const hat=gearWorn('hat')&&bare;
   if(hat){ F('#c8322b',2,-1,8,3); F('#ffffff',3,-1,6,2); F('#e9e2d2',2,1,8,1);            // trucker hat: white foam front, red mesh back
     if(c.dir==='down')F('#c8322b',2,2,8,1); else if(c.dir==='left')F('#c8322b',0,2,4,1); else if(c.dir==='right')F('#c8322b',8,2,4,1); else F('#e9e2d2',3,-1,6,2) }
-  if(gearWorn('goggles')&&bare&&c.dir!=='up'){                                             // Dr. Alex's goggles: up on his forehead, or round his neck under the hat
+  if(gearWorn('goggles')&&bare&&c.dir!=='up'){                                             // Doc Alex's goggles: up on his forehead, or round his neck under the hat
     const gy=hat?6:0; F('#2b2b2b',2,gy,8,1);
     const lh=hat?1:2; if(c.dir==='down'){F('#7fd3ff',3,gy,2,lh); F('#7fd3ff',7,gy,2,lh); F('#d6f2ff',3,gy,1,1)} else F('#7fd3ff',c.dir==='left'?3:7,gy,2,lh) }
   if(gearWorn('oakleys')&&head!=='potato'){
@@ -231,7 +231,7 @@ const GEAR_ART={
   clover(F){ // one big four-leaf clover
     const leaf=(x,y)=>{F('#2e7d32',x,y,9,9); F('#2e7d32',x+1,y-1,7,11); F('#5fbf5f',x+1,y,6,6); F('#a8ecb0',x+2,y+1,2,2)};
     leaf(10,2); leaf(21,2); leaf(10,13); leaf(21,13); F('#1d5a2a',19,11,2,2); F('#2e7d32',19,22,2,6); F('#2e7d32',21,26,2,2) },
-  goggles(F){ // Dr. Alex's lab goggles: black strap, two round cyan lenses
+  goggles(F){ // Doc Alex's lab goggles: black strap, two round cyan lenses
     F('#2b2b2b',0,12,40,3); F('#2b2b2b',6,8,12,12); F('#2b2b2b',22,8,12,12); F('#2b2b2b',18,12,4,4);
     F('#7fd3ff',8,10,8,8); F('#7fd3ff',24,10,8,8); F('#d6f2ff',9,11,3,2); F('#d6f2ff',25,11,3,2); F('#4aa8d8',8,16,8,2); F('#4aa8d8',24,16,8,2) },
   disc(F){ // Margie's lucky disc: a pink flying disc, tilted, with a white heart
