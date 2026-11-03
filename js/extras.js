@@ -275,3 +275,48 @@ function drawLionsGate(){
   for(const x of [T1,T2]){F('#2f7a4a',x,TOP,4,DECK-TOP+2); F('#4f9a68',x,TOP,1,DECK-TOP+2); F('#1f5a36',x+3,TOP,1,DECK-TOP+2); F('#2f7a4a',x-1,TOP+5,6,1); F('#2f7a4a',x-1,TOP+11,6,1);
     if(Math.floor(time/900)%2)F('#ff3b3b',x+1,TOP-1,2,1)}                                         // the towers (with aircraft lights)
 }
+
+// ---------- Christmas on the main map ----------
+// string lights on little posts along the cobblestone road and footpaths, twinkling
+const XLIGHTS=['#e54b4b','#f4d35e','#5fa8e8','#7fd39a','#ffffff'];
+const LIGHT_RUNS=(()=>{ const runs=[], gapTop=[[40,56],[184,200],[308,324]], gapBot=[[183,201]];
+  const along=(y,gaps,x0,x1)=>{ let xs=[]; for(let x=x0;x<=x1;x+=24){ if(gaps.some(([a,b])=>x>=a-2&&x<=b+2))continue; xs.push(x) }
+    for(let i=0;i+1<xs.length;i++){ const a=xs[i], b=xs[i+1]; if(b-a===24&&!gaps.some(([g0,g1])=>g0<b&&g1>a))runs.push({x0:a,y0:y,x1:b,y1:y}) } };
+  along(148,gapTop,4,380); along(166,gapBot,4,380);
+  const down=(x,y0,y1)=>{ for(let y=y0;y+24<=y1;y+=24)runs.push({x0:x,y0:y,x1:x,y1:y+24}) };
+  down(184,170,286); down(200,170,286);                        // the road down to Wylee Woods
+  down(41,76,148); down(55,76,148); down(309,76,148); down(323,76,148);   // the footpaths up to the farm and the Birkie
+  return runs })();
+function drawPathLights(){
+  const F=(c,x,y,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,h)}, tw=Math.floor(time/420);
+  const posts=new Set();
+  LIGHT_RUNS.forEach((r,ri)=>{ posts.add(r.x0+','+r.y0); posts.add(r.x1+','+r.y1);
+    const n=8; for(let k=1;k<n;k++){ const t=k/n, x=Math.round(r.x0+(r.x1-r.x0)*t), y=Math.round(r.y0+(r.y1-r.y0)*t-6+(r.y0===r.y1?Math.sin(t*Math.PI)*3:0));
+      F('#3a3a44',x,y-1,1,1); const on=(tw+k+ri)%5!==0; F(on?XLIGHTS[(k+ri)%XLIGHTS.length]:'#5a5a66',x,y,1,1);
+      if(on&&(tw+k+ri)%3===0){ctx.fillStyle='rgba(255,240,200,.18)'; ctx.fillRect(x-1,y-1,3,3)} } });
+  for(const p of posts){ const [x,y]=p.split(',').map(Number); F('#4a3a2a',x,y-7,1,7); F('#6b5a44',x,y-8,1,1) }
+}
+// decorated Christmas trees: a snowy fir with a garland, twinkling ornaments and a gold star
+function drawXmasTree(x,y,big){
+  const s=big?1.5:1, F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(Math.round(x+dx*s),Math.round(y+dy*s),Math.max(1,Math.round(w*s)),Math.max(1,Math.round(h*s)))};
+  F('rgba(0,0,0,.2)',-5,0,11,2); F('#5a3d26',-1,-3,2,3);
+  for(let i=0;i<4;i++){const w=4+i*2.5, y0=-17+i*3.5; F(i%2?'#2b5a3a':'#2f6b3f',-w/2,y0,w,4.5); F('#ffffff',-w/2,y0,w/2,1)}   // tiers with snow on top
+  F('#e9d27a',-4,-11,8,1); F('#e9d27a',-5,-6,10,1);                                                                  // a gold garland
+  const tw=Math.floor(time/380);
+  [[-2,-13,'#e54b4b'],[2,-9,'#5fa8e8'],[-4,-8,'#f4d35e'],[3,-5,'#e54b7a'],[-1,-4,'#ffffff'],[1,-15,'#7fd39a']].forEach(([dx,dy,c],k)=>F((tw+k)%4?c:'#fff6c8',dx,dy,1,1));
+  F('#ffd84d',-1,-20,2,2); F('#ffd84d',-2,-19,4,1); if(tw%2)F('#fff3a8',0,-21,1,1);                                       // the star
+}
+const BIG_TREE={x:211,y:147};   // by the kitchen porch, out of the hens' way
+solids.push(R(BIG_TREE.x-5,BIG_TREE.y-3,10,4));
+{const u=SCENES.world.under; SCENES.world.under=function(){ u.call(this); drawPathLights() }}
+{const e=SCENES.world.ents; SCENES.world.ents=function(list){ e.call(this,list); list.push({y:BIG_TREE.y,draw:()=>{drawXmasTree(BIG_TREE.x,BIG_TREE.y,true);
+  const g=ctx; g.fillStyle='#c8322b'; g.fillRect(BIG_TREE.x-9,BIG_TREE.y-3,5,4); g.fillStyle='#f4d35e'; g.fillRect(BIG_TREE.x-7,BIG_TREE.y-3,1,4); g.fillStyle='#3d6fb0'; g.fillRect(BIG_TREE.x+5,BIG_TREE.y-2,4,3); g.fillStyle='#ffffff'; g.fillRect(BIG_TREE.x+6,BIG_TREE.y-2,1,3)}}) }}   // with presents
+// the marina at False Creek: a dock with little boats tied up, their lights glowing in the water
+function drawMarina(){
+  const F=(c,x,y,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,h)}, b=k=>Math.round(Math.sin(time/900+k)*.6);
+  F('#6b4a2f',74,265,30,2); F('#8a6a4a',74,265,30,1); for(const fx of [80,90,100])F('#6b4a2f',fx,267,2,7);   // dock and fingers
+  for(const [bx,k] of [[75,0],[84,1],[94,2]]){ const yy=269+b(k);
+    F('#f2f2ee',bx,yy,5,3); F('#d9d9d4',bx,yy+2,5,1); F('#9aa3b2',bx+2,yy-5,1,5); F('#ffe9a8',bx+1,yy,2,1);    // a little sailboat, cabin light on
+    F('rgba(243,196,106,.4)',bx+1,yy+4,1,2+(Math.floor(time/300+k)%2)) }
+  for(const px of [74,84,94,103]){F('#3a3a44',px,262,1,3); F(Math.floor(time/500+px)%3?'#ffe9a8':'#fff6c8',px,261,1,1)}   // dock lamps
+}

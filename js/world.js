@@ -108,7 +108,8 @@ const bg=document.createElement('canvas'); bg.width=WW; bg.height=WH;
   const glass=(b,base,line,shine)=>{F(base,b.x,b.y,b.w,b.h);
     for(let y=b.y+3;y<b.y+b.h-8;y+=4)F(line,b.x,y,b.w,1); for(let x=b.x+4;x<b.x+b.w;x+=5)F(line,x,b.y,1,b.h-8);   // floors + mullions
     for(let k=0;k<b.h-8;k++){const x=b.x+b.w-6-Math.floor(k*.6); if(x>b.x)F(shine,x,b.y+k,2,1)}                    // a reflection streak
-    for(let y=b.y+4;y<b.y+b.h-10;y+=4)for(let x=b.x+1;x<b.x+b.w-3;x+=5)if(rnd()<.22)F('#f3d27a',x,y,3,2)};          // a few lit windows
+    for(let y=b.y+4;y<b.y+b.h-10;y+=4)for(let x=b.x+1;x<b.x+b.w-3;x+=5)if(rnd()<.45)F(rnd()<.8?'#f3d27a':'#ffb3d0',x,y,3,2);   // lots of lit windows (a few catch the pink sunset)
+    for(let k=0;k<b.h-10;k+=3)F('rgba(255,150,200,.18)',b.x,b.y+k,2,1)};
   // a teal glass tower with a green roof garden
   {const b=R(8,178,40,52); F('#1d3a42',b.x-1,b.y-5,b.w+2,6); F('#3d6b3a',b.x+2,b.y-5,b.w-4,4);
     for(let x=b.x+4;x<b.x+b.w-4;x+=7){F('#4f8a45',x,b.y-6,4,3); F('#62a356',x+1,b.y-6,2,1)}
@@ -123,8 +124,12 @@ const bg=document.createElement('canvas'); bg.width=WW; bg.height=WH;
   // the beach (driftwood logs), English Bay, and the North Shore mountains across the water
   F('#cdb98e',0,232,72,12); F('#cdb98e',72,256,92,8); for(let i=0;i<70;i++)F('#bba878',rnd()*164|0,232+rnd()*32|0,1,1);
   for(const [x,y,w] of [[6,236,16],[30,239,12],[50,235,14],[92,259,18],[130,260,14]]){F('#8a7458',x,y,w,2); F('#a8916f',x,y,w,1); F('#6b5a44',x+w-1,y,1,2)}   // driftwood
-  F('#1e3a52',0,244,72,44); F('#1e3a52',72,264,92,24); F('#e8eef0',0,244,72,1); F('#e8eef0',72,264,92,1);   // ocean, little waves at the shore
-  for(let i=0;i<70;i++){const x=rnd()*164|0, y=246+rnd()*30|0; if(x>=72&&y<266)continue; F('#2a4c68',x,y,5,1)}
+  F('#2b3f78',0,244,72,44); F('#2b3f78',72,264,92,24); F('#f2d6e4',0,244,72,1); F('#f2d6e4',72,264,92,1);   // the harbor at sunset, little waves at the shore
+  for(let i=0;i<90;i++){const x=rnd()*164|0, y=246+rnd()*30|0; if(x>=72&&y<266)continue; F(['#3a5290','#c86a9a','#f3c46a','#5a6fb0'][i%4],x,y,i%4===2?2:5,1)}   // pink and gold sunset light on the water
+  // Stanley Park: a forested point in the bottom corner, ringed by the seawall, with the little red-and-white lighthouse
+  {F('#b9b2a6',0,252,34,36); F('#ded8cc',0,253,33,1); F('#2f5a36',0,255,31,33); F('#3d7044',2,256,26,30);
+   for(const [tx,ty] of [[4,258],[11,256],[18,259],[25,258],[6,266],[14,264],[22,268],[8,274],[17,272],[26,276],[4,282],[13,281]]){F('#1f4a2c',tx-3,ty,7,5); F('#2f6b3a',tx-2,ty-1,5,4); F('#4a8a52',tx-1,ty,2,1)}
+   F('#c8322b',28,262,4,6); F('#ffffff',28,264,4,2); F('#ffffff',28,259,4,3); F('#1d1d22',29,258,2,1); F('#ffe9a8',29,260,2,1)}
   for(let x=0;x<164;x++){const h=6+Math.round(5*Math.sin(x/9)+3*Math.sin(x/4.3+1)); F('#3a4a62',x,288-h,1,h); if(h>9)F('#e8eef4',x,288-h,1,2)}   // mountains
   for(let x=0;x<164;x+=2){const h=3+Math.round(2*Math.sin(x/5)); F('#2b3a50',x,288-h,2,h)}
   F('rgba(200,210,225,.18)',0,276,164,4);   // mist
@@ -161,14 +166,16 @@ const bg=document.createElement('canvas'); bg.width=WW; bg.height=WH;
   // sugar beet rows
   for(let y=244;y<284;y+=8){F('#9a7b66',236,y,104,4); for(let x=240;x<338;x+=6){F('#7d2b52',x,y+1,3,2);F('#4f9a3c',x+1,y-2,1,3)}}
   // roads
-  const road=(x,y,w,h)=>{F('#c9a46b',x,y,w,h); for(let i=0;i<w*h/30;i++)F('#b8935b',x+rnd()*w|0,y+rnd()*h|0,1,1);
-    for(let i=0;i<w*h/140;i++)F(rnd()<.5?'#a9a39a':'#d8c49a',x+rnd()*w|0,y+rnd()*h|0,1,1);                                 // pebbles
-    if(w>h){F('#b38c58',x,y,w,1); F('#b38c58',x,y+h-1,w,1); for(let k=0;k<w;k+=3)if(rnd()<.5)F('#8cc866',x+k,y-1,1,1)}   // edges, grass creeping in
-    else {F('#b38c58',x,y,1,h); F('#b38c58',x+w-1,y,1,h)}};
-  // one road across the middle, one down to Wylee Woods, and matching footpaths up to each place
+  // cobblestones: staggered rows of rounded stones with mortar between, a curb along the edges, a dusting of snow
+  const cobble=(x,y,w,h,horiz)=>{ F('#7f7464',x,y,w,h);
+    const stones=['#b3a793','#a89b86','#c0b4a0','#9f927e','#b8ad9a'];
+    if(horiz){ for(let yy=y+1,row=0;yy<y+h-1;yy+=3,row++)for(let xx=x-(row%2?2:0);xx<x+w;){const sw=3+(rnd()*3|0), x0=Math.max(x,xx), x1=Math.min(x+w,xx+sw); if(x1-x0>0){F(stones[rnd()*stones.length|0],x0,yy,x1-x0,2); F('rgba(255,255,255,.18)',x0,yy,1,1)} xx+=sw+1} }
+    else { for(let xx=x+1,col=0;xx<x+w-1;xx+=3,col++)for(let yy=y-(col%2?2:0);yy<y+h;){const sh=3+(rnd()*3|0), y0=Math.max(y,yy), y1=Math.min(y+h,yy+sh); if(y1-y0>0){F(stones[rnd()*stones.length|0],xx,y0,2,y1-y0); F('rgba(255,255,255,.18)',xx,y0,1,1)} yy+=sh+1} }
+    for(let i=0;i<w*h/45;i++)F('#f4f6fa',x+rnd()*w|0,y+rnd()*h|0,1,1);                                  // snow in the cracks
+    if(horiz){F('#6b6152',x,y,w,1); F('#6b6152',x,y+h-1,w,1); for(let k=0;k<w;k+=3)if(rnd()<.5)F('#8cc866',x+k,y-1,1,1)} else {F('#6b6152',x,y,1,h); F('#6b6152',x+w-1,y,1,h)} };
+  const road=(x,y,w,h)=>cobble(x,y,w,h,w>h);
   road(0,150,WW,14); road(186,164,12,124);
-  const path=(x,y,w,h)=>{F('#c9a46b',x,y,w,h); for(let i=0;i<w*h/30;i++)F('#b8935b',x+rnd()*w|0,y+rnd()*h|0,1,1);
-    if(w<h){F('#b38c58',x,y,1,h); F('#b38c58',x+w-1,y,1,h)} else {F('#b38c58',x,y,w,1); F('#b38c58',x,y+h-1,w,1)}};
+  const path=(x,y,w,h)=>cobble(x,y,w,h,w>h);
   path(43,74,10,76);     // the farm: road to the barn doors
   path(187,140,10,10);   // the kitchen: road to the porch steps
   path(311,74,10,76);    // the Birkie: road to the arch
@@ -323,7 +330,7 @@ SCENES.world={ music:()=>farm.active?'chase':'world',
     drawCupcake();
     for(const p of smoke){ctx.fillStyle=`rgba(240,240,240,${Math.max(0,p.a)*.7})`;ctx.fillRect(Math.round(p.x),Math.round(p.y),3,3)}
   },
-  ents(list){trees.forEach(([x,y])=>list.push({y,draw:()=>drawTree(x,y)}));
+  ents(list){trees.forEach(([x,y])=>list.push({y,draw:()=>drawXmasTree(x,y)}));   // Christmas trees (extras.js)
 
     pines.forEach(([x,y])=>list.push({y,draw:()=>drawPine(x,y,snowPine)})); cedars.forEach(([x,y])=>list.push({y,draw:()=>drawPine(x,y,mossCedar)})); woods.forEach(([x,y])=>list.push({y,draw:()=>drawPine(x,y,darkPine)}));
     list.push({y:67,draw:()=>ctx.drawImage(birkArch,290,38)}); list.push({y:286,draw:()=>ctx.drawImage(woodsArch,176,254)});
@@ -332,27 +339,26 @@ SCENES.world={ music:()=>farm.active?'chase':'world',
     farmOverlay();
     drawFargoTop();
     ctx.save(); ctx.beginPath(); ctx.rect(0,170,164,118); ctx.clip();                                        // city: dark, rain, searchlight
-    ctx.fillStyle='rgba(10,12,30,.28)'; ctx.fillRect(0,170,164,118);
-    const ang=Math.sin(time/1800)*.6;
-    ctx.fillStyle='rgba(255,240,180,.08)'; ctx.beginPath(); ctx.moveTo(78,288);
-    ctx.lineTo(78+Math.sin(ang-.12)*220,288-Math.cos(ang-.12)*220); ctx.lineTo(78+Math.sin(ang+.12)*220,288-Math.cos(ang+.12)*220); ctx.fill();
-    ctx.fillStyle='rgba(170,190,230,.55)'; for(const r of rain)ctx.fillRect(Math.round(r.x),Math.round(r.y),1,3);
+    {const gr=ctx.createLinearGradient(0,170,0,288); gr.addColorStop(0,'rgba(255,140,170,.32)'); gr.addColorStop(.45,'rgba(190,110,210,.22)'); gr.addColorStop(1,'rgba(70,90,190,.16)'); ctx.fillStyle=gr; ctx.fillRect(0,170,164,118)}   // Vancouver at sunset
+    drawMarina();
     for(const [x,y] of [[68,206],[104,260]]){ctx.fillStyle='#4a4f60'; ctx.fillRect(x,y-16,1,16); ctx.fillRect(x-1,y-17,4,1); ctx.fillStyle='#ffe9a8'; ctx.fillRect(x+1,y-16,2,2);   // streetlamps
       const gr=ctx.createRadialGradient(x+2,y-8,1,x+2,y-4,20); gr.addColorStop(0,'rgba(255,225,150,.32)'); gr.addColorStop(1,'rgba(255,225,150,0)'); ctx.fillStyle=gr; ctx.fillRect(x-20,y-28,44,40)}
     // the Gastown steam clock (it whistles steam on the quarter hour... here, every few seconds)
     {const x=94,y=228; ctx.fillStyle='#5a3a22'; ctx.fillRect(x,y-22,6,22); ctx.fillStyle='#7a5232'; ctx.fillRect(x+1,y-20,4,18); ctx.fillStyle='#c9a24a'; ctx.fillRect(x-1,y-23,8,2); ctx.fillRect(x-1,y-2,8,2);
       ctx.fillStyle='#f2efe6'; ctx.fillRect(x+1,y-18,4,4); ctx.fillStyle='#2b2b2b'; ctx.fillRect(x+3,y-17,1,2); ctx.fillRect(x+3,y-16,2,1);
       ctx.fillStyle='#c9a24a'; ctx.fillRect(x+2,y-26,2,3); if(Math.floor(time/2600)%3===0){ctx.fillStyle='rgba(235,235,240,.55)'; const t=(time%2600)/2600; for(let k=0;k<4;k++)ctx.fillRect(x+1+((k*3+Math.floor(t*6))%5),y-30-k*3-t*6,3,3)}}
-    // rain rings on the water, and the little rainbow ferry going back and forth
-    ctx.fillStyle='rgba(170,200,230,.45)'; for(let i=0;i<14;i++){const k=Math.floor(time/500+i*.37), ph=((time/500+i*.37)%1), rx=(i*23+k*17)%160+2, ry=(rx<72?248:268)+(i*13+k*7)%8, r=1+ph*3; ctx.fillRect(rx-r,ry,r*2,1)}
+    // the little rainbow ferry going back and forth
+    // (no rain tonight: a clear sunset)
     // the freighters anchored out in the bay (they're always there)
     const ship=(x,y,len,cols)=>{const b=Math.round(Math.sin(time/1400+x)*.6); ctx.fillStyle='rgba(0,0,0,.25)'; ctx.fillRect(x+1,y+6+b,len,2);
       ctx.fillStyle='#2b2f3a'; ctx.fillRect(x,y+1+b,len,5); ctx.fillStyle='#8a2a22'; ctx.fillRect(x+1,y+5+b,len-2,1); ctx.fillRect(x+len,y+3+b,1,2);
       cols.forEach((c,i)=>{ctx.fillStyle=c; ctx.fillRect(x+3+i*4,y-2+b,4,3)});
       ctx.fillStyle='#e8eef0'; ctx.fillRect(x+len-7,y-5+b,5,6); ctx.fillStyle='#ffe9a8'; ctx.fillRect(x+len-6,y-4+b,1,1); ctx.fillRect(x+len-4,y-4+b,1,1);
-      if(Math.floor(time/900+x)%2){ctx.fillStyle='#ff3b3b'; ctx.fillRect(x+len-5,y-7+b,1,1)}};
-    ship(4,254,36,['#c8322b','#2f6db0','#e8a020','#2f8a4a','#c8322b','#5fa8e8']); ship(104,270,42,['#2f8a4a','#e8a020','#c8322b','#2f6db0','#e8a020','#8a5a9a','#2f6db0']);
-    {const bx=Math.round(8+(Math.sin(time/5000)+1)*20), by=266; ctx.fillStyle='rgba(0,0,0,.25)'; ctx.fillRect(bx,by+5,14,2); ctx.fillStyle='#f2efe6'; ctx.fillRect(bx,by,14,5);
+      if(Math.floor(time/900+x)%2){ctx.fillStyle='#ff3b3b'; ctx.fillRect(x+len-5,y-7+b,1,1)}
+      const XC=['#e54b4b','#f4d35e','#5fa8e8','#7fd39a']; for(let k=0;k<=len;k+=3){const yy=k<len-7?y-3-Math.round(Math.sin(k/len*Math.PI)*3):y-6; ctx.fillStyle=XC[(k/3+Math.floor(time/350))%4]; ctx.fillRect(x+k,yy+b,1,1)}   // Christmas lights strung bow to stern
+      ctx.fillStyle='rgba(243,196,106,.35)'; for(let k=2;k<len;k+=6)ctx.fillRect(x+k,y+8+b,1,2+(Math.floor(time/300+k)%2))};   // their lights on the water
+    ship(36,252,34,['#c8322b','#2f6db0','#e8a020','#2f8a4a','#c8322b','#5fa8e8']); ship(122,270,40,['#2f8a4a','#e8a020','#c8322b','#2f6db0','#e8a020','#8a5a9a','#2f6db0']);
+    {const bx=Math.round(38+(Math.sin(time/5000)+1)*8), by=268; ctx.fillStyle='rgba(0,0,0,.25)'; ctx.fillRect(bx,by+5,14,2); ctx.fillStyle='#f2efe6'; ctx.fillRect(bx,by,14,5);
       ['#e54b4b','#f4a03a','#f4d35e','#4fbf73','#5fa8e8'].forEach((c,i)=>{ctx.fillStyle=c; ctx.fillRect(bx+2+i*2,by-2,2,2)}); ctx.fillStyle='#ffe9a8'; ctx.fillRect(bx+3,by+1,8,1)}
     drawLionsGate();
     ctx.fillStyle='#7d8694'; ctx.fillRect(150,170,1,10); if(Math.floor(time/700)%2){ctx.fillStyle='#ff3b3b'; ctx.fillRect(149,170,3,2)}   // antenna
