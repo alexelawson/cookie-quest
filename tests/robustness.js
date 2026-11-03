@@ -88,7 +88,7 @@ for(const [vpName,vp,touch] of [['desktop',{width:1280,height:800}],['phone',{wi
 // F. sound settings
 {const p=await page(); await fresh(p,ALL);
   const r=await p.evaluate(()=>{const a=song; setSound(false); const off=song; tone(440,.1); sfx('reward'); setSound(true); const on=song; setMusic(false); const m=song; setMusic(true); return {a,off,on,m,back:song}});
-  ok('F turning sound off stops the music; on brings back this place\'s song; Music can be off on its own',r.a==='farm'&&r.off===null&&r.on==='farm'&&r.m===null&&r.back==='farm',JSON.stringify(r));
+  ok('F turning sound off stops the music; on brings back this place\'s song; Music can be off on its own',r.a==='world'&&r.off===null&&r.on==='world'&&r.m===null&&r.back==='world',JSON.stringify(r));
   await p.context().close()}
 
 // G. Start over: two taps erase everything

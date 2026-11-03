@@ -115,11 +115,12 @@ ok('F all three stacked: John breaches',r.lw==='ok'&&r.lbl.includes('3/3')&&r.sa
 ok('F then you can drop in',r.next==='Drop through the skylight',r.next);
 // G0. the Confectioner is waiting under the skylight: hold A to zap him with Doc Alex's gadget; he turns into a gingerbread man
 r=await p.evaluate(()=>{const hud=$('hud').textContent; action(); const intro=T.clickThrough(); const open=!$('boss').hidden, vaultFirst=!$('vault').hidden;
-  actionHeld=true; bossTick(BOSS.ZAP_MS*.5); const half=boss.p, taunt=$('bossMsg').textContent, isTaunt=HEIST.bossTaunts.includes(taunt); actionHeld=false; bossTick(1000); const drained=boss.p;
+  const bossSong=song; actionHeld=true; bossTick(BOSS.ZAP_MS*.5); const half=boss.p, taunt=$('bossMsg').textContent, isTaunt=HEIST.bossTaunts.includes(taunt); actionHeld=false; bossTick(1000); const drained=boss.p;
   actionHeld=true; bossTick(BOSS.ZAP_MS); actionHeld=false; const zap=boss.phase; bossTick(BOSS.ZAP_ANIM+20);
-  const win=T.clickThrough(); return {hud,intro,open,vaultFirst,half,taunt,isTaunt,drained,zap,win,beat:!!have.confectionerBeat,vault:!$('vault').hidden,boss:!$('boss').hidden}});
+  const after=song; const win=T.clickThrough(); return {bossSong,after,hud,intro,open,vaultFirst,half,taunt,isTaunt,drained,zap,win,beat:!!have.confectionerBeat,vault:!$('vault').hidden,boss:!$('boss').hidden}});
 ok('G0 drop in: the Confectioner is waiting (not the crates yet)',r.hud.includes('Confectioner')&&r.intro.some(l=>l.startsWith('The Confectioner:'))&&r.open&&!r.vaultFirst,r.intro.join(' | '));
 ok('G0 holding A charges the zap and he taunts you; letting go drains it a bit',r.half>.45&&r.half<.55&&r.isTaunt&&r.drained<r.half&&r.drained>0,JSON.stringify({h:r.half,d:r.drained,t:r.taunt}));
+ok('G0 the fight has its own music, and the heist music comes back after',r.bossSong==='boss'&&r.after==='heist',r.bossSong+' / '+r.after);
 ok('G0 a full charge zaps him into a gingerbread man, then his riddle (the vault) opens',r.zap==='zap'&&r.beat&&r.win.join().includes('gingerbread man')&&r.vault&&!r.boss,r.win.join(' | '));
 // G. vault: three crates and a logic puzzle; raisins first, then the real thing
 r=await p.evaluate(()=>{action(); const open=!$('vault').hidden; const rule=$('vaultRule').textContent, labels=[0,1,2].map(i=>$('crateLabel'+i).textContent);

@@ -105,8 +105,11 @@ ok('J Settings > Change outfit: pick the Cupcake costume any time',r.ids.include
 r=await p.evaluate(async()=>{const out={}; for(const [s,e] of [['world','start'],['golf','fromRoad'],['birkie','start'],['fargo','fromHighway'],['city','start'],['kitchen','fromDoor']]){goTo(s,e); for(let i=0;i<60;i++)update(16.7); out[s]=song}
   kit.dance=true; sceneMusic(); out.dance=song; kit.dance=false; sceneMusic();
   $('settingsBtn').click(); const box=!!$('musicToggle'); $('musicToggle').checked=false; $('musicToggle').onchange(); const off=song; $('musicToggle').checked=true; $('musicToggle').onchange(); const on=song; $('settingsClose').click();
+  goTo('world','start'); for(let i=0;i<60;i++)update(16.7); farmStart(); out.chase=song; farmReset(); out.afterChase=song;
+  openEnding(); out.ending=song; closeEnding();
+  const bad=Object.entries(SONGS).filter(([k,S])=>{const n=t=>t.trim().split(/\s+/).reduce((a,x)=>a+(+x.split(':')[1]),0); return Math.abs(n(S.lead)-n(S.bass))>1e-6}).map(([k])=>k); out.uneven=bad.join();
   return {...out,box,off,on}});
-ok('L each place plays its own song',r.world==='farm'&&r.golf==='golf'&&r.birkie==='birkie'&&r.fargo==='fargo'&&r.city==='heist'&&r.kitchen==='kitchen',JSON.stringify(r));
+ok('L each place plays its own song (the map, the hen chase, the ending too; every song\'s melody and bass line up)',r.world==='world'&&r.chase==='chase'&&r.afterChase==='world'&&r.ending==='ending'&&!r.uneven&&r.golf==='golf'&&r.birkie==='birkie'&&r.fargo==='fargo'&&r.city==='heist'&&r.kitchen==='kitchen',JSON.stringify(r));
 ok('L the Cookie Dance switches to Jingle Bells; Settings > Music turns it off and on',r.dance==='jingle'&&r.box&&r.off===null&&r.on==='kitchen');
 // M. exits: walk into them and you leave, no button; arriving next to one doesn't bounce you straight back out
 await fresh(ALL);

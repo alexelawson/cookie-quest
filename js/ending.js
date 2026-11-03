@@ -51,7 +51,7 @@ const photoUnlocked=id=>id==='kitchen'?!!have.baked:!!have[id];
 
 // ---------- the screens ----------
 const ending={page:null, photo:0, fromSettings:false};
-function openEnding(){ ending.fromSettings=false; $('ending').hidden=false; paused=true; prompt.hidden=true; playSong('kitchen'); showCredits() }
+function openEnding(){ ending.fromSettings=false; $('ending').hidden=false; paused=true; prompt.hidden=true; playSong('ending'); showCredits() }
 function openAlbum(){ ending.fromSettings=true; $('ending').hidden=false; paused=true; prompt.hidden=true; showAlbum() }
 function closeEnding(){ $('ending').hidden=true; $('creditRoll').getAnimations().forEach(a=>a.cancel()); paused=overlayOpen(); sceneMusic() }
 function endButtons(next,skip){

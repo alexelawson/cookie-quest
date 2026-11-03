@@ -38,11 +38,12 @@ function farmReset(){
   farm.active=false; farm.won=false; farm.loose=[]; farm.carrying=null; farm.keelan.carrying=null;
   farm.penned=[...Array(FARM.HENS)].map(penHen);
   Object.assign(farm.keelan,{x:KEELAN_HOME.x,y:KEELAN_HOME.y,dir:'down',moving:false});
+  if(typeof sceneMusic==='function'&&typeof scene!=='undefined'&&scene)sceneMusic();   // back to the map music
 }
 const escapeGap=i=>FARM.FIRST_GAP+(FARM.LAST_GAP-FARM.FIRST_GAP)*Math.min(1,i/(FARM.ESCAPES-1));
 
 function farmStart(){
-  farmReset(); farm.active=true; farm.escapesLeft=FARM.ESCAPES; farm.escIdx=0;
+  farmReset(); farm.active=true; farm.escapesLeft=FARM.ESCAPES; farm.escIdx=0; sceneMusic();   // the hen-chase music
   for(let i=0;i<FARM.START_LOOSE;i++)escapeOne();
   farm.gapT=escapeGap(farm.escIdx);
 }
@@ -200,7 +201,7 @@ function farmUpdate(dt){
   if(farm.loose.length>=FARM.LOSE_AT){
     farmReset(); showDialog({place:KEELAN.place,speaker:KEELAN.name,pages:KEELAN.lose,actions:[CLOSE]});
   } else if(farm.penned.length>=FARM.HENS){   // everyone's home
-    farm.active=false; farm.won=true; have.farmWon=true; save();
+    farm.active=false; farm.won=true; have.farmWon=true; save(); sceneMusic();
     showDialog({place:KEELAN.place,speaker:KEELAN.name,pages:KEELAN.win,actions:[{label:KEELAN.thanks,fn:()=>{closeDialog();showReward('farm')}}]});
   }
 }

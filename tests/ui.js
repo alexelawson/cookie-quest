@@ -18,6 +18,8 @@ ok('A both fonts are embedded and load with no internet',r.pix&&r.body&&!r.googl
 ok('A the game window fits on a 1280x800 laptop screen',r.bottom<=800,'bottom '+r.bottom);
 ok('A title, basket and game share one center line',Math.abs(r.mid-r.bmid)<2&&Math.abs(r.mid-r.hmid)<2,`${r.mid} ${r.bmid} ${r.hmid}`);
 ok('B the title screen draws the snowy night (lots of colors, so Joe, Grp, the kitchen and the tree are there)',r.colors>25,r.colors+' colors');
+await p.mouse.click(5,5); await p.waitForTimeout(100); r=await p.evaluate(()=>song);
+ok('B the title screen has its own music once you tap anything',r==='title',String(r));
 // typewriter
 await p.click('#startBtn'); await p.evaluate(()=>skipWelcome());
 r=await p.evaluate(()=>{ window.uiHit=0; showDialog({speaker:'Keelan',pages:['Hey. You here about the eggs? Because we have got a situation...'],actions:[{label:'Okay',fn:()=>{uiHit++;closeDialog()}}]});

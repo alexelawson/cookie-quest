@@ -68,7 +68,7 @@ function openBoss(){
   say(HEIST.bossIntro.map(([sp,tx])=>[sp,tx,sp]),()=>{
     Object.assign(boss,{open:true,p:0,phase:'fight',t:0,taunt:-1});
     $('bossTitle').textContent=HEIST.bossTitle; $('bossMsg').textContent=HEIST.bossHold; $('bossBtn').textContent=HEIST.bossBtn;
-    $('boss').hidden=false; paused=true; prompt.hidden=true; bossLoop(); setTimeout(()=>$('bossBtn').focus({preventScroll:true}),0);
+    $('boss').hidden=false; paused=true; prompt.hidden=true; playSong('boss'); bossLoop(); setTimeout(()=>$('bossBtn').focus({preventScroll:true}),0);
   });
 }
 function bossHeld(){ return boss.btnHeld||actionHeld }
@@ -86,7 +86,7 @@ function bossTick(dt){
   $('bossFill').style.width=Math.round(boss.p*100)+'%';
 }
 function bossWon(){
-  boss.open=false; boss.phase='done'; $('boss').hidden=true; have.confectionerBeat=true; save();
+  boss.open=false; boss.phase='done'; $('boss').hidden=true; have.confectionerBeat=true; save(); sceneMusic();
   say(HEIST.bossWin.map(([sp,tx])=>[sp,tx,sp==='The Confectioner'?'Gingerbread Confectioner':sp]),()=>openVault());
 }
 function bossLoop(){
