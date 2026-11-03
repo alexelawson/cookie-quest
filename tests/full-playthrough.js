@@ -48,17 +48,10 @@ await reload();
 r=await p.evaluate(()=>({found:secretsFound(),of:SECRETS.length,bonus:[...$('basket').querySelectorAll('.slot.bonus,.slot.extra')].map(s=>s.dataset.key)}));
 ok('3 all seven secrets found by walking and talking, and they survive a reload',r.found===r.of,JSON.stringify(r));
 
-// 4. home: everyone's there, the secret word (typed for real), bake, party
+// 4. home: everyone's there, bake, party
 r=await p.evaluate(()=>{goTo('kitchen','fromDoor'); T.run(40); const crowd=CROWD.filter(c=>!c.needs||have[c.needs]).length;
-  T.at(64,60); action(); T.pages(); T.click("Let's bake"); return {crowd,pw:!$('xword').hidden}});
-ok('4 everyone came over; Let\'s bake asks for the secret word',r.crowd>=12&&r.pw,r.crowd+' guests');
-await p.keyboard.type(await p.evaluate(()=>PASSWORD.word.toUpperCase())); await p.keyboard.press('Enter');
-r=await p.evaluate(()=>({ok:!!have.passwordOk,btn:$('pwGo').textContent}));
-ok('4 typing the secret word on the keyboard unlocks the recipe card',r.ok&&r.btn==="Let's bake",JSON.stringify(r));
-await p.evaluate(()=>closePassword());
-await reload();
-r=await p.evaluate(()=>{goTo('kitchen','fromDoor'); T.run(40); T.at(64,60); action(); T.pages(); T.click("Let's bake"); return {pw:!$('xword').hidden,bake:!$('bake').hidden}});
-ok('4 after a reload it stays unlocked: straight to baking',!r.pw&&r.bake);
+  T.at(64,60); action(); T.pages(); T.click("Let's bake"); return {crowd,bake:!$('bake').hidden}});
+ok('4 everyone came over; Let\'s bake goes straight to baking',r.crowd>=12&&r.bake,r.crowd+' guests');
 r=await p.evaluate(()=>{const tick=ms=>{for(let t=0;t<ms;t+=16.7)SCENES.kitchen.ambient(16.7)};
   for(let guard=0;guard<30&&bake.state!=='oven';guard++){const s=stepNow(); if(bake.state==='good'){bakePress();continue}
     if(s.kind==='pour'){bakePress(); tick(s.target/s.rate*1000); bakeRelease()} else if(s.kind==='count'){for(let k=0;k<s.target;k++)bakePress(); eggsDone()} else {for(let k=0;k<(s.taps||12);k++)bakePress()}}
@@ -84,7 +77,7 @@ ok('5 after a reload Joe still has his (legendary) crown',r.crown&&r.legend);
 // 6. Play again: everything starts over, including the new stuff
 r=await p.evaluate(()=>{goTo('kitchen','fromDoor'); T.run(40); T.at(64,60); action(); const ending=!$('ending').hidden; $('endSkip').click(); $('endNext').click(); $('endNext').click(); $('endNext').click();
   const pa=[...$('ecard').querySelectorAll('button')].find(b=>b.textContent===KITCHEN.playAgain); if(!pa)return {err:$('ecard').textContent.slice(0,80)+' | dlg '+$('dtext').textContent+' | near '+(near&&near.label),keys:[]}; pa.click(); T.run(40);
-  return {ending,keys:Object.keys(have),basket:[...$('basket').querySelectorAll('.slot.got')].length,gear:!!have.gear,xw:!!have.passwordOk,crown:!!have.crown,scene:scene===SCENES.world,closed:$('ending').hidden}});
-ok('6 the counter replays the ending; Play again wipes everything (basket, gear, secret word, crown)',r.ending&&r.basket===0&&!r.gear&&!r.xw&&!r.crown&&r.scene&&r.closed,JSON.stringify(r.keys));
+  return {ending,keys:Object.keys(have),basket:[...$('basket').querySelectorAll('.slot.got')].length,gear:!!have.gear,crown:!!have.crown,scene:scene===SCENES.world,closed:$('ending').hidden}});
+ok('6 the counter replays the ending; Play again wipes everything (basket, gear, crown)',r.ending&&r.basket===0&&!r.gear&&!r.crown&&r.scene&&r.closed,JSON.stringify(r.keys));
 
 console.log(R.join('\n')); console.log('page errors:',errs.length?errs:'none'); await b.close(); process.exit(R.some(l=>l.startsWith('FAIL'))||errs.length?1:0)})();

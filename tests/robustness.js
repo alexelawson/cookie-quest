@@ -18,8 +18,6 @@ const OVERLAYS=[
   ['snack shop', ALL, ()=>{goTo('fargo','fromHighway'); setTimeout(()=>{try{closeDialog()}catch(e){} have.fargoStage='store'; parkAndGetOut(); openShop()},900)}, '#giveBtn', 1200],
   ['vault', {...ALL,heistStage:3,heistBriefed:true,heistHowTo:true}, ()=>{goTo('city','start'); setTimeout(()=>{try{closeDialog()}catch(e){} openVault()},900)}, '#crate2', 1200],
   ['anagrams', {...ALL,heistStage:4,heistBriefed:true,heistHowTo:true}, ()=>{goTo('city','start'); setTimeout(()=>{try{closeDialog()}catch(e){} openAnagrams()},900)}, '#anaStart', 1200],
-  ['secret word: the box', ALL, ()=>openPassword(()=>{}), '#pwInput'],
-  ['secret word: Unlock', ALL, ()=>openPassword(()=>{}), '#pwGo'],
   ['baking', ALL, ()=>{goTo('kitchen','fromDoor'); setTimeout(openBake,900)}, '#bakeBtn', 1200],
   ['ending: stats', {...ALL,baked:true}, ()=>{openEnding(); $('endSkip').click()}, '#endNext'],
   ['ending: album', {...ALL,baked:true}, ()=>{openEnding(); $('endSkip').click(); $('endNext').click()}, '#endNext'],
@@ -55,7 +53,7 @@ for(const [vpName,vp,touch] of [['desktop',{width:1280,height:800}],['phone',{wi
 
 // C. menus on top of menus: opening ⚙ Settings over another pop-up and closing it must not unpause the game underneath
 {const p=await page(); const stuck=[];
-  for(const [name,st,open] of [['secret word',ALL,()=>openPassword(()=>{})],['baking',ALL,()=>{goTo('kitchen','fromDoor'); setTimeout(openBake,900)}],['snack shop',ALL,()=>{goTo('fargo','fromHighway'); setTimeout(()=>{try{closeDialog()}catch(e){} have.fargoStage='store'; parkAndGetOut(); openShop()},900)}],
+  for(const [name,st,open] of [['baking',ALL,()=>{goTo('kitchen','fromDoor'); setTimeout(openBake,900)}],['snack shop',ALL,()=>{goTo('fargo','fromHighway'); setTimeout(()=>{try{closeDialog()}catch(e){} have.fargoStage='store'; parkAndGetOut(); openShop()},900)}],
     ['ending',{...ALL,baked:true},()=>openEnding()],['reward',ALL,()=>showReward('farm')],['dialog',ALL,()=>showDialog({pages:['hi'],actions:[CLOSE]})]]){
     await fresh(p,st); await p.evaluate(open); await p.waitForTimeout(1300);
     const r=await p.evaluate(()=>{$('settingsBtn').click(); $('settingsClose').click(); const x=P.x; dirs.right=true; for(let i=0;i<20;i++)update(16.7); dirs.right=false; return {paused,moved:P.x!==x}});
@@ -94,7 +92,7 @@ for(const [vpName,vp,touch] of [['desktop',{width:1280,height:800}],['phone',{wi
   await p.context().close()}
 
 // G. Start over: two taps erase everything
-{const p=await page(); await fresh(p,{...ALL,gear:{oakleys:1},passwordOk:true});
+{const p=await page(); await fresh(p,{...ALL,gear:{oakleys:1}});
   await p.click('#resetBtn'); await p.click('#resetBtn'); await p.waitForLoadState('load'); await p.waitForTimeout(300); await p.click('#startBtn'); await p.waitForTimeout(200);
   const r=await p.evaluate(()=>({keys:Object.keys(have).filter(k=>k!=='welcomed'),welcome:$('dspeaker').textContent}));
   ok('G Start over (tap twice) erases everything and Alex welcomes Joe again',!r.keys.length&&r.welcome==='Alex',JSON.stringify(r));

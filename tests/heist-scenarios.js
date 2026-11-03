@@ -36,7 +36,7 @@ ok('A Joe and Lars can\'t lift it; John can',r.joe.said.includes('Step aside Joe
 ok('A John keeps carrying the log; you can switch back and walk to Dr. Alex with him following',r.switched&&r.w==='ok'&&r.johnNear,r.w);
 ok('A walk up to Dr. Alex (Alex as a mad scientist) and she briefs the crew',r.lbl==='Talk to Dr. Alex'&&r.face&&r.lines[0].startsWith('Dr. Alex')&&r.lines.join().includes('formula')&&r.lines.some(l=>l.startsWith('John'))&&r.lines.some(l=>l.startsWith('Lars')),r.lines.length+' lines');
 ok('A agent select: 3 agents with roles + powers + controls, LOCK IN',r.how&&r.rows===3&&r.ctl.includes('Space')&&r.ctl.includes('press F')&&r.sel==='Agent select|LOCK IN|Initiator,Duelist,Sentinel'&&r.onOne===1&&r.lead===0,r.sel);
-ok('A Dr. Alex hands Joe the defuser',r.lines.join().includes('defuser'));
+ok('A Dr. Alex hands Joe her gadget',r.lines.join().includes('My gadget'));
 ok('A crew bar + objective + skill label',r.bar&&r.hud.includes('Bridge')&&r.lab==='Sonar',r.hud+' / '+r.lab);
 // B. the gap: Lars tries the long jump (and finds ice cream), then John lays the log across
 r=await p.evaluate(()=>{T.hints=[]; const w=T.walkTo(98,102); update(16.7); const lbl=prompt.textContent; action(); const menu=T.btns();
@@ -113,6 +113,14 @@ ok('F only John can rip the grate',r.msg.includes('Only John'),r.msg);
 ok('F stack up first: the whole crew has to be on the skylight',r.lbl1.includes('/3 stacked')&&r.early.join().includes('Stack up')&&r.st1===2,r.lbl1+' / '+r.early[0]);
 ok('F all three stacked: John breaches',r.lw==='ok'&&r.lbl.includes('3/3')&&r.said.join().includes('Breaching')&&r.st===3,r.lw+' / '+r.lbl+' / '+r.said.join(' | '));
 ok('F then you can drop in',r.next==='Drop through the skylight',r.next);
+// G0. the Confectioner is waiting under the skylight: hold A to zap him with Dr. Alex's gadget; he turns into a gingerbread man
+r=await p.evaluate(()=>{const hud=$('hud').textContent; action(); const intro=T.clickThrough(); const open=!$('boss').hidden, vaultFirst=!$('vault').hidden;
+  actionHeld=true; bossTick(BOSS.ZAP_MS*.5); const half=boss.p, taunt=$('bossMsg').textContent, isTaunt=HEIST.bossTaunts.includes(taunt); actionHeld=false; bossTick(1000); const drained=boss.p;
+  actionHeld=true; bossTick(BOSS.ZAP_MS); actionHeld=false; const zap=boss.phase; bossTick(BOSS.ZAP_ANIM+20);
+  const win=T.clickThrough(); return {hud,intro,open,vaultFirst,half,taunt,isTaunt,drained,zap,win,beat:!!have.confectionerBeat,vault:!$('vault').hidden,boss:!$('boss').hidden}});
+ok('G0 drop in: the Confectioner is waiting (not the crates yet)',r.hud.includes('Confectioner')&&r.intro.some(l=>l.startsWith('The Confectioner:'))&&r.open&&!r.vaultFirst,r.intro.join(' | '));
+ok('G0 holding A charges the zap and he taunts you; letting go drains it a bit',r.half>.45&&r.half<.55&&r.isTaunt&&r.drained<r.half&&r.drained>0,JSON.stringify({h:r.half,d:r.drained,t:r.taunt}));
+ok('G0 a full charge zaps him into a gingerbread man, then his riddle (the vault) opens',r.zap==='zap'&&r.beat&&r.win.join().includes('gingerbread man')&&r.vault&&!r.boss,r.win.join(' | '));
 // G. vault: three crates and a logic puzzle; raisins first, then the real thing
 r=await p.evaluate(()=>{action(); const open=!$('vault').hidden; const rule=$('vaultRule').textContent, labels=[0,1,2].map(i=>$('crateLabel'+i).textContent);
   const wrong=vault.choc===0?1:0; pickCrate(wrong); const raisin=T.clickThrough(); const reopened=!$('vault').hidden;
@@ -121,7 +129,7 @@ r=await p.evaluate(()=>{action(); const open=!$('vault').hidden; const rule=$('v
 ok('G vault: a rule and three labeled crates',r.open&&r.rule.length>5&&r.labels.every(l=>l.length>2)&&!r.labels.join().includes('{'),r.rule+' | '+r.labels.join(' | '));
 ok('G raisins: John objects, choose again',r.raisin.join().includes('Raisins')&&r.reopened,r.raisin[0]);
 ok('G Lars gives a hint if you ask',!!r.hint,r.hint);
-ok('G finale, then Lars challenges you to anagrams (no other games)',r.fin.some(l=>l.includes('final ingredient'))&&r.btns.join()==='Bring it'&&r.ana&&r.st===4,r.ask);
+ok('G the gingerbread man: "Why so salty?" Then the finale, and Lars challenges you to anagrams',r.fin.some(l=>l.startsWith('The Confectioner:')&&l.includes('salty'))&&r.fin.some(l=>l.includes('final ingredient'))&&r.btns.join()==='Bring it'&&r.ana&&r.st===4,r.ask);
 // the right crate moves around, and the puzzles rotate
 r=await p.evaluate(()=>{const spots=new Set(), rules=new Set(); for(let k=0;k<40;k++){openVault(); spots.add(vault.choc); rules.add(vault.puzzle.rule); $('vault').hidden=true} vault.open=false; paused=false; return {spots:[...spots].sort().join(),rules:rules.size}});
 ok('G the chocolate crate is shuffled and the puzzle changes',r.spots==='0,1,2'&&r.rules>=3,JSON.stringify(r));

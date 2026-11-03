@@ -68,6 +68,15 @@
         <p class="vhint" id="vaultHintText" hidden></p>
       </div>
     </div>
+    <div class="vault" id="boss" hidden role="dialog" aria-labelledby="bossTitle">
+      <div class="vcard bosscard">
+        <small id="bossTitle"></small>
+        <canvas id="bossArt" width="128" height="64" aria-hidden="true"></canvas>
+        <p id="bossMsg" aria-live="polite"></p>
+        <div class="bossbar" aria-hidden="true"><i id="bossFill"></i></div>
+        <button class="pbtn" id="bossBtn"></button>
+      </div>
+    </div>
     <div class="anagram" id="anagram" hidden role="dialog" aria-labelledby="anaTitle">
       <div class="acard">
         <div class="ahead"><h3 id="anaTitle"></h3><span class="atime" id="anaTime">60</span></div>
@@ -106,14 +115,6 @@
         <canvas id="bakeArt" width="96" height="64" aria-hidden="true"></canvas>
         <div class="bsay"><canvas id="bakeFace" width="40" height="40" aria-hidden="true"></canvas><p id="bakeMsg" aria-live="polite"></p></div>
         <div class="brow"><button class="pbtn" id="bakeBtn"></button><button class="btn ghost" id="bakeAlt" hidden></button></div>
-      </div>
-    </div>
-    <div class="bake" id="xword" hidden role="dialog" aria-labelledby="pwTitle">
-      <div class="pcard bcard pwcard">
-        <small id="pwTitle"></small>
-        <div class="bsay"><canvas id="pwFace" width="40" height="40" aria-hidden="true"></canvas><p id="pwMsg" aria-live="polite"></p></div>
-        <input id="pwInput" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" aria-label="Secret word">
-        <div class="brow"><button class="btn" id="pwGo"></button><button class="btn ghost" id="pwLater"></button></div>
       </div>
     </div>
     <div class="bake" id="cloverHunt" hidden role="dialog" aria-labelledby="cloverTitle">
@@ -183,10 +184,10 @@
 <script src="js/ui.js"></script>
 <script src="js/farm.js"></script>
 <script src="js/kitchen.js"></script>
-<script src="js/password.js"></script>
 <script src="js/city.js"></script>
 <script src="js/fargo.js"></script>
 <script src="js/portraits.js"></script>
+<script src="js/confectioner.js"></script>
 <script src="js/anagrams.js"></script>
 <script src="js/larsgames.js"></script>
 <script src="js/golf.js"></script>

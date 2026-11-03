@@ -45,11 +45,11 @@ const HEIST = {
   briefing:["Ah. You came.",
             "For years I have perfected the ultimate chocolate chip cookie. The formula is complete... except for one ingredient.",
             "The chocolate's gone. Every last bar in the city. Taken by someone calling himself The Confectioner.",
-            "He's holed up in the old candy works, three rooftops east. Searchlights. Guards. Lasers you can't see.",
+            "He's holed up three rooftops over. Searchlights. Guards. Lasers you can't see.",
             "Bring me that chocolate. Science will thank you. (So will I.)",
-            "Oh! Joe. Take this. My defuser. Laser panels hate it. Hold it down and do NOT let go."],
+            "Oh! Joe. Take this. My gadget. Laser panels hate it. So do villains. Hold it down and do NOT let go."],
   crewHello:[['John',"We got you, man."],['Lars',"I am ready."]],
-  strangerAgain:"Three rooftops east. Go! Science waits for no one.",
+  strangerAgain:"Three rooftops over. Go! Science waits for no one.",
   whoIsThat:"Who's that by the lab bench? Go talk to her. Something's bubbling.",
   johnLog:"That log's blocking the way. Think you can lift it?",
   briefFirst:"Let's see what the lady in the lab coat wants first.",
@@ -80,10 +80,9 @@ const HEIST = {
   fuse:"Flip the LIGHT POWER switch",
   onlyLars:"It's across the searchlights. Lars is the only one fast enough.",
   fuseDone:"*KA-CHUNK* Lights out.",
-  lightsOutCall:"Twenty seconds till they reboot. Everybody across to the candy works. Rotate, rotate!",
+  lightsOutCall:"Twenty seconds till they reboot. Everybody across. Rotate, rotate!",
   lightsAlreadyOut:"Lights are already out. Go!",
   lightsBack:"Lights are back up! Hide! I'll flip it again.",
-  allAcross:"Everybody's on the candy works roof. The lights can come back on all they want.",
   gateCheck:"Check the gate",
   gateUnlock:"Unlock the gate",
   gateLocked:"Hmm. It's locked. There's got to be a key around here somewhere...",
@@ -91,17 +90,17 @@ const HEIST = {
   gateUnlocked:"*click* It's open. Go, go, go.",
   grabKey:"Grab the key",
   gotKey:"Got the key.",
-  heroLasers:"Tripwires around the skylight. Some I can see, some I can't. One ping of the sonar and I'll chalk-mark the hidden ones. There's a control panel past them, by the skylight. If I get through, I can shut them all off for everyone.",
+  heroLasers:"Tripwires. One ping of my sonar shows the hidden ones.",
   lasersOff:"Shut off the lasers",
   defuseLabel:"Defuse the lasers (hold)",
   defuseKeep:"Keep defusing (hold)",
   defuseHold:"Hold A (or Space) to defuse. Don't let go.",
   defuseHalf:"Half defused! Hold A to finish.",
-  onlyJoe:"Only Joe has Dr. Alex's defuser.",
+  onlyJoe:"Only Joe has Dr. Alex's gadget.",
   defuseCall:"Clutch defuse.",
   stackUp:"Stack up on the skylight first. Everybody. {n} of 3 here.",
   breach:"Everyone stacked? Breaching.",
-  rounds:[{title:"ROUND 1", name:"The lab roof"},{title:"ROUND 2", name:"The searchlights"},{title:"ROUND 3", name:"The candy works"}],
+  rounds:[{title:"ROUND 1", name:"The lab roof"},{title:"ROUND 2", name:"The searchlights"},{title:"ROUND 3", name:"The skylight"}],
   roundWon:"ROUND WON",
   lasersDone:"*click* Lasers off. Come on up, guys. Watch out for the guard.",
   grate:"Rip off the grate",
@@ -113,13 +112,23 @@ const HEIST = {
   backToCheckpoint:"Back to the last checkpoint.",
   followTip:"{who} was following right behind you. Set the crew to Hold, and they'll wait while you go.",
   followTipYou:"You were tagging along right behind {lead}. Set the crew to Hold, and the others wait while one person goes.",
-  vaultTitle:"The Confectioner's vault",
-  vaultNote:"One crate has the chocolate. Two have raisins. The Confectioner left a rule:",
+  vaultTitle:"The Confectioner's riddle",
+  vaultNote:"One crate has the chocolate. Two have raisins. The gingerbread man squeaks his rule:",
   vaultHint:"Ask Lars for a hint",
   raisins:[['John',"Raisins. In a cookie. ABSOLUTELY not."],['Lars',"That's a crime. Read the labels again."]],
   gotIt:"Chocolate. A whole crate of it.",
-  villainNote:"A last note, taped inside the lid: \"Fine. Keep your chocolate. Why so salty? —The Confectioner\"",
-  finale:[['Dr. Alex',"You found it! The final ingredient!"],['Dr. Alex',"The formula is complete. MWAHAHAHA. Ahem. I mean: thank you."],['John',"Can we go home now? It's cold."]],
+  villainNote:"Fine. Keep your chocolate. Why so salty?",   // the gingerbread Confectioner says this
+  // the showdown under the skylight: the Confectioner is waiting. Hold A to zap him with Dr. Alex's gadget.
+  bossIntro:[['The Confectioner',"Well, well, well. Uninvited guests."],['The Confectioner',"You want my chocolate? Over my dead dessert."],['John',"Joe. The gadget."]],
+  bossTitle:"The Confectioner",
+  bossHold:"Hold A (or this button) to zap him. Don't let go!",
+  bossBtn:"Hold to zap",
+  bossTaunts:["Is that a hair dryer? How adorable.","Stop that! You'll melt my mustache!","No... NO... not the sprinkles setting!"],
+  bossLetGo:"Ha! Out of batteries already?",
+  bossZap:"*ZAP!*",
+  bossWin:[['',"A puff of powdered sugar. Where the Confectioner stood, there's a tiny gingerbread man."],['The Confectioner',"...What did you DO to me?!"],['Lars',"He's so small."],['John',"He smells amazing."],
+           ['The Confectioner',"Fine! The chocolate's in my vault. But you'll NEVER solve my riddle!"]],
+  finale:[['Dr. Alex',"(on the radio) You found it! The final ingredient!"],['Dr. Alex',"The formula is complete. MWAHAHAHA. Ahem. I mean: thank you."],['John',"Can we go home now? It's cold."]],
   thanks:"Let's go bake",
   larsChallenge:[['Lars',"Hold up. Before we go home..."],['Lars',"Loser carries the chocolate down the ladder. Anagrams. Right now."],['John',"Oh no. Not this again."]],
   larsPick:"Six letters, sixty seconds. Different letters every game, so no memorizing.",
@@ -127,7 +136,7 @@ const HEIST = {
   howToTitle:"Agent select",
   howToPick:"Tap who leads, then lock in.",
   roles:{hero:"Initiator", lars:"Duelist", john:"Sentinel"},
-  howToSkills:{hero:"Lights up the dark and shows hidden tripwires (one ping chalk-marks them). Carries the defuser.",
+  howToSkills:{hero:"Sonar shows hidden tripwires. Carries Dr. Alex's gadget.",
                lars:"A burst of speed: dash shadow to shadow under the searchlights. Only he can reach the light switch.",
                john:"Carries heavy things: the log, the grate."},
   howToControls:["Switch who you control: tap their face below the screen, or press 1, 2, 3.",
@@ -142,10 +151,10 @@ const HEIST = {
   larsWins:[['Lars',"Ha! Again? New letters this time, if that helps."]],
   larsLoses:[['Lars',"...Best two out of three?"],['John',"No. You carry the chocolate, Lars."]],
   // after the chocolate: Lars lugs the crate back to the grate, John rolls his eyes, and everyone heads home
-  exitLines:[['Lars',"Who packed this?! It weighs as much as a Viking."],['John',"*rolls eyes* You lost. You carry. Those are the rules."],['Lars',"Best three out of five?"],['John',"Down the grate, Lars."]],
+  exitLines:[['Lars',"Who packed this?! It weighs as much as a Viking."],['John',"*rolls eyes* You lost. You carry. Those are the rules."],['Lars',"Best three out of five?"],['John',"Down the fire escape, Lars."]],
   strangerRematch:"Your friend wants his rematch.",
   after:"The cookie signal's up. The experiment can begin.",
-  climbDown:"Climb down the ladder",
+  climbDown:"Climb down the fire escape",
 };
 
 // ---------- The welcome: Alex explains the game when you press Start the first time ----------
@@ -346,7 +355,9 @@ const FARGO = {
   pumpTitle:"Lil Q's bet: stop on exactly $30.00",
   pumpHint:"Hold to pump. Let go to stop. Quick taps for the last few cents.",
   bust:["Ohhh, a penny over! The pump don't lie, baby.","Over again! Lil Q resets. Lil Q forgives.","Thirty and WHAT?? Run it back.","Steady hands, rookie. Be the pump. Become the pump."],
-  pumpWin:["THIRTY. EVEN. Somebody get this rookie a record deal.","Now go inside and grab something for your co-pilot. She's been real patient. Unlike Lil Q."],
+  pumpWin:["THIRTY. EVEN. Somebody get this rookie a record deal.","Pull up by the door, rookie. Shop's open."],
+  // then Joe and Alex get out of the car (Alex's name pops up)
+  snackAsk:[["Joe","Want anything from inside?"],["Alex","No, I'm good."],["Alex","..."],["Alex","I mean. If YOU'RE getting something."],["","(She definitely wants a snack.)"]],
   goInside:"Go inside",
   bobWaiting:"Go on in, she's waiting. Wrong snack and Lil Q writes a diss track about you.",
   win:["Ginger ale AND Mott's? That's love, rookie. Lil Q respects it.","Here. Sugar, straight outta the Red River Valley. Peace."],
@@ -387,20 +398,6 @@ const FARGO = {
   alexOutside:"...",
   alexWaiting:"Snacks. Please. I've been in this car for nine hours.",
 };
-
-// ---------- The locked recipe card: Joe types the secret word from Alex's paper crossword ----------
-// Change `word` to the real answer. Capitals and spaces don't matter.
-const PASSWORD = {
-  word:'klister',   // from the paper crossword: the circled letters spell it
-  title:"The locked recipe card",
-  intro:"The recipe card is locked! Solve the crossword I gave you, then type the secret word here.",
-  placeholder:"Secret word",
-  check:"Unlock", later:"Later",
-  empty:"Type the secret word from the crossword first.",
-  wrong:"Hmm, that's not it. Check the crossword again!",
-  right:"That's it! The recipe card is unlocked. Let's bake.",
-  go:"Let's bake",
-};
 // ---------- Joe's gear, hidden around the main map (where: GEAR in extras.js) ----------
 const GEAR_TEXT = {
   place:"Found something!",
@@ -425,6 +422,16 @@ const JACKIE = {
   tryAgain:"Go back inside (try again)",
 };
 // ---------- Logan (the clover field on the farm, by the barn path) ----------
+// The two football Vikings jogging laps on the main road. Talk to them as they run past: one line each time, in order.
+const ROAD_VIKINGS = {
+  name:"A football Viking",
+  lines:["Out of my way! Two-a-days!",
+         "Can't stop. Coach is watching.",
+         "On your left! ...Your OTHER left.",
+         "Hut! Hut! Hydrate!",
+         "Lap forty-one. Or fourteen. I lost count at the Birkie."],
+};
+
 const LOGAN_TEXT = {
   place:"The clover patch",
   hello:["Oh, hey. Taking a quick break from my workout.","Interval six of twelve.","Anyway. Four-leaf clovers. I've found three this year. Statistically, there's one right... here... somewhere."],
@@ -462,7 +469,7 @@ const ENDING = {
   thanks:["Made with love by Alex","For Joe · Christmas 2026"],
   skip:"Skip", next:"Next", close:"Close", toNote:"One more thing...",
   statsTitle:"Joe's stats",
-  stats:{birkie:"Birkie time", golf:"Wylee Woods", anagrams:"Anagrams vs Lars", spotted:"Spotted on the rooftops", snacks:"Wrong snacks for Alex", pwTries:"Wrong passwords", steps:"Steps walked", look:"Look"},
+  stats:{birkie:"Birkie time", golf:"Wylee Woods", anagrams:"Anagrams vs Lars", spotted:"Spotted on the rooftops", snacks:"Wrong snacks for Alex", steps:"Steps walked", look:"Look"},
   secretsLine:(n,of)=>`Secrets found: ${n} of ${of}`,
   secretNames:{cupcake:'Cupcake',sprinkles:'Sprinkles',icecream:'Ice cream',oakleys:'Oakleys',headband:'Headband',shoes:'Carbon shoes',clover:'Lucky clover'},
   secretsTip:"Keep exploring to find the rest. Find them all for a surprise.",

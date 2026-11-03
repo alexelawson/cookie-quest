@@ -7,7 +7,7 @@
   // every ingredient in the basket, then into the kitchen (the password, baking and the party are still yours to play)
   const ingredients=mk('Skip to the kitchen',()=>{ for(const i of ITEMS)have[i.key]=true; have.welcomed=true; save(); renderBasket(); goTo('kitchen','fromDoor') });
   // straight to the credits, stats, album and note
-  const ending=mk('Skip to the ending',()=>{ for(const i of ITEMS)have[i.key]=true; Object.assign(have,{welcomed:true,passwordOk:true,baked:true,crown:true}); save(); renderBasket(); goTo('kitchen','fromDoor'); setTimeout(openEnding,900) });
+  const ending=mk('Skip to the ending',()=>{ for(const i of ITEMS)have[i.key]=true; Object.assign(have,{welcomed:true,baked:true,crown:true}); save(); renderBasket(); goTo('kitchen','fromDoor'); setTimeout(openEnding,900) });
   box.append(label,ingredients,ending);
   $('settingsClose').before(box);
 })();

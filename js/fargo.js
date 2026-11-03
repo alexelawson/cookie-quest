@@ -253,7 +253,7 @@ function pumpRelease(){
   } else if(pump.cents===3000){
     pump.lock=99999; $('pumpMsg').textContent='$30.00 on the nose!'; sfx('ding');
     setTimeout(()=>{ $('pump').hidden=true; pump.open=false; have.fargoStage='store'; have.fargoBob=fargo.bob; save();
-      showDialog({place:FARGO.place,speaker:FARGO.bob,pages:FARGO.pumpWin,actions:[{label:FARGO.goInside,fn:()=>{closeDialog();parkAndGetOut()}}]}) },700);
+      showDialog({place:FARGO.place,speaker:FARGO.bob,pages:FARGO.pumpWin,actions:[{label:FARGO.goInside,fn:()=>{closeDialog();parkAndGetOut(); say(FARGO.snackAsk)}}]}) },700);
   }
 }
 function pumpTick(dt){

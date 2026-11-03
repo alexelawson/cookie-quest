@@ -180,15 +180,20 @@ addEventListener('keydown',e=>{ if(!hunt.open)return;
 },true);
 triggers.push({z:R(LOGAN.x-30,LOGAN.y-10,40,18), label:'Talk to Logan', btn:'Talk', act:talkLogan});
 
-// ---------- the Vikings jogging, and Lil Q scooting by, on the main road ----------
+// ---------- two football Vikings jogging laps on the main road (you can talk to them; they don't stop) ----------
+const JOG={EVERY:22000, ON:.6, Y:157};
+function joggerX(k){ const vt=(time%JOG.EVERY)/JOG.EVERY; return vt<JOG.ON?-20+vt/JOG.ON*(WW+40)-k*12:null }
 function roadWalkers(list){
-  const vt=(time%22000)/22000;                 // the Vikings, left to right, every 22 s
-  if(vt<.6){const x=-20+vt/.6*(WW+40); for(let k=0;k<2;k++){const vx=x-k*12, vy=156+Math.abs(Math.sin(time/110+k))*-2; list.push({y:157,draw:()=>drawVikingStanding(vx,vy,k?'football':'norse','52')})}}
-  const qt=((time+9000)%27000)/27000;          // Lil Q on her scooter, right to left, every 27 s
-  if(qt<.4){const x=WW+20-qt/.4*(WW+40), y=162; list.push({y,draw:()=>{const F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(Math.round(x)+dx,y+dy,w,h)};
-    F('rgba(0,0,0,.2)',-7,1,14,2); F('#c8322b',-6,-4,10,2); F('#2b2b2b',-7,-2,3,3); F('#2b2b2b',3,-2,3,3); F('#8a8f9a',-6,-8,1,5); F('#8a8f9a',-7,-8,3,1);
-    drawBob(x+1,y-3); ctx.fillStyle='rgba(255,255,255,.5)'; ctx.fillRect(Math.round(x)+8+((time/80|0)%3),y-2,2,1)}})}
+  for(let k=0;k<2;k++){const x=joggerX(k); if(x==null)continue; const vy=JOG.Y-1+Math.abs(Math.sin(time/110+k))*-2;
+    list.push({y:JOG.Y,draw:()=>drawVikingStanding(x,vy,'football',k?'21':'52')})}
 }
+let jogLine=0;
+function joggerTrigger(){
+  for(let k=0;k<2;k++){const x=joggerX(k); if(x!=null&&Math.abs(P.x-x)<14&&Math.abs(P.y-JOG.Y)<14)
+    return {label:'Talk to the Vikings', btn:'Talk', act:()=>{const n=jogLine++%ROAD_VIKINGS.lines.length; showDialog({speaker:ROAD_VIKINGS.name,face:'Football Viking',pages:[ROAD_VIKINGS.lines[n]],actions:[CLOSE]})}}}
+  return null;
+}
+{const dt=SCENES.world.dynTrigger; SCENES.world.dynTrigger=()=>dt()||joggerTrigger()}
 
 // ---------- Alex's "where to next?" hints ----------
 const idle={t:0, shown:false};

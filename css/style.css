@@ -254,8 +254,6 @@ canvas{border-radius:6px}
 .devarea[hidden]{display:none}
 .shint{font-size:.75rem!important;color:var(--muted);margin:0}
 
-/* the locked recipe card: type the secret word */
-.pwcard{width:min(100%,320px)}
 .clovercard{width:min(100%,360px)}
 .cloverfield{display:grid;width:100%;box-sizing:border-box;grid-template-columns:repeat(7,1fr);background:#5f9e4a;background-image:radial-gradient(circle at 20% 30%,rgba(255,255,255,.08) 0 18%,transparent 19%),radial-gradient(circle at 70% 75%,rgba(0,0,0,.08) 0 20%,transparent 21%);border:3px solid #3f6f30;border-radius:8px;padding:3px}
 .cloverfield .clov{appearance:none;border:0;background:transparent;padding:0;aspect-ratio:1;cursor:pointer;border-radius:4px;min-width:0}
@@ -265,8 +263,6 @@ canvas{border-radius:6px}
 .cloverfield .nope{animation:nope .3s}
 @keyframes nope{25%{transform:translateX(-2px)}75%{transform:translateX(2px)}}
 @media (prefers-reduced-motion:reduce){.cloverfield .nope{animation:none}}
-#pwInput{font-family:var(--pixel);font-size:1.1rem;text-align:center;letter-spacing:.08em;padding:8px 10px;border:3px solid var(--ink);border-radius:6px;background:#fffdf6;color:var(--ink);width:100%;box-sizing:border-box}
-#pwInput:focus{outline:3px solid var(--gold);outline-offset:1px}
 /* Alex's "where to next?" hint */
 .alexhint{position:absolute;left:50%;bottom:8px;transform:translateX(-50%);z-index:3;display:flex;gap:8px;align-items:center;background:var(--paper);color:var(--ink);border:3px solid var(--ink);border-radius:8px;padding:5px 10px 5px 5px;width:min(92%,340px);box-shadow:0 6px 16px rgba(0,0,0,.4);animation:rin .3s ease-out}
 .alexhint[hidden]{display:none}
@@ -396,3 +392,10 @@ h1::before,h1::after{content:'✦';color:var(--berry);font-size:.6em;vertical-al
 .btn.pulse:active{animation:none}
 @media (max-width:520px){.titlecard p{display:none} .btn.big{font-size:1.05rem;padding:7px 24px}}
 @media (prefers-reduced-motion:reduce){.btn.pulse,.basket.wiggle{animation:none}}
+/* the Confectioner showdown */
+.bosscard{width:min(100%,360px);gap:6px}
+#bossArt{width:100%;height:auto;aspect-ratio:2/1;image-rendering:pixelated;image-rendering:crisp-edges;border-radius:6px;border:2px solid var(--darkLine)}
+#bossMsg{min-height:2.6em;font-size:.9rem!important;display:flex;align-items:center;justify-content:center}
+.bossbar{width:100%;height:12px;background:#11141f;border:2px solid var(--darkLine);border-radius:6px;overflow:hidden}
+.bossbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#5fd3ff,#ffffff);box-shadow:0 0 8px #7fe8ff}
+#bossBtn{touch-action:none;user-select:none;-webkit-user-select:none}

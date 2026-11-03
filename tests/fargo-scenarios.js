@@ -41,8 +41,9 @@ r=await p.evaluate(()=>{const t0=performance.now(); pump.cents=0; pumpPress(); l
   let taps=0; while(pump.cents<3000&&taps<200){pumpPress(); T.run(1); pumpRelease(); taps++} return {fast,taps,cents:pump.cents}});
 ok('D a full hold reaches ~$29.50 in a few seconds',r.fast>2&&r.fast<9,r.fast.toFixed(1)+'s'); ok('D single-frame taps land exactly on $30.00',r.cents===3000,r.taps+' taps');
 await p.waitForFunction(()=>!dlg.hidden&&$('dspeaker').textContent==='Lil Q',null,{timeout:8000});
-r=await p.evaluate(()=>{const ps=[]; while(true){ps.push($('dtext').textContent); if(!T.btns().includes('Next'))break; T.click('Next')} const line=ps.join(' '); T.click('Go inside'); return {line,onFoot:fargo.onFoot,car:!!fargo.car,alex:!!fargo.alex,stage:have.fargoStage,hud:$('hud').textContent,free:!blocked(P.x,P.y)}});
-ok('D exact $30 -> go inside',r.line.includes('co-pilot')&&r.stage==='store'); ok('D you and Alex get out, car parked',r.onFoot&&r.car&&r.alex&&r.free,r.hud);
+r=await p.evaluate(()=>{const ps=[]; while(true){ps.push($('dtext').textContent); if(!T.btns().includes('Next'))break; T.click('Next')} const line=ps.join(' '); T.click('Go inside'); const ask=[]; for(let k=0;k<10&&!dlg.hidden;k++){ask.push($('dspeaker').textContent+': '+$('dtext').textContent); T.click(T.btns()[0])} return {ask,line,onFoot:fargo.onFoot,car:!!fargo.car,alex:!!fargo.alex,stage:have.fargoStage,hud:$('hud').textContent,free:!blocked(P.x,P.y)}});
+ok('D exact $30 -> go inside',r.line.includes('Shop\'s open')&&r.stage==='store'); ok('D you and Alex get out, car parked',r.onFoot&&r.car&&r.alex&&r.free,r.hud);
+ok('D Joe asks if Alex wants anything; she says no (she does)',r.ask[0]==='Joe: Want anything from inside?'&&r.ask.some(l=>l.startsWith('Alex: No'))&&r.ask.some(l=>l.includes('definitely wants a snack')),r.ask.join(' | '));
 // E. shop: two wrong picks -> kicked out
 r=await p.evaluate(()=>{const g=STATIONS[fargo.bob]; T.walkTo(g.door.x+8,g.door.y+4); const lbl=prompt.textContent; action(); return {lbl,open:!$('shop').hidden,give:$('giveBtn').disabled}});
 ok('E walk to the shop door and go in',r.lbl==='Go inside'&&r.open,r.lbl); ok('E give button waits for both picks',r.give);

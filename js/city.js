@@ -1,10 +1,10 @@
 // The city at night: the chocolate heist.
 // You play a crew of three and switch between them:
-//   you  = sonar pulse (lights up the dark, chalk-marks the invisible tripwires)
+//   you  = sonar pulse (lights up the dark, chalk-marks the invisible tripwires) and Dr. Alex's gadget (laser panel, the Confectioner)
 //   Lars = sprint (fast enough to dash between cover under the searchlights)
 //   John = lift (carries the log, rips off the grate)
 // Route: roof A (a log blocks the way to Dr. Alex's rooftop lab: John lifts it and carries it; the briefing; then the log bridges the gap) -> roof B (searchlights; Lars
-//        hops cover to cover to the LIGHT POWER switch) -> roof C (a guard + a laser maze around the skylight) -> the vault.
+//        hops cover to cover to the LIGHT POWER switch) -> roof C (a guard + a laser maze around the skylight) -> the Confectioner -> his riddle (the vault).
 const CW=520, CH=200;
 const ROOF_A=R(6,30,112,156), ROOF_B=R(150,20,170,166), ROOF_C=R(352,26,160,160);
 const BEAM_SLOT=R(116,96,36,12);          // where the log bridges A -> B
@@ -460,7 +460,7 @@ function cutFuse(){
 }
 function lightsTick(dt){
   if(heistStage()!==1)return;
-  if(gateOpen()&&heist.crew.every(c=>c.x>ROOF_C.x+2)){ heist.lightsOutT=0; have.heistStage=2; save(); sfx('fanfare'); return say([['Lars',HEIST.allAcross]],()=>roundWon(2)) }   // everyone made it: the lights stay off
+  if(gateOpen()&&heist.crew.every(c=>c.x>ROOF_C.x+2)){ heist.lightsOutT=0; have.heistStage=2; save(); sfx('fanfare'); return roundWon(2) }   // everyone made it: the lights stay off
   if(heist.lightsOutT>0){ heist.lightsOutT-=dt; if(heist.lightsOutT<=0){ heist.lightsOutT=0; sfx('bad'); say([['Lars',HEIST.lightsBack]]) } }
 }
 // the gate on the plank is locked; the key hangs under the parked spotlight (no one mentions it: you find out at the gate)
@@ -541,7 +541,7 @@ function pickCrate(i){
   if(!vault.open)return;
   if(i!==vault.choc){ sfx('bad'); $('vault').hidden=true; say(HEIST.raisins,()=>{ $('vault').hidden=false; paused=true }); return }
   vault.open=false; $('vault').hidden=true; have.heistStage=4; save(); sfx('fanfare');
-  say([['',HEIST.gotIt],['',HEIST.villainNote],...HEIST.finale,...HEIST.larsChallenge],()=>openLarsMenu());
+  say([['',HEIST.gotIt],['The Confectioner',HEIST.villainNote,'Gingerbread Confectioner'],...HEIST.finale,...HEIST.larsChallenge],()=>openLarsMenu());
 }
 $('vaultHint').onclick=vaultHint; [0,1,2].forEach(i=>$('crate'+i).onclick=()=>pickCrate(i));
 
@@ -562,7 +562,7 @@ function heistTrigger(){
   if(st===1&&!gateOpen()&&!heist.keyHolder&&!lightsOn()&&Math.hypot(P.x-KEY_SPOT.x,P.y-KEY_SPOT.y)<12)return {label:HEIST.grabKey, act:grabKey};
   if(st>=2&&st<4&&!lasersOff()&&hit(feet,R(LASER_PANEL.x-4,LASER_PANEL.y,LASER_PANEL.w+6,16)))return {label:heist.defuse?HEIST.defuseKeep:HEIST.defuseLabel, btn:'Hold', act:startDefuse};
   if(st===2&&hit(feet,R(SKYLIGHT.x-4,SKYLIGHT.y+SKYLIGHT.h,SKYLIGHT.w+8,12)))return {label:HEIST.grate+' ('+stacked()+'/3 stacked)', act:ripGrate};
-  if(st===3&&hit(feet,R(SKYLIGHT.x-4,SKYLIGHT.y+SKYLIGHT.h,SKYLIGHT.w+8,12)))return {label:HEIST.dropIn, act:openVault};
+  if(st===3&&hit(feet,R(SKYLIGHT.x-4,SKYLIGHT.y+SKYLIGHT.h,SKYLIGHT.w+8,12)))return {label:HEIST.dropIn, act:()=>have.confectionerBeat?openVault():openBoss()};   // the Confectioner first (confectioner.js), then his riddle
   return null;
 }
 
@@ -697,5 +697,6 @@ SCENES.city={ music:'heist',
   },
   hud(){ const st=heistStage(); const steps=['Bridge the gap','Kill the lights, get everyone across','Defuse the lasers, stack up on the skylight','Crack the vault','Beat Lars at anagrams','Done!'];
     if(st===1&&heist.lightsOutT>0)return `<span>Lights back in 0:${String(Math.ceil(heist.lightsOutT/1000)).padStart(2,'0')}</span>`;
+    if(st===3&&!have.confectionerBeat)return '<span>Drop in. Beat the Confectioner</span>';
     return st>=5||have.city?'':`<span>${steps[st]}</span>` },
 };

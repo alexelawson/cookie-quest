@@ -21,11 +21,9 @@ ok('A missing ingredients: the card lists them, nobody is over yet',r.msg.includ
 await fresh(ALL);
 r=await p.evaluate(()=>{goTo('kitchen','fromDoor'); T.run(40); P.x=30;P.y=94; update(16.7); const lbl=prompt.textContent; action(); const sp=$('dspeaker').textContent; T.through(); return {lbl,sp,n:CROWD.length}});
 ok('B everyone came over (and you can talk to them)',r.lbl==='Talk to Keelan'&&r.sp==='Keelan'&&r.n>=10,r.lbl);
-r=await p.evaluate(()=>{P.x=64;P.y=60; update(16.7); action(); const pages=[]; while(T.btns().includes('Next')){pages.push($('dtext').textContent);T.click('Next')} T.click("Let's bake"); const pwOpen=!$('xword').hidden, bakeFirst=!$('bake').hidden;
-  $('pwInput').value='  '+PASSWORD.word[0].toUpperCase()+PASSWORD.word.slice(1)+' '; pwCheck(); const right=$('pwMsg').textContent, btn=$('pwGo').textContent; $('pwGo').click();
-  return {pages,pwOpen,bakeFirst,right,btn,ok:have.passwordOk,open:!$('bake').hidden,step:$('bakeStep').textContent}});
-ok('B Let\'s bake opens the locked recipe card first (the secret word)',r.pwOpen&&!r.bakeFirst,r.right);
-ok('B the right word (any capitals, extra spaces) unlocks it and goes straight on to baking at step 1 (butter)',r.ok&&r.btn==="Let's bake"&&r.open&&r.step.includes('Butter'),r.step);
+r=await p.evaluate(()=>{P.x=64;P.y=60; update(16.7); action(); const pages=[]; while(T.btns().includes('Next')){pages.push($('dtext').textContent);T.click('Next')} T.click("Let's bake");
+  return {pages,open:!$('bake').hidden,step:$('bakeStep').textContent}});
+ok('B Let\'s bake goes straight to baking at step 1 (butter), no locked recipe card',r.open&&r.step.includes('Butter'),r.step);
 // C. pouring: too little, too much, spill, then right on the line
 r=await p.evaluate(()=>{const s=stepNow(), out={}; T.pour(.6); out.little=$('bakeMsg').textContent; T.tick(700);
   T.pour(2.4); out.much=$('bakeMsg').textContent; T.tick(700); bakePress(); T.tick(4000); out.spill=$('bakeMsg').textContent; bakeRelease(); T.tick(800);
@@ -102,20 +100,7 @@ r=await p.evaluate(()=>{const before=WARDROBE.outfits.filter(o=>!o.unlock||have[
   return {before,pages,ids,title,look:have.look,paused,avant:ids.includes('avant')}});
 ok('J Avant Guard is there; Cupcake is locked until you find the cupcake',r.avant&&!r.before.includes('cupcake')&&r.pages.join(' ').includes('unlocked'),r.pages.slice(-1)[0]);
 ok('J Settings > Change outfit: pick the Cupcake costume any time',r.ids.includes('cupcake')&&r.look==='cupcake'&&!r.paused&&r.title.includes('look'),r.ids.join(','));
-// K. the secret word: a wrong word says try again, Later closes it, typing WASD/Space goes in the box (not to the game)
-await fresh(ALL);
-await p.evaluate(()=>{goTo('kitchen','fromDoor'); T.run(90)}); await p.waitForTimeout(300); await p.evaluate(()=>openPassword(openBake)); await p.waitForTimeout(100);
-r=await p.evaluate(()=>({open:!$('xword').hidden,focus:document.activeElement===$('pwInput'),title:$('pwTitle').textContent}));
-ok('K the locked recipe card opens with the box ready to type in',r.open&&r.focus,r.title);
-await p.keyboard.type('was d'); await p.keyboard.press('Enter');
-r=await p.evaluate(()=>({typed:$('pwInput').value,msg:$('pwMsg').textContent,ok:!!have.passwordOk,tries:have.pwTries,moved:dirs.up||dirs.left||dirs.down||dirs.right,bake:!$('bake').hidden}));
-ok('K typing goes in the box (W, A, S, D and Space too); a wrong word says try again',r.typed==='was d'&&r.msg.includes('not it')&&!r.ok&&r.tries===1&&!r.moved&&!r.bake,r.typed+' / '+r.msg);
-r=await p.evaluate(()=>{$('pwLater').click(); return {closed:$('xword').hidden,paused}});
-ok('K Later closes it and you can walk again',r.closed&&!r.paused);
-r=await p.evaluate(()=>{openPassword(openBake); return 1}); await p.keyboard.type(await p.evaluate(()=>PASSWORD.word)); await p.keyboard.press('Enter'); await p.keyboard.press('Enter');
-r=await p.evaluate(()=>({ok:!!have.passwordOk,bake:!$('bake').hidden,closed:$('xword').hidden}));
-ok('K the right word, then Enter again: on to baking',r.ok&&r.bake&&r.closed,JSON.stringify(r));
-await p.evaluate(()=>closeBake());
+
 // L. background music: each place has its own song; the Cookie Dance has Jingle Bells; Settings can turn music off
 r=await p.evaluate(async()=>{const out={}; for(const [s,e] of [['world','start'],['golf','fromRoad'],['birkie','start'],['fargo','fromHighway'],['city','start'],['kitchen','fromDoor']]){goTo(s,e); for(let i=0;i<60;i++)update(16.7); out[s]=song}
   kit.dance=true; sceneMusic(); out.dance=song; kit.dance=false; sceneMusic();
@@ -167,4 +152,12 @@ r=await p.evaluate(()=>{const before=!!henEnt(); have.gear={hen:1}; const keep=s
 ok('P no Grp before the farm',!r.before);
 ok('P after the farm he follows Joe in every world, and rides along in the car in Fargo',Object.values(r.out).every(v=>v),JSON.stringify(r.out));
 ok('P a different outfit in each world',r.looks===6,r.looks+' looks');
+// P. the main road: only the two football Vikings jog by (no Lil Q, no Norse Viking), and you can talk to them as they pass
+r=await p.evaluate(()=>{goTo('world','start'); T.run(40); if(!dlg.hidden)closeDialog(); const kinds=new Set(); const orig=drawVikingStanding; let bob=0; const ob=drawBob;
+  window.drawBob=(...a)=>{bob++; return ob(...a)}; drawVikingStanding=(x,y,k,n)=>{kinds.add(k); return orig(x,y,k,n)};
+  time=Math.floor(time/JOG.EVERY)*JOG.EVERY+JOG.EVERY*.3; for(let k=0;k<30;k++)draw(); const x=joggerX(0); P.x=x; P.y=JOG.Y; const t=joggerTrigger(); let said='', who='';
+  if(t){t.act(); said=$('dtext').textContent; who=$('dspeaker').textContent; closeDialog()} const t2=joggerTrigger(); if(t2){t2.act(); said+=' / '+$('dtext').textContent; closeDialog()}
+  drawVikingStanding=orig; window.drawBob=ob; return {kinds:[...kinds].join(),bob,label:t&&t.label,said,who}});
+ok('P only the football Vikings jog the main road',r.kinds==='football'&&r.bob===0,JSON.stringify(r));
+ok('P talk to them as they run by: a different line each time',r.label==='Talk to the Vikings'&&r.who==='A football Viking'&&r.said.split(' / ').length===2&&r.said.split(' / ')[0]!==r.said.split(' / ')[1],r.said);
 console.log(R.join('\n')); console.log('page errors:',errs.length?errs:'none'); await b.close()})();
