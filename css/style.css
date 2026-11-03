@@ -316,3 +316,83 @@ canvas{border-radius:6px}
 .alexhint.radio b{display:block;font-family:var(--pixel);font-size:.72rem;color:var(--berry);margin-bottom:1px}
 .alexhint.caption{width:auto;max-width:92%;padding:6px 14px;text-align:center}
 .alexhint.caption p{font-size:.9rem}
+
+/* =====================================================================
+   UI polish: one centered column, chunky buttons, name tag, switches,
+   the title screen, basket sparkle. (Later rules override earlier ones.)
+   ===================================================================== */
+:root{--btnShadow:0 3px 0 var(--ink); --darkCard:#1d2130; --darkLine:#4d5a78}
+body{background:radial-gradient(120% 70% at 50% 0%,#222846 0%,var(--bg) 60%) fixed,var(--bg)}
+/* the whole game is one column, sized so the game window fits on a laptop screen without scrolling */
+.app{max-width:min(760px,max(340px,calc((100svh - 250px)*4/3)));align-items:stretch}
+header{flex-direction:column;justify-content:center;gap:8px}
+h1{font-size:clamp(1.15rem,3.2vw,1.55rem);text-align:center;text-shadow:0 2px 0 #6b4a2f}
+h1::before,h1::after{content:'✦';color:var(--berry);font-size:.6em;vertical-align:.3em;margin:0 .5em;text-shadow:none}
+.basket{justify-content:center;align-self:center;max-width:100%}
+.basket.wiggle{animation:wiggle .5s ease-out}
+@keyframes wiggle{0%,100%{transform:none}25%{transform:rotate(-1.5deg) scale(1.02)}55%{transform:rotate(1.2deg)}80%{transform:rotate(-.4deg)}}
+.slot.got{box-shadow:0 0 10px rgba(239,195,90,.35)}
+.spark{position:fixed;z-index:50;width:6px;height:6px;pointer-events:none;background:var(--gold);clip-path:polygon(50% 0,62% 38%,100% 50%,62% 62%,50% 100%,38% 62%,0 50%,38% 38%);transform:translate(-50%,-50%)}
+.spark.big{width:10px;height:10px;background:#fff6d6}
+.screen{border-width:4px;box-shadow:0 0 0 2px #0e1022,0 14px 40px rgba(0,0,0,.45)}
+
+/* ---------- buttons: one style everywhere ---------- */
+.btn,.pbtn{font-family:var(--pixel);font-weight:600;font-size:.95rem;letter-spacing:.02em;line-height:1.15;border:3px solid var(--ink);background:var(--gold);color:var(--ink);
+  padding:6px 16px;border-radius:6px;cursor:pointer;box-shadow:var(--btnShadow);transition:transform .06s,box-shadow .06s,filter .12s}
+.btn:hover,.pbtn:hover{filter:brightness(1.07)}
+.btn:active,.pbtn:active,.pbtn.on{transform:translateY(2px);box-shadow:0 1px 0 var(--ink)}
+.btn:disabled{filter:none;transform:none;box-shadow:none}
+.btn.ghost{background:var(--paper);color:var(--ink)}
+.btn.big{font-size:1.25rem;padding:9px 30px;border-radius:8px}
+.pbtn{font-size:1rem;padding:9px 18px}
+/* on the dark (night) cards, the second-choice button is dark with a light outline */
+.vcard .btn.ghost,.acard .btn.ghost,.howto .btn.ghost,.ending .btn.ghost,.acontrols .btn.ghost{background:#2a3044;color:var(--paper);border-color:var(--darkLine);box-shadow:0 3px 0 #0b0d16}
+.vcard .btn,.acard .btn,.howto .btn,.ending .btn{box-shadow:0 3px 0 #0b0d16}
+.dbtns.menu .btn{box-shadow:0 2px 0 var(--ink);font-weight:400}
+.dbtns{margin-top:2px}
+.minibtn{box-shadow:none;font-weight:400}
+/* the little buttons under the game */
+.reset{font-family:var(--pixel);font-size:.82rem;background:#232845;color:var(--paper);border:2px solid var(--line);border-radius:6px;padding:5px 14px;box-shadow:0 2px 0 #0b0d16;transition:transform .06s}
+.reset:hover{border-color:var(--muted)}
+.reset:active{transform:translateY(1px);box-shadow:none}
+.crewbar button{box-shadow:0 2px 0 #0b0d16}
+.pad button{box-shadow:inset 0 -3px 0 rgba(0,0,0,.3)}
+.abtn{box-shadow:inset 0 -5px 0 rgba(0,0,0,.25),0 4px 0 #6d1f19}
+.abtn:active{transform:translateY(2px);box-shadow:inset 0 -3px 0 rgba(0,0,0,.25),0 2px 0 #6d1f19}
+
+/* ---------- dialog: a name tag on top, typewriter text ---------- */
+.dialog{overflow:visible;display:flex;flex-direction:column;padding:0;max-height:calc(100% - 28px);box-shadow:0 6px 0 rgba(0,0,0,.25)}
+.dialog .dscroll{overflow:auto;min-height:0;padding:10px 12px}
+.dialog.tall{top:24%}
+.speaker{position:absolute;left:10px;top:-17px;z-index:1;background:var(--berry);color:var(--paper);border:3px solid var(--ink);border-radius:6px;
+  padding:1px 10px 0;font-size:.95rem;line-height:1.3;box-shadow:0 2px 0 rgba(0,0,0,.25);max-width:calc(100% - 20px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.speaker:empty{display:none}
+.place{text-align:right;font-size:.66rem;margin-bottom:-2px}
+.place:empty{display:none}
+.dialog:has(.speaker:not(:empty)) .dscroll{padding-top:14px}
+.tw-rest{visibility:hidden}
+
+/* ---------- settings: on/off switches ---------- */
+#settings .vcard{gap:8px;padding:12px 14px}
+#settings .vcard>.btn{width:100%}
+.srow{justify-content:space-between;width:100%;padding:6px 10px;background:#262c40;border:2px solid #343c56;border-radius:8px;font-family:var(--pixel);font-size:.95rem}
+.srow input{appearance:none;-webkit-appearance:none;margin:0;width:42px;height:24px;flex:none;border-radius:12px;background:#3b4166;border:2px solid var(--ink);position:relative;cursor:pointer;transition:background .15s}
+.srow input::before{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:var(--paper);box-shadow:0 2px 0 rgba(0,0,0,.3);transition:transform .15s}
+.srow input:checked{background:var(--gold)}
+.srow input:checked::before{transform:translateX(18px)}
+.srow input:disabled{opacity:.4;cursor:default}
+.srow input:focus-visible{outline:3px solid var(--berry);outline-offset:2px}
+.srow:has(input:disabled){opacity:.6}
+
+/* ---------- the title screen ---------- */
+.titlecard{background:#0c1028;padding:0;justify-content:flex-start;z-index:8;overflow:hidden}
+#titleArt{position:absolute;inset:0;width:100%;height:100%;border-radius:6px}
+.tcontent{position:relative;display:flex;flex-direction:column;align-items:center;gap:clamp(4px,1.4vw,10px);padding:clamp(10px,4%,30px) 16px 0;text-align:center}
+.titlecard h2{font-size:clamp(1.7rem,7vw,3.1rem);text-shadow:0 3px 0 #6b4a2f,0 0 24px rgba(239,195,90,.35)}
+.titlecard small{color:#c9cff0;font-size:clamp(.7rem,2vw,.9rem);text-transform:uppercase;letter-spacing:.18em}
+.titlecard p{font-size:clamp(.8rem,2.1vw,1rem);color:#e6e9f7;text-shadow:0 1px 2px #0c1028}
+.btn.pulse{animation:startPulse 1.6s ease-in-out infinite}
+@keyframes startPulse{0%{box-shadow:0 3px 0 #2b2236,0 0 0 0 rgba(239,195,90,.6)}70%,100%{box-shadow:0 3px 0 #2b2236,0 0 0 14px rgba(239,195,90,0)}}
+.btn.pulse:active{animation:none}
+@media (max-width:520px){.titlecard p{display:none} .btn.big{font-size:1.05rem;padding:7px 24px}}
+@media (prefers-reduced-motion:reduce){.btn.pulse,.basket.wiggle{animation:none}}

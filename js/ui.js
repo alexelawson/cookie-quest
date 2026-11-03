@@ -25,25 +25,54 @@ function renderBasket(){
 function showDialog({place,speaker,face,pages,actions,noteLast,menu}){
   paused=true; prompt.hidden=true; let i=0;
   $('dplace').textContent=place||''; $('dspeaker').textContent=speaker||''; showPortrait(face||speaker);
+  const voice=typeVoice(speaker);
   const draw=()=>{
-    const t=$('dtext'); t.textContent=pages[i]; t.className=(noteLast&&i===pages.length-1)?'note':'';
+    const t=$('dtext'); typeOut(t,pages[i],voice); t.className=(noteLast&&i===pages.length-1)?'note':'';
     const box=$('dbtns'); box.innerHTML=''; const last=i===pages.length-1; box.classList.toggle('menu',!!menu&&last); dlg.classList.toggle('tall',!!menu&&last);
     const list=i<pages.length-1?[{label:'Next',fn:()=>{i++;draw();sfx('next')}}]:actions;
     list.forEach((a,n)=>{const b=document.createElement('button');b.className='btn'+(a.ghost?' ghost':'');b.textContent=a.label;b.onclick=a.fn;box.appendChild(b); if(n===0)setTimeout(()=>b.focus({preventScroll:true}),0)});
   };
   dlg.hidden=false; draw(); sfx('blip');
 }
+// ---------- typewriter text ----------
+// The whole line is in the box from the start (the untyped part is invisible), so the box never jumps in size
+// and anything reading the text gets all of it. Space, A or a tap on the box finishes the line.
+let typing=null;
+const TYPE_MS=19, TYPE_PAUSE={'.':170,'!':170,'?':170,',':80,'…':170,':':90};
+function typeVoice(name){ let h=0; for(const ch of String(name||''))h=(h*31+ch.charCodeAt(0))%997; return 560+(h%7)*45 }   // everyone sounds a little different
+function typeOut(el,text,voice){
+  finishTyping();
+  const shown=document.createElement('span'), rest=document.createElement('span'); rest.className='tw-rest';
+  shown.textContent=''; rest.textContent=text; el.replaceChildren(shown,rest);
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches||!text.length){shown.textContent=text; rest.textContent=''; return}
+  let n=0, tmr=null;
+  const done=()=>{clearTimeout(tmr); shown.textContent=text; rest.textContent=''; typing=null};
+  const step=()=>{
+    if(!el.isConnected||dlg.hidden)return done();
+    n++; shown.textContent=text.slice(0,n); rest.textContent=text.slice(n);
+    const ch=text[n-1]; if(ch&&ch!==' '&&n%2)sfx('type',voice);
+    if(n>=text.length)return done();
+    tmr=setTimeout(step,TYPE_MS+(TYPE_PAUSE[ch]&&text[n]===' '?TYPE_PAUSE[ch]:0));
+  };
+  typing={done}; tmr=setTimeout(step,TYPE_MS);
+}
+function finishTyping(){ if(!typing)return false; typing.done(); return true }
+$('dialog').addEventListener('pointerdown',e=>{ if(typing&&!e.target.closest('button'))finishTyping() });
+// Space / Enter / E while a line is still typing: finish it first (don't press the button yet)
+let swallowKeyUp=false;
+addEventListener('keydown',e=>{ if(['Space','Enter','KeyE'].includes(e.code)&&!dlg.hidden&&typing){finishTyping(); swallowKeyUp=true; e.preventDefault(); e.stopImmediatePropagation()} },true);
+addEventListener('keyup',e=>{ if(swallowKeyUp&&['Space','Enter','KeyE'].includes(e.code)){swallowKeyUp=false; e.preventDefault()} },true);
 // is any pop-up still open? (so closing one menu never unpauses the game under another)
 const OVERLAYS=['dialog','reward','pump','shop','vault','anagram','howto','wardrobe','bake','xword','cloverHunt','ending','settings','titlecard'];
 const overlayOpen=()=>OVERLAYS.some(id=>!$(id).hidden);
-function closeDialog(){dlg.hidden=true; paused=overlayOpen(); cv.focus?.()}
+function closeDialog(){finishTyping(); dlg.hidden=true; paused=overlayOpen(); cv.focus?.()}
 const CLOSE={label:'Close',fn:closeDialog};
 
 function action(){
   if(!$('titlecard').hidden){start();return}
   if(!$('pump').hidden||!$('shop').hidden||!$('vault').hidden||!$('anagram').hidden||!$('howto').hidden||!$('wardrobe').hidden||!$('bake').hidden||!$('xword').hidden||!$('ending').hidden||!$('settings').hidden)return;   // the pump and shop have their own buttons
   if(!$('reward').hidden){collectReward();return}
-  if(!dlg.hidden){const f=document.activeElement, b=$('dbtns').contains(f)?f:$('dbtns').querySelector('button'); b&&b.click(); return}
+  if(!dlg.hidden){if(finishTyping())return; const f=document.activeElement, b=$('dbtns').contains(f)?f:$('dbtns').querySelector('button'); b&&b.click(); return}
   if(near)near.act(); else if(scene.ability)scene.ability();
 }
 // ---------- settings ----------
@@ -148,7 +177,7 @@ function collectReward(){
   have[key]=true; save(); sfx('pop');
   const art=$('rewardArt'), i=ITEMS.findIndex(it=>it.key===key);
   const slot=$('basket').querySelector(`[data-key="${key}"]`), a=art.getBoundingClientRect(), b=slot?slot.getBoundingClientRect():a;
-  const done=()=>{$('reward').hidden=true; renderBasket(); const sl=$('basket').querySelector(`[data-key="${key}"]`); sl&&sl.classList.add('pop'); paused=false; const f=rewardThen; rewardThen=null; giveKeepsake(key,f)};   // each stop's keepsake (extras.js), then whatever comes next
+  const done=()=>{$('reward').hidden=true; renderBasket(); const sl=$('basket').querySelector(`[data-key="${key}"]`); sl&&(sl.classList.add('pop'),sparkle(sl)); $('basket').classList.remove('wiggle'); void $('basket').offsetWidth; $('basket').classList.add('wiggle'); paused=false; const f=rewardThen; rewardThen=null; giveKeepsake(key,f)};   // each stop's keepsake (extras.js), then whatever comes next
   const still=matchMedia('(prefers-reduced-motion: reduce)').matches;
   if(still||!art.animate)return done();
   art.style.animation='none';
@@ -156,6 +185,18 @@ function collectReward(){
     {duration:550,easing:'cubic-bezier(.5,0,.75,0)'}).onfinish=()=>{art.style.animation='';done()};
 }
 $('rewardArt').onclick=collectReward;
+// little gold stars burst out of a basket slot when something lands in it
+function sparkle(el){
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches||!el.animate)return;
+  const r=el.getBoundingClientRect(), cx=r.left+r.width/2, cy=r.top+r.height/2;
+  for(let k=0;k<10;k++){
+    const s=document.createElement('i'); s.className='spark'; s.style.left=cx+'px'; s.style.top=cy+'px';
+    if(k%3===0)s.classList.add('big'); document.body.append(s);
+    const a=k/10*Math.PI*2+Math.random()*.4, d=26+Math.random()*22;
+    s.animate([{transform:'translate(-50%,-50%) scale(.4)',opacity:1},{transform:`translate(calc(-50% + ${Math.cos(a)*d}px),calc(-50% + ${Math.sin(a)*d}px)) scale(1) rotate(45deg)`,opacity:1,offset:.6},{transform:`translate(calc(-50% + ${Math.cos(a)*d*1.2}px),calc(-50% + ${Math.sin(a)*d*1.2+8}px)) scale(.2) rotate(90deg)`,opacity:0}],
+      {duration:700+Math.random()*200,easing:'cubic-bezier(.2,.7,.3,1)'}).onfinish=()=>s.remove();
+  }
+}
 
 // ---------- start over ----------
 // First tap arms it; a second tap within 4 seconds erases saved progress and restarts.

@@ -4,8 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>The Great Cookie Quest</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600&family=Nunito:wght@400;700&display=swap">
+<link rel="stylesheet" href="css/fonts.css">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -20,11 +19,13 @@
     <div class="hud" id="hud" hidden></div>
     <button class="btn minibtn" id="golfRestart" hidden>↺ Restart round</button>
     <div class="dialog" id="dialog" hidden role="dialog" aria-live="polite">
-      <canvas class="portrait" id="dportrait" width="32" height="32" hidden aria-hidden="true"></canvas>
-      <div class="place" id="dplace"></div>
       <div class="speaker" id="dspeaker"></div>
-      <p id="dtext"></p>
-      <div class="dbtns" id="dbtns"></div>
+      <div class="dscroll">
+        <canvas class="portrait" id="dportrait" width="32" height="32" hidden aria-hidden="true"></canvas>
+        <div class="place" id="dplace"></div>
+        <p id="dtext"></p>
+        <div class="dbtns" id="dbtns"></div>
+      </div>
     </div>
     <div class="reward" id="reward" hidden role="dialog" aria-labelledby="rewardName">
       <div class="rcard">
@@ -137,17 +138,20 @@
         <small id="setTitle">Settings</small>
         <button class="btn" id="setOutfit"></button>
         <button class="btn" id="setAlbum">Photo album</button>
-        <label class="srow"><input type="checkbox" id="soundToggle"> Sound</label>
-        <label class="srow"><input type="checkbox" id="musicToggle"> Music</label>
+        <label class="srow"><span>Sound</span><input type="checkbox" role="switch" id="soundToggle"></label>
+        <label class="srow"><span>Music</span><input type="checkbox" role="switch" id="musicToggle"></label>
         <div id="gearRows" hidden></div>
         <button class="btn ghost" id="settingsClose">Close</button>
       </div>
     </div>
     <div class="titlecard" id="titlecard">
-      <small>A Christmas game</small>
-      <h2>The Great<br>Cookie Quest</h2>
-      <p>Five stops. One basket. The best chocolate chip cookies (and a glass of milk) ever made.</p>
-      <button class="btn" id="startBtn">Start</button>
+      <canvas id="titleArt" width="128" height="96" aria-hidden="true"></canvas>
+      <div class="tcontent">
+        <small>A Christmas game</small>
+        <h2>The Great<br>Cookie Quest</h2>
+        <p>Five stops. One basket. The best chocolate chip cookies (and a glass of milk) ever made.</p>
+        <button class="btn big pulse" id="startBtn">Start</button>
+      </div>
     </div>
   </div>
   <div class="crewbar" id="crewbar" hidden>
@@ -191,6 +195,7 @@
 <script src="js/ending.js"></script>
 <script src="js/extras.js"></script>
 <script src="js/game.js"></script>
+<script src="js/title.js"></script>
 <script src="js/devskip.js"></script>   <!-- testing only: delete this line and js/devskip.js before giving it to Joe -->
 </body>
 </html>

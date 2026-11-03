@@ -29,7 +29,8 @@ function noise(dur,{vol=.15,at=0,freq=1200,q=1}={}){
 }
 const SFX={
   blip:()=>tone(660,.05,{vol:.04}),                                   // dialog opens
-  next:()=>tone(520,.035,{vol:.03}),                                  // next page
+  next:()=>tone(520,.035,{vol:.03}),
+  type:(f=620)=>tone(f,.022,{vol:.018,type:'square'}),                // one letter of dialog typing                                  // next page
   reward:()=>[523,659,784,1046].forEach((f,i)=>tone(f,.2,{vol:.08,at:i*.08,type:'triangle'})),
   pop:()=>tone(700,.1,{vol:.09,slide:500,type:'sine'}),               // into the basket
   pickup:()=>{tone(784,.08,{vol:.08}); tone(1046,.14,{vol:.08,at:.07})},
@@ -60,7 +61,7 @@ const SFX={
   jump:()=>tone(260,.3,{vol:.09,slide:600}),
   boing:()=>tone(180,.45,{vol:.11,type:'sine',slide:320}),
 };
-function sfx(name){ try{ audioInit(); SFX[name]&&SFX[name]() }catch(e){} }
+function sfx(name,arg){ try{ audioInit(); SFX[name]&&SFX[name](arg) }catch(e){} }
 // ---- background music: a little chiptune loop for each place ----
 // Each song: tempo (bpm), a lead line and a bass line. Notes are written 'E5:1' = the note E5 for 1 beat; 'R:2' = rest 2 beats.
 // Each line loops; keep the lead and bass the same total length. The scene picks its song with `music:` (e.g. SCENES.golf music:'golf').

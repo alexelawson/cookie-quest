@@ -148,10 +148,10 @@ function henEnt(){
   const h=henPos(), f=h.x<P.x?1:h.x>P.x?-1:(P.dir==='left'?-1:1), hop=P.moving&&Math.floor(time/150)%2?1:0;
   return {y:h.y, draw:()=>drawGrp(h.x,h.y-hop,f,sceneName())};
 }
-function drawGrp(x,y,f,where,headOnly){
+function drawGrp(x,y,f,where,headOnly,g=ctx){
   x=Math.round(x); y=Math.round(y);
   // P: draw a rect given for facing right; mirrored when he faces left
-  const P=(c,dx,dy,w,h)=>{ctx.fillStyle=c; ctx.fillRect(f>0?x+dx:x-dx-w+1,y+dy,w,h)};
+  const P=(c,dx,dy,w,h)=>{g.fillStyle=c; g.fillRect(f>0?x+dx:x-dx-w+1,y+dy,w,h)};
   const W='#f4f1ea', WS='#d9d3c8', RED='#d43b2f', BEAK='#e8b04a', LEG='#e0a43a';
   if(!headOnly){
     if(where==='birkie'){P('#2f6db0',-7,1,15,1); P('#2f6db0',8,0,1,1); P('#2f6db0',-8,0,1,1)}                       // tiny skis
