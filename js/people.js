@@ -135,11 +135,20 @@ function drawClover(x,y,n){ const F=(c,a,b,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x
   F('#2e7d32',3,5,1,3); F('#2e7d32',4,7,1,1);                                             // stem
   if(n===4){ leaf(0,0); leaf(4,0); leaf(0,4); leaf(4,4); F('#1d5a2a',3,3,1,1) }
   else { leaf(0,1); leaf(4,1); leaf(2,-2); F('#1d5a2a',3,3,1,1) } }
-// his spot: rollerskis and poles in the grass behind him, a few clearly drawn clovers, and butterflies that stay right here
+// his rollerskis and poles, set down in the grass in front of him (drawn flat on the ground, no outline)
+function drawLoganGear(){
+  const F=(c,x,y,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,h)}, x0=LOGAN.x-14, y0=LOGAN.y+12;
+  for(const dy of [0,4]){ const y=y0+dy;                                                   // two rollerskis side by side
+    F('rgba(0,0,0,.18)',x0,y+2,16,1);                                                      // a soft shadow on the grass
+    F('#b9c1cb',x0+2,y,12,1); F('#7d8694',x0+2,y+1,12,1);                                  // the aluminum shaft
+    F('#1d1d22',x0,y,3,2); F('#1d1d22',x0+13,y,3,2); F('#8a8f9a',x0+1,y,1,1); F('#8a8f9a',x0+14,y,1,1);   // a wheel at each end
+    F('#c8322b',x0+6,y-1,4,1); F('#e85a50',x0+6,y-1,1,1) }                                 // the red binding
+  F('#3b3b44',x0-1,y0+9,19,1); F('#3b3b44',x0,y0+11,19,1);                                 // the poles, lying next to them
+  F('#c8322b',x0-2,y0+9,2,1); F('#c8322b',x0-1,y0+11,2,1); F('#9aa3b0',x0+16,y0+8,1,3); F('#9aa3b0',x0+17,y0+10,1,3);   // grips and baskets
+}
+// his spot: a few clearly drawn clovers, and butterflies that stay right here
 function drawLoganSpot(){
   const F=(c,x,y,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,h)}, x0=LOGAN.x, y0=LOGAN.y;
-  for(const dy of [3,6]){F('#1d1d22',x0-6,y0+dy,14,1); F('#8a8f9a',x0-5,y0+dy+1,2,1); F('#8a8f9a',x0+5,y0+dy+1,2,1); F('#c8322b',x0-1,y0+dy-1,4,1)}   // rollerskis
-  F('#3b3b44',x0+5,y0-18,1,17); F('#3b3b44',x0+8,y0-17,1,16); F('#c8322b',x0+5,y0-19,1,2); F('#c8322b',x0+8,y0-18,1,2);          // poles, planted
   for(const [dx,dy,n] of LOGAN_CLOVERS){ drawClover(x0+dx,y0+dy,n);
     if(n===4&&Math.floor(time/300)%4===0){F('#fff3a8',x0+dx+8,y0+dy-3,1,3); F('#fff3a8',x0+dx+7,y0+dy-2,3,1)} }
   for(const [k,c] of [[0,'#f4d35e'],[1,'#f2a7c8'],[2,'#9fd2f0']]){                       // butterflies, only around his spot
@@ -258,5 +267,5 @@ function drawThink(){
   const n=1+Math.floor(time/300)%3; for(let i=0;i<n;i++)F('#1d2130',2+i*4,3,2,2);
 }
 {const ents=SCENES.world.ents; SCENES.world.ents=function(list){ ents.call(this,list);
-  list.push({y:LOGAN.y-12,draw:drawLoganSpot},{y:LOGAN.y+6,draw:()=>drawLogan(LOGAN.x-1,LOGAN.y+7,'search')});
+  list.push({y:LOGAN.y-12,draw:drawLoganGear,flat:true},{y:LOGAN.y-12,draw:drawLoganSpot},{y:LOGAN.y+6,draw:()=>drawLogan(LOGAN.x-1,LOGAN.y+7,'search')});
   roadWalkers(list) }}
