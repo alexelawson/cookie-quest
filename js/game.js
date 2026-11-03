@@ -114,7 +114,7 @@ function draw(){
   const ents=[]; scene.ents&&scene.ents(ents);
   ents.push({y:P.y,draw:()=>{(scene.drawPlayer||drawPlayer)(P.x,P.y); if(farm.carrying&&scene===SCENES.world)drawHen(P.x,P.y-20,P.dir==='left'?-1:1)}});
   const hen=henEnt(); if(hen)ents.push(hen);   // Grp the rooster, dressed for wherever Joe is (extras.js)
-  ents.sort((a,b)=>a.y-b.y).forEach(e=>e.draw());
+  drawOutlined(()=>ents.sort((a,b)=>a.y-b.y).forEach(e=>e.draw()),cx,cy);   // people and things, with a dark pixel outline (outline.js)
   scene.over&&scene.over();
   extrasDraw();
   if(fade.next){

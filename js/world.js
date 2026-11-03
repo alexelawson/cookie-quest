@@ -1,7 +1,7 @@
 // The overworld: size, collision boxes, doors, and the one-time painting of the map.
 // Other places you can walk into (kitchen, city rooftops) are separate scenes; see kitchen.js and city.js.
 const WW=384, WH=288, VW=224, VH=168;
-const cv=document.getElementById('game'), ctx=cv.getContext('2d'); ctx.imageSmoothingEnabled=false;
+const cv=document.getElementById('game'); let ctx=cv.getContext('2d'); ctx.imageSmoothingEnabled=false;   // (let: draw() points it at the sprite layer for a moment to outline sprites)
 const R=(x,y,w,h)=>({x,y,w,h});
 const REG={farm:R(0,0,164,144), mill:R(220,0,164,144), city:R(0,170,164,118), fargo:R(220,170,164,118)};
 const trees=[[172,30],[212,30],[172,64],[212,64],[214,228],[110,154],[270,154]];
