@@ -134,7 +134,7 @@ function larsTurn(){
   const weighted=pool.map(o=>({...o,wt:ANAGRAM.LARS.WEIGHTS[o.len]})), tot=weighted.reduce((a,o)=>a+o.wt,0);
   let r=Math.random()*tot, pick=weighted[0]; for(const o of weighted){r-=o.wt; if(r<=0){pick=o;break}}
   ana.larsFound.push(pick.w); ana.lars+=ANAGRAM.POINTS[pick.len];
-  $('anaLarsWord').textContent=`Lars: ${pick.w} +${ANAGRAM.POINTS[pick.len]}`;
+  $('anaLarsWord').textContent=`Lars found a word! +${ANAGRAM.POINTS[pick.len]}`;   // points only: showing his word would give it away
 }
 function anaTick(dt){
   if(!ana.open||!ana.running)return;

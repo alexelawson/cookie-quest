@@ -125,7 +125,7 @@ ok('G0 a full charge zaps him into a gingerbread man, then his riddle (the vault
 r=await p.evaluate(()=>{action(); const open=!$('vault').hidden; const rule=$('vaultRule').textContent, labels=[0,1,2].map(i=>$('crateLabel'+i).textContent);
   const wrong=vault.choc===0?1:0; pickCrate(wrong); const raisin=T.clickThrough(); const reopened=!$('vault').hidden;
   $('vaultHint').click(); const hint=!$('vaultHintText').hidden&&$('vaultHintText').textContent;
-  pickCrate(vault.choc); const fin=T.clickThrough(); const ask=$('dtext').textContent, btns=T.btns(); [...$('dbtns').querySelectorAll('button')].find(b=>b.textContent==='Bring it').click(); return {open,rule,labels,raisin,reopened,hint,fin,ask,btns,ana:!$('anagram').hidden,st:have.heistStage}});
+  pickCrate(vault.choc); const fin=[]; for(let i=0;i<30&&!dlg.hidden&&!T.btns().includes('Bring it');i++){fin.push($('dspeaker').textContent+': '+$('dtext').textContent); $('dbtns').querySelector('button').click()} const ask=$('dtext').textContent, btns=T.btns(); [...$('dbtns').querySelectorAll('button')].find(b=>b.textContent==='Bring it').click(); return {open,rule,labels,raisin,reopened,hint,fin,ask,btns,ana:!$('anagram').hidden,st:have.heistStage}});
 ok('G vault: a rule and three labeled crates',r.open&&r.rule.length>5&&r.labels.every(l=>l.length>2)&&!r.labels.join().includes('{'),r.rule+' | '+r.labels.join(' | '));
 ok('G raisins: John objects, choose again',r.raisin.join().includes('Raisins')&&r.reopened,r.raisin[0]);
 ok('G Lars gives a hint if you ask',!!r.hint,r.hint);
@@ -135,12 +135,16 @@ r=await p.evaluate(()=>{const spots=new Set(), rules=new Set(); for(let k=0;k<40
 ok('G the chocolate crate is shuffled and the puzzle changes',r.spots==='0,1,2'&&r.rules>=3,JSON.stringify(r));
 r=await p.evaluate(()=>{openAnagrams(); return 1});
 // lose to Lars first (do nothing), then rematch with new letters and win
-r=await p.evaluate(()=>{const set1=ana.set.letters; anaGo(); for(let i=0;i<60*62;i++)update(16.7); const res=$('anaResult').textContent; $('anaNext').click(); const gl=T.clickThrough(); const again=T.btns(); [...$('dbtns').querySelectorAll('button')].find(b=>b.textContent==='Bring it').click();
+r=await p.evaluate(()=>{const set1=ana.set.letters; anaGo(); for(let i=0;i<60*62;i++)update(16.7); const res=$('anaResult').textContent; $('anaNext').click(); const gl=[]; for(let i=0;i<30&&!dlg.hidden&&!T.btns().includes('Bring it');i++){gl.push($('dspeaker').textContent+': '+$('dtext').textContent); $('dbtns').querySelector('button').click()} const again=T.btns(); [...$('dbtns').querySelectorAll('button')].find(b=>b.textContent==='Bring it').click();
   return {set1,res,gl,again,open:!$('anagram').hidden,set2:ana.set.letters}});
 ok('G doing nothing loses to Lars, and he gloats',r.res.startsWith('Lars wins')&&r.gl.join().includes('Again'),r.res);
 ok('G rematch uses different letters',r.again.join()==='Bring it'&&r.open&&r.set2!==r.set1,r.set1+' -> '+r.set2);
 r=await p.evaluate(()=>{const seen=new Set(); for(let k=0;k<30;k++){$('anagram').hidden=true; ana.open=false; openAnagrams(); seen.add(ana.set.letters)} return seen.size});
 ok('G lots of different letter sets',r>=8,r+' sets seen in 30 games');
+r=await p.evaluate(()=>{$('anagram').hidden=true; ana.open=false; openAnagrams(); anaGo(); const seen=[]; for(let i=0;i<60*20;i++){update(16.7); const t=$('anaLarsWord').textContent; if(t&&!seen.includes(t))seen.push(t)}
+  const leaked=ana.larsFound.filter(w=>seen.some(t=>t.toUpperCase().includes(w.toUpperCase())));
+  return {seen:seen.slice(0,3),found:ana.larsFound.length,leaked}});
+ok('G during the game you only see Lars\'s points, never his words',r.found>0&&r.seen.length>0&&r.leaked.length===0&&r.seen.every(t=>/\+\d+/.test(t)),JSON.stringify(r));
 r=await p.evaluate(()=>{$('anagram').hidden=true; ana.open=false; return 1});
 r=await p.evaluate(()=>{openAnagrams(); anaGo(); const type=w=>{for(const ch of w){const i=ana.letters.findIndex((l,j)=>l===ch&&!ana.picked.includes(j)); ana.picked.push(i)} anaSubmit(); return $('anaMsg').textContent};
   const msgs=[type('ZZZ'.slice(0,0)+ana.set.letters.slice(0,3).split('').reverse().join(''))];
@@ -154,7 +158,7 @@ await p.click('#rewardArt',{force:true}); await p.waitForTimeout(900);
 r=await p.evaluate(()=>({city:!!have.city,basket:$('basket').textContent}));
 ok('G chocolate in the basket',r.city&&r.basket.includes('Chocolate'));
 // H. the way home: just a quick word (no long cutscene), then back on the main map
-r=await p.evaluate(()=>{const ks=()=>{const l=[];for(let i=0;i<15&&!dlg.hidden&&!l.join().includes('Settings');i++){l.push($('dspeaker').textContent+': '+$('dtext').textContent);const bs=[...$('dbtns').querySelectorAll('button')];(bs.find(x=>x.textContent==='Next')||bs[0]).click()}return {l,gear:Object.keys(have.gear||{}).join()}};window.K=ks(); const lines=T.clickThrough(); T.run(60); return {k:K,lines,world:scene===SCENES.world,bar:$('crewbar').hidden}});
+r=await p.evaluate(()=>{const ks=()=>{const l=[];for(let i=0;i<15&&!dlg.hidden&&!l.join().includes('Settings');i++){l.push($('dspeaker').textContent+': '+$('dtext').textContent);const bs=[...$('dbtns').querySelectorAll('button')];(bs.find(x=>x.textContent==='Next')||bs[0]).click()}if(!$('itemCard').hidden){l.push('CARD: '+$('itemName').textContent+' | '+$('itemLine').textContent+' '+$('itemTip').textContent); $('itemBtn').click()} return {l,gear:Object.keys(have.gear||{}).join()}};window.K=ks(); const lines=T.clickThrough(); T.run(60); return {k:K,lines,world:scene===SCENES.world,bar:$('crewbar').hidden}});
 ok('H Dr. Alex hands Joe her spare goggles',r.k.l[0].startsWith('Dr. Alex')&&r.k.gear.includes('goggles'),r.k.l[0]);
 ok('H a few lines from Lars and John, then you\'re back on the map',r.lines.join().includes('rolls eyes')&&r.lines.length<=5&&r.world&&r.bar,JSON.stringify(r));
 // I. reload mid-heist resumes at the right checkpoint

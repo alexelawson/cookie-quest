@@ -1,48 +1,60 @@
-// The title screen: a snowy night outside the kitchen, Joe and Grp waiting to start.
+// The title screen: a snowy evening at the Craftsbury Outdoor Center. Barn-red buildings with white trim on the hill,
+// Great Hosmer Pond frozen below, the ski stadium and finish banner, and Joe and Alex side by side in Santa hats (Grp too).
 // Drawn on its own small canvas (128 x 96, scaled up), only while the title card is showing.
 (function(){
   const c=$('titleArt'); if(!c)return;
   const g=c.getContext('2d'); g.imageSmoothingEnabled=false;
-  const W=c.width, H=c.height, GROUND=78;
+  const W=c.width, H=c.height, POND=58, SNOW=67;
   const F=(col,x,y,w,h)=>{g.fillStyle=col; g.fillRect(x,y,w,h)};
-  // fixed stars and falling snow (seeded, so the sky is the same every time)
-  let seed=7; const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
-  const stars=Array.from({length:34},()=>({x:Math.floor(rnd()*W),y:Math.floor(rnd()*50),p:rnd()*6}));
+  let seed=11; const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
+  const stars=Array.from({length:30},()=>({x:Math.floor(rnd()*W),y:Math.floor(rnd()*38),p:rnd()*6}));
   const flakes=Array.from({length:70},()=>({x:rnd()*W,y:rnd()*H,v:4+rnd()*7,s:rnd()<.25?2:1,ph:rnd()*6}));
   const still=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const lightCols=['#e54b4b','#f4d35e','#5fa8e8','#7fd39a'];
 
   function sky(t){
-    const grd=g.createLinearGradient(0,0,0,GROUND); grd.addColorStop(0,'#0c1028'); grd.addColorStop(.6,'#18204a'); grd.addColorStop(1,'#2a3466');
-    g.fillStyle=grd; g.fillRect(0,0,W,GROUND);
+    const grd=g.createLinearGradient(0,0,0,POND); grd.addColorStop(0,'#0f1434'); grd.addColorStop(.55,'#232a5c'); grd.addColorStop(1,'#5a5488');
+    g.fillStyle=grd; g.fillRect(0,0,W,POND);
     for(const s of stars){ const on=Math.sin(t/700+s.p)>-.4; F(on?'#f7efdf':'#6d76a6',s.x,s.y,1,1) }
-    F('#f3e9c8',104,9,9,9); F('#f3e9c8',103,11,11,5); F('#fff8e2',105,10,3,3); F('#d9cfae',109,14,2,2);   // the moon
-    // far hills and pines
-    g.fillStyle='#141a3c'; g.beginPath(); g.moveTo(0,62); for(let x=0;x<=W;x+=8)g.lineTo(x,58+Math.sin(x/17)*4+Math.sin(x/7)*1.5); g.lineTo(W,GROUND); g.lineTo(0,GROUND); g.fill();
-    for(const [x,h] of [[4,14],[16,10],[88,12],[96,16],[120,11]]){ for(let k=0;k<h;k++){const w=Math.max(1,Math.round(k*.45)); F('#0f1532',x-w,GROUND-h-2+k,w*2+1,1)} }
+    F('#f3e9c8',108,7,7,7); F('#f3e9c8',107,9,9,3); F('#fff8e2',109,8,2,2);                                  // the moon
+    // the far hills and the spruce along the far shore of the pond
+    g.fillStyle='#262c5a'; g.beginPath(); g.moveTo(0,46); for(let x=0;x<=W;x+=6)g.lineTo(x,44+Math.sin(x/19)*3+Math.sin(x/7)*1); g.lineTo(W,POND); g.lineTo(0,POND); g.fill();
+    for(let x=0;x<W;x+=3){const h=4+((x*7)%5); for(let k=0;k<h;k++){const w=Math.max(0,Math.round(k*.35)); F('#141a3c',x-w,POND-h-1+k,w*2+1,1)}}
   }
-  function cabin(){
-    // the kitchen, glowing
-    F('#5a3a2a',8,58,30,20); F('#6e4632',8,58,30,2); for(let y=62;y<78;y+=4)F('#4a2e22',8,y,30,1);
-    F('#e9eef7',5,52,36,6); F('#ffffff',7,50,32,3); F('#cfd8ea',5,57,36,1);                       // snowy roof
-    F('#7a4a36',31,44,5,8); F('#ffffff',30,43,7,2);                                               // chimney
-    F('#ffd27a',13,63,8,7); F('#ffb347',13,63,8,1); F('#5a3a2a',16,63,1,7); F('#5a3a2a',13,66,8,1); // window
-    F('#2e5a3a',26,64,7,14); F('#c8322b',28,66,3,3); F('#e2c35a',31,70,1,1);                    // door with a wreath
-    F('rgba(255,210,122,.18)',10,70,14,8);
+  function pond(){
+    // Great Hosmer Pond, frozen and dusted with snow
+    F('#aebcd6',0,POND,W,SNOW-POND); F('#c9d4e8',0,POND,W,1); for(const [x,y,w] of [[8,60,22],[44,62,30],[86,61,18],[20,64,14],[100,64,20]])F('#d8e1f0',x,y,w,1);
+    // the boathouse on the shore, and its dock
+    F('#8f2c26',94,52,16,8); F('#a8362f',95,53,14,7); F('#f2efe6',94,52,16,1); F('#f2efe6',94,52,1,8); F('#f2efe6',109,52,1,8);
+    F('#ffffff',92,49,20,3); F('#e9eef7',93,48,18,2); F('#f2efe6',99,55,6,5); F('#6b4a2f',100,56,4,4);        // snowy roof, big doors
+    F('#7a5a3a',84,60,12,2); F('#5a3a22',85,62,1,2); F('#5a3a22',94,62,1,2);
   }
-  function tree(t){
-    // a pine wrapped in lights
-    const x=108, base=GROUND;
-    F('#4a2e22',x-1,base-4,3,4);
-    for(let k=0;k<22;k++){const w=Math.round(k*.42)+1; F(k%5===4?'#1f5a34':'#2a6e3f',x-w,base-26+k,w*2+1,1)}
-    F('#f4d35e',x,base-28,1,2); F('#f4d35e',x-1,base-27,3,1);
-    const cols=['#e54b4b','#f4d35e','#5fa8e8','#7fd39a'];
-    [[-3,-19],[2,-16],[-5,-12],[4,-9],[-7,-6],[1,-6],[6,-4],[-2,-14]].forEach(([dx,dy],i)=>F(cols[(i+Math.floor(t/500))%4],x+dx,base+dy,1,1));
-    F('#ffffff',x-4,base-21,3,1); F('#ffffff',x+1,base-13,4,1); F('#ffffff',x-6,base-8,4,1);
+  function lodge(t){
+    // the main buildings on the hill: barn red, white trim, snow on the roofs, lit windows, lights along the eaves
+    const bldg=(x,y,w,h,roof)=>{ F('rgba(0,0,0,.2)',x+2,y+h,w,2);
+      F('#8f2c26',x,y,w,h); F('#a8362f',x+1,y+1,w-2,h-1); for(let k=y+3;k<y+h;k+=3)F('#94302a',x+1,k,w-2,1);
+      F('#f2efe6',x,y,1,h); F('#f2efe6',x+w-1,y,1,h); F('#f2efe6',x,y,w,1);                                      // white trim
+      const cx=x+w/2; for(let k=0;k<=roof;k++){const half=Math.round((w/2+1)*k/roof); F(k===roof?'#cfd8ea':'#ffffff',Math.round(cx)-half,y-roof+k,half*2,1); if(half>1)F('#e9eef7',Math.round(cx)+half-2,y-roof+k,2,1)}   // snowy gable roof, widest at the eaves
+      F('#8f2c26',Math.round(cx)-2,y-roof+4,4,3); F('#ffd27a',Math.round(cx)-1,y-roof+5,2,2) };   // a little attic window
+    bldg(30,48,18,18,7); bldg(2,44,30,23,10);
+    for(const [x,y] of [[6,50],[14,50],[22,50],[6,58],[22,58],[34,53],[41,53]]){F('#f2efe6',x-1,y-1,6,6); F('#ffd27a',x,y,4,4); F('#ffb347',x,y,4,1); F('#a8362f',x+1,y,1,4)}
+    F('#2e5a3a',13,58,6,9); F('#f2efe6',12,57,8,1); F('#e2c35a',17,62,1,1);                                     // the front door
+    for(let a=0;a<8;a++){const r=a/8*Math.PI*2; F(a%3?'#2f6b36':'#3d8443',16+Math.round(Math.cos(r)*2),61+Math.round(Math.sin(r)*2),1,1)} F('#c8322b',15,63,2,1);   // wreath on the door
+    for(let x=3;x<47;x+=3)F(lightCols[(x/3+Math.floor(t/500))%4],x,x<31?45+((x/3)%2):49+((x/3)%2),1,1);        // string lights on the eaves
+    F('rgba(255,210,122,.12)',0,64,50,6);
   }
-  function ground(){
-    F('#dfe6f3',0,GROUND,W,H-GROUND); F('#ffffff',0,GROUND,W,1); F('#c7d1e6',0,GROUND+1,W,1);
-    for(const [x,y,w] of [[20,84,10],[50,90,14],[86,86,9],[112,92,12],[4,92,8]])F('#c7d1e6',x,y,w,1);
-    F('#cfd8ea',40,79,48,1);
+  function stadium(t){
+    // the snow and the trails: corduroy and two classic tracks curving through
+    F('#e3e9f4',0,SNOW,W,H-SNOW); F('#ffffff',0,SNOW,W,1);
+    for(let y=SNOW+4;y<H;y+=2)F('#d6deec',52+(y-SNOW)*.6|0,y,W,1);                                              // groomed corduroy
+    for(let y=SNOW+3;y<H;y++){const x=48+(y-SNOW)*.6|0; F('#b9c6dc',x,y,1,1); F('#b9c6dc',x+4,y,1,1)}            // classic tracks
+    // the finish: two posts, a blue banner, the clock
+    F('#3a3f52',92,62,2,22); F('#3a3f52',124,62,2,22); F('#2f6db0',92,62,34,8); F('#1d3f73',92,69,34,1); F('#ffffff',92,62,34,1);
+    pixText(g,'FINISH',97,64,'#ffffff');
+    F('#1d1d22',108,74,17,7); F('#3a3f52',115,81,2,5); const on=Math.floor(t/1000)%2; pixText(g,on?'1:24':'1:25',109,75,'#ff5a4a');
+    // stadium fencing along the trail, with a few lights strung on it
+    F('#5f6676',84,86,44,1); for(let x=84;x<128;x+=6){F('#5f6676',x,83,1,6); F(lightCols[(x/6+Math.floor(t/450))%4],x+3,85,1,1)}
+    F('#3d6fb0',84,87,44,2); F('#f4d35e',84,87,44,1);
   }
   function snow(t,dt){
     for(const f of flakes){
@@ -50,20 +62,22 @@
       F(f.s>1?'#ffffff':'rgba(255,255,255,.8)',Math.round(f.x),Math.round(f.y),f.s,f.s);
     }
   }
+  function santaHat(x,top,flop){ // brim on the head, red cone flopping to one side, white pompom
+    F('#c8322b',x-4,top-2,9,2); F('#c8322b',x-3,top-4,7,2); F('#c8322b',x-1,top-5,4,1); F('#c8322b',x+1*flop+1,top-6,3,1); F('#c8322b',x+3*flop+1,top-5,2,2);
+    F('#e8584c',x-3,top-4,2,1); F('#f7f5ef',x-5,top,11,2); F('#ffffff',x-5,top,11,1); F('#ffffff',x+4*flop+1,top-5,2,2) }
   function cast(t){
-    // Joe in whatever he picked (or his jersey), and Grp beside him pecking at the snow
-    const joe={x:58,y:GROUND+10,dir:'down',moving:false,step:0};
-    const look=have.look&&have.look!=='jersey'&&typeof OUTFIT_LOOK!=='undefined'&&OUTFIT_LOOK[have.look];
-    if(look)drawHero(joe,g,look); else drawJoeJersey(joe,g);
-    typeof drawGear==='function'&&drawGear(joe,g,look||null);
+    // Joe in his jersey and Alex, side by side in Santa hats; Grp at their feet, pecking at the snow
+    const joe={x:58,y:91,dir:'down',moving:false,step:0};
+    drawJoeJersey(joe,g); santaHat(58,70,1);
+    drawAlex(72,91,'ok',g); santaHat(72,70,-1);
     const peck=!still&&(t%2600)<380?1:0, hop=!still&&(t%2600)>1300&&(t%2600)<1460?1:0;
-    drawGrp(76,GROUND+10+peck-hop,-1,'world',false,g);
+    drawGrp(86,91+peck-hop,-1,'world',false,g);
   }
   let last=performance.now(), raf=0;
   function frame(now){
     raf=0; if($('titlecard').hidden)return;
     const dt=Math.min(50,now-last); last=now;
-    sky(now); cabin(); ground(); tree(now); cast(now); snow(now,dt);
+    sky(now); pond(); stadium(now); lodge(now); cast(now); snow(now,dt);
     raf=requestAnimationFrame(frame);
   }
   function go(){ if(!raf&&!$('titlecard').hidden){last=performance.now(); raf=requestAnimationFrame(frame)} }

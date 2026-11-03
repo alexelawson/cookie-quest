@@ -63,7 +63,7 @@ let swallowKeyUp=false;
 addEventListener('keydown',e=>{ if(['Space','Enter','KeyE'].includes(e.code)&&!dlg.hidden&&typing){finishTyping(); swallowKeyUp=true; e.preventDefault(); e.stopImmediatePropagation()} },true);
 addEventListener('keyup',e=>{ if(swallowKeyUp&&['Space','Enter','KeyE'].includes(e.code)){swallowKeyUp=false; e.preventDefault()} },true);
 // is any pop-up still open? (so closing one menu never unpauses the game under another)
-const OVERLAYS=['dialog','reward','pump','shop','vault','boss','anagram','howto','wardrobe','bake','cloverHunt','ending','settings','titlecard'];
+const OVERLAYS=['dialog','reward','itemCard','pump','shop','vault','boss','anagram','howto','wardrobe','bake','cloverHunt','ending','settings','titlecard'];
 const overlayOpen=()=>OVERLAYS.some(id=>!$(id).hidden);
 function closeDialog(){finishTyping(); dlg.hidden=true; paused=overlayOpen(); cv.focus?.()}
 const CLOSE={label:'Close',fn:closeDialog};
@@ -72,6 +72,7 @@ function action(){
   if(!$('titlecard').hidden){start();return}
   if(!$('pump').hidden||!$('shop').hidden||!$('vault').hidden||!$('boss').hidden||!$('anagram').hidden||!$('howto').hidden||!$('wardrobe').hidden||!$('bake').hidden||!$('ending').hidden||!$('settings').hidden)return;   // the pump and shop have their own buttons
   if(!$('reward').hidden){collectReward();return}
+  if(!$('itemCard').hidden){$('itemBtn').click();return}
   if(!dlg.hidden){if(finishTyping())return; const f=document.activeElement, b=$('dbtns').contains(f)?f:$('dbtns').querySelector('button'); b&&b.click(); return}
   if(near)near.act(); else if(scene.ability)scene.ability();
 }

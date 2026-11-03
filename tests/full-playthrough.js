@@ -38,8 +38,8 @@ for(const key of order){
 
 // 3. the secrets, found the real way: walking, talking
 r=await p.evaluate(()=>{ goTo('world','start'); T.run(40); const out={};
-  for(const k of ['oakleys','headband','shoes']){T.at(GEAR[k].x,GEAR[k].y); out[k]=have.gear&&have.gear[k]; closeDialog()}
-  T.at(LOGAN.x+6,LOGAN.y+2); action(); T.pages(); T.click(LOGAN_TEXT.help); $('cloverField').querySelector('[data-four]').click(); T.pages(); T.click(LOGAN_TEXT.wear); out.clover=have.gear.clover;
+  for(const k of ['oakleys','headband','shoes']){T.at(GEAR[k].x,GEAR[k].y); out[k]=have.gear&&have.gear[k]; if(!$('itemCard').hidden)$('itemBtn').click()}
+  T.at(LOGAN.x+6,LOGAN.y+2); action(); T.pages(); T.click(LOGAN_TEXT.help); $('cloverField').querySelector('[data-four]').click(); T.pages(); T.click('OK'); $('itemBtn').click(); out.clover=have.gear.clover;
   T.at(CUPCAKE.x,CUPCAKE.y); out.cupcake=!!have.cupcake; while(!dlg.hidden)[...$('dbtns').querySelectorAll('button')][0].click();
   talkBryan(); T.pages(); [...$('dbtns').querySelectorAll('button')][0].click(); return out});
 await p.click('#rewardArt',{force:true}); await p.waitForTimeout(900);

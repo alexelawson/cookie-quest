@@ -184,21 +184,21 @@ function drawAttendant(x,y,i){
 // Alex, waiting in the car park: long straight dark-brown hair swept back off her face, past her shoulders; big smile; green scoop-neck tee. mood: happy / frown / ok
 const ALEX_SPR={down:["..HHHHHHHH..",".HHLLhLLHHH.",".HHSSSSSSHH.",".HSBBSSBBSH.",".HSWESSEWSH.",".HSSSssSSSH.",".HSSSSSSSSH.",
   ".HHHsSSsHHH.",".HHTTSSTTHH.",".HHTTTTTTHH.",".HSTTTTTTSH.","..STTTTTtS..","..STTTTTtS..","..sTTTTTts..","...PPPPPP...","...PPPPPP..."]};   // tall and lanky
-function drawAlex(x,y,mood){
-  const X=Math.round(x)-6, Y=Math.round(y)-21, F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(X+dx,Y+dy,w,h)};
+function drawAlex(x,y,mood,g=ctx){
+  const X=Math.round(x)-6, Y=Math.round(y)-21, F=(c,dx,dy,w,h)=>{g.fillStyle=c;g.fillRect(X+dx,Y+dy,w,h)};
   const pal={H:ALEX.hair,h:ALEX.hairD,L:ALEX.hairL,B:ALEX.hairD,S:ALEX.skin,s:ALEX.skinS,W:'#ffffff',E:ALEX.eye,T:ALEX.top,t:ALEX.topD,P:ALEX.pants};
   F('rgba(0,0,0,.2)',2,20,8,2);
   F(ALEX.pants,3,16,2,4); F(ALEX.pants,7,16,2,4); F('#22222a',4,16,1,4); F('#22222a',8,16,1,4);                                  // long legs
   F(ALEX.shoe,2,20,3,1); F(ALEX.shoe,7,20,3,1); F('#5a4030',2,20,1,1); F('#5a4030',7,20,1,1);
-  drawSprite(ctx,X,Y,ALEX_SPR,pal,'down',4,10);
+  drawSprite(g,X,Y,ALEX_SPR,pal,'down',4,10);
   if(mood==='happy'){F(ALEX.smile,5,6,2,1); F(ALEX.smile,4,5,1,1); F(ALEX.smile,7,5,1,1); F(ALEX.blush,2,5,1,1); F(ALEX.blush,9,5,1,1)}   // a big smile
   else if(mood==='frown'){F(ALEX.frown,5,6,2,1); F(ALEX.skin,3,3,2,1); F(ALEX.skin,7,3,2,1); F(ALEX.hairD,3,3,1,1); F(ALEX.hairD,4,2,1,1); F(ALEX.hairD,8,3,1,1); F(ALEX.hairD,7,2,1,1)}   // cross brows
   else {F(ALEX.smile,4,6,4,1); F('#ffffff',5,6,2,1); F(ALEX.blush,2,5,1,1); F(ALEX.blush,9,5,1,1)}   // her usual big smile
   if(mood!=='ok'){ // bubble
-    const bx=Math.round(x)+5, by=Math.round(y)-30; ctx.fillStyle='#ffffff'; ctx.fillRect(bx,by,9,8); ctx.fillRect(bx+1,by+8,2,2);
-    ctx.fillStyle=mood==='happy'?'#e54b7a':'#4a4a5a';
-    if(mood==='happy'){ctx.fillRect(bx+2,by+2,2,2);ctx.fillRect(bx+5,by+2,2,2);ctx.fillRect(bx+2,by+3,5,2);ctx.fillRect(bx+3,by+5,3,1);ctx.fillRect(bx+4,by+6,1,1)}
-    else {ctx.fillRect(bx+2,by+2,1,1);ctx.fillRect(bx+6,by+2,1,1);ctx.fillRect(bx+3,by+5,3,1);ctx.fillRect(bx+2,by+6,1,1);ctx.fillRect(bx+6,by+6,1,1)}
+    const bx=Math.round(x)+5, by=Math.round(y)-30; g.fillStyle='#ffffff'; g.fillRect(bx,by,9,8); g.fillRect(bx+1,by+8,2,2);
+    g.fillStyle=mood==='happy'?'#e54b7a':'#4a4a5a';
+    if(mood==='happy'){g.fillRect(bx+2,by+2,2,2);g.fillRect(bx+5,by+2,2,2);g.fillRect(bx+2,by+3,5,2);g.fillRect(bx+3,by+5,3,1);g.fillRect(bx+4,by+6,1,1)}
+    else {g.fillRect(bx+2,by+2,1,1);g.fillRect(bx+6,by+2,1,1);g.fillRect(bx+3,by+5,3,1);g.fillRect(bx+2,by+6,1,1);g.fillRect(bx+6,by+6,1,1)}
   }
 }
 function drawWaterTower(){

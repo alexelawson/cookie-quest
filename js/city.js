@@ -67,7 +67,7 @@ const cityBg=document.createElement('canvas'); cityBg.width=CW; cityBg.height=CH
   F('#05060c',0,0,CW,CH);                                                         // the street, way down there
   for(const [x0,w] of [[118,32],[320,32]]){
     F('#0b0d16',x0,0,w,CH); for(let y=0;y<CH;y+=12)F('#1d2030',x0+w/2-1,y,1,6);                                      // the road and its center line
-    for(let y=4;y<CH;y+=7)for(const sx of [x0+1,x0+w-4]){F('#141826',sx,y,3,5); if(rnd()<.35)F(rnd()<.5?'#f3d27a':'#8fd3ff',sx+1,y+1,1,2)}   // building walls, a few lit windows
+    for(let y=4;y<CH;y+=7)for(const sx of [x0+1,x0+w-4]){F('#123230',sx,y,3,5); F('#1d4a46',sx,y,3,1); if(rnd()<.35)F(rnd()<.5?'#f3d27a':'#8fe8dc',sx+1,y+1,1,2)}   // teal glass walls down at street level, a few lit windows
     for(let k=0;k<6;k++){const y=rnd()*CH|0; F(['rgba(255,80,160,.25)','rgba(90,200,255,.22)','rgba(255,200,90,.2)'][k%3],x0+5,y,w-10,2)}   // neon reflected in the wet road
   }
   for(const r of [ROOF_A,ROOF_B,ROOF_C]){

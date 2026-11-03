@@ -78,9 +78,24 @@ PORTRAITS['Maureen']={size:32, bg:'#ece4f4', draw(g){ const F=px(g);
 // ---------- Logan: short, medium brown hair, in his rollerski gear, "taking a break from his workout" to look for four-leaf clovers ----------
 const LOGAN={x:36, y:122};   // his own quiet corner, left of the farm path
 const LOGAN_KIT={suit:'#1f3a73', suitD:'#152a55', stripe:'#ffffff', helmet:'#f6f6f2', helmetD:'#c9ced4', vent:'#1f3a73', hair:'#7a5232', skin:'#f0c6a0'};   // Middlebury navy and white
-// pose 'sit': on the grass, legs out, magnifying glass over the clovers. Otherwise standing (at the party, at the Birkie finish).
+// pose 'search': in the clover patch, bent over his magnifying glass (on the map). 'sit': on the grass. Otherwise standing (at the party, at the Birkie finish).
 function drawLogan(x,y,pose){
   const F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(Math.round(x)-5+dx,Math.round(y)-16+dy,w,h)}, K=LOGAN_KIT;
+  if(pose==='search'){   // standing on his rollerskis in the clover patch, bent over a big magnifying glass (facing left)
+    const sway=Math.round(Math.sin(time/900)), G='#d9a92e', g2='#f4d35e', lx=-8+sway, ly=9;
+    F('rgba(0,0,0,.2)',-3,15,15,2);
+    F(K.suitD,8,8,2,6); F(K.suit,6,8,2,6); F(K.stripe,6,8,1,6); F('#2b2b33',5,14,4,1); F('#2b2b33',8,14,3,1);   // legs, race shoes
+    F(K.suit,3,3,7,6); F(K.suit,2,4,2,4); F(K.suitD,3,8,7,1); F(K.stripe,3,5,7,1); F(K.suitD,9,3,1,5);         // bent over at the hips
+    F(K.skin,-1,0,5,5); F('#e3b08c',3,3,1,2); F(K.hair,3,0,1,3); F('#2b2b2b',0,2,1,1); F('#b5654f',0,4,2,1);       // head, peering down
+    F(K.helmet,0,-3,4,1); F(K.helmet,-1,-2,6,1); F(K.helmet,-2,-1,7,1); F(K.vent,1,-2,1,1); F(K.vent,3,-2,1,1); F(K.helmetD,-2,0,2,1);   // vented helmet
+    F('#1d1d22',1,-1,3,1); F('#7fb0ff',1,-1,1,1);                                                                 // sunglasses up on the helmet
+    F(K.suit,1,4,2,3); F(K.suit,0,6,2,2); F(K.skin,-1,8,2,2);                                                     // arm reaching down
+    F('#8a5a34',lx+7,ly+3,3,1); F('#6a4224',lx+7,ly+4,3,1);                                                       // the handle
+    F('rgba(220,240,255,.55)',lx+1,ly+2,5,3); F('rgba(220,240,255,.55)',lx+2,ly+1,3,5);                           // the lens...
+    F('#3f9a46',lx+2,ly+2,2,2); F('#3f9a46',lx+4,ly+2,1,2); F('#3f9a46',lx+2,ly+4,2,1); F('#3f9a46',lx+4,ly+4,1,1); F('#a8ecb0',lx+2,ly+2,1,1);   // ...with the clover big inside it
+    for(const [a,c,w,h] of [[2,0,3,1],[2,6,3,1],[0,2,1,3],[6,2,1,3],[1,1,1,1],[5,1,1,1],[1,5,1,1],[5,5,1,1]])F(G,lx+a,ly+c,w,h);   // the gold rim
+    F(g2,lx+2,ly,2,1); F('#ffffff',lx+4,ly+2,1,1);                                                               // shine
+    return }
   if(pose==='sit'){   // side-on, sitting in the grass facing left: legs out in front, glass held over the clovers
     F('rgba(0,0,0,.16)',-5,14,14,2);
     F(K.suit,-3,11,7,3); F(K.suitD,-3,13,7,1); F(K.stripe,-3,11,7,1);                     // legs stretched out
@@ -165,7 +180,7 @@ function openCloverHunt(){
 function pickClover(i,b){
   const T=LOGAN_TEXT;
   if(i===hunt.four){ closeCloverHunt(); have.gear=have.gear||{}; have.gear.clover=1; save(); sfx('reward');
-    return showDialog({place:T.place,speaker:'Logan',pages:T.found,actions:[{label:T.wear,fn:closeDialog}]}) }
+    return showDialog({place:T.place,speaker:'Logan',pages:T.found,actions:[{label:'OK',fn:()=>{closeDialog(); showItem('clover')}}]}) }
   hunt.misses++; sfx('bad'); b.classList.remove('nope'); void b.offsetWidth; b.classList.add('nope');
   $('cloverMsg').textContent=T.huntMiss[(hunt.misses-1)%T.huntMiss.length];
   if(hunt.misses>=HUNT.HINT_AFTER){ const fb=$('cloverField').children[hunt.four]; drawHuntClover(fb.querySelector('canvas').getContext('2d'),4,hunt.seed+hunt.four,true); if(hunt.misses===HUNT.HINT_AFTER)$('cloverMsg').textContent=T.huntHint }
@@ -233,5 +248,5 @@ function drawThink(){
   const n=1+Math.floor(time/300)%3; for(let i=0;i<n;i++)F('#1d2130',2+i*4,3,2,2);
 }
 {const ents=SCENES.world.ents; SCENES.world.ents=function(list){ ents.call(this,list);
-  list.push({y:LOGAN.y-12,draw:drawLoganSpot},{y:LOGAN.y,draw:()=>drawLogan(LOGAN.x,LOGAN.y,'sit')});
+  list.push({y:LOGAN.y-12,draw:drawLoganSpot},{y:LOGAN.y+6,draw:()=>drawLogan(LOGAN.x-1,LOGAN.y+7,'search')});
   roadWalkers(list) }}

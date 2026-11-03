@@ -21,14 +21,14 @@ const solids=[
   R(108,16,52,30),                                           // Bryan's pond (he's out in his boat)
   R(67,204,3,3),R(103,258,3,3),                              // city streetlamps
   R(8,178,40,52),R(110,184,48,56),R(0,244,72,44),R(72,264,92,24),R(94,224,6,4),   // city towers, the ocean, the steam clock
-  R(310,180,60,40),R(256,198,6,10),R(280,198,6,10),R(235,214,3,12), // gas shop, pumps, sign pole
+  R(300,180,50,40),R(256,198,6,10),R(280,198,6,10),R(356,200,28,36),R(350,280,28,6), // Lil Q's, pumps, grain elevator, water tower
   ...[...trees,...pines,...woods,...cedars].map(([x,y])=>R(x-3,y-3,6,4)),
 ];
 const triggers=[
   {z:R(320,70,24,18),  label:'Talk to John', btn:'Talk', act:()=>talkJohn()},
   {z:R(86,36,26,16),   label:'Talk to Bryan', btn:'Talk', act:()=>talkBryan()},
   {z:R(124,240,20,12), label:'Take the elevator up', act:()=>openWardrobe(()=>{ heist.outfitReact=true; goTo('city','fromStreet') })},
-  {z:R(330,220,20,12), label:'Drive into Fargo',   act:()=>goTo('fargo','fromHighway')},
+  {z:R(315,220,20,12), label:'Drive into Fargo',   act:()=>goTo('fargo','fromHighway')},
   {z:R(182,142,20,10), label:'Enter your kitchen', act:()=>goTo('kitchen','fromDoor')},
   {z:R(184,276,16,10), label:'Go to the disc golf course', act:()=>goTo('golf','fromRoad')},
   // Keelan's trigger moves with him; see farm.js
@@ -112,10 +112,10 @@ const bg=document.createElement('canvas'); bg.width=WW; bg.height=WH;
   // a teal glass tower with a green roof garden
   {const b=R(8,178,40,52); F('#1d3a42',b.x-1,b.y-5,b.w+2,6); F('#3d6b3a',b.x+2,b.y-5,b.w-4,4);
     for(let x=b.x+4;x<b.x+b.w-4;x+=7){F('#4f8a45',x,b.y-6,4,3); F('#62a356',x+1,b.y-6,2,1)}
-    glass(b,'#2f5f6f','#29525f','#6fb0c0'); F('#ffe9a8',b.x+12,b.y+b.h-8,16,8); F('#d9c27a',b.x+19,b.y+b.h-8,1,8)}   // glowing lobby
+    glass(b,'#2a6e6a','#235c58','#7fd8c8'); F('#ffe9a8',b.x+12,b.y+b.h-8,16,8); F('#d9c27a',b.x+19,b.y+b.h-8,1,8)}   // glowing lobby
   // the tall blue one: a stepped glass crown, and an elevator lobby (the way up to the rooftops)
   {const b=R(110,184,48,56); F('#1c2c44',b.x+6,b.y-8,b.w-12,4); F('#1c2c44',b.x-1,b.y-5,b.w+2,6); F('#4f8fd0',b.x+8,b.y-8,b.w-16,1);
-    glass(b,'#2c4a6e','#243d5c','#7fb0e0'); F('#ffe9a8',126,b.y+b.h-10,16,10); F('#d9c27a',134,b.y+b.h-10,1,10); F('#9aa3b2',125,b.y+b.h-11,18,1)}
+    glass(b,'#2c6a72','#24585f','#86dcd4'); F('#ffe9a8',126,b.y+b.h-10,16,10); F('#d9c27a',134,b.y+b.h-10,1,10); F('#9aa3b2',125,b.y+b.h-11,18,1)}
   // moss everywhere: in the sidewalk cracks, along the curbs, on the tower roofs
   for(let i=0;i<220;i++){const x=rnd()*164|0, y=170+rnd()*90|0; F(rnd()<.5?'#3a5e36':'#4a7442',x,y,1+(rnd()*3|0),1)}
   for(let x=0;x<70;x+=3)F(rnd()<.5?'#3a5e36':'#4a7442',x,231,2,1); for(let x=8;x<48;x+=2)F('#4a7442',x,229,1,1);
@@ -130,20 +130,36 @@ const bg=document.createElement('canvas'); bg.width=WW; bg.height=WH;
   F('rgba(200,210,225,.18)',0,276,164,4);   // mist
   // the green bike lane next to the street
   F('#3f8a4a',86,170,4,74); for(let y=180;y<240;y+=22){F('#e8eef0',87,y,2,1); F('#e8eef0',86,y+2,1,2); F('#e8eef0',89,y+2,1,2)}
-  // fargo
-  F('#cdb978',220,170,164,118); soft(R(220,170,164,118),'#cdb978','lt');                                 // fargo: dry, flat, summer
+  // fargo: flat prairie in summer. A tall theater-style FARGO sign by the road, Lil Q's little gas station,
+  // a grain elevator, the town water tower, and sugar beet rows running out to the edge
+  F('#cdb978',220,170,164,118); soft(R(220,170,164,118),'#cdb978','lt');
   for(let i=0;i<150;i++)F(['#bfa865','#d9c98e','#c4b06c'][i%3],220+rnd()*164|0,170+rnd()*118|0,2,1);
-  // the gas station forecourt: one clean slab of asphalt from the road to the shop door
-  F('#9a9690',250,166,128,70); for(let i=0;i<160;i++)F(rnd()<.5?'#8f8b85':'#a5a19a',250+rnd()*128|0,166+rnd()*70|0,1,1);
-  F('#b5b1aa',250,166,128,1); F('#7f7b75',250,235,128,1); F('#7f7b75',250,166,1,70); F('#7f7b75',377,166,1,70);
-  for(let x=300;x<372;x+=12)F('#e2dfd8',x,224,1,10);                                       // parking spaces in front of the shop
-  F('#d9d4c8',310,180,60,40); F('#2f6db0',310,180,60,8); F('#1d3f73',314,181,52,7); pixText(g,'FARGO GAS',322,182,'#ffffff');
-  F('#6b6f7a',334,206,12,14); F('#9fd2f0',314,194,14,9); F('#9fd2f0',352,194,14,9);
-  F('#c7372f',256,198,6,10); F('#c7372f',280,198,6,10); F('#f1f4f8',257,200,4,3); F('#f1f4f8',281,200,4,3);
-  F('#8a8f9a',235,214,3,12); F('#1d3f73',222,200,30,15); F('#c7372f',222,200,30,3);
-  const DIG={'2':['111','001','111','100','111'],'7':['111','001','010','010','010'],'9':['111','101','111','001','111'],'.':['0','0','0','0','1']};
-  let tx=230; for(const ch of '2.79'){const m=DIG[ch]; m.forEach((row,ry)=>[...row].forEach((c,rx)=>{if(c==='1')F('#ffd84d',tx+rx,206+ry,1,1)})); tx+=m[0].length+1}
-  for(let y=244;y<284;y+=8){F('#9a7b66',236,y,140,4); for(let x=240;x<374;x+=6){F('#7d2b52',x,y+1,3,2);F('#4f9a3c',x+1,y-2,1,3)}}
+  // the forecourt: one slab of asphalt from the road to the shop door
+  F('#9a9690',240,166,112,70); for(let i=0;i<150;i++)F(rnd()<.5?'#8f8b85':'#a5a19a',240+rnd()*112|0,166+rnd()*70|0,1,1);
+  F('#b5b1aa',240,166,112,1); F('#7f7b75',240,235,112,1); F('#7f7b75',240,166,1,70); F('#7f7b75',351,166,1,70);
+  for(let x=302;x<350;x+=12)F('#e2dfd8',x,224,1,10);                                         // parking spaces
+  // Lil Q's Gas & Go: white clapboard, a red-and-white awning, a big blue sign
+  F('rgba(0,0,0,.2)',302,220,50,2);
+  F('#f2efe6',300,184,50,36); for(let y=188;y<220;y+=3)F('#dcd7cc',300,y,50,1); F('#c9c4b8',349,184,1,36);
+  F('#2f6db0',300,180,50,9); F('#1d3f73',302,181,46,7); F('#ffffff',300,180,50,1); pixText(g,"LIL Q'S",310,182,'#ffffff');
+  for(let x=300;x<350;x+=4){F('#c7372f',x,189,2,4); F('#ffffff',x+2,189,2,4)} F('rgba(0,0,0,.15)',300,193,50,1);   // the awning
+  F('#9fd2f0',303,196,13,9); F('#cfeaf8',304,197,4,2); F('#9fd2f0',334,196,13,9); F('#cfeaf8',335,197,4,2);          // windows
+  F('#e9c46a',305,203,4,2); F('#e54b4b',310,203,4,2); F('#7fd39a',336,203,4,2); F('#f28cb8',341,203,4,2);           // snacks on the shelves
+  F('#6b6f7a',319,206,12,14); F('#8a8f9a',320,207,10,12); F('#f4d35e',327,213,1,2); F('#ffffff',321,209,8,3);     // the door, OPEN
+  // the pumps (the canopy over them is drawn on top, in over())
+  F('#c7372f',256,198,6,10); F('#c7372f',280,198,6,10); F('#f1f4f8',257,200,4,3); F('#f1f4f8',281,200,4,3); F('#2b2b2b',262,201,1,5); F('#2b2b2b',286,201,1,5);
+  // the grain elevator: three concrete silos and a head house on top
+  F('rgba(0,0,0,.25)',356,234,28,3);
+  for(const x of [356,365,374]){F('#d8d4cc',x,182,9,53); F('#ebe8e2',x+1,182,2,53); F('#b9b4aa',x+7,182,2,53); for(let y=186;y<234;y+=7)F('#c9c4ba',x,y,9,1)}
+  F('#c9c4ba',360,168,18,15); F('#e2ded6',361,168,6,15); F('#a8a39a',360,168,18,1); F('#b03a2e',360,171,18,3); F('#2b2f3a',366,176,5,4);   // head house
+  F('#8a8f9a',357,180,2,12); F('#8a8f9a',357,180,6,1);                                                                                  // the leg / spout
+  // the water tower, FARGO painted on the tank
+  {const x=348, y=238; F('rgba(0,0,0,.2)',x+2,y+47,32,2);
+   for(const lx of [x+3,x+14,x+25]){F('#7a7f8a',lx,y+20,2,27); F('#5f6370',lx+1,y+20,1,27)} F('#7a7f8a',x+3,y+32,24,1); F('#7a7f8a',x+5,y+40,20,1);   // legs + cross braces
+   F('#9fb4c8',x,y+4,30,17); F('#c4d4e2',x+2,y+4,8,17); F('#7f93a8',x+25,y+4,5,17); F('#9fb4c8',x+3,y+2,24,2); F('#b4c6d6',x+8,y,14,2);   // tank, dome
+   F('#7f93a8',x,y+20,30,1); pixText(g,'FARGO',x+5,y+9,'#1d3f73')}
+  // sugar beet rows
+  for(let y=244;y<284;y+=8){F('#9a7b66',236,y,104,4); for(let x=240;x<338;x+=6){F('#7d2b52',x,y+1,3,2);F('#4f9a3c',x+1,y-2,1,3)}}
   // roads
   const road=(x,y,w,h)=>{F('#c9a46b',x,y,w,h); for(let i=0;i<w*h/30;i++)F('#b8935b',x+rnd()*w|0,y+rnd()*h|0,1,1);
     for(let i=0;i<w*h/140;i++)F(rnd()<.5?'#a9a39a':'#d8c49a',x+rnd()*w|0,y+rnd()*h|0,1,1);                                 // pebbles
@@ -291,7 +307,7 @@ const yurt=archSprite(36,32,g=>{const F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x
 const SCENES={};
 SCENES.world={ music:'farm',
   w:WW, h:WH, bounds:R(2,10,WW-4,WH-12), bg, solids, triggers,
-  entries:{start:{x:192,y:156,dir:'down'}, fromKitchen:{x:192,y:157,dir:'down'}, fromCity:{x:134,y:256,dir:'down'}, fromFargo:{x:340,y:238,dir:'down'}, fromGolf:{x:192,y:266,dir:'up'}, fromMill:{x:316,y:92,dir:'down'}},
+  entries:{start:{x:192,y:156,dir:'down'}, fromKitchen:{x:192,y:157,dir:'down'}, fromCity:{x:134,y:256,dir:'down'}, fromFargo:{x:325,y:238,dir:'down'}, fromGolf:{x:192,y:266,dir:'up'}, fromMill:{x:316,y:92,dir:'down'}},
   hud:()=>farmHud(),
   dynTrigger:()=>farmTrigger(),
   ambient(dt){
@@ -314,8 +330,7 @@ SCENES.world={ music:'farm',
     list.push({y:124,draw:()=>ctx.drawImage(yurt,336,94)}); list.push({y:81,draw:()=>drawTrailJohn(331,81,trailJohnDir())}); list.push({y:74,draw:drawBarn}); farmEntities(list)},
   over(){
     farmOverlay();
-    ctx.fillStyle='#c7372f';ctx.fillRect(244,184,52,6);ctx.fillStyle='#f1f4f8';ctx.fillRect(244,189,52,2);   // gas canopy
-    ctx.fillStyle='#8a8f9a';ctx.fillRect(246,191,2,14);ctx.fillRect(292,191,2,14);
+    drawFargoTop();
     ctx.save(); ctx.beginPath(); ctx.rect(0,170,164,118); ctx.clip();                                        // city: dark, rain, searchlight
     ctx.fillStyle='rgba(10,12,30,.28)'; ctx.fillRect(0,170,164,118);
     const ang=Math.sin(time/1800)*.6;
@@ -339,6 +354,7 @@ SCENES.world={ music:'farm',
     ship(4,254,36,['#c8322b','#2f6db0','#e8a020','#2f8a4a','#c8322b','#5fa8e8']); ship(104,270,42,['#2f8a4a','#e8a020','#c8322b','#2f6db0','#e8a020','#8a5a9a','#2f6db0']);
     {const bx=Math.round(8+(Math.sin(time/5000)+1)*20), by=266; ctx.fillStyle='rgba(0,0,0,.25)'; ctx.fillRect(bx,by+5,14,2); ctx.fillStyle='#f2efe6'; ctx.fillRect(bx,by,14,5);
       ['#e54b4b','#f4a03a','#f4d35e','#4fbf73','#5fa8e8'].forEach((c,i)=>{ctx.fillStyle=c; ctx.fillRect(bx+2+i*2,by-2,2,2)}); ctx.fillStyle='#ffe9a8'; ctx.fillRect(bx+3,by+1,8,1)}
+    drawLionsGate();
     ctx.fillStyle='#7d8694'; ctx.fillRect(150,170,1,10); if(Math.floor(time/700)%2){ctx.fillStyle='#ff3b3b'; ctx.fillRect(149,170,3,2)}   // antenna
     if(have.city){ // the cookie signal, up on the clouds
       ctx.fillStyle='rgba(255,240,180,.22)'; ctx.beginPath(); ctx.ellipse(46,184,16,9,0,0,Math.PI*2); ctx.fill();

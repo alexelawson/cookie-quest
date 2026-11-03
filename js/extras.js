@@ -60,15 +60,14 @@ function giveKeepsake(key,then){
   const place={farm:KEELAN.place,city:HEIST.place,golf:GOLF_TEXT.place,fargo:FARGO.place,mill:BIRKIE.place}[key]||'';
   let i=0; const next=()=>{ if(i<lines.length){const [sp,tx,face]=lines[i++]; return showDialog({place,speaker:sp,face,pages:[tx],actions:[{label:'Next',fn:next}]})} closeDialog(); gotIt() };
   next();
-  function gotIt(){ have.gear=have.gear||{}; have.gear[k]=1; save(); sfx('pickup');
-    showDialog({place:GEAR_TEXT.place,speaker:'',pages:[T.found,GEAR_TEXT.tip],actions:[{label:T.wear,fn:()=>{closeDialog(); then&&then()}}]}) }
+  function gotIt(){ have.gear=have.gear||{}; have.gear[k]=1; save(); sfx('pickup'); showItem(k,then) }
 }
 const gearWorn=k=>have.gear&&have.gear[k]===1;
 function gearTick(){
   if(scene!==SCENES.world)return;
   for(const k in GEAR){ const g=GEAR[k]; if(g.give||(have.gear&&k in have.gear))continue;
     if(Math.hypot(P.x-g.x,P.y-g.y)<8){ have.gear=have.gear||{}; have.gear[k]=1; save(); sfx('pickup');
-      const T=GEAR_TEXT[k]; showDialog({place:GEAR_TEXT.place,speaker:'',pages:[T.found,GEAR_TEXT.tip],actions:[{label:T.wear,fn:closeDialog}]}); return } }
+      showItem(k); return } }
 }
 function drawGearItem(k,x,y){
   const F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x+dx,y+dy,w,h)};
@@ -118,10 +117,20 @@ const LAND_SIGNS=[['THE FARM',58,132],['VANCOUVER',104,166]];
     F('rgba(0,0,0,.25)',x+2,y+16,w-2,2); F('#5a3a22',x+3,y+9,2,8); F('#5a3a22',x+w-5,y+9,2,8);
     F('#5a3a22',x,y,w,11); F('#f2e6c8',x+1,y+1,w-2,9); F('#d9c9a2',x+1,y+9,w-2,1); pixText(g,t,x+4,y+3,'#3b2a1e');
     solids.push(R(x+3,y+14,2,3),R(x+w-5,y+14,2,3))}}
-// the welcome-to-Fargo sign on the main map
-solids.push(R(226,183,2,3),R(242,183,2,3));
-{const g=bg.getContext('2d'), F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};
-  F('#8a8f9a',226,180,2,6); F('#8a8f9a',242,180,2,6); F('#2f5f9e',224,170,22,11); F('#ffffff',224,170,22,1); pixText(g,'FARGO',226,173,'#ffffff')}
+// Fargo on the main map: the gas canopy (with Lil Q's price) and a tall theater-style FARGO sign, its bulbs chasing
+solids.push(R(226,208,3,4));
+function drawFargoTop(){
+  const F=(c,x,y,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,h)};
+  F('rgba(0,0,0,.18)',246,191,50,2);
+  F('#c7372f',244,181,52,7); F('#e8584c',244,181,52,1); F('#f1f4f8',244,188,52,2); F('#8a8f9a',246,190,2,14); F('#8a8f9a',292,190,2,14);   // the canopy
+  F('#1d3f73',262,182,17,6); pixText(ctx,'2.79',263,182,'#ffd84d');                                                                // the price
+  // the sign: a red blade on a pole, F-A-R-G-O stacked, a border of bulbs
+  F('#5f6370',227,200,2,12); F('#3a3f4a',226,198,4,3);
+  F('#8a1f1a',222,166,10,33); F('#c7372f',223,167,8,31); F('#e8584c',223,167,1,31);
+  const on=Math.floor(time/220)%2;
+  for(let y=168;y<197;y+=3){F((y/3+on)%2?'#fff3a8':'#a8762a',222,y,1,1); F((y/3+on+1)%2?'#fff3a8':'#a8762a',231,y,1,1)}
+  [...'FARGO'].forEach((ch,i)=>pixText(ctx,ch,226-(ch==='M'?1:0),169+i*6,'#ffd84d'));
+}
 
 // hook into the main map
 {const ents=SCENES.world.ents;
@@ -204,4 +213,65 @@ function renderGearSettings(){
   const box=$('gearRows'); box.replaceChildren(); const found=Object.keys(GEAR).filter(k=>have.gear&&k in have.gear); box.hidden=!found.length;
   for(const k of found){ const l=document.createElement('label'); l.className='srow'; const cb=document.createElement('input'); cb.type='checkbox'; cb.checked=gearWorn(k);
     cb.onchange=()=>{have.gear[k]=cb.checked?1:0; save()}; l.append(cb,' '+GEAR_TEXT[k].name); box.append(l) }
+}
+
+// ---------- item cards: a big picture of whatever Joe just found or was given ----------
+// Each painter draws on a 40 x 30 canvas (shown at 4x), like the ingredient cards.
+const GEAR_ART={
+  oakleys(F){ // sporty wraparound shades with prism lenses
+    F('#1d1d22',4,10,32,3); F('#1d1d22',2,12,3,4); F('#1d1d22',35,12,3,4); F('#1d1d22',18,13,4,3);
+    F('#e0603a',5,13,13,7); F('#7a4fa0',22,13,13,7); F('#f4a04a',5,13,13,2); F('#a070d0',22,13,13,2); F('#1d1d22',5,20,13,1); F('#1d1d22',22,20,13,1);
+    F('#ffe0b0',7,14,3,1); F('#ffffff',24,14,3,1); F('#3a3a44',0,13,3,1); F('#3a3a44',37,13,3,1) },
+  headband(F){ // a teal ski headband, stretched in a loop
+    F('#2fb3a0',8,9,24,4); F('#2fb3a0',8,19,24,4); F('#2fb3a0',5,11,4,10); F('#2fb3a0',31,11,4,10); F('#1f8a7a',8,12,24,1); F('#1f8a7a',8,22,24,1);
+    F('#5fd8c4',9,9,22,1); F('#ffffff',17,10,6,2); F('#ffffff',15,20,10,1) },
+  shoes(F){ // a pair of carbon racing shoes: orange uppers, big white soles, yellow laces
+    for(const [x,y] of [[2,8],[20,14]]){ F('#ff5a1f',x+2,y,13,6); F('#ff5a1f',x,y+3,4,3); F('#ff7a3f',x+3,y,10,1); F('#ffffff',x-1,y+6,19,3); F('#d9d9d9',x-1,y+8,19,1);
+      F('#1d1d22',x+14,y+1,3,5); F('#f4d35e',x+6,y+1,1,1); F('#f4d35e',x+8,y+1,1,1); F('#f4d35e',x+10,y+1,1,1); F('#2b2b33',x+3,y+4,8,1) } },
+  clover(F){ // one big four-leaf clover
+    const leaf=(x,y)=>{F('#2e7d32',x,y,9,9); F('#2e7d32',x+1,y-1,7,11); F('#5fbf5f',x+1,y,6,6); F('#a8ecb0',x+2,y+1,2,2)};
+    leaf(10,2); leaf(21,2); leaf(10,13); leaf(21,13); F('#1d5a2a',19,11,2,2); F('#2e7d32',19,22,2,6); F('#2e7d32',21,26,2,2) },
+  goggles(F){ // Dr. Alex's lab goggles: black strap, two round cyan lenses
+    F('#2b2b2b',0,12,40,3); F('#2b2b2b',6,8,12,12); F('#2b2b2b',22,8,12,12); F('#2b2b2b',18,12,4,4);
+    F('#7fd3ff',8,10,8,8); F('#7fd3ff',24,10,8,8); F('#d6f2ff',9,11,3,2); F('#d6f2ff',25,11,3,2); F('#4aa8d8',8,16,8,2); F('#4aa8d8',24,16,8,2) },
+  disc(F){ // Margie's lucky disc: a pink flying disc, tilted, with a white heart
+    for(let y=-8;y<=8;y++){const h=Math.round(17*Math.sqrt(1-(y/9)**2)); F(y>5?'#b33a64':y<-5?'#ffb3d0':'#f28cb8',20-h,15+y,h*2,1)}
+    for(let y=-6;y<=4;y++){const h=Math.round(12*Math.sqrt(1-(y/7)**2)); F('#e86a98',20-h,15+y,1,1); F('#e86a98',19+h,15+y,1,1)}
+    F('#ffffff',16,11,3,2); F('#ffffff',21,11,3,2); F('#ffffff',15,12,10,3); F('#ffffff',16,15,8,1); F('#ffffff',17,16,6,1); F('#ffffff',18,17,4,1); F('#ffffff',19,18,2,1) },
+  hat(F,g){ // a Lil Q's Gas & Go trucker hat, from the side: red front panel, white mesh back, flat brim
+    F('#f2efe6',20,5,10,16); F('#f2efe6',30,7,3,14); F('#f2efe6',33,10,2,11); F('#f2efe6',20,3,7,2);                       // mesh back
+    for(let x=21;x<34;x+=2)for(let y=6;y<20;y+=2)F('#cfcac0',x,y,1,1);
+    F('#c8322b',8,5,14,16); F('#c8322b',10,3,11,2); F('#c8322b',6,9,2,12); F('#e8584c',10,3,9,1); F('#a02a22',6,19,16,2);   // red front
+    F('#f4d35e',19,1,4,2); F('#d9a92e',20,2,2,1);                                                                            // the button on top
+    F('#1d2130',0,20,24,3); F('#2f3446',0,20,24,1);                                                                          // the flat brim
+    pixText(g,'LQ',10,9,'#ffffff') },
+  jersey(F){ // the purple #18 Vikings jersey
+    F('#4f2683',10,4,20,24); F('#4f2683',3,4,8,9); F('#4f2683',29,4,8,9); F('#3d1d66',10,26,20,2); F('#ffc62f',3,11,8,2); F('#ffc62f',29,11,8,2);
+    F('#ffffff',16,3,8,3); F('#4f2683',17,3,6,2);
+    F('#ffc62f',13,11,2,10); F('#ffc62f',12,12,1,1);                                                  // the 1
+    F('#ffc62f',18,11,7,2); F('#ffc62f',18,15,7,2); F('#ffc62f',18,19,7,2); F('#ffc62f',18,11,2,10); F('#ffc62f',23,11,2,10) },   // the 8
+};
+function showItem(k,then){
+  const T=GEAR_TEXT[k], c=$('itemCanvas'), g=c.getContext('2d'); g.imageSmoothingEnabled=false; g.clearRect(0,0,c.width,c.height);
+  const F=(col,x,y,w,h)=>{g.fillStyle=col;g.fillRect(x,y,w,h)};
+  c.width=k==='hen'?26:40; c.height=k==='hen'?20:30; g.imageSmoothingEnabled=false;   // Grp gets a smaller canvas, so he shows up bigger
+  if(k==='hen')drawGrp(12,19,1,'world',false,g); else GEAR_ART[k]&&GEAR_ART[k](F,g);
+  $('itemFrom').textContent=T.from||GEAR_TEXT.place; $('itemName').textContent=T.name; $('itemLine').textContent=T.found||'';
+  $('itemTip').textContent=k==='hen'?'':GEAR_TEXT.tip; $('itemBtn').textContent=T.wear||'OK';
+  $('itemBtn').onclick=()=>{ $('itemCard').hidden=true; paused=overlayOpen(); then&&then() };
+  paused=true; prompt.hidden=true; $('itemCard').hidden=false; sfx('reward');
+  setTimeout(()=>$('itemBtn').focus({preventScroll:true}),0);
+}
+
+// the Lions Gate Bridge across the bottom of Vancouver: two green towers, the deck, and the necklace of lights on the cables
+function drawLionsGate(){
+  const F=(c,x,y,w,h)=>{ctx.fillStyle=c;ctx.fillRect(Math.round(x),Math.round(y),w,h)}, DECK=279, TOP=261, T1=46, T2=118;
+  F('rgba(0,0,0,.25)',0,DECK+2,164,2);
+  F('#2a4a3a',0,DECK,164,2); F('#3f6b52',0,DECK,164,1);                                          // the deck
+  for(let x=2;x<164;x+=6)F(Math.floor(time/600+x)%5?'#ffe9a8':'#fff8d8',x,DECK+1,1,1);             // streetlights on the deck
+  const cable=(x0,y0,x1,y1,sag)=>{ for(let k=0;k<=1;k+=1/(Math.abs(x1-x0)*1.2)){const x=x0+(x1-x0)*k, y=y0+(y1-y0)*k+sag*4*k*(1-k); F('#5f8a6e',x,y,1,1)}
+    for(let k=.04;k<1;k+=.09){const x=x0+(x1-x0)*k, y=y0+(y1-y0)*k+sag*4*k*(1-k); F(Math.floor(time/400+k*20)%4?'#fff3c4':'#ffffff',x,y,1,1); if(Math.round(k*100)%18<9)F('rgba(63,107,82,.55)',x,y+1,1,DECK-y-1)}};   // lights + a few hangers
+  cable(T1+2,TOP+1,T2+2,TOP+1,12); cable(-6,DECK-4,T1+2,TOP+1,-3); cable(T2+2,TOP+1,170,DECK-4,-3);
+  for(const x of [T1,T2]){F('#2f7a4a',x,TOP,4,DECK-TOP+2); F('#4f9a68',x,TOP,1,DECK-TOP+2); F('#1f5a36',x+3,TOP,1,DECK-TOP+2); F('#2f7a4a',x-1,TOP+5,6,1); F('#2f7a4a',x-1,TOP+11,6,1);
+    if(Math.floor(time/900)%2)F('#ff3b3b',x+1,TOP-1,2,1)}                                         // the towers (with aircraft lights)
 }

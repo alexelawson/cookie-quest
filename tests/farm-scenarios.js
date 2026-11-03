@@ -36,7 +36,7 @@ let r=await p.evaluate(()=>{T.start(); const kx=farm.keelan.x; const e=T.runToEn
 if(r.fail){console.log('scenario 1 stopped:',r.msg);process.exit(1)}
 ok('1 ends as soon as all 20 are in',r.e==='paused'&&r.pen===20,r.msg); ok('1 Keelan stays put without cupcake',!r.helped&&!r.kmoved); ok('1 reward pop-up shows',r.reward);
 await p.click('#rewardArt',{force:true}); await p.waitForTimeout(900);
-r=await p.evaluate(()=>{const ks=()=>{const l=[];for(let i=0;i<15&&!dlg.hidden&&!l.join().includes('Settings');i++){l.push($('dspeaker').textContent+': '+$('dtext').textContent);const b=T.btns();T.click(b.includes('Next')?'Next':b[0])}return {l,gear:Object.keys(have.gear||{}).join()}};const k=ks(); return {k,farm:!!have.farm,paused,basket:$('basket').textContent}}); ok('1 Keelan hands over Grp the rooster (G for short)',r.k.l.join().includes('Grp')&&r.k.l.join().includes('Green Red Poultry')&&r.k.gear.includes('hen'),r.k.l[0]); ok('1 tap adds to basket and unpauses',r.farm&&!r.paused,r.basket);
+r=await p.evaluate(()=>{const ks=()=>{const l=[];for(let i=0;i<15&&!dlg.hidden&&!l.join().includes('Settings');i++){l.push($('dspeaker').textContent+': '+$('dtext').textContent);const b=T.btns();T.click(b.includes('Next')?'Next':b[0])}if(!$('itemCard').hidden){l.push('CARD: '+$('itemName').textContent+' | '+$('itemLine').textContent+' '+$('itemTip').textContent); $('itemBtn').click()} return {l,gear:Object.keys(have.gear||{}).join()}};const k=ks(); return {k,farm:!!have.farm,paused,basket:$('basket').textContent}}); ok('1 Keelan hands over Grp the rooster (G for short)',r.k.l.join().includes('Grp')&&r.k.l.join().includes('Green Red Poultry')&&r.k.gear.includes('hen'),r.k.l[0]); ok('1 tap adds to basket and unpauses',r.farm&&!r.paused,r.basket);
 r=await p.evaluate(()=>{T.talk(); return T.btns()}); ok('1 after winning, Keelan says thanks (offers cupcake only if you found it on the way)',r.join()==='Close'||r.join()==='Give Keelan the cupcake,Bye',r.join());
 
 // 2. cupcake before starting: Keelan helps
@@ -82,7 +82,7 @@ r=await p.evaluate(()=>({reward:!$('reward').hidden,farm:!!have.farm})); ok('7 r
 
 // 8. Enter key collects once, not twice; arrows don't walk
 await p.focus('#rewardArt'); await p.keyboard.press('Enter'); await p.waitForTimeout(900);
-r=await p.evaluate(()=>{const ks=()=>{const l=[];for(let i=0;i<15&&!dlg.hidden&&!l.join().includes('Settings');i++){l.push($('dspeaker').textContent+': '+$('dtext').textContent);const b=T.btns();T.click(b.includes('Next')?'Next':b[0])}return {l,gear:Object.keys(have.gear||{}).join()}};ks(); return {farm:!!have.farm,reward:$('reward').hidden,paused}}); ok('8 Enter collects reward',r.farm&&r.reward&&!r.paused);
+r=await p.evaluate(()=>{const ks=()=>{const l=[];for(let i=0;i<15&&!dlg.hidden&&!l.join().includes('Settings');i++){l.push($('dspeaker').textContent+': '+$('dtext').textContent);const b=T.btns();T.click(b.includes('Next')?'Next':b[0])}if(!$('itemCard').hidden){l.push('CARD: '+$('itemName').textContent+' | '+$('itemLine').textContent+' '+$('itemTip').textContent); $('itemBtn').click()} return {l,gear:Object.keys(have.gear||{}).join()}};ks(); return {farm:!!have.farm,reward:$('reward').hidden,paused}}); ok('8 Enter collects reward',r.farm&&r.reward&&!r.paused);
 
 // 9. walk into the kitchen mid-chase and come back
 await fresh(); r=await p.evaluate(()=>{T.start(); T.step(200); const pen=farm.penned.length, loose=farm.loose.length; goTo('kitchen','fromDoor');

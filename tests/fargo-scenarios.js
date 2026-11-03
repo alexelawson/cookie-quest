@@ -7,7 +7,7 @@ const helpers=()=>{window.T={
   click:t=>{const b=[...$('dbtns').querySelectorAll('button')].find(b=>b.textContent===t); if(!b)throw new Error('no button "'+t+'" in '+T.btns()+' | '+$('dtext').textContent); b.click()},
   pages:()=>{while(T.btns().includes('Next'))T.click('Next')},
   run:(n)=>{for(let i=0;i<n;i++)update(16.7)},
-  enter:()=>{P.x=340;P.y=232;update(16.7);action();T.run(40)},
+  enter:()=>{P.x=325;P.y=226;update(16.7);action();T.run(40)},
   toLot:i=>{const s=STATIONS[i];P.x=s.lot.x+10;P.y=s.lot.y+22;P.dir='right';update(16.7)},
   walkTo:(x,y,max=600)=>{for(let i=0;i<max;i++){const dx=x-P.x,dy=y-P.y; if(Math.hypot(dx,dy)<2)break; for(const k in dirs)dirs[k]=false;
      if(dx>1)dirs.right=true;if(dx<-1)dirs.left=true;if(dy>1)dirs.down=true;if(dy<-1)dirs.up=true; update(16.7)} for(const k in dirs)dirs[k]=false},
@@ -61,7 +61,7 @@ await p.waitForFunction(()=>!dlg.hidden&&T.btns().join().includes('Next'),null,{
 r=await p.evaluate(()=>{const line=$('dtext').textContent; T.pages(); T.click('Thanks, Lil Q!'); return {line,reward:!$('reward').hidden,name:$('rewardName').textContent,onFoot:fargo.onFoot,stage:have.fargoStage}});
 ok('F Bob hands over the sugar',r.reward&&r.name==='Sugar'&&r.stage==='reward',r.line); ok('F back in the car',!r.onFoot);
 await p.click('#rewardArt',{force:true}); await p.waitForTimeout(900);
-r=await p.evaluate(()=>{const ks=()=>{const l=[];for(let i=0;i<15&&!dlg.hidden&&!l.join().includes('Settings');i++){l.push($('dspeaker').textContent+': '+$('dtext').textContent);const b=T.btns();T.click(b.includes('Next')?'Next':b[0])}return {l,gear:Object.keys(have.gear||{}).join()}};const k=ks(); return {k,fargo:!!have.fargo,basket:$('basket').textContent,paused}});
+r=await p.evaluate(()=>{const ks=()=>{const l=[];for(let i=0;i<15&&!dlg.hidden&&!l.join().includes('Settings');i++){l.push($('dspeaker').textContent+': '+$('dtext').textContent);const b=T.btns();T.click(b.includes('Next')?'Next':b[0])}if(!$('itemCard').hidden){l.push('CARD: '+$('itemName').textContent+' | '+$('itemLine').textContent+' '+$('itemTip').textContent); $('itemBtn').click()} return {l,gear:Object.keys(have.gear||{}).join()}};const k=ks(); return {k,fargo:!!have.fargo,basket:$('basket').textContent,paused}});
 ok('F Lil Q hands over the trucker hat',r.k.l[0].startsWith('Lil Q')&&r.k.gear.includes('hat'),r.k.l[0]);
 ok('F sugar goes in the basket',r.fargo&&r.basket.includes('✓ Sugar')&&!r.paused,r.basket);
 r=await p.evaluate(()=>{T.toLot(fargo.bob); action(); return $('dtext').textContent}); ok('F Bob after: goodbye line',r.includes('Lil Q out'),r);
