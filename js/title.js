@@ -1,5 +1,5 @@
-// The title screen: a snowy evening at the Craftsbury Outdoor Center. Barn-red buildings with white trim on the hill,
-// Great Hosmer Pond frozen below, the ski stadium and finish banner, and Joe and Alex side by side in Santa hats (Grp too).
+// The title screen: a snowy evening at the Craftsbury Outdoor Center. The big red barn with white trim and its silo, a cedar cabin,
+// the solar array, Great Hosmer Pond frozen below, the ski stadium and finish banner, and Joe and Alex side by side in Santa hats (Grp too).
 // Drawn on its own small canvas (128 x 96, scaled up), only while the title card is showing.
 (function(){
   const c=$('titleArt'); if(!c)return;
@@ -22,26 +22,42 @@
     for(let x=0;x<W;x+=3){const h=4+((x*7)%5); for(let k=0;k<h;k++){const w=Math.max(0,Math.round(k*.35)); F('#141a3c',x-w,POND-h-1+k,w*2+1,1)}}
   }
   function pond(){
-    // Great Hosmer Pond, frozen and dusted with snow
+    // Great Hosmer Pond, frozen and dusted with snow, with a little dock
     F('#aebcd6',0,POND,W,SNOW-POND); F('#c9d4e8',0,POND,W,1); for(const [x,y,w] of [[8,60,22],[44,62,30],[86,61,18],[20,64,14],[100,64,20]])F('#d8e1f0',x,y,w,1);
-    // the boathouse on the shore, and its dock
-    F('#8f2c26',94,52,16,8); F('#a8362f',95,53,14,7); F('#f2efe6',94,52,16,1); F('#f2efe6',94,52,1,8); F('#f2efe6',109,52,1,8);
-    F('#ffffff',92,49,20,3); F('#e9eef7',93,48,18,2); F('#f2efe6',99,55,6,5); F('#6b4a2f',100,56,4,4);        // snowy roof, big doors
-    F('#7a5a3a',84,60,12,2); F('#5a3a22',85,62,1,2); F('#5a3a22',94,62,1,2);
+    F('#7a5a3a',70,60,14,2); F('#5a3a22',71,62,1,2); F('#5a3a22',82,62,1,2); F('#ffffff',70,59,14,1);
+  }
+  function solar(){
+    // the solar array by the trails: a big panel facing us on a post, snow along its top edge
+    F('#5f6676',110,54,3,10); F('#4a5060',108,63,7,1);
+    F('#c9ced4',97,40,28,15); F('#2f4f9a',98,41,26,13);
+    for(let r=0;r<4;r++)for(let k=0;k<8;k++){const x=98+k*3+Math.floor(k/4), y=41+r*3+Math.floor(r/2); F('#3a5fb4',x,y,2,2); F('#5a80d0',x,y,1,1)}
+    F('#ffffff',97,39,28,2); F('#e9eef7',98,41,26,1);
   }
   function lodge(t){
-    // the main buildings on the hill: barn red, white trim, snow on the roofs, lit windows, lights along the eaves
-    const bldg=(x,y,w,h,roof)=>{ F('rgba(0,0,0,.2)',x+2,y+h,w,2);
-      F('#8f2c26',x,y,w,h); F('#a8362f',x+1,y+1,w-2,h-1); for(let k=y+3;k<y+h;k+=3)F('#94302a',x+1,k,w-2,1);
-      F('#f2efe6',x,y,1,h); F('#f2efe6',x+w-1,y,1,h); F('#f2efe6',x,y,w,1);                                      // white trim
-      const cx=x+w/2; for(let k=0;k<=roof;k++){const half=Math.round((w/2+1)*k/roof); F(k===roof?'#cfd8ea':'#ffffff',Math.round(cx)-half,y-roof+k,half*2,1); if(half>1)F('#e9eef7',Math.round(cx)+half-2,y-roof+k,2,1)}   // snowy gable roof, widest at the eaves
-      F('#8f2c26',Math.round(cx)-2,y-roof+4,4,3); F('#ffd27a',Math.round(cx)-1,y-roof+5,2,2) };   // a little attic window
-    bldg(30,48,18,18,7); bldg(2,44,30,23,10);
-    for(const [x,y] of [[6,50],[14,50],[22,50],[6,58],[22,58],[34,53],[41,53]]){F('#f2efe6',x-1,y-1,6,6); F('#ffd27a',x,y,4,4); F('#ffb347',x,y,4,1); F('#a8362f',x+1,y,1,4)}
-    F('#2e5a3a',13,58,6,9); F('#f2efe6',12,57,8,1); F('#e2c35a',17,62,1,1);                                     // the front door
-    for(let a=0;a<8;a++){const r=a/8*Math.PI*2; F(a%3?'#2f6b36':'#3d8443',16+Math.round(Math.cos(r)*2),61+Math.round(Math.sin(r)*2),1,1)} F('#c8322b',15,63,2,1);   // wreath on the door
-    for(let x=3;x<47;x+=3)F(lightCols[(x/3+Math.floor(t/500))%4],x,x<31?45+((x/3)%2):49+((x/3)%2),1,1);        // string lights on the eaves
-    F('rgba(255,210,122,.12)',0,64,50,6);
+    // the big red barn with white trim and a round silo (snow on the roofs, lights along the eaves),
+    // and a natural-wood cabin beside it
+    // the silo
+    F('#8f2c26',2,38,10,29); F('#a8362f',4,38,5,29); F('#7a2420',10,38,2,29); for(let y=42;y<66;y+=5)F('#94302a',2,y,10,1);
+    for(let k=0;k<6;k++)F(k<2?'#ffffff':'#e9eef7',7-k,32+k,k*2+1,1); F('#f2efe6',1,38,12,1);
+    // the barn: steep gable, white fascia, white-trimmed windows and doors
+    const x=12, y=46, w=32, h=21, cx=x+w/2, roof=13;
+    F('rgba(0,0,0,.2)',x+2,y+h,w,2);
+    F('#8f2c26',x,y,w,h); F('#a8362f',x+1,y,w-2,h); for(let k=x+3;k<x+w;k+=3)F('#94302a',k,y,1,h);         // board-and-batten
+    for(let k=0;k<=roof;k++){const half=Math.round((w/2)*k/roof); F('#a8362f',Math.round(cx)-half,y-roof+k,half*2,1)}            // the gable end
+    for(let k=0;k<=roof;k++){const half=Math.round((w/2+1)*k/roof); F('#ffffff',Math.round(cx)-half-1,y-roof+k,2,1); F('#ffffff',Math.round(cx)+half-1,y-roof+k,2,1)}   // white fascia (and snow) along the roof edge
+    F('#f2efe6',x,y,1,h); F('#f2efe6',x+w-1,y,1,h);                                                        // corner trim
+    F('#f2efe6',Math.round(cx)-3,y-8,6,5); F('#2b2f3a',Math.round(cx)-2,y-7,4,3);                          // hayloft door
+    for(const wx of [x+3,x+8,x+20,x+25]){F('#f2efe6',wx-1,y+3,6,5); F('#ffd27a',wx,y+4,4,3); F('#f2efe6',wx+1,y+4,1,3)}   // a row of windows
+    F('#f2efe6',Math.round(cx)-5,y+10,10,11); F('#7a2420',Math.round(cx)-4,y+11,8,10); F('#f2efe6',Math.round(cx)-4,y+11,8,1);   // big doors, X-braced
+    for(let k=0;k<8;k++){F('#f2efe6',Math.round(cx)-4+k,y+11+Math.round(k*1.2),1,1); F('#f2efe6',Math.round(cx)+3-k,y+11+Math.round(k*1.2),1,1)}
+    for(let a=0;a<8;a++){const r=a/8*Math.PI*2; F(a%3?'#2f6b36':'#3d8443',Math.round(cx)+Math.round(Math.cos(r)*3),y-12+Math.round(Math.sin(r)*2)+9,1,1)}   // wreath over the hayloft
+    for(let k=0;k<=roof;k+=2){const half=Math.round((w/2+1)*k/roof); F(lightCols[(k/2+Math.floor(t/500))%4],Math.round(cx)-half-2,y-roof+k+1,1,1); F(lightCols[(k/2+1+Math.floor(t/500))%4],Math.round(cx)+half,y-roof+k+1,1,1)}   // lights along the roofline
+    // a natural-wood cabin: cedar planks, a deep snowy overhang, one lit window
+    F('rgba(0,0,0,.2)',47,67,16,2);
+    F('#b8834e',46,50,16,17); for(let yy=52;yy<67;yy+=2)F('#a06f3e',46,yy,16,1); F('#c9945e',46,50,1,17);
+    F('#6b4a2f',44,47,20,3); F('#ffffff',44,46,20,2); F('#e9eef7',45,48,18,1);                             // the roof overhang
+    F('#2f5a4a',49,53,6,5); F('#ffd27a',50,54,4,3); F('#6b4a2f',56,58,4,9); F('#8a6a4a',57,59,2,8);         // window, door
+    F('rgba(255,210,122,.12)',0,62,64,6);
   }
   function stadium(t){
     // the snow and the trails: corduroy and two classic tracks curving through
@@ -77,7 +93,7 @@
   function frame(now){
     raf=0; if($('titlecard').hidden)return;
     const dt=Math.min(50,now-last); last=now;
-    sky(now); pond(); stadium(now); lodge(now); cast(now); snow(now,dt);
+    sky(now); pond(); solar(); stadium(now); lodge(now); cast(now); snow(now,dt);
     raf=requestAnimationFrame(frame);
   }
   function go(){ if(!raf&&!$('titlecard').hidden){last=performance.now(); raf=requestAnimationFrame(frame)} }
