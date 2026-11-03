@@ -277,25 +277,6 @@ function drawLionsGate(){
 }
 
 // ---------- Christmas on the main map ----------
-// string lights on little posts along the cobblestone road and footpaths, twinkling
-const XLIGHTS=['#e54b4b','#f4d35e','#5fa8e8','#7fd39a','#ffffff'];
-const LIGHT_RUNS=(()=>{ const runs=[], gapTop=[[40,56],[184,200],[308,324]], gapBot=[[183,201]];
-  const along=(y,gaps,x0,x1)=>{ let xs=[]; for(let x=x0;x<=x1;x+=24){ if(gaps.some(([a,b])=>x>=a-2&&x<=b+2))continue; xs.push(x) }
-    for(let i=0;i+1<xs.length;i++){ const a=xs[i], b=xs[i+1]; if(b-a===24&&!gaps.some(([g0,g1])=>g0<b&&g1>a))runs.push({x0:a,y0:y,x1:b,y1:y}) } };
-  along(148,gapTop,4,380); along(166,gapBot,4,380);
-  const down=(x,y0,y1)=>{ for(let y=y0;y+24<=y1;y+=24)runs.push({x0:x,y0:y,x1:x,y1:y+24}) };
-  down(184,170,286); down(200,170,286);                        // the road down to Wylee Woods
-  down(41,76,148); down(55,76,148); down(309,76,148); down(323,76,148);   // the footpaths up to the farm and the Birkie
-  return runs })();
-function drawPathLights(){
-  const F=(c,x,y,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,h)}, tw=Math.floor(time/420);
-  const posts=new Set();
-  LIGHT_RUNS.forEach((r,ri)=>{ posts.add(r.x0+','+r.y0); posts.add(r.x1+','+r.y1);
-    const n=8; for(let k=1;k<n;k++){ const t=k/n, x=Math.round(r.x0+(r.x1-r.x0)*t), y=Math.round(r.y0+(r.y1-r.y0)*t-6+(r.y0===r.y1?Math.sin(t*Math.PI)*3:0));
-      F('#3a3a44',x,y-1,1,1); const on=(tw+k+ri)%5!==0; F(on?XLIGHTS[(k+ri)%XLIGHTS.length]:'#5a5a66',x,y,1,1);
-      if(on&&(tw+k+ri)%3===0){ctx.fillStyle='rgba(255,240,200,.18)'; ctx.fillRect(x-1,y-1,3,3)} } });
-  for(const p of posts){ const [x,y]=p.split(',').map(Number); F('#4a3a2a',x,y-7,1,7); F('#6b5a44',x,y-8,1,1) }
-}
 // decorated Christmas trees: a snowy fir with a garland, twinkling ornaments and a gold star
 function drawXmasTree(x,y,big){
   const s=big?1.5:1, F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(Math.round(x+dx*s),Math.round(y+dy*s),Math.max(1,Math.round(w*s)),Math.max(1,Math.round(h*s)))};
@@ -308,7 +289,6 @@ function drawXmasTree(x,y,big){
 }
 const BIG_TREE={x:211,y:147};   // by the kitchen porch, out of the hens' way
 solids.push(R(BIG_TREE.x-5,BIG_TREE.y-3,10,4));
-{const u=SCENES.world.under; SCENES.world.under=function(){ u.call(this); drawPathLights() }}
 {const e=SCENES.world.ents; SCENES.world.ents=function(list){ e.call(this,list); list.push({y:BIG_TREE.y,draw:()=>{drawXmasTree(BIG_TREE.x,BIG_TREE.y,true);
   const g=ctx; g.fillStyle='#c8322b'; g.fillRect(BIG_TREE.x-9,BIG_TREE.y-3,5,4); g.fillStyle='#f4d35e'; g.fillRect(BIG_TREE.x-7,BIG_TREE.y-3,1,4); g.fillStyle='#3d6fb0'; g.fillRect(BIG_TREE.x+5,BIG_TREE.y-2,4,3); g.fillStyle='#ffffff'; g.fillRect(BIG_TREE.x+6,BIG_TREE.y-2,1,3)}}) }}   // with presents
 // the marina at False Creek: a dock with little boats tied up, their lights glowing in the water

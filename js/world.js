@@ -166,16 +166,14 @@ const bg=document.createElement('canvas'); bg.width=WW; bg.height=WH;
   // sugar beet rows
   for(let y=244;y<284;y+=8){F('#9a7b66',236,y,104,4); for(let x=240;x<338;x+=6){F('#7d2b52',x,y+1,3,2);F('#4f9a3c',x+1,y-2,1,3)}}
   // roads
-  // cobblestones: staggered rows of rounded stones with mortar between, a curb along the edges, a dusting of snow
-  const cobble=(x,y,w,h,horiz)=>{ F('#7f7464',x,y,w,h);
-    const stones=['#b3a793','#a89b86','#c0b4a0','#9f927e','#b8ad9a'];
-    if(horiz){ for(let yy=y+1,row=0;yy<y+h-1;yy+=3,row++)for(let xx=x-(row%2?2:0);xx<x+w;){const sw=3+(rnd()*3|0), x0=Math.max(x,xx), x1=Math.min(x+w,xx+sw); if(x1-x0>0){F(stones[rnd()*stones.length|0],x0,yy,x1-x0,2); F('rgba(255,255,255,.18)',x0,yy,1,1)} xx+=sw+1} }
-    else { for(let xx=x+1,col=0;xx<x+w-1;xx+=3,col++)for(let yy=y-(col%2?2:0);yy<y+h;){const sh=3+(rnd()*3|0), y0=Math.max(y,yy), y1=Math.min(y+h,yy+sh); if(y1-y0>0){F(stones[rnd()*stones.length|0],xx,y0,2,y1-y0); F('rgba(255,255,255,.18)',xx,y0,1,1)} yy+=sh+1} }
-    for(let i=0;i<w*h/45;i++)F('#f4f6fa',x+rnd()*w|0,y+rnd()*h|0,1,1);                                  // snow in the cracks
-    if(horiz){F('#6b6152',x,y,w,1); F('#6b6152',x,y+h-1,w,1); for(let k=0;k<w;k+=3)if(rnd()<.5)F('#8cc866',x+k,y-1,1,1)} else {F('#6b6152',x,y,1,h); F('#6b6152',x+w-1,y,1,h)} };
-  const road=(x,y,w,h)=>cobble(x,y,w,h,w>h);
+  const road=(x,y,w,h)=>{F('#c9a46b',x,y,w,h); for(let i=0;i<w*h/30;i++)F('#b8935b',x+rnd()*w|0,y+rnd()*h|0,1,1);
+    for(let i=0;i<w*h/140;i++)F(rnd()<.5?'#a9a39a':'#d8c49a',x+rnd()*w|0,y+rnd()*h|0,1,1);                                 // pebbles
+    if(w>h){F('#b38c58',x,y,w,1); F('#b38c58',x,y+h-1,w,1); for(let k=0;k<w;k+=3)if(rnd()<.5)F('#8cc866',x+k,y-1,1,1)}   // edges, grass creeping in
+    else {F('#b38c58',x,y,1,h); F('#b38c58',x+w-1,y,1,h)}};
+  // one road across the middle, one down to Wylee Woods, and matching footpaths up to each place
   road(0,150,WW,14); road(186,164,12,124);
-  const path=(x,y,w,h)=>cobble(x,y,w,h,w>h);
+  const path=(x,y,w,h)=>{F('#c9a46b',x,y,w,h); for(let i=0;i<w*h/30;i++)F('#b8935b',x+rnd()*w|0,y+rnd()*h|0,1,1);
+    if(w<h){F('#b38c58',x,y,1,h); F('#b38c58',x+w-1,y,1,h)} else {F('#b38c58',x,y,w,1); F('#b38c58',x,y+h-1,w,1)}};
   path(43,74,10,76);     // the farm: road to the barn doors
   path(187,140,10,10);   // the kitchen: road to the porch steps
   path(311,74,10,76);    // the Birkie: road to the arch
@@ -341,14 +339,15 @@ SCENES.world={ music:()=>farm.active?'chase':'world',
     ctx.save(); ctx.beginPath(); ctx.rect(0,170,164,118); ctx.clip();                                        // city: dark, rain, searchlight
     {const gr=ctx.createLinearGradient(0,170,0,288); gr.addColorStop(0,'rgba(255,140,170,.32)'); gr.addColorStop(.45,'rgba(190,110,210,.22)'); gr.addColorStop(1,'rgba(70,90,190,.16)'); ctx.fillStyle=gr; ctx.fillRect(0,170,164,118)}   // Vancouver at sunset
     drawMarina();
+    ctx.fillStyle='rgba(190,200,235,.5)'; for(const r of rain)ctx.fillRect(Math.round(r.x),Math.round(r.y),1,3);   // it's always raining in Vancouver
     for(const [x,y] of [[68,206],[104,260]]){ctx.fillStyle='#4a4f60'; ctx.fillRect(x,y-16,1,16); ctx.fillRect(x-1,y-17,4,1); ctx.fillStyle='#ffe9a8'; ctx.fillRect(x+1,y-16,2,2);   // streetlamps
       const gr=ctx.createRadialGradient(x+2,y-8,1,x+2,y-4,20); gr.addColorStop(0,'rgba(255,225,150,.32)'); gr.addColorStop(1,'rgba(255,225,150,0)'); ctx.fillStyle=gr; ctx.fillRect(x-20,y-28,44,40)}
     // the Gastown steam clock (it whistles steam on the quarter hour... here, every few seconds)
     {const x=94,y=228; ctx.fillStyle='#5a3a22'; ctx.fillRect(x,y-22,6,22); ctx.fillStyle='#7a5232'; ctx.fillRect(x+1,y-20,4,18); ctx.fillStyle='#c9a24a'; ctx.fillRect(x-1,y-23,8,2); ctx.fillRect(x-1,y-2,8,2);
       ctx.fillStyle='#f2efe6'; ctx.fillRect(x+1,y-18,4,4); ctx.fillStyle='#2b2b2b'; ctx.fillRect(x+3,y-17,1,2); ctx.fillRect(x+3,y-16,2,1);
       ctx.fillStyle='#c9a24a'; ctx.fillRect(x+2,y-26,2,3); if(Math.floor(time/2600)%3===0){ctx.fillStyle='rgba(235,235,240,.55)'; const t=(time%2600)/2600; for(let k=0;k<4;k++)ctx.fillRect(x+1+((k*3+Math.floor(t*6))%5),y-30-k*3-t*6,3,3)}}
-    // the little rainbow ferry going back and forth
-    // (no rain tonight: a clear sunset)
+    // rain rings on the water, and the little rainbow ferry going back and forth
+    ctx.fillStyle='rgba(170,200,230,.45)'; for(let i=0;i<14;i++){const k=Math.floor(time/500+i*.37), ph=((time/500+i*.37)%1), rx=(i*23+k*17)%160+2, ry=(rx<72?248:268)+(i*13+k*7)%8, r=1+ph*3; ctx.fillRect(rx-r,ry,r*2,1)}
     // the freighters anchored out in the bay (they're always there)
     const ship=(x,y,len,cols)=>{const b=Math.round(Math.sin(time/1400+x)*.6); ctx.fillStyle='rgba(0,0,0,.25)'; ctx.fillRect(x+1,y+6+b,len,2);
       ctx.fillStyle='#2b2f3a'; ctx.fillRect(x,y+1+b,len,5); ctx.fillStyle='#8a2a22'; ctx.fillRect(x+1,y+5+b,len-2,1); ctx.fillRect(x+len,y+3+b,1,2);
