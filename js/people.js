@@ -27,52 +27,62 @@ PORTRAITS['Jackie']={size:32, bg:'#e8dcc8', draw(g){ const F=px(g);
   F('#d9a37f',15,16,2,2); F('#b5654f',13,19,6,1);                                  // flat, unimpressed mouth
 }};
 
-// ---------- Ethan (Joe's brother): a little stocky, short-medium brown hair, glasses, grey/white/black, black Crocs ----------
-// Ethan: Joe's brother, a little stocky. Short medium-brown hair, glasses, grey tee with white trim, black shorts, black Crocs. 13 x 20 px.
+// ---------- Ethan (Joe's brother): stocky, short-medium brown hair, glasses, grey/white/black, black Crocs ----------
+// Ethan: Joe's brother, solid and stocky (broad shoulders, normal height). Short medium-brown hair, glasses, grey tee with white trim, black shorts, black Crocs. 11 x 22 px.
 const ETHAN_PAL={H:'#6b4428',h:'#4f301b',L:'#8a5a38',S:'#eab896',s:'#d4a07c',E:'#2b2b2b',G:'#1d1d22',g:'#9fd2f0',M:'#b5654f',T:'#8a8f9a',l:'#9aa0ab',t:'#6f7480',R:'#ffffff',K:'#1d1d22',k:'#2b2b33'};
 const ETHAN_SPR={
-  down:["...HHHLLHH...","..HHHHHHHHH..","..HSSSSSSSH..","..SGGGSGGGS..","..sGgEGEgGs..","..SSSSsSSSS..","...sSMMMSs...",
-        ".TTTTRRRTTTT.","STTTTTTTTTTtS","STTTTTTTTTTtS","SRTTTTTTTTTRS","sRTTTTTTTTTRs",".ttttttttttt.",".KKKKKkKKKKK.","..KKKKkKKKK.."],
-  up:  ["...HHHLLHH...","..HHHHHHHHH..","..HHHHHHHHH..","..HHHHHHHHH..","..sHHHHHHHs..","..hHHHHHHHh..","...sSSSSSs...",
-        ".TTTTTTTTTTT.","STTTTTTTTTTtS","STTTTTTTTTTtS","SRTTTTTTTTTRS","sRTTTTTTTTTRs",".ttttttttttt.",".KKKKKKKKKKK.","..KKKKKKKKK.."],
+  down:["...HHLLH...","..HHHHHHH..","..HSSSSSH..","..GGGSGGG..","..gEgGgEg..","..SSSsSSS..","...sMMMs...",
+        ".TTTRRRTTT.","STTTTTTTTtS","STTTTTTTTtS","SRTTTTTTTRS","STTTTTTTTtS",".ttttttttt.",".KKKKkKKKK.",".KKKKkKKKK."],
+  up:  ["...HHLLH...","..HHHHHHH..","..HHHHHHH..","..HHHHHHH..","..GHHHHHG..","..hHHHHHh..","...sSSSs...",
+        ".TTTTTTTTT.","STTTTTTTTtS","STTTTTTTTtS","SRTTTTTTTRS","STTTTTTTTtS",".ttttttttt.",".KKKKKKKKK.",".KKKKKKKKK."],
 };
 function drawEthan(x,y,dir='down',chew=0){
-  const X=Math.round(x)-6, Y=Math.round(y)-19, F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(X+dx,Y+dy,w,h)};
-  F('rgba(0,0,0,.25)',1,18,11,2);
-  F('#eab896',3,14,3,3); F('#eab896',7,14,3,3); F('#d4a07c',5,14,1,3); F('#d4a07c',9,14,1,3);
-  F('#1d1d22',2,17,4,2); F('#1d1d22',7,17,4,2); F('#3a3f4a',3,17,1,1); F('#3a3f4a',8,17,1,1); F('#3a3f4a',5,18,1,1); F('#3a3f4a',10,18,1,1); F('#3a3f4a',4,18,1,1); F('#3a3f4a',9,17,1,1);   // black Crocs (with the holes)
-  let set=ETHAN_SPR; if(chew&&dir!=='up')set={down:ETHAN_SPR.down.map((r,i)=>i===6?'...sSSSSSs...':i===7?'.TTTTRMRTTTT.':r)};   // chewing: mouth drops a row
+  const X=Math.round(x)-5, Y=Math.round(y)-21, F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(X+dx,Y+dy,w,h)};
+  F('rgba(0,0,0,.25)',1,20,9,2);
+  F('#eab896',2,14,3,4); F('#eab896',6,14,3,4); F('#d4a07c',4,14,1,4); F('#d4a07c',8,14,1,4);                 // legs
+  F('#1d1d22',1,18,4,2); F('#1d1d22',6,18,4,2); F('#3a3f4a',2,18,1,1); F('#3a3f4a',4,19,1,1); F('#3a3f4a',7,18,1,1); F('#3a3f4a',9,19,1,1); F('#3a3f4a',3,19,1,1); F('#3a3f4a',8,18,1,1);   // black Crocs (with the holes)
+  let set=ETHAN_SPR; if(chew&&dir!=='up')set={down:ETHAN_SPR.down.map((r,i)=>i===6?'...sSSSs...':i===7?'.TTTRMRTTT.':r)};   // chewing: mouth drops a row
   drawSprite(ctx,X,Y-1,set,ETHAN_PAL,dir==='up'?'up':'down',4,4);
 }
 PORTRAITS['Ethan']={size:32, bg:'#d9dde3', draw(g){ const F=px(g);
-  F('#8a8f9a',3,24,26,8); F('#ffffff',13,24,6,2); F('#eab896',12,20,8,4);
-  F('#eab896',8,6,16,16); F('#d9a37f',8,18,16,4); F('#6b4428',8,4,16,5); F('#8a5a38',11,4,7,1); F('#6b4428',7,7,2,6); F('#6b4428',23,7,2,6);
+  F('#8a8f9a',4,24,24,8); F('#ffffff',13,24,6,2); F('#eab896',13,20,6,4);
+  F('#eab896',9,6,14,14); F('#eab896',10,20,12,1); F('#d9a37f',11,20,10,2); F('#eab896',12,21,8,1); F('#6b4428',9,4,14,5); F('#8a5a38',12,4,6,1); F('#6b4428',8,7,2,6); F('#6b4428',22,7,2,6);
   F('#1d1d22',9,11,6,5); F('#1d1d22',17,11,6,5); F('#1d1d22',15,12,2,1); F('#cfe6f2',10,12,4,3); F('#cfe6f2',18,12,4,3); F('#3b2a1e',11,13,2,2); F('#3b2a1e',19,13,2,2);
   F('#d9a37f',15,16,2,2); F('#b5654f',13,19,6,1);
 }};
-// ---------- Maureen (Joe's mom): tall and thin, curly light-brown hair, a very precise (and very sweet) baker ----------
-// Maureen: Joe's mom. Tall and thin, curly light-brown hair, a fitted purple V-neck top with a gold pendant, a belt, jeans, ankle boots, a warm smile. 11 x 24 px.
-const MAUREEN_PAL={H:'#b08560',c:'#c9a07a',h:'#8f6a48',S:'#f2cfb0',s:'#e0b896',E:'#4a6a8a',B:'#8f6a48',r:'#eaa3a0',M:'#c06a60',P:'#7b4fb8',p:'#62399a',l:'#9a72d0',Y:'#e8c04a',T:'#5a3a22',J:'#3a5f9e',j:'#2c4a7c'};
+// ---------- Maureen (Joe's mom): tall and thin, soft light-brown waves, a very precise (and very sweet) baker ----------
+// Maureen: Joe's mom. Tall and thin, soft light-brown waves to her shoulders with a side part, a quilted sage puffer vest over a purple
+// V-neck with a gold pendant, jeans, ankle boots, a warm smile. 11 x 24 px.
+const MAUREEN_PAL={H:'#ab7f57',c:'#c9a07a',h:'#8a6240',S:'#f2cfb0',s:'#e0b896',E:'#4a6a8a',B:'#8f6a48',r:'#eaa3a0',M:'#c06a60',P:'#7b4fb8',p:'#62399a',Y:'#e8c04a',
+  V:'#5f8a72',v:'#4a705b',q:'#7aa58c',J:'#3a5f9e',j:'#2c4a7c'};
 const MAUREEN_SPR={
-  down:["...HcHcHc..","..cHhhhhHc.",".HcSSSSScH.",".cHSBSBSHc.",".HcSESEScH.",".cHrSSSrHc.",".HcSMMMScH.","..cHsSsHc..",
-        "..PPSSSPP..",".SPPPYPPPS.",".SPlPPPPpS.",".SPlPPPPpS.",".SPPPPPPpS.",".sPPPPPPps.","..TTTYTTT..","..JJJJJJJ..","..JJJjJJJ.."],
-  up:  ["...HcHHcH..","..cHHHHHcH.",".HHcHHHcHH.",".cHHHHcHHc.",".HHcHHHHcH.",".hHHHcHHHh.",".HhHHHHHhH.","..chsSshc..",
-        "..PPPPPPP..",".SPPPPPPPS.",".SPPPPPPpS.",".SPPPPPPpS.",".SPPPPPPpS.",".sPPPPPPps.","..TTTTTTT..","..JJJJJJJ..","..JJJjJJJ.."],
+  down:["...hHHHh...","..hHHcHHHh.",".hHHHHHSHHh",".hHSBSBSHHh",".hHSESESHh.",".hHrSSSrHh.",".hHSMMMSHh.","..hHsSsHHh.",
+        ".hHVPSPVHh.",".PhVPYPVhP.",".PqqqPqqqP.",".PVVVPVVVP.",".pqqqPqqqp.",".SVVvPvVVS.","..vVVPVVv..","..JJJJJJJ..","..JJJjJJJ.."],
+  up:  ["...hHHHh...","..hHHcHHHh.",".hHHHcHHHHh",".hHHcHHHHHh",".hHHcHHHHHh",".hHHHcHHHHh",".hHHHcHHHh.","..hHHHHHHh.",
+        ".hHVVVVVHh.",".PhVVVVVhP.",".PqqqqqqqP.",".PVVVVVVVP.",".pqqqqqqqp.",".SVVVvVVVS.","..vVVVVVv..","..JJJJJJJ..","..JJJjJJJ.."],
 };
 function drawMaureen(x,y,dir='down',chew=0){
   const X=Math.round(x)-5, Y=Math.round(y)-23, F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(X+dx,Y+dy,w,h)};
   F('rgba(0,0,0,.22)',1,22,9,2);
   F('#3a5f9e',3,16,2,6); F('#3a5f9e',6,16,2,6); F('#2c4a7c',4,16,1,6); F('#2c4a7c',7,16,1,6); F('#4d74b4',3,17,1,2); F('#4d74b4',6,17,1,2);   // jeans
   F('#6b4428',2,20,3,3); F('#6b4428',6,20,3,3); F('#8a5a38',2,20,2,1); F('#8a5a38',6,20,2,1);   // ankle boots
-  let set=MAUREEN_SPR; if(chew&&dir!=='up')set={down:MAUREEN_SPR.down.map((r,i)=>i===6?'.HcSSMSScH.':r)};
+  let set=MAUREEN_SPR; if(chew&&dir!=='up')set={down:MAUREEN_SPR.down.map((r,i)=>i===6?'.hHSSMSSHh.':r)};
   drawSprite(ctx,X,Y-1,set,MAUREEN_PAL,dir==='up'?'up':'down',4,5);
 }
-PORTRAITS['Maureen']={size:32, bg:'#ece4f4', draw(g){ const F=px(g);
-  F('#9b8ac4',4,25,24,7); F('#ffffff',12,25,8,4); F('#f2cfb0',13,21,6,4);
-  F('#f2cfb0',10,7,12,15); F('#e3b898',10,19,12,3);
-  for(const [x,y] of [[8,3],[11,1],[15,0],[19,1],[22,3],[7,7],[23,7],[6,11],[24,11],[7,15],[23,15],[8,19],[22,19]]){F('#b08560',x,y,4,4); F('#c9a07a',x,y,2,2)}
-  F('#ffffff',12,12,3,2); F('#ffffff',18,12,3,2); F('#4a6a8a',13,12,2,2); F('#4a6a8a',19,12,2,2); F('#e8a0a0',11,16,2,1); F('#e8a0a0',20,16,2,1);
-  F('#e3b898',15,15,2,2); F('#c06a60',13,18,6,1); F('#c06a60',12,17,1,1); F('#c06a60',19,17,1,1);
+PORTRAITS['Maureen']={size:32, bg:'#e6eee8', draw(g){ const F=px(g);
+  F('#ab7f57',7,4,18,21); F('#ab7f57',9,2,14,3); F('#ab7f57',6,7,20,15);                                    // soft waves down to her shoulders
+  for(const [y,o] of [[9,0],[12,1],[15,0],[18,1],[21,0]]){F('#ab7f57',5-o,y,2,3); F('#ab7f57',25+o,y,2,3); F('#8a6240',5-o,y+2,1,1); F('#8a6240',26+o,y+2,1,1)}   // a wavy outline
+  F('#ab7f57',4,23,5,3); F('#ab7f57',23,23,5,3); F('#8a6240',4,25,3,1); F('#8a6240',25,25,3,1);                // the ends flip out at the shoulders
+  for(const [x,y] of [[7,10],[8,12],[7,14],[8,16],[7,18],[24,10],[23,12],[24,14],[23,16],[24,18]])F('#c9a07a',x,y,1,2);   // soft S-shaped highlights
+  F('#5f8a72',3,26,26,6); F('#7aa58c',3,28,9,1); F('#7aa58c',20,28,9,1); F('#7aa58c',3,31,9,1); F('#7aa58c',20,31,9,1);   // the puffer vest, quilted
+  F('#7b4fb8',12,26,8,6); F('#f2cfb0',14,24,4,4); F('#f2cfb0',15,28,2,1); F('#e8c04a',15,29,2,2);                 // purple V-neck, gold pendant
+  F('#f2cfb0',10,7,12,12); F('#f2cfb0',11,19,10,2); F('#f2cfb0',13,21,6,1); F('#e3b898',14,22,4,2);   // face, a soft chin
+  F('#ab7f57',9,5,9,4); F('#ab7f57',9,8,4,2); F('#c9a07a',11,5,5,1); F('#8a6240',18,5,1,3);   // side-swept bangs + shine
+  F('#6b5038',11,11,4,1); F('#6b5038',18,11,4,1);                                                              // brows
+  F('#ffffff',12,13,3,2); F('#ffffff',18,13,3,2); F('#4a6a8a',13,13,2,2); F('#4a6a8a',19,13,2,2); F('#2b2236',13,13,1,1); F('#2b2236',19,13,1,1);
+  F('#eaa3a0',11,16,2,1); F('#eaa3a0',20,16,2,1); F('#e3b898',15,15,2,2);
+  F('#c06a60',14,18,4,1); F('#c06a60',13,17,1,1); F('#c06a60',18,17,1,1);                                     // a closed, warm smile
+  F('#e8c04a',9,17,1,2); F('#e8c04a',22,17,1,2);                                                               // little gold earrings
 }};
 
 // ---------- Logan: short, medium brown hair, in his rollerski gear, "taking a break from his workout" to look for four-leaf clovers ----------

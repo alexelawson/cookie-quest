@@ -54,7 +54,11 @@ r=await p.evaluate(()=>{goTo('kitchen','fromDoor'); T.run(40); const crowd=CROWD
 ok('4 everyone came over; Let\'s bake goes straight to baking',r.crowd>=12&&r.bake,r.crowd+' guests');
 r=await p.evaluate(()=>{const tick=ms=>{for(let t=0;t<ms;t+=16.7)SCENES.kitchen.ambient(16.7)};
   for(let guard=0;guard<30&&bake.state!=='oven';guard++){const s=stepNow(); if(bake.state==='good'){bakePress();continue}
-    if(s.kind==='pour'){bakePress(); tick(s.target/s.rate*1000); bakeRelease()} else if(s.kind==='count'){for(let k=0;k<s.target;k++)bakePress(); eggsDone()} else {for(let k=0;k<(s.taps||12);k++)bakePress()}}
+    if(s.kind==='pour'){bakePress(); tick(s.target/s.rate*1000); bakeRelease()} else if(s.kind==='count'){for(let k=0;k<s.target;k++)bakePress(); eggsDone()}
+    else if(s.kind==='rhythm'){for(let k=0;k<30&&bake.state==='rhythm';k++){tick(STIR.BEAT-bake.bt%STIR.BEAT+4); bakePress()}}
+    else if(s.kind==='scoop'){for(let i=0;i<6;i++){for(let g=0;g<600&&!(Math.abs(bake.sx-SCOOP.SPOTS[i])<1.5&&!bake.drop);g++)tick(16.7); bakePress(); tick(300)}}
+    else if(s.kind==='chips'){for(const c of shapeCells(bake.shape))chipToggle(c)}
+    else {for(let k=0;k<(s.taps||12);k++)bakePress()}}
   bakePress(); tick(BAKE.TARGET/BAKE.RATE*1000); bakePress(); const done=bake.state; bakePress(); return {done,taste:!!kit.taste,baked:have.baked}});
 ok('4 every baking step, then the oven to 10:00: the taste test starts',r.taste&&r.baked,JSON.stringify(r));
 

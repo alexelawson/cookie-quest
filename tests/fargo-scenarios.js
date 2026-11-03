@@ -92,4 +92,6 @@ r=await p.evaluate(()=>{const c={}; for(let i=0;i<300;i++){fargoNewRun(); c[farg
 ok('J Bob is never at the station right by the start, and moves around',!r[2]&&Object.keys(r).length===5,JSON.stringify(r));
 r=await p.evaluate(()=>({n:EXIT_SIGNS.length, onRoad:EXIT_SIGNS.some(e=>ROADS.some(rd=>hit(R(e.x,e.y,26,18),rd))), signs:STATIONS.map(s=>s.signText), bob:STATIONS[fargo.bob].signText}));
 ok('K EXIT signs point the way out (none on the road), and every shop has a name sign',r.n>=3&&!r.onRoad&&r.signs.every(Boolean)&&r.bob==="LIL Q'S",JSON.stringify(r));
+r=await p.evaluate(()=>{const e=EXITS.fargo[0], x0=P.x; P.x=20; const atStart=e.markWhen(); P.x=100; const away=e.markWhen(); P.x=x0; return {atStart,away}});
+ok('K the yellow EXIT arrow stays off the car when you pull in, and shows once you drive off',!r.atStart&&r.away,JSON.stringify(r));
 console.log(R.join('\n')); console.log('page errors:',errs.length?errs:'none'); await b.close()})();

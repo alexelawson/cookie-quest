@@ -27,7 +27,7 @@ const HOUSES=[R(70,124,24,20),R(110,132,26,20),R(244,74,26,20),R(244,118,26,20),
 const TOWER={x:186,y:142};
 const WELCOME=R(12,196,24,12);
 // green EXIT signs pointing back to the highway (the way out is the left end of the middle road)
-const EXIT_SIGNS=[{x:146,y:146,dir:'<'},{x:346,y:146,dir:'<'},{x:66,y:68,dir:'v'},{x:66,y:266,dir:'^'}];
+const EXIT_SIGNS=[{x:346,y:146,dir:'<'},{x:66,y:68,dir:'v'},{x:66,y:266,dir:'^'}];
 const NEAR_START=[2];   // the station straight ahead when you arrive is never Bob's
 
 const fargo={fuel:FUEL.START, bob:0, introPending:false, warned:false, won:false,

@@ -9,6 +9,11 @@ const helpers=()=>{window.T={
   run:n=>{for(let i=0;i<n;i++)update(16.7)},
   tick:ms=>{for(let t=0;t<ms;t+=16.7)SCENES.kitchen.ambient(16.7)},
   pour:secs=>{bakePress(); T.tick(secs*1000); bakeRelease()},
+  onBeat:()=>{T.tick(STIR.BEAT-bake.bt%STIR.BEAT+4); bakePress()},
+  offBeat:()=>{const o=bake.bt%STIR.BEAT; T.tick((STIR.BEAT/2-o+STIR.BEAT)%STIR.BEAT); bakePress()},
+  scoopAt:i=>{for(let g=0;g<600&&!(Math.abs(bake.sx-SCOOP.SPOTS[i])<1.5&&!bake.drop);g++)SCENES.kitchen.ambient(16.7); bakePress(); T.tick(300)},
+  scoopGap:()=>{for(let g=0;g<600&&!(Math.abs(bake.sx-(SCOOP.SPOTS[0]+7))<1&&!bake.drop);g++)SCENES.kitchen.ambient(16.7); bakePress()},
+  cellXY:i=>{const c=$('bakeArt'), r=c.getBoundingClientRect(), q=chipXY(i); return {x:r.left+c.clientLeft+(q.x+.5)*c.clientWidth/c.width, y:r.top+c.clientTop+(q.y+.5)*c.clientHeight/c.height}},
 }};
 const fresh=async(st)=>{await p.goto(URL);await p.evaluate(s=>{localStorage.clear(); if(s)localStorage.setItem('cookie-quest-v1',JSON.stringify(s))},st);await p.reload();await p.click('#startBtn'); await p.evaluate(()=>skipWelcome());await p.evaluate(helpers)};
 const R=[];const ok=(n,c,x='')=>R.push((c?'PASS ':'FAIL ')+n+(x?'  ('+x+')':''));
@@ -24,6 +29,10 @@ ok('B everyone came over (and you can talk to them)',r.lbl==='Talk to Keelan'&&r
 r=await p.evaluate(()=>{P.x=64;P.y=60; update(16.7); action(); const pages=[]; while(T.btns().includes('Next')){pages.push($('dtext').textContent);T.click('Next')} T.click("Let's bake");
   return {pages,open:!$('bake').hidden,step:$('bakeStep').textContent}});
 ok('B Let\'s bake goes straight to baking at step 1 (butter), no locked recipe card',r.open&&r.step.includes('Butter'),r.step);
+// the BAKE arrow over the counter shows once everything's in, and goes away while baking
+await p.evaluate(()=>{closeBake(); window.marks=[]; const d=drawExitMark; window.drawExitMark=m=>{marks.push(m.text||'EXIT'); d(m)}});
+r=await p.evaluate(async()=>{const w=ms=>new Promise(res=>setTimeout(res,ms)); marks.length=0; await w(200); const idle=marks.includes('BAKE'); openBake(); await w(50); marks.length=0; await w(200); const baking=marks.includes('BAKE'); return {idle,baking}});
+ok('B a bouncing BAKE arrow points at the counter (and hides while you bake)',r.idle&&!r.baking,JSON.stringify(r));
 // C. pouring: too little, too much, spill, then right on the line
 r=await p.evaluate(()=>{const s=stepNow(), out={}; T.pour(.6); out.little=$('bakeMsg').textContent; T.tick(700);
   T.pour(2.4); out.much=$('bakeMsg').textContent; T.tick(700); bakePress(); T.tick(4000); out.spill=$('bakeMsg').textContent; bakeRelease(); T.tick(800);
@@ -34,9 +43,28 @@ r=await p.evaluate(()=>{bakePress(); const s=stepNow(); T.pour(s.target/s.rate);
   for(let k=0;k<3;k++)bakePress(); const many=$('bakeMsg').textContent; T.tick(600); bakePress(); eggsDone(); const few=$('bakeMsg').textContent; bakePress(); eggsDone(); const eggs=bake.state; bakePress();
   return {sugar,many,few,eggs,step:$('bakeStep').textContent}});
 ok('C sugar on the line; eggs: 3 is too many, 1 is too few, 2 is right',r.sugar==='good'&&r.many.includes('lot of eggs')&&r.few.includes('one more')&&r.eggs==='good'&&r.step.includes('Flour'),r.many+' | '+r.few);
-r=await p.evaluate(()=>{let s=stepNow(); T.pour(s.target/s.rate); const flour=bake.state; bakePress(); s=stepNow(); T.pour(s.target/s.rate); const choc=bake.state; bakePress();
-  for(let k=0;k<12;k++)bakePress(); const stir=bake.state; bakePress(); return {flour,choc,stir,oven:bake.state,step:$('bakeStep').textContent}});
-ok('C flour, chocolate, then stir 12 times; then the oven',r.flour==='good'&&r.choc==='good'&&r.stir==='good'&&r.oven==='oven'&&r.step==='00:00',JSON.stringify(r));
+r=await p.evaluate(()=>{let s=stepNow(); T.pour(s.target/s.rate); const flour=bake.state; bakePress();
+  const step=$('bakeStep').textContent, btn=$('bakeBtn').textContent; T.onBeat(); T.onBeat(); const two=bake.stirs; T.offBeat(); const off=$('bakeMsg').textContent, after=bake.stirs;
+  for(let k=0;k<20&&bake.state==='rhythm';k++)T.onBeat(); return {flour,step,btn,two,off,after,stir:bake.state}});
+ok('C flour, then stir to the beat: taps on the beat count',r.flour==='good'&&r.step.includes('Stir')&&r.btn==='Stir!'&&r.two===2&&r.stir==='good',JSON.stringify(r));
+ok('C ...a tap off the beat takes one back and Alex says so',r.off.includes('Off the beat')&&r.after===1,r.off);
+r=await p.evaluate(()=>{bakePress(); const step=$('bakeStep').textContent; T.scoopGap(); const miss=$('bakeMsg').textContent, none=bake.tray.filter(Boolean).length; T.tick(400);
+  T.scoopAt(0); const one=bake.tray.filter(Boolean).length; T.scoopAt(0); const taken=$('bakeMsg').textContent; T.tick(400);
+  for(let i=1;i<6;i++)T.scoopAt(i); return {step,miss,none,one,taken,state:bake.state}});
+ok('C scoop: dropping between spots misses, a full spot is taken, six on the spots is done',r.step.includes('Scoop')&&r.miss.includes('Missed')&&r.none===0&&r.one===1&&r.taken.includes('already')&&r.state==='good',JSON.stringify(r));
+r=await p.evaluate(()=>{bakePress(); const shape=bake.shape, want=[...shapeCells(shape)], msg=$('bakeMsg').textContent, card=KITCHEN.shapes[shape];
+  const wrong=[...Array(25).keys()].filter(i=>!want.includes(i)).slice(0,want.length); wrong.forEach(chipToggle); const bad=$('bakeMsg').textContent;
+  bakeAltPress(); const cleared=bake.chips.size; return {shape,want,msg,card,bad,cleared,cells:want.map(T.cellXY)}});
+ok('C chips: the card names the shape; a wrong pattern gets a nudge; Start over clears it',r.msg.includes(r.card)&&r.bad.includes("doesn't match")&&r.cleared===0,r.shape+' | '+r.bad);
+for(const c of r.cells.slice(0,-1)) await p.mouse.click(c.x,c.y);
+await p.mouse.click(r.cells[0].x,r.cells[0].y); await p.mouse.click(r.cells[0].x,r.cells[0].y);   // pick one up and put it back
+await p.mouse.click(r.cells.at(-1).x,r.cells.at(-1).y);
+r=await p.evaluate(()=>({state:bake.state,msg:$('bakeMsg').textContent,n:bake.chips.size}));
+ok('C chips: tapping the cookie places chips; matching the card finishes the step',r.state==='good'&&r.msg.includes('searchlight'),JSON.stringify(r));
+r=await p.evaluate(()=>{const seen=new Set(); for(let k=0;k<12;k++){openBake(); seen.add(bake.shape)} closeBake(); openBake(); bake.i=bakeSteps().findIndex(s=>s.key==='chocolate'); bakeSetup(); return {seen:[...seen]}});
+ok('C every tray gets a different chip pattern than the last one',r.seen.length>=3,r.seen.join(','));
+r=await p.evaluate(()=>{const s0=bake.shape; let prev=s0, rep=0; for(let k=0;k<30;k++){openBake(); if(bake.shape===prev)rep++; prev=bake.shape} bake.i=bakeSteps().findIndex(s=>s.key==='chocolate'); bakeSetup(); for(const c of shapeCells(bake.shape))chipToggle(c); bakePress(); return {rep,oven:bake.state,step:$('bakeStep').textContent}});
+ok('C ...never the same twice in a row; then the oven',r.rep===0&&r.oven==='oven'&&r.step==='00:00',JSON.stringify(r));
 // D. baking: too early, too late, then 10:00
 r=await p.evaluate(()=>{const at=m=>{bakePress(); T.tick(m/BAKE.RATE*1000); bakePress(); return $('bakeMsg').textContent};
   const raw=at(6); T.tick(700); const burnt=at(12.5); T.tick(700); const auto=(()=>{bakePress(); T.tick(16/BAKE.RATE*1000); return $('bakeMsg').textContent})(); T.tick(700);
@@ -90,7 +118,7 @@ await p.waitForTimeout(900);
 r.after=await p.evaluate(()=>({basket:$('basket').textContent, have:!!have.sprinkles}));
 ok('I Bryan is chill and gives Joe sprinkles',r.lbl==='Talk to Bryan'&&r.pages.join(' ').includes('sprinkles')&&r.reward==='Sprinkles'&&r.after.have&&r.after.basket.includes('Sprinkles'),r.pages.slice(-1)[0]);
 r=await p.evaluate(()=>{goTo('kitchen','fromDoor'); T.run(40); openBake(); const n=bakeSteps().length; bake.i=n-1; bakeSetup(); const step=$('bakeStep').textContent, btn=$('bakeBtn').textContent; for(let k=0;k<6;k++)bakePress(); return {n,step,btn,state:bake.state,crowd:CROWD.some(c=>c.name==='Bryan')}});
-ok('I with sprinkles there is a shake-the-sprinkles step, and Bryan comes to the party',r.n===7&&r.step.includes("Bryan's sprinkles")&&r.btn==='Shake!'&&r.state==='good'&&r.crowd,r.step);
+ok('I with sprinkles there is a shake-the-sprinkles step, and Bryan comes to the party',r.n===8&&r.step.includes("Bryan's sprinkles")&&r.btn==='Shake!'&&r.state==='good'&&r.crowd,r.step);
 // J. the cupcake unlocks a cupcake costume; Settings > Change outfit works anywhere
 await fresh({welcomed:true});
 r=await p.evaluate(()=>{const before=WARDROBE.outfits.filter(o=>!o.unlock||have[o.unlock]).map(o=>o.id);

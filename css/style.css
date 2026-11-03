@@ -234,7 +234,8 @@ canvas{border-radius:6px}
 .bcard{background:var(--paper)}
 .bstep{font-family:var(--pixel);font-size:.95rem;color:var(--ink)}
 .bstep.timer{font-size:1.5rem;color:#2b2236;letter-spacing:.06em}
-#bakeArt{width:144px;height:96px;image-rendering:pixelated;image-rendering:crisp-edges;border-radius:6px;background:#efe2c4;border:2px solid var(--ink)}
+#bakeArt{width:240px;height:160px;touch-action:manipulation;image-rendering:pixelated;image-rendering:crisp-edges;border-radius:6px;background:#efe2c4;border:2px solid var(--ink)}
+#bakeArt.tap{cursor:pointer}
 .brow{display:flex;gap:8px;align-items:center;justify-content:center}
 .bcard{gap:4px;padding:8px 12px}
 .bcard p{min-height:2.5em;font-size:.82rem}
@@ -418,3 +419,5 @@ h1::before,h1::after{content:'✦';color:var(--berry);font-size:.6em;vertical-al
 @media (min-width:900px){ .app{gap:10px} header{gap:6px} body{padding-block:10px} }
 @media (max-width:520px){ .outfit canvas{width:33px;height:50px} .outfit{font-size:.62rem;padding:3px 2px 4px} .wline{font-size:.78rem!important}
   #wardGo{position:sticky;bottom:0;box-shadow:0 3px 0 #0b0c12,0 0 0 8px #1d2130} }
+/* baking on a phone: drop the title and Alex's little face so the bigger picture and the buttons all fit */
+@media (max-width:520px){ #bakeArt{width:192px;height:128px} #bakeTitle{display:none} .bcard .bsay canvas{display:none} .bcard{padding:5px 8px;gap:3px} .bcard p{font-size:.76rem;min-height:2.3em;line-height:1.2} .bcard .pbtn,.bcard .btn{padding:5px 12px} }

@@ -5,6 +5,7 @@ const KIT_TRIGGERS=[
   {z:R(158,54,26,8),  label:'Read the recipe card', act:()=>readRecipe()},
   {z:R(184,112,34,12),label:'Look at the tree',     act:()=>say1(KITCHEN.tree)},
 ];
+const BAKE_MARK={x:64,y:44,dir:'down',text:'BAKE'};
 const say1=t=>showDialog({place:KITCHEN.place,speaker:KITCHEN.speaker,pages:[t],actions:[CLOSE]});
 function readRecipe(){
   const lines=ITEMS.map(i=>(have[i.key]?'✓ ':'◻ ')+i.label).join('\n');
@@ -75,20 +76,33 @@ function drawCrown(x,y){ const F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(Ma
 
 // ---------- the baking card ----------
 const BAKE={RATE:1.25, TARGET:10, WINDOW:.5, MAX:15};   // oven runs 1.25 minutes per real second; take them out at 10:00 +/- 0:30
-const bake={open:false, i:0, state:'', amt:0, holding:false, eggs:0, stirs:0, t:0, lock:0};
+const bake={open:false, i:0, state:'', amt:0, holding:false, eggs:0, stirs:0, t:0, lock:0, bt:0, sx:0, sdir:1, tray:[], drop:null, chips:new Set(), cur:12, shape:'heart', lastShape:''};
+// stirring: a beat every BEAT ms; a tap within WIN ms of it counts. Scooping: the scoop sweeps at SPEED px/s; drop within TOL px of an empty spot.
+const STIR={BEAT:600, WIN:150}, SCOOP={SPEED:46, TOL:5, X0:8, X1:88, SPOTS:[14,28,42,56,70,84], Y:46};
+// the chocolate chip patterns, on a 5x5 grid (one is picked at random for each tray)
+const CHIP_SHAPES={
+  heart:[".....",".X.X.","XXXXX",".XXX.","..X.."],
+  joe:  ["..XXX","...X.","...X.","X..X.",".XX.."],
+  star: ["..X..","XXXXX",".XXX.",".X.X.","X...X"],
+  smile:[".X.X.",".X.X.",".....","X...X",".XXX."],
+};
+const shapeCells=k=>{const out=new Set(); CHIP_SHAPES[k].forEach((row,r)=>[...row].forEach((ch,c)=>{if(ch==='X')out.add(r*5+c)})); return out};
+const CHIP_GRID={cx:62, cy:32, gap:9};   // the big cookie, and how far apart the chip spots are (canvas px)
+const chipXY=i=>({x:CHIP_GRID.cx+(i%5-2)*CHIP_GRID.gap, y:CHIP_GRID.cy+((i/5|0)-2)*CHIP_GRID.gap});
 const kit={party:false, crownT:0, confetti:[]};
 const bakeSteps=()=>KITCHEN.steps.filter(s=>!s.needs||have[s.needs]);   // Bryan's sprinkles step only if you have them
 const stepNow=()=>bakeSteps()[bake.i];
 function bakeMsg(t,mood='ok'){ $('bakeMsg').textContent=t; const g=$('bakeFace').getContext('2d'); g.fillStyle='#e3d6bd'; g.fillRect(0,0,40,40); drawAlexFace(g,mood) }   // Alex says it, with her face
-function openBake(){ Object.assign(bake,{open:true,i:0}); bakeSetup(); paused=true; prompt.hidden=true; $('bake').hidden=false; setTimeout(()=>$('bakeBtn').focus({preventScroll:true}),0) }
+function openBake(){ const ks=Object.keys(CHIP_SHAPES).filter(k=>k!==bake.lastShape); bake.shape=ks[Math.random()*ks.length|0]; bake.lastShape=bake.shape; Object.assign(bake,{open:true,i:0}); bakeSetup(); paused=true; prompt.hidden=true; $('bake').hidden=false; setTimeout(()=>$('bakeBtn').focus({preventScroll:true}),0) }
 function bakeSetup(){
-  const s=stepNow(), K=KITCHEN; Object.assign(bake,{state:s.kind, amt:0, holding:false, eggs:0, stirs:0, lock:0});
+  const s=stepNow(), K=KITCHEN; Object.assign(bake,{state:s.kind, amt:0, holding:false, eggs:0, stirs:0, lock:0, bt:STIR.BEAT/2, sx:SCOOP.X0, sdir:1, tray:SCOOP.SPOTS.map(()=>false), drop:null, chips:new Set(), cur:12});
   $('bakeTitle').textContent=K.bakeTitle; $('bakeStep').className='bstep'; $('bakeStep').textContent=`${bake.i+1}/${bakeSteps().length+1} · ${s.name}${s.label?' · '+s.label:''}`;
-  bakeMsg(s.hint);
-  $('bakeBtn').textContent=s.kind==='pour'?K.pourHold:s.kind==='count'?K.eggTap:s.shake?'Shake!':K.stirTap;
-  $('bakeAlt').hidden=s.kind!=='count'; $('bakeAlt').textContent=K.eggDone;
+  bakeMsg(s.kind==='chips'?s.hint+' '+K.chipCard.replace('{shape}',K.shapes[bake.shape]):s.hint);
+  $('bakeBtn').textContent=s.kind==='pour'?K.pourHold:s.kind==='count'?K.eggTap:s.kind==='scoop'?K.scoopTap:s.kind==='chips'?K.chipTap:s.shake?'Shake!':K.stirTap;
+  $('bakeAlt').hidden=!['count','chips'].includes(s.kind); $('bakeAlt').textContent=s.kind==='chips'?K.chipClear:K.eggDone;
+  $('bakeArt').classList.toggle('tap',s.kind==='chips');
 }
-function bakeGood(){ sfx('good'); const s=stepNow(); bake.state='good'; bakeMsg(s.good,'happy'); $('bakeBtn').textContent=KITCHEN.next; $('bakeAlt').hidden=true }
+function bakeGood(){ sfx('good'); const s=stepNow(); bake.state='good'; const sh=KITCHEN.shapes[bake.shape]; bakeMsg(s.kind==='chips'?sh[0].toUpperCase()+sh.slice(1)+'! '+s.good:s.good,'happy'); $('bakeArt').classList.remove('tap'); $('bakeBtn').textContent=KITCHEN.next; $('bakeAlt').hidden=true }
 function ovenSetup(){ bake.state='oven'; bake.t=0; $('bakeStep').className='bstep timer'; $('bakeStep').textContent='00:00'; bakeMsg(KITCHEN.bakeHint); $('bakeBtn').textContent=KITCHEN.bakeStart; $('bakeAlt').hidden=true }
 const ovenMin=()=>bake.t/1000*BAKE.RATE;
 const ovenClock=m=>`${String(Math.floor(m)).padStart(2,'0')}:${String(Math.floor(m%1*60)).padStart(2,'0')}`;
@@ -97,6 +111,14 @@ function bakePress(){
   if(bake.state==='pour'){ bake.holding=true; $('bakeBtn').classList.add('on'); return }
   if(bake.state==='count'){ sfx('crack'); bake.eggs++; if(bake.eggs>s.target){bakeMsg(K.eggMany,'frown'); bake.eggs=0; bake.lock=500} return }
   if(bake.state==='stir'){ sfx(s.shake?'shake':'stir'); bake.stirs++; if(bake.stirs>=s.taps)bakeGood(); return }
+  if(bake.state==='rhythm'){ const off=bake.bt%STIR.BEAT, d=Math.min(off,STIR.BEAT-off);
+    if(d<=STIR.WIN){ sfx('stir'); bake.stirs++; bake.hitAt=time; if($('bakeMsg').textContent===K.offBeat)bakeMsg(s.hint); if(bake.stirs>=s.taps)bakeGood() }
+    else { sfx('bad'); bake.stirs=Math.max(0,bake.stirs-1); bakeMsg(K.offBeat,'frown') } return }
+  if(bake.state==='scoop'){ if(bake.drop)return; let best=-1,bd=99; SCOOP.SPOTS.forEach((x,i)=>{const d=Math.abs(x-bake.sx); if(d<bd){bd=d;best=i}});
+    if(bd>SCOOP.TOL){ sfx('bad'); bakeMsg(K.scoopMiss,'frown'); bake.lock=350; return }
+    if(bake.tray[best]){ sfx('bad'); bakeMsg(K.scoopTaken,'frown'); bake.lock=350; return }
+    sfx('glug'); bake.drop={i:best, t:0}; return }
+  if(bake.state==='chips'){ chipToggle(bake.cur); return }
   if(bake.state==='good'){ bake.i++; if(bake.i<bakeSteps().length)bakeSetup(); else ovenSetup(); return }
   if(bake.state==='oven'){ sfx('click'); bake.state='baking'; bake.t=0; $('bakeBtn').textContent=K.bakeOut; bakeMsg('Okay, they\'re in. Watch the timer...'); return }
   if(bake.state==='baking'){ const m=ovenMin();
@@ -111,12 +133,27 @@ function bakeRelease(){
   if(Math.abs(d)<=s.tol)return bakeGood();
   bakeMsg(d>0?K.tooMuch:K.tooLittle,'frown'); sfx('bad'); bake.lastAmt=bake.amt; bake.amt=0; bake.lock=600;
 }
+function chipToggle(i){
+  if(bake.state!=='chips'||i<0||i>24)return; bake.cur=i;
+  if(bake.chips.has(i)){ bake.chips.delete(i); sfx('click') } else { bake.chips.add(i); sfx('type',420) }
+  const want=shapeCells(bake.shape), same=want.size===bake.chips.size&&[...want].every(k=>bake.chips.has(k));
+  if(same)return bakeGood();
+  if(bake.chips.size>=want.size)bakeMsg(KITCHEN.chipWrong,'frown');
+  else if($('bakeMsg').textContent===KITCHEN.chipWrong)bakeMsg(stepNow().hint+' '+KITCHEN.chipCard.replace('{shape}',KITCHEN.shapes[bake.shape]));
+}
+function chipMove(dx,dy){ const r=Math.max(0,Math.min(4,(bake.cur/5|0)+dy)), c=Math.max(0,Math.min(4,bake.cur%5+dx)); bake.cur=r*5+c }
+function chipAt(cx,cy){ let best=-1,bd=7; for(let i=0;i<25;i++){const p=chipXY(i), d=Math.hypot(p.x-cx,p.y-cy); if(d<bd){bd=d;best=i}} return best }
+function bakeAltPress(){ if(bake.state==='count')return eggsDone(); if(bake.state==='chips'){ bake.chips.clear(); sfx('click'); bakeSetupMsgChips() } }
+function bakeSetupMsgChips(){ bakeMsg(stepNow().hint+' '+KITCHEN.chipCard.replace('{shape}',KITCHEN.shapes[bake.shape])) }
 function eggsDone(){ const s=stepNow(); if(bake.state!=='count')return; if(bake.eggs===s.target)bakeGood(); else bakeMsg(KITCHEN.eggFew,'frown') }
 function closeBake(){ bake.open=false; $('bake').hidden=true; paused=false }
 function bakeTick(dt){
   if(!bake.open)return; if(bake.lock>0)bake.lock-=dt;
   const s=stepNow();
   if(bake.state==='pour'&&bake.holding){ if((bake.glugT=(bake.glugT||0)+dt)>140){bake.glugT=0; sfx('glug')} bake.amt+=s.rate*dt/1000; if(bake.amt>=s.max){ bake.holding=false; $('bakeBtn').classList.remove('on'); bake.amt=0; bake.lock=700; bakeMsg(KITCHEN.spilled,'frown') } }
+  if(bake.state==='rhythm'){ const was=Math.floor(bake.bt/STIR.BEAT); bake.bt+=dt; if(Math.floor(bake.bt/STIR.BEAT)!==was)sfx('click') }
+  if(bake.state==='scoop'){ if(bake.drop){ bake.drop.t+=dt; if(bake.drop.t>=220){ bake.tray[bake.drop.i]=true; bake.drop=null; sfx('crack'); if(bake.tray.every(Boolean))bakeGood() } }
+    else { bake.sx+=bake.sdir*SCOOP.SPEED*dt/1000; if(bake.sx>=SCOOP.X1){bake.sx=SCOOP.X1;bake.sdir=-1} if(bake.sx<=SCOOP.X0){bake.sx=SCOOP.X0;bake.sdir=1} } }
   if(bake.state==='baking'){ bake.t+=dt; const m=ovenMin(); $('bakeStep').textContent=ovenClock(Math.min(m,99));
     if(m>=BAKE.MAX){ bake.state='oven'; bake.lock=600; bakeMsg(KITCHEN.burnt,'frown'); $('bakeBtn').textContent=KITCHEN.bakeStart } }
   drawBakeArt();
@@ -127,7 +164,7 @@ function drawBakeArt(){
   const done=bakeSteps().slice(0,bake.i+(bake.state==='good'?1:0));
   const bowl=(x,y)=>{ F('#c9d6e0',x,y,40,14); F('#a9b8c4',x+2,y+14,36,3); F('#8a99a6',x+6,y+17,28,2);   // mixing bowl, with what's in it so far
     let lv=0; for(const d of done){ if(d.kind==='pour'){F(d.color,x+3,y+11-lv,34,2); lv+=2} if(d.kind==='count'){F('#f4c430',x+12,y+11-lv,4,2); F('#f4c430',x+22,y+11-lv,4,2)} }
-    if(done.some(d=>d.key==='stir')){F('#e0bf86',x+3,y+4,34,8); for(let k=0;k<7;k++)F('#5a3220',x+5+k*5,y+5+(k%2)*3,2,2)}
+    if(done.some(d=>d.key==='stir')){F('#e0bf86',x+3,y+4,34,8); F('#ead0a0',x+6,y+5,12,2); F('#cfa86e',x+20,y+9,12,1)}
     if(done.some(d=>d.key==='sprinkles'))for(let k=0;k<14;k++)F(['#e54b4b','#f4d35e','#4fbf73','#5fa8e8','#e54b7a'][k%5],x+5+(k*7)%30,y+4+(k*3)%7,2,1);
     F('#dfe8ee',x,y,40,1) };
   if(bake.state==='pour'||(bake.state==='good'&&s.kind==='pour')){
@@ -140,11 +177,38 @@ function drawBakeArt(){
   } else if(bake.state==='count'||(bake.state==='good'&&s.kind==='count')){
     bowl(50,36); for(let k=0;k<3;k++){const ex=10+k*12; if(k<bake.eggs){F('#ffffff',ex,40,9,3); F('#f4c430',ex+3,38,3,3)} else {F('#f6f0e2',ex+1,22,7,10); F('#e8dcc4',ex+1,30,7,2); F('#ffffff',ex+2,23,2,3)}}
     if(bake.state==='good')for(let k=0;k<2;k++){F('#ffffff',10+k*12,40,9,3); F('#f4c430',13+k*12,38,3,3)}
+  } else if(bake.state==='rhythm'||(bake.state==='good'&&s.kind==='rhythm')){
+    bowl(28,30); const off=bake.bt%STIR.BEAT, beat=Math.floor(bake.bt/STIR.BEAT), ph=off/STIR.BEAT, good=bake.state==='good';
+    const ring=(rx,ry,col)=>{for(let a=0;a<64;a++){const t=a/64*Math.PI*2; F(col,Math.round(48+Math.cos(t)*rx),Math.round(31+Math.sin(t)*ry),1,1)}};
+    if(!good){ ring(22,7,'#c9a24a'); const k=1-ph; ring(22+k*22,7+k*12,`rgba(229,75,75,${.35+.65*ph})`) }   // the gold rim, and the red ring closing in on it
+    if(time-(bake.hitAt||-1e9)<160)ring(22,7,'#4fbf73');
+    const sw=good?Math.sin(time/120):Math.cos(Math.PI*(beat+ph)), sx=48+sw*11, sy=36;   // the spoon swings side to side, hitting each side on the beat
+    g.strokeStyle='#8a5a34'; g.lineWidth=2; g.beginPath(); g.moveTo(sx,sy); g.lineTo(sx+sw*4+6,sy-24); g.stroke();
+    const p=Math.min(1,bake.stirs/s.taps); F('#c9d6e0',20,58,56,3); F('#4fbf73',20,58,56*p,3);
+  } else if(bake.state==='scoop'||(bake.state==='good'&&s.kind==='scoop')){
+    drawTray(F,bake.state==='good'?SCOOP.SPOTS.map(()=>true):bake.tray,0);
+    if(bake.state==='scoop'){ const x=Math.round(bake.sx);
+      F('#9aa3b0',x+4,8,10,2); F('#7d8694',x+12,7,6,3);                                  // the scoop's handle
+      F('#b9c1cb',x-5,10,11,6); F('#9aa3b0',x-4,15,9,2); if(!bake.drop)doughBall(F,x,11)
+      F('rgba(43,34,54,.25)',x,20,1,22);                                                  // a little guide line down to the tray
+      if(bake.drop){const k=bake.drop.t/220, dx=SCOOP.SPOTS[bake.drop.i]; doughBall(F,dx,16+k*(SCOOP.Y-10))} }
+    const n=bake.tray.filter(Boolean).length, p=bake.state==='good'?1:n/s.balls; F('#c9d6e0',20,60,56,2); F('#4fbf73',20,60,56*p,2);
+  } else if(bake.state==='chips'||(bake.state==='good'&&s.kind==='chips')){
+    const want=shapeCells(bake.shape), good=bake.state==='good', on=good?want:bake.chips;
+    // the recipe card, top left: the pattern to copy
+    F('#fffdf6',3,6,26,30); F('#e8e2d6',3,35,26,1); F('#c64b3d',3,6,26,2);
+    for(let i=0;i<25;i++){const x=6+(i%5)*4, y=11+(i/5|0)*4; F(want.has(i)?'#5a3220':'#efe6d2',x,y,3,3)}
+    // the big cookie (dough for now)
+    const {cx,cy}=CHIP_GRID, R0=27; for(let y=-R0;y<=R0;y++){const w=Math.round(Math.sqrt(R0*R0-y*y)); F(y>R0-4?'#cfa86e':'#e0bf86',cx-w,cy+y,w*2,1)}
+    F('#ead0a0',cx-16,cy-21,14,2); F('#ead0a0',cx-20,cy-17,6,2);
+    for(let i=0;i<25;i++){const {x,y}=chipXY(i);
+      if(on.has(i)){F('#3a1f12',x-2,y-1,5,3); F('#5a3220',x-1,y-2,3,4); F('#7a4a30',x-1,y-2,1,1)}
+      else F('#cda068',x-1,y-1,2,2) }
+    if(!good&&Math.floor(time/300)%2){const {x,y}=chipXY(bake.cur); F('#e8a020',x-4,y-4,9,1); F('#e8a020',x-4,y+4,9,1); F('#e8a020',x-4,y-4,1,9); F('#e8a020',x+4,y-4,1,9)}
   } else if(bake.state==='stir'||(bake.state==='good'&&s.kind==='stir')){
-    bowl(28,30);
-    if(s.shake){ const sx=44+Math.sin(bake.stirs*1.7)*6; F('#f2efe6',sx,4,10,14); F('#c8322b',sx,2,10,3);   // the shaker, and sprinkles falling
-      for(let k=0;k<bake.stirs*3;k++)F(['#e54b4b','#f4d35e','#4fbf73','#5fa8e8','#e54b7a'][k%5],32+(k*11)%32,20+(k*5)%12,2,1) }
-    else { const ang=bake.stirs*.9+(bake.state==='good'?time/200:0), sx=48+Math.cos(ang)*10, sy=36+Math.sin(ang)*3;
+    if(s.shake){ drawTray(F,SCOOP.SPOTS.map(()=>true),bake.state==='good'?s.taps:bake.stirs); const sx=44+Math.sin(bake.stirs*1.7)*20; F('#f2efe6',sx,4,10,14); F('#c8322b',sx,2,10,3);   // the shaker, over the tray
+      for(let k=0;k<4&&bake.state!=='good';k++)F(['#e54b4b','#f4d35e','#4fbf73','#5fa8e8'][k],sx+2+k*2,20+((time/60+k*5)%18),1,2) }
+    else { bowl(28,30); const ang=bake.stirs*.9+(bake.state==='good'?time/200:0), sx=48+Math.cos(ang)*10, sy=36+Math.sin(ang)*3;
       g.strokeStyle='#8a5a34'; g.lineWidth=2; g.beginPath(); g.moveTo(sx,sy); g.lineTo(sx+10,sy-22); g.stroke() }
     const p=Math.min(1,bake.stirs/s.taps); F('#c9d6e0',20,58,56,3); F('#4fbf73',20,58,56*p,3);
   } else { // the oven
@@ -159,9 +223,21 @@ function drawBakeArt(){
 }
 $('bakeBtn').addEventListener('pointerdown',e=>{e.preventDefault(); bakePress()});
 ['pointerup','pointerleave','pointercancel'].forEach(t=>$('bakeBtn').addEventListener(t,bakeRelease));
-$('bakeAlt').onclick=eggsDone;
+$('bakeAlt').onclick=bakeAltPress;
+// tap a spot on the big cookie to place (or pick up) a chip
+$('bakeArt').addEventListener('pointerdown',e=>{ if(bake.state!=='chips')return; e.preventDefault(); const c=$('bakeArt'), r=c.getBoundingClientRect(), b=c.clientLeft;
+  const i=chipAt((e.clientX-r.left-b)*c.width/c.clientWidth,(e.clientY-r.top-c.clientTop)*c.height/c.clientHeight); if(i>=0)chipToggle(i) });
+// a round little ball of dough sitting at (x, bottom)
+function doughBall(F,x,b){ F('#e0bf86',x-2,b-7,5,1); F('#e0bf86',x-3,b-6,7,1); F('#e0bf86',x-4,b-5,9,4); F('#cfa86e',x-4,b-1,9,1); F('#ead0a0',x-2,b-6,3,1); F('#ead0a0',x-3,b-5,2,1); F('#5a3220',x+1,b-4,1,1); F('#5a3220',x-2,b-2,1,1) }
+// the tray of dough balls (sprinkles: how many shakes so far)
+function drawTray(F,filled,sprinkles){
+  F('#8a96a6',4,SCOOP.Y-2,88,12); F('#b9c4d0',4,SCOOP.Y-2,88,1); F('#6c7a8a',4,SCOOP.Y+9,88,1); F('#f6efe0',6,SCOOP.Y,84,8);   // a baking sheet with parchment
+  SCOOP.SPOTS.forEach((x,i)=>{ if(filled[i])doughBall(F,x,SCOOP.Y+6); else {F('#e2d6bf',x-4,SCOOP.Y+1,9,5); F('#f6efe0',x-3,SCOOP.Y+2,7,3)} });
+  for(let k=0;k<sprinkles*3;k++){const x=SCOOP.SPOTS[k%6]; F(['#e54b4b','#f4d35e','#4fbf73','#5fa8e8','#e54b7a'][k%5],x-3+(k*7)%7,SCOOP.Y+1+(k*3)%4,1,1)}
+}
 addEventListener('keydown',e=>{ if(!bake.open)return;
   if(['Space','Enter'].includes(e.code)){ if(document.activeElement===$('bakeAlt'))return; e.preventDefault(); e.stopImmediatePropagation(); if(!e.repeat)bakePress() }
+  else if(bake.state==='chips'&&KEYMAP[e.code]){ e.preventDefault(); e.stopImmediatePropagation(); const d={left:[-1,0],right:[1,0],up:[0,-1],down:[0,1]}[KEYMAP[e.code]]; chipMove(...d) }
   else if(e.code!=='Tab'){ e.preventDefault(); e.stopImmediatePropagation() } },true);
 addEventListener('keyup',e=>{ if(bake.open&&['Space','Enter'].includes(e.code))bakeRelease() },true);
 
@@ -362,5 +438,6 @@ SCENES.kitchen={ place:KITCHEN.place, music:()=>kit.dance?'jingle':'kitchen',
   },
   over(){ctx.fillStyle='rgba(255,190,110,.06)'; ctx.fillRect(0,0,224,168);   // warm light
     for(const p of kit.confetti){ctx.fillStyle=p.c; ctx.fillRect(p.x|0,p.y|0,2,2)}
+    if(allIn()&&!have.baked&&!bake.open&&!kit.taste&&!paused)drawExitMark(BAKE_MARK);   // a bouncing BAKE arrow over the mixing bowl once everything's in
     drawHug(); drawTasteNerves(); kitCaption(); if(kit.dance)drawDanceBanner() },
 };

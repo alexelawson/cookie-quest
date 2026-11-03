@@ -10,7 +10,8 @@
 const EXITS={
   kitchen:[{z:R(100,160,24,8), mark:{x:112,y:158,dir:'down'}, go:()=>goTo('world','fromKitchen')}],
   golf:   [{z:R(96,160,32,8),  mark:{x:112,y:160,dir:'down'}, when:()=>!golf.active, go:()=>goTo('world','fromGolf')}],
-  fargo:  [{z:R(0,166,6,28),   mark:{x:6,y:179,dir:'left'},  when:()=>!fargo.onFoot, go:()=>goTo('world','fromFargo')}],
+  fargo:  [{z:R(0,166,6,28),   mark:{x:6,y:179,dir:'left'},  when:()=>!fargo.onFoot, markWhen:()=>P.x>56,   // (no arrow on top of the car when you've just pulled in)
+           go:()=>goTo('world','fromFargo')}],
   city:   [{z:LADDER,          mark:{x:21,y:170,dir:'down'}, go:()=>goTo('world','fromCity')}],
 };
 let exitArmed=false;   // you have to step out of an exit before it works (so arriving next to one doesn't bounce you out)
@@ -27,8 +28,8 @@ function drawExitMark(m){
   // the arrow: a gold triangle with a dark outline
   if(m.dir==='down'){for(let i=0;i<5;i++){F('#1d2130',ax-5+i,ay-3+i,11-i*2,1)} for(let i=0;i<4;i++)F('#f4d35e',ax-4+i,ay-3+i,9-i*2,1); F('#1d2130',ax-2,ay-8,5,5); F('#f4d35e',ax-1,ay-8,3,5)}
   else {for(let i=0;i<5;i++){F('#1d2130',ax+i,ay-4+i,1,9-i*2)} for(let i=0;i<4;i++)F('#f4d35e',ax+1+i,ay-3+i,1,7-i*2); F('#1d2130',ax+5,ay-2,6,5); F('#f4d35e',ax+5,ay-1,5,3)}
-  const lx=m.dir==='left'?m.x+2:m.x+8, ly=m.dir==='left'?m.y-14:m.y-8;
-  F('#1d2130',lx-1,ly-1,textW('EXIT')+3,7); pixText(ctx,'EXIT',lx+1-1+1,ly+1-1+1-1,'#f4d35e');
+  const lx=m.dir==='left'?m.x+2:m.x+8, ly=m.dir==='left'?m.y-14:m.y-8, word=m.text||'EXIT';
+  F('#1d2130',lx-1,ly-1,textW(word)+3,7); pixText(ctx,word,lx+1,ly,'#f4d35e');
 }
 // the bouncing arrow over Joe's head when there's something to do right here
 function drawNearMark(){
@@ -206,7 +207,7 @@ const drawHenrietta=drawGrp;   // (older name)
 // called from game.js every frame
 function extrasTick(){ sceneExitTick(); gearTick() }
 function extrasAlways(dt){ cloverTick(dt) }
-function extrasDraw(){ for(const e of exitsHere())drawExitMark(e.mark); drawSparkles(); drawNearMark(); drawThink() }
+function extrasDraw(){ for(const e of exitsHere())if(!e.markWhen||e.markWhen())drawExitMark(e.mark); drawSparkles(); drawNearMark(); drawThink() }
 
 // ---------- settings: take gear off / put it back on ----------
 function renderGearSettings(){
