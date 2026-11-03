@@ -9,7 +9,7 @@ const out=await p.evaluate((OV)=>{Object.assign(BIRK,OV); scene=SCENES.birkie; p
     const blocked=(l,d=60)=>OBSTACLES.some(o=>{const dd=obstacleY(o)-P.y; return dd>-4&&dd<d&&o.lanes.includes(l)&&o.kind==='pack'});
     for(const o of OBSTACLES){ if(!ahead(o)||birk.hit.has(o)||!o.lanes.includes(lane))continue;
       if(!decided.has(o))decided.set(o,Math.random()>=miss); if(!decided.get(o))continue;
-      if(o.kind==='fallen'){ if(obstacleY(o)-P.y<BIRK.JUMP_LEN*.6)birkJump() }
+      if(o.kind!=='pack'){ if(obstacleY(o)-P.y<BIRK.JUMP_LEN*.6)birkJump() }
       else { const opts=[-1,0,1].filter(l=>!o.lanes.includes(l)&&!blocked(l)).sort((a,b)=>Math.abs(a-lane)-Math.abs(b-lane)); if(opts.length&&!birk.drink)birkLane(opts[0]>lane?1:-1) } }
     for(const f of FEEDS){ const d=f.y-P.y; if(f.used||d<0||d>130)continue; if(!decided.has(f))decided.set(f,Math.random()>=miss);
       const want=cupLane(f,time+d/Math.max(birk.v,.02)); if(decided.get(f)&&lane!==want&&!blocked(want,d+6))birkLane(want>lane?1:-1) } } };   // where the cup will be when we get there

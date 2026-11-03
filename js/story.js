@@ -175,7 +175,6 @@ const BRYAN = {name:'Bryan', place:'The Pond',
 
 // ---------- Joe's stealth wardrobe (picked before the city) ----------
 const WARDROBE = {title:"Suit up, Joe", intro:"It's a stealth mission. What are you wearing?", go:"Suit up",
-  jersey:{id:'jersey', name:"Joe's Jersey", line:"White jersey, red trim. The classic Joe."},   // only offered at the start
   outfits:[
     {id:'cape',    name:"The Classic",      line:"Dark suit, mask, dramatic cape. Very brooding."},
     {id:'potato',  name:"Baked Potato",     line:"Wrapped in foil, split open, a pat of butter for a hat. Chives. Fully loaded."},
@@ -183,7 +182,10 @@ const WARDROBE = {title:"Suit up, Joe", intro:"It's a stealth mission. What are 
     {id:'sweater', name:"Ugly Xmas Sweater",line:"Stealth: zero. Festive: maximum."},
     {id:'vikings', name:"Vikings Gameday",  line:"Purple jersey, gold pants, horned helmet. SKOL."},
     {id:'disco',   name:"70s Disco",        line:"White suit, gold chain, big hair. Stayin' alive."},
-    {id:'avant',   name:"Avant Guard",      line:"Black turtleneck, one enormous white shoulder, red beret, tiny sunglasses. It's a statement."},
+    {id:'avant',   name:"Avant Guard",      line:"One ENORMOUS white shoulder, a lime sleeve, a hot-pink zigzag, a spiky gold collar, mismatched boots, a beret with an antenna. Sparkles. It's a statement."},
+    {id:'grp',     name:"GRP training shorts", line:"No shirt. Black spandex to mid-calf with green stripes. Helmet, shades. It's a training day."},
+    {id:'dave',    name:"Dave",             line:"A red cat. His name is Dave."},
+    {id:'john',    name:"John",             line:"Red cap, white tee, jeans, boots. Basically John."},
     {id:'cupcake', name:"Cupcake",          line:"A whole cupcake. Frosting hat, sprinkles, cherry on top. Unlocked by finding the cupcake.", unlock:'cupcakeCostume'},
   ],
   changeOutfit:"Change outfit",   // the button in Settings
@@ -194,6 +196,9 @@ const WARDROBE = {title:"Suit up, Joe", intro:"It's a stealth mission. What are 
          sweater:[['Lars',"They're going to see you from space."],['John',"Festive though."]],
          vikings:[['John',"SKOL!!!"],['Lars',"We're breaking into a vault, not tailgating."],['John',"Why not both."]],
          avant:[['Lars',"Is that... art?"],['John',"He looks like a security guard from the year 3000."],['Lars',"Avant Guard. I get it. I hate that I get it."]],
+         grp:[['John',"Bro. It's December. Put on a shirt."],['Lars',"Respect. Interval day?"],['John',"Every day is interval day with him."]],
+         dave:[['Lars',"...Who's this?"],['John',"That's Dave."],['Lars',"Hi, Dave."]],
+         john:[['John',"Wait. Is that... me?"],['Lars',"It's a better you."],['John',"Wow."]],
          cupcake:[['John',"Oh no. He's a cupcake."],['Lars',"Every searchlight in the city is about to want a bite."],['John',"I'd eat him. Respectfully."]],
          disco:[['John',"Bro."],['John',"BRO. It's a heist, not a roller rink."],['Lars',"Is that a gold chain?"],['John',"The searchlights are gonna think you're a disco ball. Do NOT do the Hustle up there."]]}};
 
@@ -235,7 +240,7 @@ const BIRKIE = {
   johnAfter:"Come back anytime. Bring a pencil.",
   howToTitle:"The Birkie",
   howToSteps:["It's a skate race. You ski on your own; tap left or right to change lanes (or swipe on a phone). The Vikings follow your tracks exactly.",
-    "Jump over skiers who fell: Up, A or Space (or swipe up / tap).",
+    "Jump over skiers who fell: Up, A or Space (or swipe up / tap).","Pile-ups block the whole trail. There's no way around: you HAVE to jump those.",
     "Packs of slow skiers take up two lanes. Go around them.",
     "Feed stations: a volunteer swings a cup of flat Coke between two lanes. Be in the cup's lane right when you get there to grab it, then hold steady while you drink. Jump or change lanes and it spills.",
     "Your energy drains as you go (faster uphill). Low energy is slow. Flat Coke fills it back up.",
@@ -244,6 +249,7 @@ const BIRKIE = {
   howToOk:"Let's ski",
   // John talks to you over the radio for the whole race. Short lines fit best (they wrap onto up to 3 lines).
   radioStart:["John here, on the radio. The Vikings are lined up behind you.","They'll follow your tracks exactly. Watch the sweep snowmobile on the left. Go!"],
+  pileupAhead:"Pile-up across the whole trail! Jump it!",
   crash:["Yard sale! Shake it off.","Down goes a Viking. Up you get.","Face plant. Happens to everyone.","Skis everywhere! Regroup and go."],
   packCrash:["You skied right into a pack. Lots of apologizing. Go around next time.","Tangled up in a pack of skiers. Somebody's pole is in your bib."],
   bonk:"You're bonking! Get to the next feed station.",

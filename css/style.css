@@ -407,3 +407,14 @@ h1::before,h1::after{content:'✦';color:var(--berry);font-size:.6em;vertical-al
 .itip:empty{display:none}
 #itemCard .btn{margin-top:4px}
 @media (prefers-reduced-motion:reduce){.iart{animation:none}}
+/* the wardrobe: bigger pictures and labels, four to a row */
+#wardrobe .vcard{width:min(100%,460px)}
+.outfits{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.outfit{font-size:.72rem;line-height:1.15;padding:5px 3px 6px;gap:3px}
+.outfit canvas{width:44px;height:66px}
+.wline{font-size:.85rem!important;min-height:2.6em}
+/* a bigger game window on big monitors */
+.app{max-width:min(1180px,max(340px,calc((100svh - 215px)*4/3)))}
+@media (min-width:900px){ .app{gap:10px} header{gap:6px} body{padding-block:10px} }
+@media (max-width:520px){ .outfit canvas{width:33px;height:50px} .outfit{font-size:.62rem;padding:3px 2px 4px} .wline{font-size:.78rem!important}
+  #wardGo{position:sticky;bottom:0;box-shadow:0 3px 0 #0b0c12,0 0 0 8px #1d2130} }

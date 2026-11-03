@@ -79,7 +79,7 @@ function showCredits(){
 function card(title){ ending.page=title; $('credits').hidden=true; const c=$('ecard'); c.hidden=false; c.replaceChildren(); const h=document.createElement('small'); h.textContent=title; c.append(h); c.scrollTop=0; return c }
 function showStats(){
   const E=ENDING, c=card(E.statsTitle), dl=document.createElement('dl'); dl.className='stats';
-  const look=[WARDROBE.jersey,...WARDROBE.outfits].find(o=>o.id===(have.look||'jersey'));
+  const look=WARDROBE.outfits.find(o=>o.id===have.look);
   const rows=[[E.stats.birkie,have.birkieTime||'—'],[E.stats.golf,have.golfCard||'—'],[E.stats.anagrams,have.anaScore||'—'],[E.stats.spotted,have.spotted||0],
     [E.stats.snacks,have.fargoWrong||0],[E.stats.steps,Math.round(have.steps||0).toLocaleString()],[E.stats.look,look?look.name:'—']];
   for(const [k,v] of rows){const dt=document.createElement('dt'), dd=document.createElement('dd'); dt.textContent=k; dd.textContent=v; dl.append(dt,dd)}

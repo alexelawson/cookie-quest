@@ -9,7 +9,7 @@ const BIRK={
   TIRED:.6,                              // speed multiplier at zero energy
   DRAIN:{up:.0019, other:.0008},         // energy lost per ms
   JUMP_LEN:28, JUMP_H:9,                 // a jump carries you this far down the trail (px), this high (so it feels the same uphill or down)
-  CRASH_MS:1600, CRASH_COST:16,          // a crash: how long you're down, and the energy it costs
+  CRASH_MS:1350, CRASH_COST:13,          // a crash: how long you're down, and the energy it costs
   DRINK_MS:2000, SPILL_KEEP:15,          // feed stations: hold steady this long to drink; a spill still gives you a little
   CUP_SWING:650,
   GUST_EVERY:2400, GUST_WARN:650,         // on the lake: a gust every ~2.4-3.6 s, with this much warning before it shoves you                         // the volunteer swings the cup between two lanes this often (ms)
@@ -17,7 +17,7 @@ const BIRK={
   CUTOFF:3*3600,                         // the sweep snowmobile reaches the finish at 3:00:00
   SWEEP_START:15*60,                     // ...and leaves the start at 0:15:00, at a steady pace
   ELITE:2*3600+24*60,                    // under 2:24 gets a shout-out
-  // simulated (tests/birkie-difficulty.js): sharp ~2:21, good ~2:23, casual ~2:36 (19/20 finish), distracted ~13/20 finish, never dodging 0/20
+  // simulated (tests/birkie-difficulty.js), with the pile-ups you have to jump: sharp 20/20 ~2:22, good 20/20 ~2:35, casual 15/20, distracted 3/20, never reacting 0/20
 };
 // course sections, top to bottom (the landmarks)
 const BIRK_SECTIONS=[
@@ -64,6 +64,10 @@ const OBSTACLES=(()=>{const out=[], lanes=[0,-1,1,0,1,-1,-1,0,1,1,0,-1], gaps=[1
       else out.push({kind:'fallen',y,lanes:[lane]});
       k++ }
     y+=gaps[k%gaps.length] }
+  // pile-ups: skiers tangled across all three lanes. No way around: jump them. Kept clear of everything else.
+  const clear=y=>!FEEDS.some(f=>y>f.y-90&&y<f.y+70)&&!(y>BRIDGE.y0-40&&y<BRIDGE.y1+40)&&Math.abs(y-BROOK.y)>30&&Math.abs(y-OO.y)>30&&!out.some(o=>Math.abs(o.y-y)<46);
+  for(const want of [400,720,1150,1580,1880,2280]){ let y=want; for(let d=0;d<90&&!clear(y);d+=6)y=clear(want+d)?want+d:want-d; if(clear(y))out.push({kind:'pileup',y,lanes:[-1,0,1]}) }
+  out.sort((a,b)=>a.y-b.y);
   return out})();
 const FALLEN=OBSTACLES.filter(o=>o.kind==='fallen');   // (kept for anything that still looks for fallen skiers)
 
@@ -104,22 +108,33 @@ const birkBg=document.createElement('canvas'); birkBg.width=BIRK.W; birkBg.heigh
   for(let n=0;n<520;n++){const y=rnd()*(2130)|0, side=rnd()<.5?-1:1, x=trailX(y)+side*(trailHalf(y)+8+rnd()*60);
     if(x<2||x>BIRK.W-2)continue; F('#5a3a22',x,y,2,3); F('#2f5e3a',x-4,y-8,10,8); F('#356b42',x-3,y-12,8,5); F('#ffffff',x-3,y-12,7,1); F('#ffffff',x-4,y-8,4,1)}
 })();
-function drawSkier(x,y,o={}){ // generic skier: o.jersey, o.helmet, o.horns, o.down (fallen), o.hair
+function drawSkier(x,y,o={}){ // a skate skier coming down the trail: o.jersey, o.pants, o.hat/o.pom, o.bib, o.headband, o.glasses, o.down (fallen)
   const X=Math.round(x)-5, Y=Math.round(y)-16, F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(X+dx,Y+dy,w,h)};
-  if(o.down){F('rgba(0,0,0,.2)',-2,13,14,3); F(o.jersey||'#c8322b',-1,9,10,4); F('#f0c6a0',9,9,3,3); F('#2b2b36',-4,13,16,1); F('#2b2b36',-2,6,1,8); return}
-  F('rgba(0,0,0,.18)',0,15,10,2);
+  if(o.down){ // sprawled in the snow: skis crossed, poles flung, hat knocked off
+    F('rgba(0,0,0,.2)',-3,12,16,4);
+    for(let k=0;k<14;k++){F('#2b2b36',-3+k,9+Math.floor(k/3),1,1); F('#2b2b36',-2+k,15-Math.floor(k/3),1,1)}   // crossed skis
+    F(o.jersey||'#c8322b',0,9,8,4); F(o.pants||'#1d1d22',7,10,4,3); F('#f0c6a0',-2,9,3,3); F(o.hat||'#e8742a',-4,7,3,2); F('#ffffff',-5,7,1,1);
+    F('#3b3b44',1,5,1,5); F('#3b3b44',9,13,4,1); F('#ffffff',2,10,3,2); return}
+  F('rgba(0,0,0,.18)',-1,15,12,2);
+  const push=o.step!=null?o.step%2:0, sw=push?1:-1;
   // skate skis in a V (tails together behind, tips out in front); the pushing ski kicks out further
-  const push=o.step!=null?o.step%2:0;
-  for(let k=0;k<13;k++){const d=Math.floor(k/(push?3:4)), e=Math.floor(k/(push?4:3)); F('#2b2b36',3-d,4+k,1,1); F('#2b2b36',6+e,4+k,1,1)}
-  F('#3b3b44',0,5,1,8); F('#3b3b44',9,5,1,8);                       // poles
-  F(o.pants||'#1d1d22',2,10,6,4); F(o.jersey||'#fbfbf7',2,4,6,6); if(o.trim)F(o.trim,2,4,6,1);
-  F('#f0c6a0',3,0,4,4); F(o.hair||'#b08355',3,0,4,2);
-  if(o.helmet){F(o.helmet,2,-1,6,3); if(o.horns){F('#f6f2e4',1,-3,1,3); F('#f6f2e4',8,-3,1,3)}}
-  if(o.headband)F(o.headband,3,1,4,1); if(o.glasses){F(o.glasses,2,2,6,1); F('#5a5f6a',3,2,1,1)}   // headband; wraparound sunglasses with a little shine
-  if(o.panels){F(o.panels,2,5,1,5); F(o.panels,7,5,1,5)} if(o.stripe)F(o.stripe,2,12,6,1);   // race-suit side panels, a stripe on the tights
-  F('rgba(0,0,0,.18)',6,4,1,6); F('rgba(0,0,0,.18)',5,10,2,4); F('rgba(255,255,255,.25)',4,0,2,1); F('#d9a583',6,2,1,2);   // shading: jersey side, tights, hair shine, cheek
-  if(!o.glasses&&!o.helmet){F('#2b2b2b',4,2,1,1); F('#2b2b2b',6,2,1,1)}   // eyes
+  for(let k=0;k<14;k++){const d=Math.floor(k/(push?3:4)), e=Math.floor(k/(push?4:3)); F('#2b2b36',3-d,3+k,1,1); F('#2b2b36',6+e,3+k,1,1)} F(o.ski||'#c8322b',3-Math.floor(13/(push?3:4)),15,1,1); F(o.ski||'#c8322b',6+Math.floor(13/(push?4:3)),15,1,1);
+  // legs, knees bent, pushing off
+  F(o.pants||'#1d1d22',2+(push?0:1),10,2,4); F(o.pants||'#1d1d22',6-(push?1:0),10,2,4); F('#3a3a44',2+(push?0:1),13,2,1); F('#3a3a44',6-(push?1:0),13,2,1);
+  // body leaning forward, arms swinging the poles (planted out to the side and behind)
+  F(o.jersey||'#fbfbf7',2,4,6,6); if(o.trim)F(o.trim,2,4,6,1); F('rgba(0,0,0,.16)',7,4,1,6);
+  if(o.bib!==false){F('#ffffff',3,6,4,3); F(o.bibNum||'#c8322b',4,7,2,1)}                             // race bib
+  F(o.jersey||'#fbfbf7',1,5+(push?0:1),1,3); F(o.jersey||'#fbfbf7',8,5+(push?1:0),1,3);               // arms
+  F(o.glove||'#2b2b36',1,8+(push?0:1),1,1); F(o.glove||'#2b2b36',8,8+(push?1:0),1,1);
+  F('#5f6370',0,9+(push?0:1),1,7); F('#5f6370',9,9+(push?1:0),1,7); F('#8a8f9a',-1,16,2,1); F('#8a8f9a',9,16,2,1);   // poles + baskets
+  // head: hat with a pompom (or a headband), eyes or shades
+  F('#f0c6a0',3,0,4,4); F(o.hair||'#b08355',3,0,4,1); F('#d9a583',6,2,1,2);
+  if(o.headband){F(o.headband,3,1,4,1)} else {const h=o.hat||'#2f6db0'; F(h,2,-1,6,2); F(h,3,-2,4,1); F('rgba(255,255,255,.35)',2,0,6,1); F(o.pom||'#ffffff',4,-3,2,1)}
+  if(o.glasses){F(o.glasses,2,2,6,1); F('#5a5f6a',3,2,1,1)} else {F('#2b2b2b',4,2,1,1); F('#2b2b2b',6,2,1,1)}
+  if(o.panels){F(o.panels,2,5,1,5); F(o.panels,7,5,1,5)} if(o.stripe)F(o.stripe,2,12,6,1);
 }
+const SKIER_LOOKS=[{jersey:'#2f6db0',hat:'#e8742a',pom:'#ffd84d'},{jersey:'#c8322b',hat:'#f2f2ee',pom:'#c8322b'},{jersey:'#2f8a4a',hat:'#c8322b',pom:'#ffffff'},
+  {jersey:'#7a4fa0',hat:'#ffd84d',pom:'#7a4fa0'},{jersey:'#e8742a',hat:'#1d1d22',pom:'#e8742a'},{jersey:'#5fa8e8',hat:'#2f6db0',pom:'#ffffff',pants:'#2b3a63'}];
 const JOE_RACE_KIT=()=>({jersey:'#2e9a45',trim:'#8fe09a',pants:'#111114',panels:'#111114',stripe:'#2e9a45',hair:'#b08355',headband:'#ffffff',glasses:'#111114',step:P.step});   // green race suit, black side panels and tights, white headband, black Oakleys
 const VIKING_KINDS=[{kind:'norse',sack:true},{kind:'football',num:'21'},{kind:'norse'},{kind:'football',num:'52'}];   // the lead Norse Viking carries the flour
 function drawVikingSkier(x,y,v,step){
@@ -190,10 +205,11 @@ function birkUpdate(dt){
   const lane=curLane();
   for(const o of OBSTACLES){ if(birk.hit.has(o))continue; const oy=obstacleY(o); if(Math.abs(P.y-oy)>5)continue;
     if(!o.lanes.includes(lane))continue;
-    if(o.kind==='fallen'&&birkAir()>2)continue;                      // cleared it
+    if(o.kind!=='pack'&&birkAir()>2)continue;                       // cleared it (fallen skiers and pile-ups can be jumped; packs can't)
     birk.hit.add(o); birk.crashT=BIRK.CRASH_MS; birk.v=0; birk.jumpD=0; birk.energy=Math.max(0,birk.energy-BIRK.CRASH_COST); sfx('crash');
     if(birk.drink)spill(); else birkSay(o.kind==='pack'?BIRKIE.packCrash[Math.floor(Math.random()*BIRKIE.packCrash.length)]:BIRKIE.crash[Math.floor(Math.random()*BIRKIE.crash.length)]);
     break }
+  for(const o of OBSTACLES)if(o.kind==='pileup'&&o.y-P.y>0&&o.y-P.y<110)birkOnce('pile'+o.y,BIRKIE.pileupAhead);
   // feed stations: be in the cup's lane to grab it, then hold steady (no jumping, no lane changes) until it's down
   for(const f of FEEDS){ if(!f.used&&f.y-P.y<150&&f.y>P.y)birkOnce('feedAhead'+f.y,BIRKIE.feedAhead);
     if(!f.used&&P.y>=f.y){ f.used=true;
@@ -298,8 +314,12 @@ SCENES.birkie={ place:BIRKIE.place, music:'birkie',
     if(birk.drink){const X=Math.round(x)+5, Y=Math.round(y-h)-12; ctx.fillStyle='#ffffff'; ctx.fillRect(X,Y,3,4); ctx.fillStyle='#4a2412'; ctx.fillRect(X,Y,3,2)} },
   under(){
     for(const o of OBSTACLES){const oy=obstacleY(o); if(Math.abs(oy-P.y)>200)continue;
-      if(o.kind==='fallen')drawSkier(laneX(oy,o.lanes[0]),oy,{down:true,jersey:['#2f6db0','#e8742a','#2f8a4a','#c8322b'][Math.floor(o.y)%4]});
-      else o.lanes.forEach((l,i)=>drawSkier(laneX(oy,l),oy-(i%2)*2,{jersey:['#8a8f9a','#c49a6a','#7a8aa0'][(o.y/10+i)%3|0],pants:'#3a3f4a',hair:'#6b4429',step:Math.floor(time/300)+i}))}
+      const look=k=>SKIER_LOOKS[(Math.floor(o.y/7)+k)%SKIER_LOOKS.length];
+      if(o.kind==='fallen')drawSkier(laneX(oy,o.lanes[0]),oy,{down:true,...look(0)});
+      else if(o.kind==='pileup'){ o.lanes.forEach((l,i)=>drawSkier(laneX(oy,l)+(i-1)*2,oy+(i%2)*2-1,{down:true,...look(i)}));   // a tangle across the whole trail
+        const cx=Math.round(trailX(oy)); ctx.fillStyle='#3b3b44'; for(let k=0;k<5;k++)ctx.fillRect(cx-22+k*10,oy-4+(k%2)*6,6,1);   // poles everywhere
+        if(Math.floor(time/250)%2){ctx.fillStyle='#e8742a'; ctx.fillRect(cx-30,oy-14,2,8); ctx.fillRect(cx+28,oy-14,2,8); ctx.fillStyle='#ffffff'; ctx.fillRect(cx-30,oy-14,2,2); ctx.fillRect(cx+28,oy-14,2,2)} }   // flashing marker stakes
+      else o.lanes.forEach((l,i)=>drawSkier(laneX(oy,l),oy-(i%2)*2,{...look(i+2),step:Math.floor(time/300)+i}))}
     // FEED banners over the trail
     for(const f of FEEDS){const cx=Math.round(trailX(f.y)), hw=34; ctx.fillStyle='#8a8f9a'; ctx.fillRect(cx-hw-2,f.y-20,2,22); ctx.fillRect(cx+hw,f.y-20,2,22);
       ctx.fillStyle='#e8742a'; ctx.fillRect(cx-hw-2,f.y-24,hw*2+4,9); ctx.fillStyle='#ffffff'; ctx.fillRect(cx-hw-2,f.y-24,hw*2+4,1); pixText(ctx,'FEED',cx-7,f.y-22,'#ffffff')}

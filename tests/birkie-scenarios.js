@@ -48,8 +48,8 @@ ok('E wrong lane: you miss the cup',r.missed.includes('Missed')&&r.missE<35,r.mi
 r=await p.evaluate(()=>{T.only=null; T.setup(500,0); birk.energy=100; birk.v=.03; T.run(200); const vFull=birk.v, eAfter=birk.energy; T.setup(500,0); birk.energy=0; birk.v=.03; T.run(200); return {vFull,eAfter,vEmpty:birk.v}});
 ok('F energy drains as you go, and running on empty is slow',r.eAfter<100&&r.vEmpty<r.vFull*.8,`${r.vFull.toFixed(3)} vs ${r.vEmpty.toFixed(3)}`);
 // G. the course is always passable
-r=await p.evaluate(()=>{const bad=OBSTACLES.filter(o=>o.lanes.length>=3||(o.y>BRIDGE.y0-40&&o.y<BRIDGE.y1+40)||FEEDS.some(f=>Math.abs(o.y-f.y)<60)); return {bad:bad.length,n:OBSTACLES.length,packs:OBSTACLES.filter(o=>o.kind==='pack').length,bridge:laneX(2450,1)-laneX(2450,0),trail:laneX(1000,1)-laneX(1000,0),order:sectionAt(2200).type==='lake'&&sectionAt(2450).bridge&&sectionAt(2560).type==='finish'}});
-ok('G every obstacle leaves a way through; none on the bridge or at a feed; lanes squeeze on the bridge',!r.bad&&r.n>12&&r.packs>2&&r.bridge<r.trail,JSON.stringify(r));
+r=await p.evaluate(()=>{const pile=OBSTACLES.filter(o=>o.kind==='pileup'), bad=OBSTACLES.filter(o=>(o.lanes.length>=3&&o.kind!=='pileup')||(o.y>BRIDGE.y0-40&&o.y<BRIDGE.y1+40)||FEEDS.some(f=>Math.abs(o.y-f.y)<60)); const crowd=pile.filter(p=>OBSTACLES.some(o=>o!==p&&Math.abs(o.y-p.y)<46)).length; return {bad:bad.length,pile:pile.length,crowd,n:OBSTACLES.length,packs:OBSTACLES.filter(o=>o.kind==='pack').length,bridge:laneX(2450,1)-laneX(2450,0),trail:laneX(1000,1)-laneX(1000,0),order:sectionAt(2200).type==='lake'&&sectionAt(2450).bridge&&sectionAt(2560).type==='finish'}});
+ok('G every obstacle leaves a way through (pile-ups are jumpable, with room either side); none on the bridge or at a feed; lanes squeeze on the bridge',!r.bad&&r.pile>=5&&!r.crowd&&r.n>12&&r.packs>2&&r.bridge<r.trail,JSON.stringify(r));
 ok('G the finish: across the lake, over the International Bridge, then Main Street',r.order);
 r=await p.evaluate(()=>{T.only=null; T.setup(2200,0); birk.gustT=1; birk.said.gust=0; for(let i=0;i<5;i++)update(16.7); const warned=!!birk.gust, dir=birk.gust&&birk.gust.dir; for(let i=0;i<60;i++)update(16.7); return {warned,dir,lane:birk.lane,msg:birk.msg}});
 ok('G on the lake a gust is coming (blowing snow), then it shoves you a lane',r.warned&&r.lane===r.dir,JSON.stringify(r));
@@ -80,4 +80,12 @@ await fresh(); await start();
 r=await p.evaluate(()=>{T.setup(300,0); const c=$('game'), ev=(t,x,y)=>c.dispatchEvent(new PointerEvent(t,{clientX:x,clientY:y,bubbles:true}));
   ev('pointerdown',200,300); ev('pointerup',260,305); const swipe=birk.lane; ev('pointerdown',200,300); ev('pointerup',201,300); const tap=birk.jumpD>0; return {swipe,tap}});
 ok('J on a phone: swipe right changes lane, a tap jumps',r.swipe===1&&r.tap,JSON.stringify(r));
+// G2. a pile-up blocks every lane: you have to jump it
+r=await p.evaluate(()=>{const o=OBSTACLES.find(o=>o.kind==='pileup'), out={};
+  for(const [name,lane,jump] of [['left',-1,false],['mid',0,false],['right',1,false],['jump',0,true]]){
+    birkStart(); birk.lane=lane; birk.lx=lane*BIRK.LANE; P.y=o.y-40; birk.v=.06; let jumped=false, crashed=false;
+    for(let i=0;i<120&&P.y<o.y+20;i++){ if(jump&&!jumped&&o.y-P.y<BIRK.JUMP_LEN*.6){birkJump(); jumped=true} birkUpdate(16.7); if(birk.crashT>0){crashed=true; break} }
+    out[name]=crashed }
+  birk.running=false; return out});
+ok('G2 a pile-up catches you in every lane, and a jump clears it',r.left&&r.mid&&r.right&&!r.jump,JSON.stringify(r));
 console.log(R.join('\n')); console.log('page errors:',errs.length?errs:'none'); await b.close()})();

@@ -71,16 +71,16 @@ await fresh({});
 r=await p.evaluate(()=>{P.x=134;P.y=244;update(16.7); action(); const open=!$('wardrobe').hidden, n=$('outfits').children.length;
   [...$('outfits').children].find(b=>b.dataset.id==='sweater').click(); const line=$('wardLine').textContent; $('wardGo').click(); T.run(40);
   return {open,n,line,outfit:have.outfit,city:scene===SCENES.city}});
-ok('F the elevator opens the wardrobe first; pick an outfit; then the city',r.open&&r.n===7&&r.line.includes('Festive')&&r.outfit==='sweater'&&r.city,r.line);
+ok('F the elevator opens the wardrobe first; pick an outfit; then the city',r.open&&r.n===10&&r.line.includes('Festive')&&r.outfit==='sweater'&&r.city,r.line);
 r=await p.evaluate(()=>{const seen=[]; for(let i=0;i<20&&!dlg.hidden;i++){seen.push($('dspeaker').textContent+': '+$('dtext').textContent); [...$('dbtns').querySelectorAll('button')][0].click(); if(!$('howto').hidden)$('howOk').click(); T.run(2)} T.run(5); for(let i=0;i<5&&!dlg.hidden;i++){seen.push($('dspeaker').textContent+': '+$('dtext').textContent);[...$('dbtns').querySelectorAll('button')][0].click(); T.run(2)} return seen});
 ok('F the crew reacts to the outfit',r.some(l=>l.includes('from space')),r.slice(-2).join(' | '));
 // G. the welcome from Alex, and Joe's look
 await p.goto(URL); await p.evaluate(()=>localStorage.clear()); await p.reload(); await p.click('#startBtn'); await p.evaluate(helpers);
 r=await p.evaluate(()=>{const sp=$('dspeaker').textContent, pages=[]; while(T.btns().includes('Next')){pages.push($('dtext').textContent);T.click('Next')} pages.push($('dtext').textContent); T.click("Let's go!");
-  const open=!$('wardrobe').hidden, n=$('outfits').children.length, first=$('outfits').children[0].dataset.id, title=$('wardTitle').textContent;
-  [...$('outfits').children].find(b=>b.dataset.id==='vikings').click(); $('wardGo').click(); return {sp,pages,open,n,first,title,look:have.look,welcomed:have.welcomed}});
+  const open=!$('wardrobe').hidden, n=$('outfits').children.length, first=$('outfits').children[0].dataset.id, ids=[...$('outfits').children].map(b=>b.dataset.id), title=$('wardTitle').textContent;
+  [...$('outfits').children].find(b=>b.dataset.id==='vikings').click(); $('wardGo').click(); return {sp,pages,open,n,first,ids,title,look:have.look,welcomed:have.welcomed}});
 ok('G Alex welcomes Joe and explains the game',r.sp==='Alex'&&r.pages.join(' ').includes('Merry Christmas')&&r.pages.join(' ').includes('kitchen'),r.pages.length+' pages');
-ok('G then Joe picks his look (jersey first), and it sticks',r.open&&r.n===8&&r.first==='jersey'&&r.look==='vikings'&&r.welcomed,r.title);
+ok('G then Joe picks his look (no jersey option now; GRP shorts, Dave and John are there), and it sticks',r.open&&r.n===10&&r.first!=='jersey'&&r.ids.includes('grp')&&r.ids.includes('dave')&&r.ids.includes('john')&&r.look==='vikings'&&r.welcomed,r.title);
 await p.reload(); await p.click('#startBtn'); r=await p.evaluate(()=>({dlg:!dlg.hidden,ward:!$('wardrobe').hidden})); ok('G no welcome the second time',!r.dlg&&!r.ward);
 // I. Bryan by the pond gives sprinkles; they show up in the basket and add a step to the baking
 await fresh({farm:1,mill:1,city:1,fargo:1,golf:1});

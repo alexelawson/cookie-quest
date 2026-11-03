@@ -117,6 +117,9 @@ const OUTFIT_LOOK={
   disco:  {top:'disco', pants:'#f2efe6', boots:'#e8b04a', head:'afro', flare:true},
   avant:  {top:'avant', pants:'#1d1d22', boots:'#f2f2ee', head:'beret', flare:true},
   cupcake:{top:'cupcake', pants:'#f2efe6', boots:'#e54b7a', head:'frosting'},
+  grp:    {top:'grp', pants:'#111114', boots:'#2b2b33', head:'bikehelmet', shorts:true},   // GRP training shorts: no shirt, black spandex to mid-calf with green stripes, helmet, shades
+  dave:   {top:'cat', pants:'#c8442a', boots:'#e86a4a', head:'cat', tail:true},          // Dave: a red cat
+  john:   {top:'#f4f4f0', pants:'#3a5f9e', boots:'#3b2a1e', head:'cap', arms:true},        // John: red cap, white tee, jeans, boots
 };
 const heroLook=()=>OUTFIT_LOOK[have.outfit]||OUTFIT_LOOK.cape;
 function drawHero(c,g=ctx,look=heroLook()){
@@ -125,23 +128,40 @@ function drawHero(c,g=ctx,look=heroLook()){
   const [a,b]=legs(c), sway=c.moving?(c.step%2?1:-1):0;
   F('rgba(0,0,0,.25)',1,19,10,2);
   if(L.cape&&c.dir!=='up'){F(L.cape[0],0+sway,7,12,12); F(L.cape[1],1+sway,8,1,10)}            // cape behind you
+  if(L.tail){const w=Math.round(Math.sin(time/260)); if(c.dir==='up'){F('#c8442a',5,13,2,5); F('#c8442a',5+w,17,2,2)} else {const sx=c.dir==='left'?-1:10; F('#c8442a',sx+1,12,2,2); F('#c8442a',sx+2,8+w,1,5); F('#c8442a',sx+1,7+w,2,1); F('#f0a070',sx+1,6+w,1,1)}}   // Dave's tail, swishing
   const dk=col=>{if(typeof col!=='string'||col[0]!=='#'||col.length!==7)return col; return '#'+[1,3,5].map(k=>Math.max(0,parseInt(col.slice(k,k+2),16)-34).toString(16).padStart(2,'0')).join('')};
   F(L.pants,3,13,2,6-a); F(L.pants,7,13,2,6-b); F(dk(L.pants),4,13,1,6-a); F(dk(L.pants),8,13,1,6-b); F(L.boots,2,19-a,3,1); F(L.boots,7,19-b,3,1);
   if(L.flare){F(L.pants,2,18-a,4,1); F(L.pants,6,18-b,4,1); F(L.boots,2,19-a,4,1); F(L.boots,6,19-b,4,1)}   // bell-bottoms + platforms
+  if(L.shorts){F('#2e9a45',3,15,2,1); F('#2e9a45',7,15,2,1); F('#8fe09a',3,16,2,1); F('#8fe09a',7,16,2,1); F(skin,3,17,2,2-a); F(skin,7,17,2,2-b); F('#d9a583',4,17,1,2-a); F('#d9a583',8,17,1,2-b)}   // spandex to mid-calf, green stripes, bare calves
+  if(L.top==='avant'){F('#ffd84d',7,19-b,3,1); F('#ff3fb4',2,19-a,3,1)}   // mismatched boots: one gold, one hot pink
   // body
   if(L.top==='crumb'){F('#2b2d33',2,7,8,7); F('#2b2d33',1,8,1,4); F('#2b2d33',10,8,1,4); F('#f2f2ee',1,11,1,2); F('#f2f2ee',10,11,1,2);   // black suit, white oven-mitt gloves
     if(c.dir==='down'){F('#f2f2ee',4,8,4,3); F('#ffffff',4,8,2,1); F('#6b707a',5,9,1,1); F('#6b707a',7,8,1,1); F('#6b707a',6,10,1,1)} }   // the white cookie emblem   // the cookie emblem
   else if(L.top==='foil'){F('#b9c0c8',1,6,10,8); F('#8d949c',1,13,10,1); for(const [fx,fy] of [[2,7],[5,8],[8,7],[3,10],[7,11],[9,9],[4,12]])F('#eef1f4',fx,fy,1,1); F('#8d949c',6,9,1,2); F('#8d949c',3,8,1,1)}   // crinkly foil   // fuzzy suit, lighter belly
   else if(L.top==='sweater'){F('#c8322b',1,7,10,6); F('#2f8a4a',1,9,10,1); F('#2f8a4a',1,12,10,1); F('#ffffff',3,8,1,1); F('#ffffff',6,8,1,1); F('#ffffff',9,8,1,1); F('#ffffff',4,10,1,1); F('#ffffff',8,10,1,1); F('#f4d35e',6,10,1,2)}
   else if(L.top==='jersey'){F('#4f2683',1,7,10,6); F('#ffc62f',1,7,2,2); F('#ffc62f',9,7,2,2); F('#ffffff',5,9,2,3); F('#ffc62f',1,12,10,1)}   // purple jersey, gold shoulders, a white number
-  else if(L.top==='avant'){F('#1d1d22',2,6,8,7); F('#1d1d22',3,5,6,1); F('#f2f2ee',-1,5,5,5); F('#d9d9d4',-1,9,5,1); F('#1d1d22',10,8,1,5); F('#f2f2ee',3,12,6,1)}   // turtleneck, one huge white shoulder
+  else if(L.top==='avant'){   // louder: a black turtleneck, a HUGE white stepped shoulder, a lime sleeve, a hot-pink zigzag, a gold spiky collar, sparkles
+    F('#1d1d22',2,6,8,7); F('#1d1d22',3,5,6,1);
+    F('#f2f2ee',-2,4,6,6); F('#f2f2ee',-3,3,4,3); F('#f2f2ee',-4,2,3,2); F('#d9d9d4',-2,9,6,1); F('#1d1d22',-3,5,1,1); F('#1d1d22',-1,7,1,1);   // the shoulder, with two black dots
+    F('#b6ff3a',10,7,2,6); F('#8ad61f',11,7,1,6);                                                                      // one lime sleeve
+    F('#ff3fb4',3,8,1,1); F('#ff3fb4',4,9,1,1); F('#ff3fb4',5,8,1,1); F('#ff3fb4',6,9,1,1); F('#ff3fb4',7,8,1,1); F('#ff3fb4',8,9,1,1);   // zigzag
+    for(let k=0;k<4;k++){F('#ffd84d',3+k*2,4,1,1); F('#ffd84d',3+k*2,5,2,1)}                                        // a spiky gold collar
+    F('#4fd8ff',3,11,2,2); F('#ffd84d',7,11,2,1); F('#1d1d22',2,12,8,1); F('#f2f2ee',3,13,7,1)                        // a blue square, a gold bar, an uneven hem
+    const tw=Math.floor(time/180);
+    for(const [sx,sy,k] of [[-4,0,0],[13,4,1],[11,-4,2],[-2,13,3],[13,14,4]]){ if((tw+k)%3)continue; F('#ffffff',sx,sy,1,1); F('#ffffff',sx-1,sy+1,3,1); F('#ffffff',sx,sy+2,1,1); F('#fff3a8',sx,sy+1,1,1)} }   // sparkles
   else if(L.top==='cupcake'){   // a big pleated cupcake wrapper from the chest to the knees, little arms poking out
     for(let yy=7;yy<16;yy++){const inset=Math.floor((yy-7)/3); F('#e0b46a',-1+inset,yy,14-inset*2,1)}
     for(let xx=0;xx<12;xx+=2)F('#b8863e',xx+(xx>5?0:0),8,1,8); F('#f2d49a',-1,7,14,1); F('#b8863e',1,15,10,1);
     F('#f0c6a0',-2,9,1,3); F('#f0c6a0',13,9,1,3)}
+  else if(L.top==='grp'){F(skin,2,7,8,6); F(skin,1,8,1,4); F(skin,10,8,1,4); F('#d9a583',2,7,1,6); F('#d9a583',9,7,1,6);   // no shirt
+    F('#d9a583',3,9,2,1); F('#d9a583',7,9,2,1); F('#d9a583',5,10,2,1); F('#d9a583',5,12,2,1); F('#d9a583',6,9,1,4);   // (training shows)
+    F('#111114',2,12,8,2); F('#2e9a45',2,12,8,1)}                                                                       // spandex up to the waist, a green waistband
+  else if(L.top==='cat'){F('#c8442a',2,7,8,7); F('#c8442a',1,8,1,4); F('#c8442a',10,8,1,4); F('#a83a22',9,8,1,5); F('#f0a070',4,9,4,4); F('#f0a070',1,11,1,1); F('#f0a070',10,11,1,1);   // fuzzy red suit, a pale belly, paws
+    F('#a83a22',2,9,1,1); F('#a83a22',9,11,1,1); F('#a83a22',3,12,1,1)}                                                 // tabby stripes
   else if(L.top==='disco'){F('#f2efe6',1,7,10,6); F('#e8742a',4,7,4,4); F('#f2efe6',5,8,2,3); F('#ffd84d',5,10,2,1); F('#d9d3c4',1,9,1,4); F('#d9d3c4',10,9,1,4)}   // white suit, orange wide collar, gold chain
   else {F(L.top,2,7,8,7); F(L.top,1,8,1,4); F(L.top,10,8,1,4); F(dk(L.top),9,8,1,5); F(dk(L.top),2,13,8,1)}
   if(L.belt)F(L.belt,2,12,8,1);
+  if(L.arms){F(skin,1,8,1,4); F(skin,10,8,1,4); F('#d9a583',1,10,1,2); F(L.top,1,8,1,1); F(L.top,10,8,1,1); F('#dcdcd6',9,8,1,5)}   // short sleeves, bare arms (like John)
   if(L.whisk&&c.dir!=='left'){F('#8a5a34',9,11,1,2); F('#c9ced4',8,13,3,1); F('#c9ced4',8,14,1,1); F('#c9ced4',10,14,1,1); F('#c9ced4',9,15,1,1)}   // a whisk on the belt
   F(skin,3,2,6,5);
   // head
@@ -161,9 +181,9 @@ function drawHero(c,g=ctx,look=heroLook()){
     if(c.dir==='right'){F(skin,6,3,4,3); F(eye,8,4,1,1); F('#8a8f9a',6,5,4,1); F('#f2f2ee',2,1,3,2)}
     return }
   if(L.head==='beret'){ F('#1d1d22',3,2,6,1);   // slicked hair under the beret
-    if(c.dir==='up'){F('#c8322b',1,-2,9,4); return}
-    F('#c8322b',1,-2,9,3); F('#c8322b',8,-3,2,2); F('#8a1f1a',5,-3,1,1);
-    if(c.dir==='down'){F('#1d1d22',3,3,2,2); F('#1d1d22',7,3,2,2); F('#1d1d22',5,3,2,1); F('#b5654f',5,6,2,1)}   // tiny round sunglasses
+    if(c.dir==='up'){F('#c8322b',0,-2,11,4); F('#4fd8ff',9,-7,1,5); return}
+    F('#c8322b',0,-2,11,3); F('#c8322b',8,-3,3,2); F('#8a1f1a',5,-3,1,1); F('#4fd8ff',9,-8,1,6); F('#ff3fb4',8,-9,3,2); F('#ffd84d',9,-9,1,1);   // a bigger beret with a blue antenna and a pink pom
+    if(c.dir==='down'){F('#ff3fb4',2,3,4,2); F('#ff3fb4',7,3,4,2); F('#1d1d22',3,3,2,2); F('#1d1d22',8,3,2,2); F('#ff3fb4',6,3,1,1); F('#b5654f',5,6,2,1)}   // tiny round shades in hot-pink frames
     if(c.dir==='left'){F('#1d1d22',2,3,2,2)}
     if(c.dir==='right'){F('#1d1d22',8,3,2,2)}
     return }
@@ -184,6 +204,13 @@ function drawHero(c,g=ctx,look=heroLook()){
     if(c.dir==='left'){F('#e8b04a',2,3,3,2)}
     if(c.dir==='right'){F('#e8b04a',7,3,3,2)}
     return }
+  if(L.head==='cat'){ const C='#c8442a';   // Dave: a red cat hood with pointy ears and whiskers
+    F(C,1,0,10,4); F(C,1,3,2,5); F(C,9,3,2,5); F(C,1,-2,3,2); F(C,8,-2,3,2); F(C,2,-3,1,1); F(C,9,-3,1,1); F('#f5b6b0',2,-1,1,1); F('#f5b6b0',9,-1,1,1);
+    if(c.dir==='up'){F(C,1,0,10,8); return}
+    if(c.dir==='down'){F(skin,3,3,6,5); F(eye,4,4,1,1); F(eye,7,4,1,1); F('#e86a8a',5,5,2,1); F('#b5654f',5,6,2,1); F('#2b2b2b',0,5,2,1); F('#2b2b2b',0,6,2,1); F('#2b2b2b',10,5,2,1); F('#2b2b2b',10,6,2,1)}
+    if(c.dir==='left'){F(skin,2,3,5,5); F(eye,3,4,1,1); F('#e86a8a',2,5,1,1); F('#2b2b2b',0,5,2,1); F(C,7,2,3,5)}
+    if(c.dir==='right'){F(skin,5,3,5,5); F(eye,8,4,1,1); F('#e86a8a',9,5,1,1); F('#2b2b2b',10,5,2,1); F(C,2,2,3,5)}
+    return }
   if(L.head==='hood'){ F(L.hat,1,0,10,4); F(L.hat,1,3,2,5); F(L.hat,9,3,2,5); F('#4f535c',2,4,1,3); F('#4f535c',9,4,1,3);
     if(c.dir==='up'){F(L.hat,1,0,10,8); return}
     F('#d9ad88',3,3,6,1);
@@ -200,17 +227,22 @@ function drawHero(c,g=ctx,look=heroLook()){
     if(m&&c.dir!=='up'){ if(c.dir==='down'){F(m,2,3,8,2); F('#ffffff',3,4,1,1); F(eye,4,4,1,1); F(eye,7,4,1,1); F('#ffffff',8,4,1,1)}
       else if(c.dir==='left'){F(m,1,3,6,2); F(eye,3,4,1,1)} else {F(m,5,3,6,2); F(eye,8,4,1,1)} }
   }
+  if(L.head==='bikehelmet'){ F('#111114',2,-2,8,3); F('#111114',1,0,10,1); F('#2e9a45',3,-2,1,3); F('#2e9a45',6,-2,1,3); F('#2e9a45',8,-1,1,2); F('#3a3a44',4,-2,1,1);   // vented black-and-green helmet
+    if(c.dir==='down'){F('#111114',2,3,8,2); F('#8fe09a',3,3,2,1); F('#8fe09a',7,3,2,1)}                                               // wraparound shades
+    if(c.dir==='left'){F('#111114',1,3,5,2); F('#8fe09a',2,3,2,1)} if(c.dir==='right'){F('#111114',6,3,5,2); F('#8fe09a',8,3,2,1)} }
+  if(L.head==='cap'){ F('#c8322b',2,-2,8,3); F('#9e2620',2,0,8,1); F('#f4f4f0',4,-1,1,1); F('#f4f4f0',7,-1,1,1);                       // John's red cap
+    if(c.dir==='down')F('#9e2620',3,1,6,1); if(c.dir==='right')F('#c8322b',9,0,3,1); if(c.dir==='left')F('#c8322b',0,0,3,1) }
   if(L.head==='santa'){F('#c8322b',3,-3,6,3); F('#c8322b',8,-4,2,2); F('#ffffff',11,-5,2,2); F('#c8322b',10,-5,1,2); F('#ffffff',2,0,8,1)}
 }
 // ---------- the wardrobe: pick Joe's stealth outfit before going up ----------
 function openWardrobe(then,mode='heist',fromSettings=false){   // mode 'look' = Joe's everyday look at the start (adds the jersey)
-  const W=WARDROBE, look=mode==='look', open=W.outfits.filter(o=>!o.unlock||have[o.unlock]), list=look?[W.jersey,...open]:open, key=look?'look':'outfit';
-  let pick=have[key]||(look?'jersey':'cape');
+  const W=WARDROBE, look=mode==='look', open=W.outfits.filter(o=>!o.unlock||have[o.unlock]), list=open, key=look?'look':'outfit';
+  let pick=have[key]; if(!list.some(o=>o.id===pick))pick=list[0].id;   // (an old save might still say 'jersey')
   $('wardTitle').textContent=look?ALEX_WELCOME.lookTitle:W.title; $('wardIntro').textContent=fromSettings?W.changeIntro:look?ALEX_WELCOME.lookIntro:W.intro; $('wardGo').textContent=look?ALEX_WELCOME.lookGo:W.go;
   const render=()=>{ $('outfits').querySelectorAll('.outfit').forEach(b=>b.classList.toggle('on',b.dataset.id===pick)); $('wardLine').textContent=list.find(o=>o.id===pick).line };
   $('outfits').replaceChildren(...list.map(o=>{const b=document.createElement('button'); b.className='outfit'; b.dataset.id=o.id;
-    const cv=document.createElement('canvas'); cv.width=16; cv.height=29; const who={x:8,y:28,dir:'down',moving:false,step:0};
-    if(o.id==='jersey')drawJoeJersey(who,cv.getContext('2d')); else drawHero(who,cv.getContext('2d'),OUTFIT_LOOK[o.id]);
+    const cv=document.createElement('canvas'); cv.width=22; cv.height=33; const who={x:11,y:31,dir:'down',moving:false,step:0};   // roomy enough for the big shoulders, ears and antennas
+    drawHero(who,cv.getContext('2d'),OUTFIT_LOOK[o.id]);
     const sp=document.createElement('span'); sp.textContent=o.name; b.append(cv,sp); b.onclick=()=>{pick=o.id; render()}; return b}));
   $('wardGo').onclick=()=>{ $('wardrobe').hidden=true; have[key]=pick; save(); paused=false; then&&then() };
   render(); paused=true; prompt.hidden=true; $('wardrobe').hidden=false; setTimeout(()=>$('wardGo').focus({preventScroll:true}),0);
