@@ -109,19 +109,17 @@ function crewSprite(c,g=ctx){ ({hero:drawHero,lars:drawLars,john:drawJohn})[c.id
 function legs(c){ return [c.moving&&c.step%2?1:0, c.moving&&!(c.step%2)?1:0] }
 // Joe: whatever he picked in the wardrobe (WARDROBE in story.js). Colors and pieces for each outfit:
 const OUTFIT_LOOK={
-  cape:   {top:'#34405c', pants:'#14161f', boots:'#0b0c12', belt:'#5a3a22', cape:['#0e1017','#1d2130'], head:'hair', mask:'#0b0c12'},
+  tee:    {top:'#3d6fa8', pants:'#3a5f9e', boots:'#e8e8e4', head:'hair', arms:true},        // jeans, a blue tee, white sneakers
   potato: {top:'foil', pants:'#9aa1aa', boots:'#6b4a2e', head:'potato'},                 // a baked potato in foil, split open, with a pat of butter on top
   crumb:  {top:'crumb', pants:'#2b2d33', boots:'#141519', belt:'#c9ced4', cape:['#5d626d','#454953'], head:'hair', mask:'#141519', whisk:true},   // Captain Crumb: an original baker superhero
   sweater:{top:'sweater', pants:'#3a5f9e', boots:'#3b2a1e', head:'santa'},
-  vikings:{top:'jersey', pants:'#ffc62f', boots:'#f2f2ee', head:'helmet'},
   disco:  {top:'disco', pants:'#f2efe6', boots:'#e8b04a', head:'afro', flare:true},
   avant:  {top:'avant', pants:'#1d1d22', boots:'#f2f2ee', head:'beret', flare:true},
   cupcake:{top:'cupcake', pants:'#f2efe6', boots:'#e54b7a', head:'frosting'},
-  grp:    {top:'grp', pants:'#111114', boots:'#2b2b33', head:'bikehelmet', shorts:true},   // GRP training shorts: no shirt, black spandex to mid-calf with green stripes, helmet, shades
   dave:   {top:'cat', pants:'#c8442a', boots:'#e86a4a', head:'cat', tail:true},          // Dave: a red cat
   john:   {top:'#f4f4f0', pants:'#3a5f9e', boots:'#3b2a1e', head:'cap', arms:true},        // John: red cap, white tee, jeans, boots
 };
-const heroLook=()=>OUTFIT_LOOK[have.outfit]||OUTFIT_LOOK.cape;
+const heroLook=()=>OUTFIT_LOOK[have.outfit]||OUTFIT_LOOK.tee;
 function drawHero(c,g=ctx,look=heroLook()){
   const x=Math.round(c.x)-6, y=Math.round(c.y)-20, F=(col,dx,dy,w,h)=>{g.fillStyle=col;g.fillRect(x+dx,y+dy,w,h)};
   const skin='#f0c6a0', hair='#b08355', eye='#3d8ad6', L=look;
