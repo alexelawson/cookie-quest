@@ -26,6 +26,7 @@ function update(dt){
   time+=dt;
   scene.ambient&&scene.ambient(dt);   // ambient things run even while paused
   extrasAlways(dt);
+  bootFade.t+=dt;
   if(fade.next){
     const was=fade.t; fade.t+=dt;
     if(was<fade.dur&&fade.t>=fade.dur)finishSwap();
@@ -114,16 +115,25 @@ function draw(){
   const ents=[]; scene.ents&&scene.ents(ents);
   ents.push({y:P.y,draw:()=>{(scene.drawPlayer||drawPlayer)(P.x,P.y); if(farm.carrying&&scene===SCENES.world)drawHen(P.x,P.y-20,P.dir==='left'?-1:1)}});
   const hen=henEnt(); if(hen)ents.push(hen);   // Grp the rooster, dressed for wherever Joe is (extras.js)
-  ents.sort((a,b)=>a.y-b.y).forEach(e=>e.draw());
+  drawOutlined(()=>ents.sort((a,b)=>a.y-b.y).forEach(e=>e.draw()),cx,cy);   // people and things, with a dark pixel outline (outline.js)
   scene.over&&scene.over();
   extrasDraw();
   if(fade.next){
     const a=fade.t<fade.dur?fade.t/fade.dur:Math.max(0,2-fade.t/fade.dur);
-    ctx.setTransform(1,0,0,1,0,0); ctx.fillStyle=`rgba(8,9,16,${a})`; ctx.fillRect(0,0,VW,VH);
+    ctx.setTransform(1,0,0,1,0,0); ditherFill(a);
   }
+  if(bootFade.t<bootFade.dur){ ctx.setTransform(1,0,0,1,0,0); ditherFill(1-bootFade.t/bootFade.dur) }   // the game fades in from the title
 }
+// fades are drawn as a pixel dither (a checkered pattern that fills in), not a smooth see-through black
+const DITHER=(()=>{ const B=[0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5];
+  return Array.from({length:17},(_,lv)=>{ const c=document.createElement('canvas'); c.width=4; c.height=4; const g=c.getContext('2d'); g.fillStyle='#08090f';
+    B.forEach((t,i)=>{ if(t<lv)g.fillRect(i%4,i/4|0,1,1) }); return c }) })();
+const ditherPat=[];
+function ditherFill(a){ const lv=Math.max(0,Math.min(16,Math.round(a*16))); if(!lv)return;
+  ditherPat[lv]=ditherPat[lv]||ctx.createPattern(DITHER[lv],'repeat'); ctx.fillStyle=ditherPat[lv]; ctx.fillRect(0,0,VW,VH) }
+const bootFade={t:1e9, dur:450};
 
 // ===================== LOOP =====================
 let last=performance.now();
-function loop(now){const dt=Math.min(50,now-last);last=now;update(dt);draw();requestAnimationFrame(loop)}
+function loop(now){const dt=Math.min(50,now-last);last=now;update(dt);draw();if(typeof presentFrame==='function')presentFrame();requestAnimationFrame(loop)}
 renderBasket(); requestAnimationFrame(loop);

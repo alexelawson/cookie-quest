@@ -9,14 +9,17 @@ let ctx=await b.newContext({viewport:{width:1280,height:800}}); let p=await ctx.
 await p.goto(url); await p.waitForTimeout(600);
 let r=await p.evaluate(async()=>{ await document.fonts.ready;
   const box=id=>document.querySelector(id).getBoundingClientRect();
-  const s=box('.screen'), bk=box('#basket'), h=box('h1');
+  const s=box('.screen'), bk=box('#basket'), h=box('#console'), gear=box('#settingsBtn'), g=$('game').getBoundingClientRect();
   const tc=$('titleArt').getContext('2d').getImageData(0,0,128,96).data; let colors=new Set(); for(let i=0;i<tc.length;i+=4*7)colors.add(tc[i]+','+tc[i+1]+','+tc[i+2]);
-  return {pix:document.fonts.check('16px "Pixelify Sans"'), body:document.fonts.check('16px Nunito'), bottom:s.bottom, mid:s.left+s.width/2, bmid:bk.left+bk.width/2, hmid:h.left+h.width/2, colors:colors.size,
+  return {pix:document.fonts.check('16px "Pixelify Sans"'), body:document.fonts.check('16px Nunito'), bottom:h.bottom, mid:s.left+s.width/2, bmid:bk.left+bk.width/2, hmid:h.left+h.width/2, colors:colors.size,
+    scale:g.width/224, smooth:fit.smooth, barTop:bk.bottom<=s.top+1&&gear.bottom<=s.top+1&&gear.right<=h.right, noReset:!!$('resetBtn').closest('#settings'),
     google:[...document.querySelectorAll('link')].some(l=>/googleapis/.test(l.href))};
 });
-ok('A both fonts are embedded and load with no internet',r.pix&&r.body&&!r.google,JSON.stringify(r));
+ok('A the pixel font is embedded and loads with no internet',r.pix&&!r.google,JSON.stringify(r));
 ok('A the game window fits on a 1280x800 laptop screen',r.bottom<=800,'bottom '+r.bottom);
-ok('A title, basket and game share one center line',Math.abs(r.mid-r.bmid)<2&&Math.abs(r.mid-r.hmid)<2,`${r.mid} ${r.bmid} ${r.hmid}`);
+ok('A the basket, the game and its frame share one center line',Math.abs(r.mid-r.bmid)<40&&Math.abs(r.mid-r.hmid)<2,`${r.mid} ${r.bmid} ${r.hmid}`);
+ok('A every game pixel is the same size: a whole-number scale on a laptop',!r.smooth&&Math.abs(r.scale-Math.round(r.scale))<.001&&r.scale>=3,r.scale+'x');
+ok('A the basket and the menu button sit in a bar on top of the game; Start over is inside the menu',r.barTop&&r.noReset,JSON.stringify(r));
 ok('B the title screen draws the snowy night (lots of colors, so Joe, Grp, the kitchen and the tree are there)',r.colors>25,r.colors+' colors');
 await p.mouse.click(5,5); await p.waitForTimeout(100); r=await p.evaluate(()=>song);
 ok('B the title screen has its own music once you tap anything',r==='title',String(r));

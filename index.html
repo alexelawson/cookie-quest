@@ -6,15 +6,18 @@
 <title>The Great Cookie Quest</title>
 <link rel="stylesheet" href="css/fonts.css">
 <link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/pro.css">
 </head>
 <body>
 <div class="app">
-  <header>
-    <h1>The Great Cookie Quest</h1>
+  <div class="console" id="console">
+  <div class="topbar">
     <div class="basket" id="basket"></div>
-  </header>
+    <button class="gear" id="settingsBtn" aria-label="Menu"><canvas id="gearArt" width="11" height="11" aria-hidden="true"></canvas></button>
+  </div>
   <div class="screen">
     <canvas id="game" width="224" height="168"></canvas>
+    <canvas id="present" aria-hidden="true" hidden></canvas>
     <div class="prompt" id="prompt" hidden></div>
     <div class="hud" id="hud" hidden></div>
     <button class="btn minibtn" id="golfRestart" hidden>↺ Restart round</button>
@@ -152,6 +155,7 @@
         <label class="srow"><span>Sound</span><input type="checkbox" role="switch" id="soundToggle"></label>
         <label class="srow"><span>Music</span><input type="checkbox" role="switch" id="musicToggle"></label>
         <div id="gearRows" hidden></div>
+        <button class="reset" id="resetBtn">Start over</button>
         <button class="btn ghost" id="settingsClose">Close</button>
       </div>
     </div>
@@ -162,8 +166,10 @@
         <h2>The Great<br>Cookie Quest</h2>
         <p>Can you locate all the ingredients to bake the perfect chocolate chip cookies?</p>
         <button class="btn big pulse" id="startBtn">Start</button>
+        <p class="tkeys">Arrow keys or WASD to walk · Space to talk</p>
       </div>
     </div>
+  </div>
   </div>
   <div class="crewbar" id="crewbar" hidden>
     <button data-crew="0" aria-pressed="true"><canvas width="16" height="26"></canvas><span></span></button>
@@ -181,8 +187,6 @@
     </div>
     <div class="awrap"><button class="abtn" id="abtn" aria-label="Action">A</button><span class="alabel" id="alabel"></span></div>
   </div>
-  <p class="hint">Arrow keys or WASD to walk · Space to talk</p>
-  <div class="resetrow"><button class="reset" id="resetBtn">Start over</button><button class="reset" id="settingsBtn">⚙ Settings</button></div>
 </div>
 
 <!-- Plain scripts (no modules) so the game also runs by double-clicking index.html. Order matters. -->
@@ -205,8 +209,10 @@
 <script src="js/people.js"></script>
 <script src="js/ending.js"></script>
 <script src="js/extras.js"></script>
+<script src="js/outline.js"></script>
 <script src="js/game.js"></script>
 <script src="js/title.js"></script>
+<script src="js/layout.js"></script>
 <script src="js/devskip.js"></script>   <!-- testing only: delete this line and js/devskip.js before giving it to Joe -->
 </body>
 </html>

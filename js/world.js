@@ -1,7 +1,7 @@
 // The overworld: size, collision boxes, doors, and the one-time painting of the map.
 // Other places you can walk into (kitchen, city rooftops) are separate scenes; see kitchen.js and city.js.
 const WW=384, WH=288, VW=224, VH=168;
-const cv=document.getElementById('game'), ctx=cv.getContext('2d'); ctx.imageSmoothingEnabled=false;
+const cv=document.getElementById('game'); let ctx=cv.getContext('2d'); ctx.imageSmoothingEnabled=false;   // (let: draw() points it at the sprite layer for a moment to outline sprites)
 const R=(x,y,w,h)=>({x,y,w,h});
 const REG={farm:R(0,0,164,144), mill:R(220,0,164,144), city:R(0,170,164,118), fargo:R(220,170,164,118)};
 const trees=[[172,30],[212,30],[172,64],[212,64],[214,228],[110,154],[270,154]];
@@ -210,6 +210,28 @@ const bg=document.createElement('canvas'); bg.width=WW; bg.height=WH;
   // trees
   // pen gate (bottom fence, hens squeeze under it)
   F('#8a5a34',112,117,16,3); F('#6b4428',112,118,16,1); F('#5a3a22',112,117,1,3); F('#5a3a22',127,117,1,3);
+})();
+
+// Where the lands meet the meadow: soft, natural edges instead of straight lines.
+(function edges(){
+  const g=bg.getContext('2d'), F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};
+  let sd=91; const r=()=>(sd=(sd*16807)%2147483647)/2147483647;
+  // the Birkie snow drifts out onto the grass (above the kitchen's roof): a wavy edge, a few loose flakes, a faint blue shadow
+  for(let y=0;y<78;y++){ const out=Math.max(1,Math.round(3+2*Math.sin(y/6)+1.4*Math.sin(y/2.3+1)));
+    F('#eef3f7',219-out,y,out+1,1); F('#cfdbe6',219-out-1,y,1,1);
+    for(let k=0;k<2;k++)if(r()<.35)F('#f7fafc',219-out-2-Math.floor(r()*6),y,1,1) }
+  // ...and along its bottom, a soft drift line with its shadow on the grass
+  for(let x=219;x<384;x++){ const d=Math.max(0,Math.round(1.5+1.5*Math.sin(x/7)+Math.sin(x/2.7))); F('#eef3f7',x,144,1,d); F('#b9c9a8',x,144+d,1,1); if(r()<.2)F('#f7fafc',x,146+d+Math.floor(r()*2),1,1) }
+  // Vancouver: a stone seawall along its edge (top and right) instead of a plain curb
+  const wall=(x,y,w,h,horiz)=>{ F('#5f677c',x,y,w,h);
+    if(horiz){ F('#8a93a8',x,y,w,1); F('#2a2f3e',x,y+h-1,w,1); for(let i=x;i<x+w;i+=6)F('#454c60',i,y+1,1,h-2) }
+    else { F('#8a93a8',x,y,1,h); F('#2a2f3e',x+w-1,y,1,h); for(let j=y;j<y+h;j+=5)F('#454c60',x+1,j,w-2,1) } };
+  wall(0,166,167,4,true); wall(164,170,3,66,false); F('#8a93a8',164,166,3,1);
+  F('rgba(20,30,20,.25)',0,165,167,1); F('rgba(20,30,20,.25)',167,170,1,66);                                   // its shadow on the grass
+  // Wylee Woods: the forest floor thins out into the meadow over a few rows
+  for(let y=226;y<236;y++)for(let x=164;x<220;x++){ const p=(y-226)/10; if(r()<p*p)F(r()<.5?'#3f6b3a':'#4d7d45',x,y,1,1) }
+  // Fargo's dry grass: a few tufts and sandy patches spill over its edge
+  for(let i=0;i<40;i++){ const x=212+r()*8|0, y=168+r()*64|0; F(r()<.5?'#cdb978':'#c2ad6c',x,y,1+(r()<.4),1) }
 })();
 
 // The barn is a sprite too, so you (and the hens) can walk behind it.

@@ -91,11 +91,11 @@ for(const [vpName,vp,touch] of [['desktop',{width:1280,height:800}],['phone',{wi
   ok('F turning sound off stops the music; on brings back this place\'s song; Music can be off on its own',r.a==='world'&&r.off===null&&r.on==='world'&&r.m===null&&r.back==='world',JSON.stringify(r));
   await p.context().close()}
 
-// G. Start over: two taps erase everything
+// G. Start over (in the menu): two taps erase everything
 {const p=await page(); await fresh(p,{...ALL,gear:{oakleys:1}});
-  await p.click('#resetBtn'); await p.click('#resetBtn'); await p.waitForLoadState('load'); await p.waitForTimeout(300); await p.click('#startBtn'); await p.waitForTimeout(200);
+  await p.click('#settingsBtn'); await p.click('#resetBtn'); await p.click('#resetBtn'); await p.waitForLoadState('load'); await p.waitForTimeout(300); await p.click('#startBtn'); await p.waitForTimeout(200);
   const r=await p.evaluate(()=>({keys:Object.keys(have).filter(k=>k!=='welcomed'),welcome:$('dspeaker').textContent}));
-  ok('G Start over (tap twice) erases everything and Alex welcomes Joe again',!r.keys.length&&r.welcome==='Alex',JSON.stringify(r));
+  ok('G Start over (in the menu, tap twice) erases everything and Alex welcomes Joe again',!r.keys.length&&r.welcome==='Alex',JSON.stringify(r));
   await p.context().close()}
 
 console.log(R.join('\n')); console.log('page errors:',allErrs.length?[...new Set(allErrs)]:'none'); await b.close(); process.exit(R.some(l=>l.startsWith('FAIL'))||allErrs.length?1:0)})();

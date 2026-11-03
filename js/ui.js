@@ -88,7 +88,7 @@ $('settingsBtn').onclick=openSettings; $('settingsClose').onclick=closeSettings;
 // change outfit any time: on the rooftops it's the stealth outfit, everywhere else it's Joe's everyday look
 $('setOutfit').textContent=WARDROBE.changeOutfit;
 $('setOutfit').onclick=()=>{ $('settings').hidden=true; openWardrobe(()=>{ paused=overlayOpen() },scene===SCENES.city?'heist':'look',true) };
-function start(){$('titlecard').hidden=true; paused=false; audioInit(); sceneMusic(); if(!have.welcomed)welcome()}
+function start(){bootFade.t=0; $('titlecard').hidden=true; paused=false; audioInit(); sceneMusic(); if(!have.welcomed)welcome()}
 // the first time you press Start: Alex explains everything, then you pick Joe's look
 function welcome(){
   showDialog({place:ALEX_WELCOME.place,speaker:ALEX_WELCOME.speaker,pages:ALEX_WELCOME.pages,actions:[{label:ALEX_WELCOME.go,fn:()=>{closeDialog(); openWardrobe(()=>{have.welcomed=true; save()},'look')}}]});
