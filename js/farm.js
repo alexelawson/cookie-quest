@@ -250,14 +250,17 @@ function drawKeelan(k){
 }
 function drawCupcake(){
   if(have.cupcake||have.gaveCupcake)return;
-  const x=CUPCAKE.x-2,y=CUPCAKE.y-3, F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x+dx,y+dy,w,h)};
-  F('#e9a6c0',0,3,5,3); F('#c77a9a',1,3,1,3); F('#c77a9a',3,3,1,3);   // pink striped wrapper (this bit peeks out)
-  F('#5a3220',0,0,5,3); F('#e54b7a',1,0,1,1); F('#f4d35e',3,1,1,1); F('#e54b7a',2,-1,1,1);
+  const x=CUPCAKE.x-5,y=CUPCAKE.y-8, F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x+dx,y+dy,w,h)};
+  F('#e9a6c0',1,7,8,5); for(const k of [2,4,6])F('#c77a9a',k+.5|0,7,1,5);               // pink striped wrapper (mostly hidden behind the roof)
+  F('#fbd3e3',3,2,4,1); F('#f7a8c8',2,3,6,1); F('#f7a8c8',1,4,8,1); F('#f7a8c8',0,5,10,1); F('#e07ba3',0,6,10,1);   // a big swirl of pink frosting
+  F('#fde6ef',3,3,2,1); F('#fde6ef',2,4,2,1);                                              // shine on the frosting
+  F('#f4d35e',6,4,1,1); F('#5fa8e8',3,5,1,1); F('#7fd39a',7,5,1,1); F('#ffffff',5,3,1,1);  // sprinkles
+  F('#d8283c',4,0,2,2); F('#ff8a9a',4,0,1,1); F('#3f7a2e',6,-1,1,1);                       // a cherry on top
 }
 // a sparkle flashes beside the tree every few seconds
 function drawCupcakeGlint(){
-  if(have.cupcake||have.gaveCupcake||(time%3000)>450)return;
-  const x=55,y=16; ctx.fillStyle='#fff3a8';
+  if(have.cupcake||have.gaveCupcake||(time%2000)>500)return;
+  const x=56,y=14; ctx.fillStyle='#fff3a8';
   ctx.fillRect(x,y-2,1,5); ctx.fillRect(x-2,y,5,1); ctx.fillStyle='#ffffff'; ctx.fillRect(x,y,1,1);
 }
 // entities for depth sorting

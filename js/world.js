@@ -324,11 +324,11 @@ SCENES.world={ music:()=>farm.active?'chase':'world',
   },
   update(dt){farmUpdate(dt)},
   under(){
-    drawCupcake();
     for(const p of smoke){ctx.fillStyle=`rgba(240,240,240,${Math.max(0,p.a)*.7})`;ctx.fillRect(Math.round(p.x),Math.round(p.y),3,3)}
   },
   ents(list){trees.forEach(([x,y])=>list.push({y,draw:()=>drawXmasTree(x,y)}));
-    list.push({y:30,draw:()=>{drawBoat(114,27); drawBrianInBoat(114,27)}});   // Brian fishing in his boat on the pond (outlined like everyone else)   // Christmas trees (extras.js)
+    list.push({y:30,draw:()=>{drawBoat(114,27); drawBrianInBoat(114,27)}});
+    list.push({y:-99,draw:drawCupcake});   // the cupcake peeking over the barn roof (drawn first so the barn covers its bottom)   // Brian fishing in his boat on the pond (outlined like everyone else)   // Christmas trees (extras.js)
 
     pines.forEach(([x,y])=>list.push({y,draw:()=>drawPine(x,y,snowPine)})); cedars.forEach(([x,y])=>list.push({y,draw:()=>drawPine(x,y,mossCedar)})); woods.forEach(([x,y])=>list.push({y,draw:()=>drawPine(x,y,darkPine)}));
     list.push({y:67,draw:()=>ctx.drawImage(birkArch,290,38)}); list.push({y:286,draw:()=>ctx.drawImage(woodsArch,176,254)});
