@@ -113,8 +113,8 @@ PORTRAITS['Trail John']={size:32, bg:'#dbe8f4', draw(g){ const F=px(g);
   F('rgba(220,235,250,.6)',12,14,3,2); F('rgba(220,235,250,.6)',18,14,3,2);
   F('#d9a37f',15,15,2,2); F('#b5735a',14,18,4,1);
 }};
-// Bryan: buzzed brown hair, sleepy relaxed eyes, little smile, gray tee
-PORTRAITS['Bryan']={size:32, bg:'#cfe6f2', draw(g){ const F=px(g);
+// Brian: buzzed brown hair, sleepy relaxed eyes, little smile, gray tee
+PORTRAITS['Brian']={size:32, bg:'#cfe6f2', draw(g){ const F=px(g);
   F('#8d949e',6,24,20,8); F('#7a8089',13,24,6,2); F('#e8b48e',14,24,4,1);
   F('#e8b48e',13,20,6,4); F('#e8b48e',10,6,12,15); F('#d9a37f',10,17,1,3); F('#d9a37f',21,17,1,3);
   F('#7a5232',10,5,12,3); F('#8a6240',12,5,7,1); F('#7a5232',10,8,1,3); F('#7a5232',21,8,1,3);   // buzz cut

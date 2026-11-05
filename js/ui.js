@@ -2,7 +2,7 @@
 const $=id=>document.getElementById(id);
 const dlg=$('dialog'), prompt=$('prompt');
 // The basket: a little picture of each ingredient. Ones you don't have yet are dark shadows of themselves.
-// Bonus things (the cupcake, Bryan's sprinkles, Lars's ice cream) show up after a divider once you find them.
+// Bonus things (the cupcake, Brian's sprinkles, Lars's ice cream) show up after a divider once you find them.
 function itemIcon(key,got){
   const c=document.createElement('canvas'); c.width=40; c.height=30; const g=c.getContext('2d');
   ART[key](g); if(!got){g.globalCompositeOperation='source-in'; g.fillStyle='#3a4058'; g.fillRect(0,0,40,30)}
@@ -16,7 +16,7 @@ function basketSlot(key,label,got,cls=''){
 function renderBasket(){
   const b=$('basket'); b.replaceChildren(...ITEMS.map(i=>basketSlot(i.key,i.label,!!have[i.key])));
   const extras=[]; if(have.cupcake&&!have.gaveCupcake)extras.push(basketSlot('cupcake','Cupcake',true,'extra'));
-  if(have.sprinkles)extras.push(basketSlot('sprinkles','Sprinkles',true,'bonus'));   // a bonus from Bryan
+  if(have.sprinkles)extras.push(basketSlot('sprinkles','Sprinkles',true,'bonus'));   // a bonus from Brian
   if(have.icecream)extras.push(basketSlot('icecream','Ice cream',true,'bonus'));    // a bonus from Lars's long jump
   if(extras.length){const d=document.createElement('span'); d.className='bdiv'; b.append(d,...extras)}
 }
@@ -162,7 +162,7 @@ const REWARDS={
   golf:{from:'From Margie, Jack and the creamery', name:'Milk', hint:'Tap it to put it in your basket.'},
   mill:{from:'From John (and the Vikings)', name:'Flour', hint:'Tap it to put it in your basket.'},
   icecream:{from:'From Lars (and a rooftop gutter)', name:'Rosemary Maple ice cream', hint:'A bonus! Tap it to put it in your basket.'},
-  sprinkles:{from:'From Bryan', name:'Sprinkles', hint:'A bonus! Tap them to put them in your basket.'},
+  sprinkles:{from:'From Brian', name:'Sprinkles', hint:'A bonus! Tap them to put them in your basket.'},
 };
 let rewardKey=null, rewardThen=null;
 function showReward(key,then){   // then: runs after the item lands in the basket

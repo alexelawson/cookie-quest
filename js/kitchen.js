@@ -32,7 +32,7 @@ const CROWD=[
   {name:'John',x:166,y:130, draw:(x,y,d)=>drawJohn({x,y,dir:d||'left',moving:false,step:0})},
   {name:'Lil Q',x:184,y:146, draw:(x,y)=>drawBob(x,y)},
   {name:'Trail John',x:140,y:150, draw:(x,y,d)=>drawTrailJohn(x,y,d||'down')},
-  {name:'Bryan',x:72,y:150, draw:(x,y)=>drawBryan(x,y,'down')},
+  {name:'Brian',x:72,y:150, draw:(x,y)=>drawBrian(x,y,'down')},
   {name:'Viking',x:204,y:136, draw:(x,y)=>drawVikingStanding(x,y,'norse')},
   {name:'Football Viking',x:212,y:152, draw:(x,y)=>drawVikingStanding(x,y,'football','21')},
   {name:'Logan',x:40,y:110, draw:(x,y)=>drawLogan(x,y)},
@@ -90,7 +90,7 @@ const shapeCells=k=>{const out=new Set(); CHIP_SHAPES[k].forEach((row,r)=>[...ro
 const CHIP_GRID={cx:62, cy:32, gap:9};   // the big cookie, and how far apart the chip spots are (canvas px)
 const chipXY=i=>({x:CHIP_GRID.cx+(i%5-2)*CHIP_GRID.gap, y:CHIP_GRID.cy+((i/5|0)-2)*CHIP_GRID.gap});
 const kit={party:false, crownT:0, confetti:[]};
-const bakeSteps=()=>KITCHEN.steps.filter(s=>!s.needs||have[s.needs]);   // Bryan's sprinkles step only if you have them
+const bakeSteps=()=>KITCHEN.steps.filter(s=>!s.needs||have[s.needs]);   // Brian's sprinkles step only if you have them
 const stepNow=()=>bakeSteps()[bake.i];
 function bakeMsg(t,mood='ok'){ $('bakeMsg').textContent=t; const g=$('bakeFace').getContext('2d'); g.fillStyle='#e3d6bd'; g.fillRect(0,0,40,40); drawAlexFace(g,mood) }   // Alex says it, with her face
 function openBake(){ const ks=Object.keys(CHIP_SHAPES).filter(k=>k!==bake.lastShape); bake.shape=ks[Math.random()*ks.length|0]; bake.lastShape=bake.shape; Object.assign(bake,{open:true,i:0}); bakeSetup(); paused=true; prompt.hidden=true; $('bake').hidden=false; setTimeout(()=>$('bakeBtn').focus({preventScroll:true}),0) }

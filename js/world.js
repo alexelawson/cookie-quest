@@ -18,7 +18,7 @@ const solids=[
   R(327,77,8,4),                                             // John
   R(178,282,4,4),R(201,282,4,4),                             // Wylee Woods arch posts
   R(166,98,52,42),                                           // farmhouse (your kitchen)
-  R(108,16,52,30),                                           // Bryan's pond (he's out in his boat)
+  R(108,16,52,30),                                           // Brian's pond (he's out in his boat)
   R(67,204,3,3),R(103,258,3,3),                              // city streetlamps
   R(8,178,40,52),R(110,184,48,56),R(0,244,72,44),R(72,264,92,24),R(94,224,6,4),   // city towers, the ocean, the steam clock
   R(300,180,50,40),R(256,198,6,10),R(280,198,6,10),R(356,200,28,36),R(350,280,28,6), // Lil Q's, pumps, grain elevator, water tower
@@ -26,7 +26,7 @@ const solids=[
 ];
 const triggers=[
   {z:R(320,70,24,18),  label:'Talk to John', btn:'Talk', act:()=>talkJohn()},
-  {z:R(86,36,26,16),   label:'Talk to Bryan', btn:'Talk', act:()=>talkBryan()},
+  {z:R(86,36,26,16),   label:'Talk to Brian', btn:'Talk', act:()=>talkBrian()},
   {z:R(124,240,20,12), label:'Take the elevator up', act:()=>openWardrobe(()=>{ heist.outfitReact=true; goTo('city','fromStreet') })},
   {z:R(315,220,20,12), label:'Drive into Fargo',   act:()=>goTo('fargo','fromHighway')},
   {z:R(182,142,20,10), label:'Enter your kitchen', act:()=>goTo('kitchen','fromDoor')},
@@ -85,7 +85,7 @@ const bg=document.createElement('canvas'); bg.width=WW; bg.height=WH;
   F('#8a8f9a',97,104,8,5); F('#5fa8e8',98,105,6,3); F('#9fd2f0',99,105,2,1);             // water dish
   // hay bales by the barn
   for(const [hx,hy] of [[60,78],[68,80]]){F('rgba(0,0,0,.15)',hx,hy+6,8,2); F('#d9b04a',hx,hy,8,6); F('#e8c35a',hx,hy,8,2); F('#b8903a',hx+2,hy,1,6); F('#b8903a',hx+5,hy,1,6)}
-  // Bryan's pond in the corner of the farm, with a little dock
+  // Brian's pond in the corner of the farm, with a little dock
   for(let y=14;y<48;y++){const t=(y-31)/17, hw=Math.sqrt(Math.max(0,1-t*t))*27+Math.sin(y/3)*1.5; F('#3d7fb8',134-hw|0,y,hw*2|0,1)}
   for(let y=18;y<44;y++){const t=(y-31)/13, hw=Math.sqrt(Math.max(0,1-t*t))*20; F('#4a8ec6',134-hw|0,y,hw*2|0,1)}
   F('#d7ecf8',124,22,6,1); F('#d7ecf8',140,38,5,1); F('#d7ecf8',118,34,4,1);
@@ -247,24 +247,24 @@ const treeSprite=document.createElement('canvas'); treeSprite.width=16; treeSpri
   F('#1f472a',9,10,4,2); F('#1f472a',3,12,3,1); F('#24532c',12,8,2,3);                   // shade underneath
 })();
 const drawTree=(x,y)=>ctx.drawImage(treeSprite,x-8,y-19);
-// Bryan: medium brown hair, buzzed super short, gray tee, jeans. Very chill.
-// Bryan: chill, buzz cut, half-asleep smile, grey tee, jeans, brown boots. 12 x 20 px.
-const BRYAN_PAL={H:'#7a5232',h:'#5e3e25',S:'#e8b48e',s:'#d09a74',E:'#3b2a20',M:'#b5654f',T:'#8d949e',t:'#737a85',l:'#a5abb4',J:'#3a5f9e',j:'#2c4a7c',B:'#5a3a22'};
-const BRYAN_SPR={
+// Brian: medium brown hair, buzzed super short, gray tee, jeans. Very chill.
+// Brian: chill, buzz cut, half-asleep smile, grey tee, jeans, brown boots. 12 x 20 px.
+const BRIAN_PAL={H:'#7a5232',h:'#5e3e25',S:'#e8b48e',s:'#d09a74',E:'#3b2a20',M:'#b5654f',T:'#8d949e',t:'#737a85',l:'#a5abb4',J:'#3a5f9e',j:'#2c4a7c',B:'#5a3a22'};
+const BRIAN_SPR={
   down:["...HHHHHH...","..HhHHhHHH..","..HSSSSSSH..","..SEESSEES..","..sSSssSSs..","...SMMMMS...",
         ".TTTTllTTTT.",".TTTTTTTTtT.",".TTTTTTTTtT.",".STTTTTTTtS.",".STTTTTTTtS.",".SttttttttS."],
   right:["...HHHHHH...","..HHhHHHHH..","..HHHSSSSS..","..HHsSSEES..","..hSSSSSSSS.","...sSSSSMS..",
         ".TTTTTTTTTT.",".TTTTTTTTtT.",".TTTTSTTTtT.",".TTTTSTTTtT.",".TTTTSTTTtT.",".ttttsttttt."],
 };
-function drawBryan(x,y,dir='right',g=ctx){
+function drawBrian(x,y,dir='right',g=ctx){
   const X=Math.round(x)-6, Y=Math.round(y)-19, F=(c,dx,dy,w,h)=>{g.fillStyle=c;g.fillRect(X+dx,Y+dy,w,h)};
   F('rgba(0,0,0,.2)',1,18,10,2);
   F('#3a5f9e',3,12,3,6); F('#3a5f9e',6,12,3,6); F('#2c4a7c',5,12,1,5); F('#4d74b4',3,13,1,3); F('#4d74b4',6,13,1,3);   // jeans
   F('#5a3a22',2,17,4,2); F('#5a3a22',6,17,4,2); F('#7a5236',2,17,2,1); F('#7a5236',6,17,2,1);                          // boots
-  drawSprite(g,X,Y,BRYAN_SPR,BRYAN_PAL,dir==='up'?'down':dir,null,2);   // (his eyes are already half shut)
+  drawSprite(g,X,Y,BRIAN_SPR,BRIAN_PAL,dir==='up'?'down':dir,null,2);   // (his eyes are already half shut)
 }
-// Bryan lounging in his boat by the dock: leaning back, hands behind his head, feet up
-function drawBryanInBoat(x,y){ const b=Math.round(Math.sin(time/700)*1), F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x+dx,y+b+dy,w,h)};
+// Brian lounging in his boat by the dock: leaning back, hands behind his head, feet up
+function drawBrianInBoat(x,y){ const b=Math.round(Math.sin(time/700)*1), F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x+dx,y+b+dy,w,h)};
   const skin='#e8b48e', hair='#7a5232', tee='#8d949e';
   F(tee,4,-3,6,5); F(skin,6,-8,5,5); F(hair,6,-9,5,2); F(hair,10,-8,1,2);           // leaning back against the stern, buzz cut
   F(skin,4,-9,2,2); F(skin,11,-9,2,2); F(tee,4,-7,2,2); F(tee,11,-7,2,2);           // hands behind his head
@@ -324,11 +324,11 @@ SCENES.world={ music:()=>farm.active?'chase':'world',
   },
   update(dt){farmUpdate(dt)},
   under(){
-    drawBoat(114,27); drawBryanInBoat(114,27);
     drawCupcake();
     for(const p of smoke){ctx.fillStyle=`rgba(240,240,240,${Math.max(0,p.a)*.7})`;ctx.fillRect(Math.round(p.x),Math.round(p.y),3,3)}
   },
-  ents(list){trees.forEach(([x,y])=>list.push({y,draw:()=>drawXmasTree(x,y)}));   // Christmas trees (extras.js)
+  ents(list){trees.forEach(([x,y])=>list.push({y,draw:()=>drawXmasTree(x,y)}));
+    list.push({y:30,draw:()=>{drawBoat(114,27); drawBrianInBoat(114,27)}});   // Brian fishing in his boat on the pond (outlined like everyone else)   // Christmas trees (extras.js)
 
     pines.forEach(([x,y])=>list.push({y,draw:()=>drawPine(x,y,snowPine)})); cedars.forEach(([x,y])=>list.push({y,draw:()=>drawPine(x,y,mossCedar)})); woods.forEach(([x,y])=>list.push({y,draw:()=>drawPine(x,y,darkPine)}));
     list.push({y:67,draw:()=>ctx.drawImage(birkArch,290,38)}); list.push({y:286,draw:()=>ctx.drawImage(woodsArch,176,254)});

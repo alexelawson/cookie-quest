@@ -167,8 +167,8 @@ const ALEX_WELCOME = {speaker:'Alex', place:'Home',
   go:"Let's go!",
   lookTitle:"Pick Joe's look", lookIntro:"First things first. What are you wearing today?", lookGo:"Looks good"};
 
-// ---------- Bryan: super chill, hanging out by his boat on the pond. Find him and he gives you sprinkles ----------
-const BRYAN = {name:'Bryan', place:'The Pond',
+// ---------- Brian: super chill, hanging out by his boat on the pond. Find him and he gives you sprinkles ----------
+const BRIAN = {name:'Brian', place:'The Pond',
   hello:["Oh. Hey.","...","Nice day for it.","Oh, you're making cookies? Here. Have some sprinkles."],
   take:"Take the sprinkles",
   after:["Hey again.","Boat's good. Water's good. We're good."]};
@@ -462,7 +462,7 @@ const ENDING = {
   // [portrait, name, role, (only if have[...])]
   credits:[
     ['Joe','Joe','The Cookie King'],['Alex','Alex','Head Baker, Snack Critic'],['Keelan','Keelan','Eggs, Butter, Hen Wrangling'],
-    ['Logan','Logan','Four-Leaf Clover Specialist'],['Maureen','Maureen','Head Taste Tester (very precise)'],['Ethan','Ethan','Designated Grill Master'],['Bryan','Bryan','Sprinkles. Very Chill.'],['Trail John','John (the other one)','Flour, 50 km'],
+    ['Logan','Logan','Four-Leaf Clover Specialist'],['Maureen','Maureen','Head Taste Tester (very precise)'],['Ethan','Ethan','Designated Grill Master'],['Brian','Brian','Sprinkles. Very Chill.'],['Trail John','John (the other one)','Flour, 50 km'],
     ['Lars','Lars','Long Jump (Attempted)'],['John','John','Heavy Lifting, Eye Rolling'],['Doc Alex','Doc Alex','Mad Scientist (Rooftop Division)'],
     ['Lil Q','Lil Q','Exactly $30.00 of Gas'],['Jackie','Jackie','Straight Talk','metJackie'],['Margie','Margie','The Main Character (self-appointed)'],
     ['Jack','Jack','2.1 Cookies Per Guest'],[null,'The Vikings','SKOL'],[null,'The Hens','Uncooperative'],
@@ -509,7 +509,7 @@ const KITCHEN = {place:'Home', speaker:'Your kitchen',
   // what everyone says if you talk to them in the kitchen before baking
   crowd:{Keelan:"Those are my eggs. Treat them with respect.", Alex:"I'm on dough-tasting duty.", 'Lil Q':"Scooted all the way over from Fargo for this. Rookie better deliver.", Jack:"Cookies per guest is 2.1 right now. I need it at 3.",
          Lars:"I'll time the oven. I have a watch with splits.", John:"I'll carry the tray. Or the whole oven.", 
-         Margie:"I brought the milk. I'm basically the main character.", Bryan:"Nice kitchen. Very chill in here.", Logan:"I checked your yard. No clovers. Great cookies though.", Ethan:"Grill's preheating. Just in case.", Maureen:"Did you weigh the flour, or scoop it? ...Either way, dear. It smells wonderful.", Jackie:"You figured out the snacks. Proud of you. Don't make it weird.", 'Trail John':"Flour made it all fifty kilometers.", Viking:"SKOL! When do we eat?"},
+         Margie:"I brought the milk. I'm basically the main character.", Brian:"Nice kitchen. Very chill in here.", Logan:"I checked your yard. No clovers. Great cookies though.", Ethan:"Grill's preheating. Just in case.", Maureen:"Did you weigh the flour, or scoop it? ...Either way, dear. It smells wonderful.", Jackie:"You figured out the snacks. Proud of you. Don't make it weird.", 'Trail John':"Flour made it all fifty kilometers.", Viking:"SKOL! When do we eat?"},
   // the baking card: one step per ingredient, in recipe order. target and tol are in cups.
   bakeTitle:"Bake the cookies",
   // Alex is your baking helper: she talks you through every step (her lines are the hint, good, and the oops lines below)
@@ -521,8 +521,8 @@ const KITCHEN = {place:'Home', speaker:'Your kitchen',
     {key:'stir',     name:'Stir it up',      kind:'rhythm', taps:8,                                                     hint:"Stir to the beat. Tap right when the ring hits the bowl.", good:"Now THAT is cookie dough. Don't eat it all."},
     {key:'scoop',    name:'Scoop the dough', kind:'scoop', balls:6,                                                      hint:"Scoop it onto the tray. Tap when the scoop is over a spot.", good:"Six perfect little dough balls. Evenly spaced!"},
     {key:'chocolate',name:'Chocolate chips', kind:'chips',                                                               hint:"Now the heist chocolate. Press the chips into the big one for Joe, just like the card.", good:"Worth every searchlight."},
-    // only if you found Bryan (needs: 'sprinkles')
-    {key:'sprinkles',name:"Bryan's sprinkles", kind:'stir', taps:6, needs:'sprinkles', shake:true,                            hint:"Ooh, Bryan's sprinkles! Shake some on top.", good:"So festive. Bryan would say 'nice.'"},
+    // only if you found Brian (needs: 'sprinkles')
+    {key:'sprinkles',name:"Brian's sprinkles", kind:'stir', taps:6, needs:'sprinkles', shake:true,                            hint:"Ooh, Brian's sprinkles! Shake some on top.", good:"So festive. Brian would say 'nice.'"},
   ],
   pourHold:"Hold to pour",
   tooMuch:"Whoa, way too much. Scoop it out and try again.", tooLittle:"Not quite enough. Dump it back and try again.", spilled:"Joe. It's everywhere. Again!",
@@ -552,7 +552,7 @@ const KITCHEN = {place:'Home', speaker:'Your kitchen',
   danceTitle:"THE COOKIE DANCE",
   party:[['Alex',"THEY'RE PERFECT."],['Keelan',"Best eggs in the county."],['Lil Q',"Thirty bucks of gas. Worth every penny. Lil Q approves. *mic drop*"],
     ['Lars',"Okay. But next time i'm making that jump."],['John',"Can I have six? I'm having six."],
-    ['Margie',"Milk for dunking. My idea."],['Jack',"Ten out of ten. Cookie rating logged. Margin of error: zero."],['Bryan',"Nice."],['John',"SKOL!!! (the Vikings taught me that)",'Trail John'],
+    ['Margie',"Milk for dunking. My idea."],['Jack',"Ten out of ten. Cookie rating logged. Margin of error: zero."],['Brian',"Nice."],['John',"SKOL!!! (the Vikings taught me that)",'Trail John'],
     ['','Everyone agrees. There is only one Cookie Baking King.'],['','Joe gets a crown.'],['Alex',"And now... THE COOKIE DANCE. Everybody!"]],
   icecreamLine:"Cookie ice cream sandwiches. Rosemary maple. I found it on a roof. You're welcome.",   // only if Lars found the ice cream
   playAgain:"Play again", keepExploring:"Keep exploring",

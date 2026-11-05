@@ -274,9 +274,9 @@ function farmOverlay(){
 
 farmReset();
 
-// Bryan, chilling by his boat. Gives you sprinkles (a bonus for the cookies).
-function talkBryan(){
-  const B=BRYAN;
+// Brian, chilling by his boat. Gives you sprinkles (a bonus for the cookies).
+function talkBrian(){
+  const B=BRIAN;
   if(have.sprinkles)return showDialog({place:B.place,speaker:B.name,pages:B.after,actions:[CLOSE]});
   showDialog({place:B.place,speaker:B.name,pages:B.hello,actions:[{label:B.take,fn:()=>{closeDialog(); showReward('sprinkles')}}]});
 }

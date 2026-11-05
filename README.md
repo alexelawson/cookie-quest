@@ -9,7 +9,7 @@ For live reload while editing: `python3 -m http.server` and visit http://localho
 ## Layout
 | File | What's in it |
 |---|---|
-| `js/story.js` | All dialogue, character names, the ending note. Keelan is in `KEELAN`; Jack + Margie in `GOLF_TEXT`; Bryan (the pond, sprinkles) in `BRYAN`; the heist crew + The Confectioner in `HEIST`; Lil Q (the gas station owner), Alex's snack reactions and the correct drink/snack are in `FARGO` |
+| `js/story.js` | All dialogue, character names, the ending note. Keelan is in `KEELAN`; Jack + Margie in `GOLF_TEXT`; Brian (the pond, sprinkles) in `BRIAN`; the heist crew + The Confectioner in `HEIST`; Lil Q (the gas station owner), Alex's snack reactions and the correct drink/snack are in `FARGO` |
 | `js/world.js` | Overworld map: collision rects (`solids`), doors (`triggers`), painting. Also defines the scene system (`SCENES`) |
 | `js/kitchen.js` | Kitchen interior scene; baking starts at the counter, recipe card on the fridge |
 | `js/city.js` | The chocolate heist at night: walk up to Dr. Alex (Alex as a mad scientist) at her rooftop lab for the briefing; John carries the log (turn it upright to fit past the tank, sideways to lay it across); Lars dashes shadow to shadow under the searchlights to the LIGHT POWER switch; the laser maze (hidden tripwires the sonar chalk-marks, a blinking row, a sliding gate, a guard; a panel past the maze shuts them all off); the vault; anagrams with Lars. Layout and difficulty at the top (`LIGHTS`, `COVERS`, `LASERS`, `BLINK`, `SLIDER`, `GUARD`) |
@@ -68,7 +68,7 @@ Add an object to `SCENES` with `w`, `h`, `bounds`, `bg` (a canvas), `solids`, `t
 
 ## Spoilers
 If Lars tries to long-jump the gap in the heist, he lands next to a pint of Maple Rosemary ice cream (a bonus; it shows up at the party).
-Bryan is fishing by the pond in the top corner of the farm. Talk to him for sprinkles: a bonus that adds a shake-the-sprinkles step to the baking.
+Brian is fishing by the pond in the top corner of the farm. Talk to him for sprinkles: a bonus that adds a shake-the-sprinkles step to the baking.
 The cupcake is behind the barn, in the middle. Its frosting peeks up over the roof, and a sparkle flashes beside it every few seconds. Walk behind the barn to grab it.
 
 ## Spoilers: Joe's gear

@@ -110,15 +110,15 @@ r=await p.evaluate(()=>{const sp=$('dspeaker').textContent, pages=[]; while(T.bt
 ok('G Alex welcomes Joe and explains the game',r.sp==='Alex'&&r.pages.join(' ').includes('Merry Christmas')&&r.pages.join(' ').includes('kitchen'),r.pages.length+' pages');
 ok('G then Joe picks his look (jeans & a tee first; no jersey, GRP shorts or Vikings; Dave and John are there), and it sticks',r.open&&r.n===8&&r.first==='tee'&&!r.ids.some(i=>['jersey','grp','vikings','cape'].includes(i))&&r.ids.includes('dave')&&r.ids.includes('john')&&r.look==='disco'&&r.welcomed,r.title);
 await p.reload(); await p.click('#startBtn'); r=await p.evaluate(()=>({dlg:!dlg.hidden,ward:!$('wardrobe').hidden})); ok('G no welcome the second time',!r.dlg&&!r.ward);
-// I. Bryan by the pond gives sprinkles; they show up in the basket and add a step to the baking
+// I. Brian by the pond gives sprinkles; they show up in the basket and add a step to the baking
 await fresh({farm:1,mill:1,city:1,fargo:1,golf:1});
 r=await p.evaluate(()=>{P.x=96;P.y=48; update(16.7); const lbl=prompt.textContent; action(); const pages=[]; while(T.btns().includes('Next')){pages.push($('dtext').textContent);T.click('Next')} pages.push($('dtext').textContent); T.click('Take the sprinkles');
   const reward=!$('reward').hidden&&$('rewardName').textContent; collectReward(); return {lbl,pages,reward}});
 await p.waitForTimeout(900);
 r.after=await p.evaluate(()=>({basket:$('basket').textContent, have:!!have.sprinkles}));
-ok('I Bryan is chill and gives Joe sprinkles',r.lbl==='Talk to Bryan'&&r.pages.join(' ').includes('sprinkles')&&r.reward==='Sprinkles'&&r.after.have&&r.after.basket.includes('Sprinkles'),r.pages.slice(-1)[0]);
-r=await p.evaluate(()=>{goTo('kitchen','fromDoor'); T.run(40); openBake(); const n=bakeSteps().length; bake.i=n-1; bakeSetup(); const step=$('bakeStep').textContent, btn=$('bakeBtn').textContent; for(let k=0;k<6;k++)bakePress(); return {n,step,btn,state:bake.state,crowd:CROWD.some(c=>c.name==='Bryan')}});
-ok('I with sprinkles there is a shake-the-sprinkles step, and Bryan comes to the party',r.n===8&&r.step.includes("Bryan's sprinkles")&&r.btn==='Shake!'&&r.state==='good'&&r.crowd,r.step);
+ok('I Brian is chill and gives Joe sprinkles',r.lbl==='Talk to Brian'&&r.pages.join(' ').includes('sprinkles')&&r.reward==='Sprinkles'&&r.after.have&&r.after.basket.includes('Sprinkles'),r.pages.slice(-1)[0]);
+r=await p.evaluate(()=>{goTo('kitchen','fromDoor'); T.run(40); openBake(); const n=bakeSteps().length; bake.i=n-1; bakeSetup(); const step=$('bakeStep').textContent, btn=$('bakeBtn').textContent; for(let k=0;k<6;k++)bakePress(); return {n,step,btn,state:bake.state,crowd:CROWD.some(c=>c.name==='Brian')}});
+ok('I with sprinkles there is a shake-the-sprinkles step, and Brian comes to the party',r.n===8&&r.step.includes("Brian's sprinkles")&&r.btn==='Shake!'&&r.state==='good'&&r.crowd,r.step);
 // J. the cupcake unlocks a cupcake costume; Settings > Change outfit works anywhere
 await fresh({welcomed:true});
 r=await p.evaluate(()=>{const before=WARDROBE.outfits.filter(o=>!o.unlock||have[o.unlock]).map(o=>o.id);
