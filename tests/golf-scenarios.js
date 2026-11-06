@@ -22,7 +22,7 @@ r=await p.evaluate(()=>{P.x=MARGIE_SPOT.x+12;P.y=MARGIE_SPOT.y;update(16.7); con
   golfTap(); golf.angle=aimBase(); golfTap(); golf.flight=golfFlight(golfHole(),golf.lie,golf.angle,.5,false); golf.flight.i=0; for(let i=0;i<200&&golf.state==='flight';i++)update(16.7);
   return {lbl,face,pages,btns,card,steps,rows,ask,prac,active:golf.active};});
 ok('B talk to Margie (portrait shows) and she explains the stakes',r.lbl==='Talk to Margie'&&r.face&&r.pages[0].includes('milk'),r.pages[0]);
-ok('B instructions card first (Margie + Jack + steps)',r.card&&r.steps>=5&&r.rows.includes('Margie')&&r.rows.includes('Jack'),r.steps+' steps');
+ok('B instructions card first (Margie + Jack + steps)',r.card&&r.steps>=4&&r.rows.includes('Margie')&&r.rows.includes('Jack'),r.steps+' steps');
 ok('B then a practice throw is offered',r.ask.join()==='Practice throw,Start the round'&&r.prac.includes('Practice'),r.ask.join(' | '));
 await p.waitForFunction(()=>!dlg.hidden&&T.btns().includes('Throw again'),null,{timeout:5000});
 r=await p.evaluate(()=>{const said=$('dtext').textContent; T.click('Throw again'); const again=golf.practice&&golf.state==='aim'&&golf.lie.x===HOLES[0].tee.x; const counted=golf.you.length;

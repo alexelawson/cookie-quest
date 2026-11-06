@@ -87,6 +87,14 @@
         <button class="pbtn" id="bossBtn"></button>
       </div>
     </div>
+    <div class="vault" id="lasergrid" hidden role="dialog" aria-labelledby="gridTitle">
+      <div class="vcard gridcard">
+        <small id="gridTitle"></small>
+        <p id="gridMsg" aria-live="polite"></p>
+        <div class="lgrid" id="lgrid"></div>
+        <div class="gdots" id="gdots" aria-hidden="true"></div>
+      </div>
+    </div>
     <div class="anagram" id="anagram" hidden role="dialog" aria-labelledby="anaTitle">
       <div class="acard">
         <div class="ahead"><h3 id="anaTitle"></h3><span class="atime" id="anaTime">60</span></div>
@@ -125,6 +133,14 @@
         <canvas id="bakeArt" width="96" height="64" aria-hidden="true"></canvas>
         <div class="bsay"><canvas id="bakeFace" width="40" height="40" aria-hidden="true"></canvas><p id="bakeMsg" aria-live="polite"></p></div>
         <div class="brow"><button class="pbtn" id="bakeBtn"></button><button class="btn ghost" id="bakeAlt" hidden></button></div>
+      </div>
+    </div>
+    <div class="bake" id="crane" hidden role="dialog" aria-labelledby="craneTitle">
+      <div class="pcard bcard">
+        <small id="craneTitle"></small>
+        <canvas id="craneArt" width="128" height="96" aria-hidden="true"></canvas>
+        <div class="bsay"><canvas id="craneFace" width="32" height="32" aria-hidden="true"></canvas><p id="craneMsg" aria-live="polite"></p></div>
+        <div class="brow"><button class="pbtn" id="craneBtn"></button><button class="btn ghost" id="craneLater"></button></div>
       </div>
     </div>
     <div class="bake" id="cloverHunt" hidden role="dialog" aria-labelledby="cloverTitle">
@@ -169,7 +185,7 @@
     <button data-crew="0" aria-pressed="true"><canvas width="16" height="26"></canvas><span></span></button>
     <button data-crew="1" aria-pressed="false"><canvas width="16" height="26"></canvas><span></span></button>
     <button data-crew="2" aria-pressed="false"><canvas width="16" height="26"></canvas><span></span></button>
-    <button class="follow" id="followBtn" aria-pressed="false">Crew: Follow</button>
+    <button class="follow" id="followBtn" aria-pressed="false">Crew: Following (F)</button>
     <button class="follow help" id="helpBtn" aria-label="How to play">?</button>
   </div>
   <div class="controls">
@@ -197,12 +213,14 @@
 <script src="js/city.js"></script>
 <script src="js/fargo.js"></script>
 <script src="js/portraits.js"></script>
+<script src="js/lasergrid.js"></script>
 <script src="js/confectioner.js"></script>
 <script src="js/anagrams.js"></script>
 <script src="js/larsgames.js"></script>
 <script src="js/golf.js"></script>
 <script src="js/birkie.js"></script>
 <script src="js/people.js"></script>
+<script src="js/jackc.js"></script>
 <script src="js/ending.js"></script>
 <script src="js/extras.js"></script>
 <script src="js/outline.js"></script>

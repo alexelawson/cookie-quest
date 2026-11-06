@@ -4,7 +4,7 @@ const WW=384, WH=288, VW=224, VH=168;
 const cv=document.getElementById('game'); let ctx=cv.getContext('2d'); ctx.imageSmoothingEnabled=false;   // (let: draw() points it at the sprite layer for a moment to outline sprites)
 const R=(x,y,w,h)=>({x,y,w,h});
 const REG={farm:R(0,0,164,144), mill:R(220,0,164,144), city:R(0,170,164,118), fargo:R(220,170,164,118)};
-const trees=[[172,30],[212,30],[172,64],[212,64],[214,228],[110,154],[270,154]];
+const trees=[[172,30],[172,64],[214,228],[110,154],[270,154]];
 // snowy pines around the Birkie trailhead, dark pines in Wylee Woods (the disc golf entrance)
 const pines=[[228,14],[244,30],[262,12],[284,26],[232,52],[268,48],[290,62],[352,10],[372,24],[358,44],[378,62],[346,30],[236,74]];
 const cedars=[[100,194],[62,224],[154,252]];   // mossy cedars in the city

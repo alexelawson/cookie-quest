@@ -20,7 +20,7 @@ await fresh();
 let r=await p.evaluate(()=>{P.x=320;P.y=84;update(16.7); const lbl=prompt.textContent; action(); const sp=$('dspeaker').textContent; const pages=[]; while(T.btns().includes('Next')){pages.push($('dtext').textContent);T.click('Next')} closeDialog(); return {lbl,sp,pages}});
 ok('A John explains: Vikings carry the flour, Birkie-style',r.lbl==='Talk to John'&&r.sp==='John'&&r.pages.join(' ').includes('Vikings'),r.pages[2]);
 r=await start(); const r2=await p.evaluate(()=>({running:birk.running,scene:scene===SCENES.birkie,label:$('alabel').textContent,hud:$('hud').textContent}));
-ok('A how-to card (lanes, jumping, packs, feed cups), then the race starts',r.card==='The Birkie'&&/lane/i.test(r.steps)&&/jump/i.test(r.steps)&&/spill/i.test(r.steps)&&r2.running&&r2.scene,r2.hud);
+ok('A how-to card (lanes, jumping, packs, feed cups), then the race starts',r.card==='The Birkie'&&/lane/i.test(r.steps)&&/jump/i.test(r.steps)&&/Coke/i.test(r.steps)&&r2.running&&r2.scene,r2.hud);
 ok('A the A button says Jump; no more rhythm meter',r2.label==='Jump'&&!/Rhythm/.test(r2.hud)&&/Energy/.test(r2.hud),r2.label+' | '+r2.hud);
 // B. lanes
 r=await p.evaluate(()=>{T.only=null; T.setup(300,0); T.tap('right'); const a=birk.lane; dirs.right=true; T.run(20); const held=birk.lane; dirs.right=false; T.run(1); T.tap('right'); const clamp=birk.lane; T.tap('left'); T.tap('left'); const b=birk.lane; T.run(30); const off=P.x-trailX(P.y); return {a,held,clamp,b,off}});

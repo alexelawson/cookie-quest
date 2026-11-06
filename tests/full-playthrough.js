@@ -41,12 +41,16 @@ r=await p.evaluate(()=>{ goTo('world','start'); T.run(40); const out={};
   for(const k of ['oakleys','headband','shoes']){T.at(GEAR[k].x,GEAR[k].y); out[k]=have.gear&&have.gear[k]; if(!$('itemCard').hidden)$('itemBtn').click()}
   T.at(LOGAN.x+6,LOGAN.y+2); action(); T.pages(); T.click(LOGAN_TEXT.help); $('cloverField').querySelector('[data-four]').click(); T.pages(); T.click('OK'); $('itemBtn').click(); out.clover=have.gear.clover;
   T.at(CUPCAKE.x,CUPCAKE.y); out.cupcake=!!have.cupcake; while(!dlg.hidden)[...$('dbtns').querySelectorAll('button')][0].click();
-  talkBrian(); T.pages(); [...$('dbtns').querySelectorAll('button')][0].click(); return out});
+  talkBrian(); T.pages(); [...$('dbtns').querySelectorAll('button')][0].click();
+  // Jack C: help him stack five logs with the crane
+  talkJackC(); T.pages(); T.click(JACKC.help);
+  for(let n=0;n<CRANE.LOGS;n++){ for(let g=0;g<4000&&Math.abs(craneX()-craneTopX())>1;g++)craneTick(5); craneDrop(); for(let g=0;g<200&&cr.drop;g++)craneTick(16) }
+  out.crane=cr.done; craneDrop(); out.ginghouse=!!have.gingerHouseCostume; while(!dlg.hidden)[...$('dbtns').querySelectorAll('button')][0].click(); return out});
 await p.click('#rewardArt',{force:true}); await p.waitForTimeout(900);
 await p.evaluate(()=>{have.icecream=true; save(); renderBasket()});   // (Lars's long jump is tested in the heist suite)
 await reload();
 r=await p.evaluate(()=>({found:secretsFound(),of:SECRETS.length,bonus:[...$('basket').querySelectorAll('.slot.bonus,.slot.extra')].map(s=>s.dataset.key)}));
-ok('3 all seven secrets found by walking and talking, and they survive a reload',r.found===r.of,JSON.stringify(r));
+ok('3 all eight secrets found by walking and talking (including helping Jack C), and they survive a reload',r.found===r.of,JSON.stringify(r));
 
 // 4. home: everyone's there, bake, party
 r=await p.evaluate(()=>{goTo('kitchen','fromDoor'); T.run(40); const crowd=CROWD.filter(c=>!c.needs||have[c.needs]).length;
@@ -71,7 +75,7 @@ ok('5 the crown, the Cookie Dance (Jingle Bells), then the credits',r.crown&&r.d
 r=await p.evaluate(()=>{$('endSkip').click(); const stats=$('ecard').textContent; $('endNext').click(); const secret=$('ecard').textContent; $('endNext').click();
   const album=[]; for(let i=0;i<6;i++){album.push(!!$('ecard').querySelector('.polaroid canvas')); const n=$('ecard').querySelectorAll('.pnav button')[1]; if(i<5)n.click()}
   $('endNext').click(); return {stats,secret,album,note:$('ecard').textContent}});
-ok('5 stats count all 7 secrets and show the Cookie Legend',r.stats.includes('7 of 7')&&r.stats.includes('LEGEND'),r.stats.slice(0,60));
+ok('5 stats count all 8 secrets and show the Cookie Legend',r.stats.includes('8 of 8')&&r.stats.includes('LEGEND'),r.stats.slice(0,60));
 ok('5 the secret note (only for finding everything), all six photos unlocked, then the note',r.secret.includes(await p.evaluate(()=>ENDING.secretTitle))&&r.album.every(Boolean)&&r.note.includes('Merry Christmas'));
 await p.evaluate(()=>$('endNext').click());
 await reload();

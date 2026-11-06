@@ -421,3 +421,22 @@ h1::before,h1::after{content:'✦';color:var(--berry);font-size:.6em;vertical-al
   #wardGo{position:sticky;bottom:0;box-shadow:0 3px 0 #0b0c12,0 0 0 8px #1d2130} }
 /* baking on a phone: drop the title and Alex's little face so the bigger picture and the buttons all fit */
 @media (max-width:520px){ #bakeArt{width:192px;height:128px} #bakeTitle{display:none} .bcard .bsay canvas{display:none} .bcard{padding:5px 8px;gap:3px} .bcard p{font-size:.76rem;min-height:2.3em;line-height:1.2} .bcard .pbtn,.bcard .btn{padding:5px 12px} }
+/* the crew Follow / Wait button: bigger, and it bounces when it's the thing to try */
+.crewbar .follow{font-weight:700}
+.crewbar .follow.nudge{animation:nudge .9s ease-in-out infinite;border-color:var(--gold);box-shadow:0 0 0 2px var(--gold)}
+@keyframes nudge{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+/* the laser panel memory grid */
+.gridcard{max-width:300px}
+.lgrid{display:grid;grid-template-columns:repeat(4,52px);gap:6px;justify-content:center;margin:6px auto}
+.lsq{width:52px;height:52px;border-radius:6px;border:2px solid #3a4258;background:#151827;cursor:pointer;transition:background .08s}
+.lsq:hover:not(:disabled){border-color:#7fe8ff}
+.lsq:focus-visible{outline:3px solid var(--gold);outline-offset:1px}
+.lsq.lit{background:#7fe8ff;border-color:#e9fbff;box-shadow:0 0 12px #7fe8ff}
+.lsq.bad{background:#e54b4b;border-color:#ffb3b3;box-shadow:0 0 12px #e54b4b}
+.lsq:disabled{cursor:default}
+.gdots{display:flex;gap:6px;justify-content:center}
+.gdots i{width:10px;height:10px;border-radius:50%;background:#3a4258}
+.gdots i.now{background:var(--gold)} .gdots i.done{background:#7fd39a}
+@media (max-width:520px){ .lgrid{grid-template-columns:repeat(4,44px)} .lsq{width:44px;height:44px} }
+#craneArt{width:256px;height:192px;image-rendering:pixelated;border:2px solid var(--ink);border-radius:6px;background:#a9d4f0}
+@media (max-width:520px){ #craneArt{width:192px;height:144px} }

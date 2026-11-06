@@ -350,7 +350,8 @@ SCENES.fargo={ music:'fargo',
     const bars=10, on=Math.ceil(fargo.fuel/10);
     const gauge=[...Array(bars)].map((_,i)=>`<i class="${i<on?'on fuel':''}"></i>`).join('');
     const seen=STATIONS.filter(s=>s.seen).map(s=>s.price).sort();
-    return `<span class="pips" title="Fuel">${fargo.fuel<=0?'EMPTY':'Fuel'} ${gauge}</span><span>${seen.length?'Best $'+seen[0]:'No prices yet'}</span>`;
+    const best=seen[0], found=best===CHEAPEST;
+    return `<span class="pips" title="Fuel">${fargo.fuel<=0?'EMPTY':'Fuel'} ${gauge}</span><span>${found?'Found $2.79! Pull in':FARGO.hudGoal+(best?' · best so far $'+best:'')}</span>`;
   },
 };
 fargoNewRun();

@@ -4,6 +4,7 @@
 // ---------- secrets (the 100% reward) ----------
 const SECRETS=[
   {id:'cupcake',  has:()=>have.cupcake||have.gaveCupcake},
+  {id:'ginghouse',has:()=>!!have.gingerHouseCostume},
   {id:'sprinkles',has:()=>have.sprinkles},
   {id:'icecream', has:()=>have.icecream},
   {id:'oakleys',  has:()=>have.gear&&'oakleys' in have.gear},

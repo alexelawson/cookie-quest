@@ -14,7 +14,7 @@ const KEY_SPOT={x:230,y:176};             // the gate key, on a hook under a par
 const gateOpen=()=>!!have.plankGate||heistStage()>=2;
 const LIGHTS_OUT_MS=20000;                 // Lars's switch only kills the searchlights for this long; they stay off once the whole crew is on roof C
 const DEFUSE_MS=4000;                      // hold A this long at the laser panel (it keeps half if you let go past halfway)
-const STACK=R(448,52,52,22);               // the whole crew stands here before John rips the grate
+const STACK=R(448,52,52,22);               // the whole crew stands here before John opens the fire escape hatch
 const LOOSE_BEAM=R(41,117,34,7);          // the log, wedged between the water tank and the vents: it blocks the only way to Doc Alex until John lifts it
 // roof A: a water tank and a bank of vents split the roof; the only way through is a narrow gap between them
 const TANK=R(6,112,40,18), VENTS=R(70,112,48,14);
@@ -116,6 +116,7 @@ const OUTFIT_LOOK={
   disco:  {top:'disco', pants:'#f2efe6', boots:'#e8b04a', head:'afro', flare:true},
   avant:  {top:'avant', pants:'#1d1d22', boots:'#f2f2ee', head:'beret', flare:true},
   cupcake:{top:'cupcake', pants:'#f2efe6', boots:'#e54b7a', head:'frosting'},
+  ginghouse:{top:'ginghouse', pants:'#9a5a2a', boots:'#6b3a1c', head:'roof'},            // a gingerbread house: walls, icing, gumdrops, a candy-cane door; the roof is the hat
   dave:   {top:'cat', pants:'#c8442a', boots:'#e86a4a', head:'cat', tail:true},          // Dave: a red cat
   john:   {top:'#f4f4f0', pants:'#3a5f9e', boots:'#3b2a1e', head:'cap', arms:true},        // John: red cap, white tee, jeans, boots
 };
@@ -151,6 +152,12 @@ function drawHero(c,g=ctx,look=heroLook()){
     for(let yy=7;yy<16;yy++){const inset=Math.floor((yy-7)/3); F('#e0b46a',-1+inset,yy,14-inset*2,1)}
     for(let xx=0;xx<12;xx+=2)F('#b8863e',xx+(xx>5?0:0),8,1,8); F('#f2d49a',-1,7,14,1); F('#b8863e',1,15,10,1);
     F('#f0c6a0',-2,9,1,3); F('#f0c6a0',13,9,1,3)}
+  else if(L.top==='ginghouse'){   // gingerbread walls from the chest to the knees, white icing trim, gumdrops, a candy-cane door, a window
+    F('#b8743a',-1,7,14,9); F('#9a5a2a',-1,15,14,1); F('#ffffff',-1,7,14,1); for(let xx=-1;xx<13;xx+=2)F('#ffffff',xx,8,1,1);   // walls + icing drips
+    if(c.dir!=='up'){ F('#e54b4b',4,11,4,5); F('#ffffff',4,12,4,1); F('#ffffff',4,14,4,1); F('#f4d35e',7,13,1,1);              // the candy-cane door
+      F('#fff3a8',0,10,3,3); F('#ffffff',1,10,1,3); F('#ffffff',0,11,3,1); F('#fff3a8',9,10,3,3); F('#ffffff',10,10,1,3); F('#ffffff',9,11,3,1) }   // windows
+    for(const [gx,gy,gc] of [[-1,9,'#4fbf73'],[12,9,'#e54b7a'],[2,15,'#5fa8e8'],[10,15,'#f4d35e']])F(gc,gx,gy,1,1);              // gumdrops
+    F('#f0c6a0',-2,10,1,2); F('#f0c6a0',13,10,1,2)}
   else if(L.top==='grp'){F(skin,2,7,8,6); F(skin,1,8,1,4); F(skin,10,8,1,4); F('#d9a583',2,7,1,6); F('#d9a583',9,7,1,6);   // no shirt
     F('#d9a583',3,9,2,1); F('#d9a583',7,9,2,1); F('#d9a583',5,10,2,1); F('#d9a583',5,12,2,1); F('#d9a583',6,9,1,4);   // (training shows)
     F('#111114',2,12,8,2); F('#2e9a45',2,12,8,1)}                                                                       // spandex up to the waist, a green waistband
@@ -184,6 +191,15 @@ function drawHero(c,g=ctx,look=heroLook()){
     if(c.dir==='down'){F('#ff3fb4',2,3,4,2); F('#ff3fb4',7,3,4,2); F('#1d1d22',3,3,2,2); F('#1d1d22',8,3,2,2); F('#ff3fb4',6,3,1,1); F('#b5654f',5,6,2,1)}   // tiny round shades in hot-pink frames
     if(c.dir==='left'){F('#1d1d22',2,3,2,2)}
     if(c.dir==='right'){F('#1d1d22',8,3,2,2)}
+    return }
+  if(L.head==='roof'){   // the gingerbread roof as a hat: a steep brown roof with thick white icing, gumdrops on the ridge, a little chimney
+    for(let k=0;k<7;k++)F('#9a5a2a',5-k,-5+k,2+k*2,1); F('#b8743a',0,1,12,2);
+    for(let k=0;k<7;k++){F('#ffffff',5-k,-5+k,1,1); F('#ffffff',6+k,-5+k,1,1)} F('#ffffff',-1,2,14,1); for(let xx=0;xx<12;xx+=3)F('#ffffff',xx,3,1,1);
+    F('#e54b4b',5,-7,2,2); F('#4fbf73',2,-2,1,1); F('#f4d35e',9,-2,1,1); F('#5fa8e8',6,-1,1,1); F('#8a4a2a',9,-5,2,3);
+    if(c.dir==='up')return;
+    if(c.dir==='down'){F(skin,3,3,6,4); F(eye,4,4,1,1); F(eye,7,4,1,1); F('#b5654f',5,6,2,1)}
+    if(c.dir==='left'){F(skin,2,3,5,4); F(eye,3,4,1,1)}
+    if(c.dir==='right'){F(skin,5,3,5,4); F(eye,8,4,1,1)}
     return }
   if(L.head==='frosting'){   // a giant swirl of pink frosting all around the face, sprinkles, cherry on top
     const P1='#f39ac0', P2='#fcc9de';
@@ -321,10 +337,25 @@ function drawBeam(){
   for(let x=s.x;x<s.x+s.w;x+=6){ctx.fillRect(x,s.y+2,3,1); ctx.fillRect(x,s.y+9,3,1)} ctx.fillRect(s.x,s.y+2,1,8); ctx.fillRect(s.x+s.w-1,s.y+2,1,8);
 }
 function drawCarriedLog(c){ if(!heist.carry||c.id!=='john')return; logV(Math.round(c.x)+3,Math.round(c.y)-32,30) }   // up on John's shoulder
+// the fire escape hatch on roof C (where the skylight was): a red steel lid with hazard stripes and a FIRE ESCAPE plate.
+// John pries it open (round 3), then everyone climbs down the fire escape ladder to the Confectioner.
+const HATCH_SPOTS=[[458,64],[474,66],[490,64]];   // where the three of them stand ("stack up") before John opens it
 function drawGrate(){
-  if(heistStage()>=3){ctx.fillStyle='#5f6676'; ctx.fillRect(SKYLIGHT.x+26,SKYLIGHT.y+18,12,10); return}   // tossed aside
-  ctx.fillStyle='#8b93a3'; for(let x=SKYLIGHT.x;x<SKYLIGHT.x+SKYLIGHT.w;x+=4)ctx.fillRect(x,SKYLIGHT.y,1,SKYLIGHT.h);
-  ctx.fillRect(SKYLIGHT.x,SKYLIGHT.y+7,SKYLIGHT.w,1);
+  const S=SKYLIGHT, F=(c,x,y,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,h)}, st=heistStage();
+  F('#2a2e3c',S.x-1,S.y-1,S.w+2,S.h+2);                                                     // the frame
+  if(st>=3){ F('#0b0c12',S.x,S.y,S.w,S.h); for(let y=S.y+2;y<S.y+S.h;y+=3)F('#8b93a3',S.x+4,y,S.w-8,1); F('#8b93a3',S.x+3,S.y,1,S.h); F('#8b93a3',S.x+S.w-4,S.y,1,S.h);   // open: the ladder going down
+    F('#a8322a',S.x+S.w+3,S.y+4,12,14); F('#c8443a',S.x+S.w+3,S.y+4,12,1); F('#1d1d22',S.x+S.w+3,S.y+17,12,1) }                          // the lid, tossed aside
+  else { F('#a8322a',S.x,S.y,S.w,S.h); F('#c8443a',S.x,S.y,S.w,1);
+    for(let x=S.x-S.h;x<S.x+S.w;x+=6)for(let k=0;k<S.h;k++){const px=x+k; if(px>=S.x&&px<S.x+S.w&&k<S.h)F('#f4d35e',px,S.y+S.h-1-k,1,1); if(px+1>=S.x&&px+1<S.x+S.w)F('#f4d35e',px+1,S.y+S.h-1-k,1,1)}   // hazard stripes
+    F('#5f6676',S.x+S.w/2-4,S.y+S.h/2-1,8,3); F('#c9ced4',S.x+S.w/2-3,S.y+S.h/2-1,6,1) }   // the handle
+  const pw=textW('EXIT')+4; F('#e8e2d6',S.x-pw-4,S.y+4,pw+2,9); F('#2b8a4a',S.x-pw-3,S.y+5,pw,7); pixText(ctx,'EXIT',S.x-pw-1,S.y+6,'#ffffff');   // a green EXIT plate beside it
+}
+// lasers off: yellow squares show where everybody stands, and an arrow points at the hatch (drawn on top of the dark)
+function drawHatchGuide(){
+  if(heistStage()!==2||!lasersOff())return; const S=SKYLIGHT, F=(c,x,y,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,h)};
+  for(const [x,y] of HATCH_SPOTS){ const on=crewPositions().some(c=>Math.abs(c.x-x)<6&&Math.abs(c.y-y)<5), col=on?'#7fd39a':'#f4d35e';
+    if(on||Math.floor(time/400)%2){F(col,x-5,y-3,10,1); F(col,x-5,y+2,10,1); F(col,x-5,y-3,1,6); F(col,x+4,y-3,1,6)} }
+  drawExitMark({x:S.x+S.w+3,y:S.y+8,dir:'left',text:'GO'});
 }
 
 // ---------- crew control ----------
@@ -335,7 +366,7 @@ function switchTo(i){
   syncLeadFromP(); heist.lead=i; const c=lead(); P.x=c.x;P.y=c.y;P.dir=c.dir;P.moving=false;
   heist.trail=[{x:c.x,y:c.y}]; heist.sprintT=0; renderCrewBar();
 }
-function toggleFollow(){ if(paused)return; heist.follow=!heist.follow; heist.trail=[{x:P.x,y:P.y}]; renderCrewBar() }
+function toggleFollow(){ if(paused)return; heist.follow=!heist.follow; heist.trail=[{x:P.x,y:P.y}]; have.triedHold=true; renderCrewBar(); sfx('click') }
 function placeAtCheckpoint(){
   const cp=CHECKPOINTS[Math.min(2,heistStage())];
   for(const c of heist.crew){const [x,y]=cp[c.id]; c.x=x;c.y=y;c.dir='right';c.moving=false}
@@ -419,7 +450,7 @@ const say=(lines,done)=>{ // lines: [[speaker,text],...] (or [speaker,text,face]
 };
 function briefing(){
   have.heistBriefed=true; save();
-  say([...HEIST.briefing.map(t=>[HEIST.stranger,t]),...HEIST.crewHello],()=>openHowTo());
+  say([...HEIST.briefing.map(t=>[HEIST.stranger,t]),...HEIST.crewHello],()=>{ if(!have.heistHowTo)openHowTo() });
 }
 function hintOnce(key,who,text){ if(heist.hinted[key])return; heist.hinted[key]=true; say([[who,text]]) }
 // the log blocks the way: only John can lift it, and then he carries it everywhere until it's a bridge
@@ -513,21 +544,13 @@ function drawGate(){ const F=(c,x,y,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,h)
   const g=PLANK_GATE; F('rgba(0,0,0,.35)',g.x+1,g.y+g.h,g.w+1,2); F('#8b93a3',g.x,g.y-6,g.w,g.h+6); F('#5f6676',g.x+1,g.y-6,1,g.h+6);
   for(let y=g.y-4;y<g.y+g.h;y+=4)F('#c9ced4',g.x,y,g.w,1);
   F('#e0b030',g.x-2,g.y+5,5,4); F('#8a6a1a',g.x-1,g.y+7,3,1); F('#c9ced4',g.x-1,g.y+3,3,2) }   // a big padlock
-// the laser panel: Joe holds A to defuse it (Doc Alex's defuser); let go past halfway and it keeps half
+// the laser panel: Joe hacks it with Doc Alex's gadget (a memory grid, in lasergrid.js)
 function startDefuse(){
   if(lead().id!=='hero')return flashPrompt(HEIST.onlyJoe);
-  heist.defuse=heist.defuse||{p:0,beep:0}; heist.defusing=true;
+  openLaserGrid();
 }
-function defuseTick(dt){
-  const d=heist.defuse; if(!d||!heist.defusing)return;
-  const moving=dirs.up||dirs.down||dirs.left||dirs.right;
-  if(actionHeld&&!moving){
-    d.p+=dt/DEFUSE_MS; d.beep-=dt; if(d.beep<=0){sfx('blip'); d.beep=480-380*Math.min(1,d.p)}
-    if(d.p>=1){heist.defuse=null; heist.defusing=false; lasersOffNow()}
-  } else { heist.defusing=false; if(d.p>=.5){d.p=.5; flashPrompt(HEIST.defuseHalf)} else {d.p=0; flashPrompt(HEIST.defuseHold)} }
-}
-function drawDefuse(){ const d=heist.defuse; if(!d)return; const x=Math.round(P.x)-13, y=Math.round(P.y)-32, F=(c,a,b,w,h)=>{ctx.fillStyle=c;ctx.fillRect(a,b,w,h)};
-  F('#0b0c12',x-1,y-1,28,5); F('#2a2f3e',x,y,26,3); F(d.p>=.5?'#3fbf5a':'#e8b453',x,y,Math.round(26*Math.min(1,d.p)),3); F('#ffffff',x+13,y-1,1,5) }
+function defuseTick(){}
+function drawDefuse(){}
 function lasersOffNow(){ have.lasersOff=true; save(); sfx('chunk'); say([[HEIST.crew.hero,HEIST.lasersDone],['Lars',HEIST.defuseCall]]) }
 function drawLaserPanel(){ const p=LASER_PANEL, F=(c,x,y,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,h)}, off=lasersOff();
   F('rgba(0,0,0,.4)',p.x+1,p.y+p.h,p.w,2); F('#5f6676',p.x,p.y,p.w,p.h); F('#8b93a3',p.x,p.y,p.w,1);
@@ -590,7 +613,7 @@ function heistTrigger(){
   if(st===1&&hit(feet,R(FUSE.x-14,FUSE.y-14,28,28)))return {label:heist.lightsOutT>0?HEIST.lightsAlreadyOut:HEIST.fuse, act:cutFuse};
   if(!gateOpen()&&hit(feet,R(PLANK_GATE.x-12,PLANK_GATE.y-2,PLANK_GATE.w+24,PLANK_GATE.h+4)))return {label:heist.keyHolder===lead().id?HEIST.gateUnlock:HEIST.gateCheck, act:checkGate};
   if(st===1&&!gateOpen()&&!heist.keyHolder&&!lightsOn()&&Math.hypot(P.x-KEY_SPOT.x,P.y-KEY_SPOT.y)<12)return {label:HEIST.grabKey, act:grabKey};
-  if(st>=2&&st<4&&!lasersOff()&&hit(feet,R(LASER_PANEL.x-4,LASER_PANEL.y,LASER_PANEL.w+6,16)))return {label:heist.defuse?HEIST.defuseKeep:HEIST.defuseLabel, btn:'Hold', act:startDefuse};
+  if(st>=2&&st<4&&!lasersOff()&&hit(feet,R(LASER_PANEL.x-4,LASER_PANEL.y,LASER_PANEL.w+6,16)))return {label:HEIST.defuseLabel, act:startDefuse};
   if(st===2&&hit(feet,R(SKYLIGHT.x-4,SKYLIGHT.y+SKYLIGHT.h,SKYLIGHT.w+8,12)))return {label:HEIST.grate+' ('+stacked()+'/3 stacked)', act:ripGrate};
   if(st===3&&hit(feet,R(SKYLIGHT.x-4,SKYLIGHT.y+SKYLIGHT.h,SKYLIGHT.w+8,12)))return {label:HEIST.dropIn, act:()=>have.confectionerBeat?openVault():openBoss()};   // the Confectioner first (confectioner.js), then his riddle
   return null;
@@ -600,7 +623,8 @@ function heistTrigger(){
 function renderCrewBar(){
   const bar=$('crewbar'); if(!bar)return;
   bar.querySelectorAll('[data-crew]').forEach(b=>{const i=+b.dataset.crew; b.setAttribute('aria-pressed',i===heist.lead?'true':'false')});
-  $('followBtn').textContent=heist.follow?'Crew: Follow':'Crew: Hold';
+  $('followBtn').textContent=heist.follow?HEIST.followOn:HEIST.followOff;
+  $('followBtn').classList.toggle('nudge',heistStage()===1&&heist.follow&&!have.triedHold);   // it bounces at the searchlights until you've tried it
   $('followBtn').setAttribute('aria-pressed',heist.follow?'false':'true');
 }
 function buildCrewBar(){
@@ -624,7 +648,7 @@ SCENES.city={ music:'heist',
     ...(heistStage()<1&&!heist.carry?[LOOSE_BEAM]:[]),...(gateOpen()?[]:[PLANK_GATE])] },
   entries:{start:{x:40,y:156,dir:'up'}, fromStreet:{x:40,y:156,dir:'up'}},
   enter(){
-    heist.lead=0; heist.follow=true; heist.hinted={}; heist.keyHolder=null; heist.sonarT=0; heist.sprintT=0; heist.marked=false;
+    heist.lead=0; heist.follow=true; heist.hinted={}; heist.howToShown=false; heist.keyHolder=null; heist.sonarT=0; heist.sprintT=0; heist.marked=false;
     placeAtCheckpoint(); $('crewbar').hidden=false; buildCrewBar(); banner.q=[]; banner.t=0; $('roundBanner').hidden=true;
     if(heistStage()<3)roundStart(heistStage()+1);   // (Doc Alex waits at her lab bench: walk up to her for the briefing)
   },
@@ -643,6 +667,7 @@ SCENES.city={ music:'heist',
     if(heist.promptT<=0&&heist.promptT>-999){heist.promptT=-999; if(near)prompt.textContent=near.label; else prompt.hidden=true}
   },
   update(dt){
+    if(!have.heistHowTo&&!heist.howToShown){ heist.howToShown=true; return openHowTo() }   // how to play, right as you arrive
     if(heist.outfitReact){heist.outfitReact=false; const r=WARDROBE.react[have.outfit]; if(r)return say(r)}
     if(heistStage()>=4)return;
     // guard patrol: walks up and down, pauses at each end (flashlight off while he turns)
@@ -657,7 +682,7 @@ SCENES.city={ music:'heist',
     if(st<1&&!heist.carry&&P.y<146)hintOnce('log','John',HEIST.johnLog);
     else if(!have.heistBriefed&&heist.carry&&P.y<108)hintOnce('who','John',HEIST.whoIsThat);
     else if(st<1&&have.heistBriefed&&heist.carry&&P.x>70&&P.y<110)hintOnce('gap','John',HEIST.johnGap);
-    else if(st===1&&P.x>160)hintOnce('lights','Lars',HEIST.larsLights);
+    else if(st===1&&P.x>160&&!heist.hinted.lights){ heist.hinted.lights=true; renderCrewBar(); say([['Lars',HEIST.larsLights],['John',HEIST.holdTip]]) }
     else if(st>=2&&st<3&&P.x>356)hintOnce('lasers',HEIST.crew.hero,HEIST.heroLasers);
   },
   drawPlayer:(x,y)=>{syncLeadFromP(); crewSprite(lead()); drawCarriedLog(lead()); drawHeldKey(lead())},
@@ -723,10 +748,14 @@ SCENES.city={ music:'heist',
       ctx.fillStyle='rgba(60,36,18,.85)'; [[-14,-8],[4,-12],[14,2],[-4,8],[-20,2],[2,-2],[16,-10],[-10,12]].forEach(([dx,dy])=>{ctx.fillRect(sx+dx,sy+dy,5,4)})}
     if(flashT>0){ctx.fillStyle=`rgba(220,230,255,${flashT/140*.3})`; ctx.fillRect(cx,cy,VW,VH)}
     if(heist.flashT>0){ctx.fillStyle=`rgba(255,40,40,${heist.flashT/500*.35})`; ctx.fillRect(cx,cy,VW,VH)}
+    // crew on Hold get a little WAIT tag over their heads, so you can see who's staying put
+    if(!heist.follow&&st<4)for(const c of heist.crew){ if(c===lead())continue; const w=textW('WAIT')+4, x=Math.round(c.x-w/2), y=Math.round(c.y-(c.id==='lars'?37:33));
+      ctx.fillStyle='#1d2130'; ctx.fillRect(x,y,w,7); ctx.fillStyle='#f4d35e'; ctx.fillRect(x,y+7,w,1); ctx.fillRect(x+w/2-1|0,y+8,2,1); pixText(ctx,'WAIT',x+2,y+1,'#f4d35e') }
+    drawHatchGuide();
     if(heist.caughtWho){const c=heist.crew.find(c=>c.id===heist.caughtWho); if(c){ctx.fillStyle='#ff4a4a'; ctx.fillRect(c.x-1,c.y-34,3,7); ctx.fillRect(c.x-1,c.y-25,3,2)}}
   },
-  hud(){ const st=heistStage(); const steps=['Bridge the gap','Kill the lights, get everyone across','Defuse the lasers, stack up on the skylight','Crack the vault','Beat Lars at anagrams','Done!'];
+  hud(){ const st=heistStage(); const steps=['Bridge the gap','Kill the lights, get everyone across',(lasersOff()?'Everybody to the fire escape hatch':'Shut off the lasers'),'Crack the vault','Beat Lars at anagrams','Done!'];
     if(st===1&&heist.lightsOutT>0)return `<span>Lights back in 0:${String(Math.ceil(heist.lightsOutT/1000)).padStart(2,'0')}</span>`;
-    if(st===3&&!have.confectionerBeat)return '<span>Drop in. Beat the Confectioner</span>';
+    if(st===3&&!have.confectionerBeat)return '<span>Climb down the fire escape. Beat the Confectioner</span>';
     return st>=5||have.city?'':`<span>${steps[st]}</span>` },
 };

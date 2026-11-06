@@ -100,7 +100,7 @@ r=await p.evaluate(()=>{P.x=134;P.y=244;update(16.7); action(); const open=!$('w
   [...$('outfits').children].find(b=>b.dataset.id==='sweater').click(); const line=$('wardLine').textContent; $('wardGo').click(); T.run(40);
   return {open,n,line,outfit:have.outfit,city:scene===SCENES.city}});
 ok('F the elevator opens the wardrobe first; pick an outfit; then the city',r.open&&r.n===8&&r.line.includes('Festive')&&r.outfit==='sweater'&&r.city,r.line);
-r=await p.evaluate(()=>{const seen=[]; for(let i=0;i<20&&!dlg.hidden;i++){seen.push($('dspeaker').textContent+': '+$('dtext').textContent); [...$('dbtns').querySelectorAll('button')][0].click(); if(!$('howto').hidden)$('howOk').click(); T.run(2)} T.run(5); for(let i=0;i<5&&!dlg.hidden;i++){seen.push($('dspeaker').textContent+': '+$('dtext').textContent);[...$('dbtns').querySelectorAll('button')][0].click(); T.run(2)} return seen});
+r=await p.evaluate(()=>{const seen=[]; for(let k=0;k<10&&$('howto').hidden&&dlg.hidden;k++)T.run(1); if(!$('howto').hidden){$('howOk').click(); T.run(3)} for(let i=0;i<20&&!dlg.hidden;i++){seen.push($('dspeaker').textContent+': '+$('dtext').textContent); [...$('dbtns').querySelectorAll('button')][0].click(); if(!$('howto').hidden)$('howOk').click(); T.run(2)} T.run(5); for(let i=0;i<5&&!dlg.hidden;i++){seen.push($('dspeaker').textContent+': '+$('dtext').textContent);[...$('dbtns').querySelectorAll('button')][0].click(); T.run(2)} return seen});
 ok('F the crew reacts to the outfit',r.some(l=>l.includes('from space')),r.slice(-2).join(' | '));
 // G. the welcome from Alex, and Joe's look
 await p.goto(URL); await p.evaluate(()=>localStorage.clear()); await p.reload(); await p.click('#startBtn'); await p.evaluate(helpers);
