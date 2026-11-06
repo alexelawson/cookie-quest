@@ -4,11 +4,11 @@ const JACKC_SITE={x:204, y:44};                  // the middle of the cabin's fo
 const JACKC_SPOT={x:185, y:54};                  // where he stands
 const CRANE={LOGS:5, LOG_W:30, LOG_H:6, GROUND:84, BASE_X:64, SWING:34, SPEEDS:[1.5,1.8,2.1,2.4,2.7], OK:11, PERFECT:2};   // per log: how fast it swings (radians a second); how far off still sits, and how close is perfect
 
-// ---------- how he looks: shortish, medium-brown hair, a green-and-black plaid shirt, jeans, tan work boots, a tool belt with a hammer ----------
-const JACKC_PAL={H:'#7a4f2e',h:'#5e3b20',S:'#f0c6a0',s:'#d9a882',E:'#2b2236',M:'#b5654f',r:'#eaa3a0',
-  P:'#3f8a4e',p:'#1d2a22',w:'#2a5a34',B:'#7a4a2a',b:'#c9ced4',J:'#3a5f9e',j:'#2c4a7c'};
+// ---------- how he looks: shortish, clean-shaven, light-medium brown hair, a red plaid shirt, jeans, tan work boots, a tool belt with a hammer ----------
+const JACKC_PAL={H:'#a4744a',h:'#86592f',S:'#f0c6a0',s:'#e3b48e',E:'#2b2236',M:'#c9786a',r:'#eaa3a0',
+  P:'#c8322b',p:'#3a1414',w:'#8a1f1a',B:'#7a4a2a',b:'#c9ced4',J:'#3a5f9e',j:'#2c4a7c'};
 const JACKC_SPR={
-  down:["...hHHHh...","..hHHHHHh..","..HSSSSSH..","..SESSSES..","..SrSsSrS..","...SMMMS...",
+  down:["...hHHHh...","..hHHHHHh..","..HSSSSSH..","..SESSSES..","..SrSSSrS..","...sMMMs...",
         ".PwPPwPPwP.",".wpwwpwwpw.",".PwPPwPPwP.",".SwPPwPPwS.",".SBBbBBBBS.","..JJJJJJJ..","..JJJjJJJ.."],
   up:  ["...hHHHh...","..hHHHHHh..","..HHHHHHH..","..HHHHHHH..","..hHHHHHh..","...SSSSS...",
         ".PwPPwPPwP.",".wpwwpwwpw.",".PwPPwPPwP.",".SwPPwPPwS.",".SBBBBBBBS.","..JJJJJJJ..","..JJJjJJJ.."],
@@ -21,14 +21,14 @@ function drawJackC(x,y,dir='down'){
   drawSprite(ctx,X,Y,JACKC_SPR,JACKC_PAL,dir==='up'?'up':'down',3,3);
   if(dir!=='up'){F('#8a5a34',9,10,1,4); F('#9aa3b0',8,9,3,1)}                             // a hammer on the belt
 }
-PORTRAITS['Jack C']={size:32, bg:'#e4efe0', draw(g){ const F=px(g);
-  for(let y=22;y<32;y++)for(let x=3;x<29;x++){const d=(x%4===1)+(y%4===1); F(d===2?'#1d2a22':d?'#2a5a34':'#3f8a4e',x,y,1,1)}   // plaid shirt
-  F('#f0c6a0',13,19,6,4); F('#3f8a4e',11,22,4,3); F('#3f8a4e',17,22,4,3);                // neck, collar
-  F('#f0c6a0',9,7,14,14); F('#d9a882',9,18,14,3); F('#f0c6a0',11,21,10,1);              // face
-  F('#7a4f2e',8,3,16,6); F('#7a4f2e',7,6,3,7); F('#7a4f2e',22,6,3,7); F('#5e3b20',10,8,5,1); F('#9a6a40',12,3,6,1);   // medium-brown hair
+PORTRAITS['Jack C']={size:32, bg:'#f3e6d8', draw(g){ const F=px(g);
+  for(let y=22;y<32;y++)for(let x=3;x<29;x++){const d=(x%4===1)+(y%4===1); F(d===2?'#3a1414':d?'#8a1f1a':'#c8322b',x,y,1,1)}   // red plaid shirt
+  F('#f0c6a0',13,19,6,4); F('#e3b48e',13,19,6,1); F('#c8322b',11,22,4,3); F('#c8322b',17,22,4,3);   // neck, collar
+  F('#f0c6a0',9,7,14,13); F('#f0c6a0',10,20,12,1); F('#f0c6a0',12,21,8,1);              // face, clean-shaven, a soft round chin
+  F('#a4744a',8,3,16,6); F('#a4744a',7,6,3,7); F('#a4744a',22,6,3,7); F('#86592f',10,8,5,1); F('#c4945f',12,3,6,1); F('#c4945f',9,5,3,1);   // light-medium brown hair
   F('#ffffff',11,12,3,2); F('#ffffff',18,12,3,2); F('#2b2236',12,12,2,2); F('#2b2236',19,12,2,2);
-  F('#5e3b20',11,10,4,1); F('#5e3b20',18,10,4,1); F('#eaa3a0',10,15,2,1); F('#eaa3a0',20,15,2,1); F('#d9a882',15,14,2,2);
-  F('#b5654f',13,17,6,1); F('#b5654f',12,16,1,1); F('#b5654f',19,16,1,1);               // a big grin
+  F('#86592f',11,10,4,1); F('#86592f',18,10,4,1); F('#eaa3a0',10,15,2,1); F('#eaa3a0',20,15,2,1); F('#d9a882',15,14,2,2);
+  F('#c9786a',13,17,6,1); F('#c9786a',12,16,1,1); F('#c9786a',19,16,1,1);               // a big grin
   F('#e8c04a',23,7,1,6); F('#2b2236',23,6,1,1) }};                                       // a carpenter's pencil behind his ear
 
 // ---------- his building site ----------
