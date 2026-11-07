@@ -152,11 +152,14 @@ function drawHero(c,g=ctx,look=heroLook()){
     for(let yy=7;yy<16;yy++){const inset=Math.floor((yy-7)/3); F('#e0b46a',-1+inset,yy,14-inset*2,1)}
     for(let xx=0;xx<12;xx+=2)F('#b8863e',xx+(xx>5?0:0),8,1,8); F('#f2d49a',-1,7,14,1); F('#b8863e',1,15,10,1);
     F('#f0c6a0',-2,9,1,3); F('#f0c6a0',13,9,1,3)}
-  else if(L.top==='ginghouse'){   // gingerbread walls from the chest to the knees, white icing trim, gumdrops, a candy-cane door, a window
-    F('#b8743a',-1,7,14,9); F('#9a5a2a',-1,15,14,1); F('#ffffff',-1,7,14,1); for(let xx=-1;xx<13;xx+=2)F('#ffffff',xx,8,1,1);   // walls + icing drips
-    if(c.dir!=='up'){ F('#e54b4b',4,11,4,5); F('#ffffff',4,12,4,1); F('#ffffff',4,14,4,1); F('#f4d35e',7,13,1,1);              // the candy-cane door
-      F('#fff3a8',0,10,3,3); F('#ffffff',1,10,1,3); F('#ffffff',0,11,3,1); F('#fff3a8',9,10,3,3); F('#ffffff',10,10,1,3); F('#ffffff',9,11,3,1) }   // windows
-    for(const [gx,gy,gc] of [[-1,9,'#4fbf73'],[12,9,'#e54b7a'],[2,15,'#5fa8e8'],[10,15,'#f4d35e']])F(gc,gx,gy,1,1);              // gumdrops
+  else if(L.top==='ginghouse'){   // the walls of a gingerbread house from the shoulders to the knees: icing on the corners, gumdrop trim, two frosted windows, a little arched candy door
+    F('#b8743a',-1,7,14,9); F('#a0622e',-1,15,14,1); F('#c98a4e',0,7,12,1);
+    F('#ffffff',-1,7,1,9); F('#ffffff',12,7,1,9);                                               // icing down the corners
+    for(let xx=0;xx<12;xx+=2)F('#ffffff',xx,15,1,1);                                             // a scalloped icing hem
+    if(c.dir!=='up'){ F('#ffffff',4,10,4,6); F('#e54b4b',5,11,2,5); F('#ffffff',5,12,2,1); F('#ffffff',5,14,2,1); F('#f4d35e',6,13,1,1);   // the arched candy-cane door
+      for(const wx of [0,9]){F('#ffffff',wx,9,3,3); F('#fff3a8',wx+1,10,1,1)} }                 // frosted windows with a warm light
+    else { F('#ffffff',3,9,6,1); F('#ffffff',3,12,6,1) }                                        // (icing stripes on the back)
+    for(const [gx,gy,gc] of [[1,7,'#4fbf73'],[4,7,'#e54b7a'],[7,7,'#5fa8e8'],[10,7,'#f4d35e']])F(gc,gx,gy,1,1);   // gumdrops along the top
     F('#f0c6a0',-2,10,1,2); F('#f0c6a0',13,10,1,2)}
   else if(L.top==='grp'){F(skin,2,7,8,6); F(skin,1,8,1,4); F(skin,10,8,1,4); F('#d9a583',2,7,1,6); F('#d9a583',9,7,1,6);   // no shirt
     F('#d9a583',3,9,2,1); F('#d9a583',7,9,2,1); F('#d9a583',5,10,2,1); F('#d9a583',5,12,2,1); F('#d9a583',6,9,1,4);   // (training shows)
@@ -192,14 +195,17 @@ function drawHero(c,g=ctx,look=heroLook()){
     if(c.dir==='left'){F('#1d1d22',2,3,2,2)}
     if(c.dir==='right'){F('#1d1d22',8,3,2,2)}
     return }
-  if(L.head==='roof'){   // the gingerbread roof as a hat: a steep brown roof with thick white icing, gumdrops on the ridge, a little chimney
-    for(let k=0;k<7;k++)F('#9a5a2a',5-k,-5+k,2+k*2,1); F('#b8743a',0,1,12,2);
-    for(let k=0;k<7;k++){F('#ffffff',5-k,-5+k,1,1); F('#ffffff',6+k,-5+k,1,1)} F('#ffffff',-1,2,14,1); for(let xx=0;xx<12;xx+=3)F('#ffffff',xx,3,1,1);
-    F('#e54b4b',5,-7,2,2); F('#4fbf73',2,-2,1,1); F('#f4d35e',9,-2,1,1); F('#5fa8e8',6,-1,1,1); F('#8a4a2a',9,-5,2,3);
-    if(c.dir==='up')return;
-    if(c.dir==='down'){F(skin,3,3,6,4); F(eye,4,4,1,1); F(eye,7,4,1,1); F('#b5654f',5,6,2,1)}
-    if(c.dir==='left'){F(skin,2,3,5,4); F(eye,3,4,1,1)}
-    if(c.dir==='right'){F(skin,5,3,5,4); F(eye,8,4,1,1)}
+  if(L.head==='roof'){   // the top of the house: gable walls around Joe's face (he peeks out of the attic window), a big iced roof, gumdrops, a chimney
+    F('#b8743a',-1,1,14,6); F('#ffffff',-1,1,1,6); F('#ffffff',12,1,1,6);                       // the gable wall
+    for(let k=0;k<8;k++){ F('#8a4a2a',5-k,-7+k,2+k*2,1); F('#ffffff',5-k,-7+k,1,1); F('#ffffff',6+k,-7+k,1,1) }   // the roof, iced along both edges
+    F('#ffffff',-3,1,18,1); for(let xx=-3;xx<15;xx+=2)F('#ffffff',xx,2,1,1);                   // a thick icing eave with drips
+    for(const [gx,gy,gc] of [[5,-5,'#e54b4b'],[3,-2,'#4fbf73'],[8,-2,'#f4d35e'],[1,0,'#5fa8e8'],[10,0,'#e54b7a']])F(gc,gx,gy,1,1);   // gumdrops
+    F('#6b3a1c',9,-6,2,3); F('#ffffff',9,-7,2,1);                                               // a chimney with snow on top
+    if(c.dir==='up'){ F('#a0622e',3,3,6,4); F('#ffffff',3,3,6,1); return }                       // (from the back: just wall)
+    F('#ffffff',2,2,8,6); F(skin,3,3,6,4);                                                      // the attic window, with Joe in it
+    if(c.dir==='down'){F(eye,4,4,1,1); F(eye,7,4,1,1); F('#b5654f',5,6,2,1); F('#f2a7a0',3,5,1,1); F('#f2a7a0',8,5,1,1)}
+    if(c.dir==='left'){F(eye,3,4,1,1); F('#b5654f',3,6,1,1)}
+    if(c.dir==='right'){F(eye,8,4,1,1); F('#b5654f',8,6,1,1)}
     return }
   if(L.head==='frosting'){   // a giant swirl of pink frosting all around the face, sprinkles, cherry on top
     const P1='#f39ac0', P2='#fcc9de';

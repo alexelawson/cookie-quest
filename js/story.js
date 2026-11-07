@@ -174,16 +174,16 @@ const ALEX_WELCOME = {speaker:'Alex', place:'Home',
 
 // ---------- Jack C: building a little log cabin in the meadow. Help him stack the walls and he makes you a gingerbread house to wear ----------
 const JACKC = {name:'Jack C', place:'The Building Site',
-  hello:["Oh hey. You any good with a crane?","I'm building a little cabin out here. The log walls go up today. Just me, a crane, and a lot of optimism.","Help me stack five logs? Line each one up right on top of the one below."],
-  help:"Help stack the logs", later:"Not now",
+  hello:["Oh hey! Welcome to the site.","Little log cabin. Saddle-notched corners, spruce logs, dried a whole year so they don't twist on me.","Walls go up today. The crane's rigged, I just need someone on the drop. You in?"],
+  help:"Help stack the logs", later:"Maybe later",
   title:"Raise the walls",
-  hint:"The log swings on the crane. Tap DROP when it's right over the wall.",
+  hint:"Watch the swing. Tap DROP when the log's right over the wall.",
   drop:"Drop",
-  nice:"Nice and square.", perfect:"PERFECT. Chef's kiss.", off:"Too far over! It rolled off. Grab another one.",
-  done:"Walls are up! Roof's on. She's a beauty.", doneBtn:"Done",
-  thanks:["Couldn't have done it without you.","I had some scraps left over, so I built you a little something. It's a gingerbread house. You wear it."],
+  nice:"Nice. Notches seated.", perfect:"Oh, that's PERFECT. Dead level.", off:"Whoa, too far over. No stress, grab another one.",
+  done:"Five courses, all square. Roof's on. Dude. Look at her.", doneBtn:"Done",
+  thanks:["You're a natural on the crane, man.","I had a pile of offcuts, so I built you a little something. A gingerbread house. Load-bearing icing. You wear it."],
   unlock:"🔓 New costume unlocked: Gingerbread House! Change outfits any time in ⚙ Settings.",
-  after:"Come back when it snows. It's gonna be so cozy in there."};
+  after:"Come back when it snows. The woodstove goes in next. Cast iron. So excited."};
 
 // ---------- Brian: super chill, hanging out by his boat on the pond. Find him and he gives you sprinkles ----------
 const BRIAN = {name:'Brian', place:'The Pond',
