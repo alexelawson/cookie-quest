@@ -39,7 +39,7 @@ for(const key of order){
 // 3. the secrets, found the real way: walking, talking
 r=await p.evaluate(()=>{ goTo('world','start'); T.run(40); const out={};
   for(const k of ['oakleys','headband','shoes']){T.at(GEAR[k].x,GEAR[k].y); out[k]=have.gear&&have.gear[k]; if(!$('itemCard').hidden)$('itemBtn').click()}
-  T.at(LOGAN.x+6,LOGAN.y+2); action(); T.pages(); T.click(LOGAN_TEXT.help); $('cloverField').querySelector('[data-four]').click(); T.pages(); T.click('OK'); $('itemBtn').click(); out.clover=have.gear.clover;
+  T.at(LOGAN.x+6,LOGAN.y+2); action(); T.pages(); T.click(LOGAN_TEXT.help); (()=>{for(let k=0;k<8&&hunt.open;k++){$('cloverField').querySelectorAll('.halbum')[hunt.song[1]].click(); hunt.lock=false; if(hunt.open)huntDeal()}})(); T.pages(); T.click('OK'); $('itemBtn').click(); out.clover=have.gear.clover;
   T.at(CUPCAKE.x,CUPCAKE.y); out.cupcake=!!have.cupcake; while(!dlg.hidden)[...$('dbtns').querySelectorAll('button')][0].click();
   talkBrian(); T.pages(); [...$('dbtns').querySelectorAll('button')][0].click();
   // Jack C: help him stack five logs with the crane
@@ -82,6 +82,11 @@ await reload();
 r=await p.evaluate(()=>({crown:!!have.crown,legend:allSecrets(),scene:scene===SCENES.world}));
 ok('5 after a reload Joe still has his (legendary) crown',r.crown&&r.legend);
 
+// 5b. after baking, every game can be replayed from whoever started it
+r=await p.evaluate(()=>{ const opts=fn=>{ try{ closeDialog(); fn(); const b=[...$('dbtns').querySelectorAll('button')].map(b=>b.textContent); closeDialog(); paused=false; return b }catch(e){ return ['ERR '+e.message] } };
+  if(scene!==SCENES.world){ goTo('world','start'); for(let i=0;i<100&&fade.next;i++)update(16.7) }
+  return {golf:opts(talkMargie), birkie:opts(talkJohn), jackc:opts(talkJackC), logan:opts(talkLogan)} });
+ok('5b once the cookies are baked: Margie, Trail John, Jack C and Logan all offer a replay',r.golf.includes('Play again')&&r.birkie.includes('Race again')&&r.jackc.includes('Build another one')&&r.logan.includes('Play again'),JSON.stringify(r));
 // 6. Play again: everything starts over, including the new stuff
 r=await p.evaluate(()=>{goTo('kitchen','fromDoor'); T.run(40); T.at(64,60); action(); const ending=!$('ending').hidden; $('endSkip').click(); $('endNext').click(); $('endNext').click(); $('endNext').click();
   const pa=[...$('ecard').querySelectorAll('button')].find(b=>b.textContent===KITCHEN.playAgain); if(!pa)return {err:$('ecard').textContent.slice(0,80)+' | dlg '+$('dtext').textContent+' | near '+(near&&near.label),keys:[]}; pa.click(); T.run(40);

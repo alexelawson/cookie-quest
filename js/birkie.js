@@ -129,13 +129,21 @@ function drawSkier(x,y,o={}){ // a skate skier coming down the trail: o.jersey, 
   F('#5f6370',0,9+(push?0:1),1,7); F('#5f6370',9,9+(push?1:0),1,7); F('#8a8f9a',-1,16,2,1); F('#8a8f9a',9,16,2,1);   // poles + baskets
   // head: hat with a pompom (or a headband), eyes or shades
   F('#f0c6a0',3,0,4,4); F(o.hair||'#b08355',3,0,4,1); F('#d9a583',6,2,1,2);
-  if(o.headband){F(o.headband,3,1,4,1)} else {const h=o.hat||'#2f6db0'; F(h,2,-1,6,2); F(h,3,-2,4,1); F('rgba(255,255,255,.35)',2,0,6,1); F(o.pom||'#ffffff',4,-3,2,1)}
+  if(o.bare){F(o.hair,3,-1,4,2); F(o.hair,2,0,1,2); F(o.hair,7,0,1,1); F('#c99a66',4,-1,2,1)}                       // just hair
+  else if(o.headband){F(o.hair||'#b08355',3,-1,4,1); F(o.headband,3,1,4,1)} else {const h=o.hat||'#2f6db0'; F(h,2,-1,6,2); F(h,3,-2,4,1); if(o.band)F(o.band,2,0,6,1); else F('rgba(255,255,255,.35)',2,0,6,1); F(o.pom||'#ffffff',4,-3,2,1)}
   if(o.glasses){F(o.glasses,2,2,6,1); F('#5a5f6a',3,2,1,1)} else {F('#2b2b2b',4,2,1,1); F('#2b2b2b',6,2,1,1)}
   if(o.panels){F(o.panels,2,5,1,5); F(o.panels,7,5,1,5)} if(o.stripe)F(o.stripe,2,12,6,1);
 }
-const SKIER_LOOKS=[{jersey:'#2f6db0',hat:'#e8742a',pom:'#ffd84d'},{jersey:'#c8322b',hat:'#f2f2ee',pom:'#c8322b'},{jersey:'#2f8a4a',hat:'#c8322b',pom:'#ffffff'},
-  {jersey:'#7a4fa0',hat:'#ffd84d',pom:'#7a4fa0'},{jersey:'#e8742a',hat:'#1d1d22',pom:'#e8742a'},{jersey:'#5fa8e8',hat:'#2f6db0',pom:'#ffffff',pants:'#2b3a63'}];
-const JOE_RACE_KIT=()=>({jersey:'#2e9a45',trim:'#8fe09a',pants:'#111114',panels:'#111114',stripe:'#2e9a45',hair:'#b08355',headband:'#ffffff',glasses:'#111114',step:P.step});   // green race suit, black side panels and tights, white headband, black Oakleys
+// the other racers: proper race suits (two-tone panels, trim), and a mix of beanies with poms, headbands and race shades
+const SKIER_LOOKS=[{jersey:'#2f6db0',trim:'#ffffff',panels:'#1d3a6b',hat:'#e8742a',band:'#ffd84d',pom:'#ffd84d'},
+  {jersey:'#c8322b',trim:'#1d1d22',panels:'#1d1d22',headband:'#ffffff',glasses:'#1d1d22'},
+  {jersey:'#2f8a4a',trim:'#f4d35e',panels:'#1d4a2a',hat:'#c8322b',band:'#ffffff',pom:'#ffffff'},
+  {jersey:'#7a4fa0',trim:'#ffd84d',panels:'#4a2a6b',hat:'#ffd84d',pom:'#7a4fa0',glasses:'#e8742a'},
+  {jersey:'#e8742a',trim:'#1d1d22',panels:'#1d1d22',headband:'#e8742a',glasses:'#1d1d22'},
+  {jersey:'#5fa8e8',trim:'#ffffff',panels:'#2b3a63',pants:'#2b3a63',hat:'#2f6db0',band:'#ffffff',pom:'#ffffff'},
+  {jersey:'#f2f2ee',trim:'#c8322b',panels:'#c8322b',hat:'#c8322b',band:'#f2f2ee',pom:'#f2f2ee'}];
+// Joe: just Joe. His usual white shirt with the red trim, dark pants, his own brown hair (no hat, no bib)
+const JOE_RACE_KIT=()=>({jersey:'#fbfbf7',trim:'#c8322b',pants:'#2a2a33',hair:'#a8794c',bare:true,bib:false,step:P.step});
 const VIKING_KINDS=[{kind:'norse',sack:true},{kind:'football',num:'21'},{kind:'norse'},{kind:'football',num:'52'}];   // the lead Norse Viking carries the flour
 function drawVikingSkier(x,y,v,step){
   const X=Math.round(x)-6, Y=Math.round(y)-17, F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(X+dx,Y+dy,w,h)}, fb=v.kind==='football', push=step%2;
@@ -286,7 +294,7 @@ function drawTrailJohn(cx,cy,dir){
 }
 function talkJohn(){
   const T=BIRKIE;
-  if(have.mill)return showDialog({place:T.place,speaker:T.john,face:'Trail John',pages:[T.johnAfter],actions:[CLOSE]});
+  if(have.mill)return showDialog({place:T.place,speaker:T.john,face:'Trail John',pages:[T.johnAfter],actions:have.baked?[{label:REPLAY.birkie,fn:()=>{closeDialog();goTo('birkie','start')}},CLOSE]:[CLOSE]});
   if(have.birkie)return showDialog({place:T.place,speaker:T.john,face:'Trail John',pages:[T.johnDone],actions:[{label:T.takeFlour,fn:()=>{closeDialog();showReward('mill')}}]});
   showDialog({place:T.place,speaker:T.john,face:'Trail John',pages:T.johnHello,actions:[{label:T.go,fn:()=>{closeDialog();goTo('birkie','start')}},{label:T.later,ghost:true,fn:closeDialog}]});
 }
@@ -308,7 +316,7 @@ SCENES.birkie={ place:BIRKIE.place, music:'birkie',
     if(birk.introPending){birk.introPending=false; return birkHowTo(()=>say([J(BIRKIE.radioStart[0])],()=>birkStart()))}
     birkUpdate(dt);
   },
-  drawPlayer:(x,y)=>{ if(birk.crashT>0)return drawSkier(x,y,{down:true,jersey:'#2e9a45'}); const h=birkAir();   // Joe's race kit: white and green, black Oakleys, a headband
+  drawPlayer:(x,y)=>{ if(birk.crashT>0)return drawSkier(x,y,{down:true,jersey:'#fbfbf7',pants:'#2a2a33',hat:'#a8794c'}); const h=birkAir();   // Joe, looking like Joe
     if(h>0){ctx.fillStyle='rgba(0,0,0,.15)'; ctx.fillRect(Math.round(x)-5,Math.round(y)-1,10,2)}                       // shadow stays on the snow
     drawSkier(x,y-h,JOE_RACE_KIT());
     if(birk.drink){const X=Math.round(x)+5, Y=Math.round(y-h)-12; ctx.fillStyle='#ffffff'; ctx.fillRect(X,Y,3,4); ctx.fillStyle='#4a2412'; ctx.fillRect(X,Y,3,2)} },

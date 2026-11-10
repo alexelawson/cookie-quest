@@ -51,7 +51,7 @@ const HEIST = {
             "Oh! Before you leave, Joe, take this gadget. Laser panels hate it. So do villains. Maybe it will come in handy."],
   crewHello:[['John',"I got you bro."],['Lars',"Bet. I am ready."]],
   whoIsThat:"Who's that by the lab bench?",
-  johnLog:"That log's blocking the way. Think you can lift it?",
+  johnLog:"That log's blocking the way. Think we can move it?",
   briefFirst:"Who's that by the lab bench?",
   howTo:"Tap a face (or press 1, 2, 3) to switch who you control. A uses their skill. Crew: Waiting keeps the others in place.",
   skills:{hero:'Sonar', lars:'Sprint', john:'Lift'},
@@ -71,6 +71,23 @@ const HEIST = {
   // ...and where he lands, he finds something (only the first time): a bonus for the cookies
   jumpIceCream:[['Lars',"Wait. What's this?"],['Lars',"A pint of Rosemary Maple ice cream. In the gutter. Still frozen."],['John',"...Why is that up here."],['Lars',"Don't question the rooftops, John."]],
   beamLeave:"Leave it",
+  // the log is wedged: John can't just lift it. Build a lever: a cinder block (under the tarp, Joe's sonar finds it) + a long board (behind the vents, only Lars fits)
+  leverTooHeavy:[['John',"Hngh... nope. It's wedged in there solid. Even I can't budge it."],['John',"We need leverage. Something long and strong to pry with, and something to rest it on."]],
+  leverStatus:(block,board)=>`Lever: ${block?'block ✓':'something to rest it on'} · ${board?'board ✓':'something long'}`,
+  tarpLabel:"Look under the tarp",
+  tarpLump:"A lumpy old tarp. Something's under it, but it's frozen to the roof. Joe's sonar could tell what.",
+  tarpPing:"Ping your Sonar (A) right here to see what's under it.",
+  tarpFound:"A cinder block! That's the perfect thing to rest a lever on.",
+  takeBlock:"Pick up the cinder block",
+  boardLabel:"Reach for the board",
+  boardStuck:"There's a long board wedged behind the vents. Way too tight to reach. Lars is skinny enough.",
+  boardGot:[['Lars',"Got it. Long, flat and sturdy. Like me."],['John',"..."]],
+  setBlock:"Set the block by the log",
+  setBoard:"Lay the board over the block",
+  needBlockFirst:"It needs something to rest on first.",
+  pushLever:"John: push down on the lever",
+  leverBuilt:[['John',"Okay. Block's the pivot, board's the lever. Physics, baby."]],
+  leverPop:[['John',"Hup!"],['','*CRACK* The log pops loose.']],
   beamTooHeavy:[['Joe',"Hnnngh. Nope."],['John',"Step aside Joe."]],
   beamTooHeavyLars:[['Lars',"I'm a sprinter, not a forklift."],['John',"*rolls eyes*"],['Lars',"..."]],
   onlyJohn:"Only John can lift that.",
@@ -156,7 +173,7 @@ const HEIST = {
   larsWins:[['Lars',"Ha! Again? New letters this time, if that helps."]],
   larsLoses:[['Lars',"...Best two out of three?"],['John',"No. You carry the chocolate, Lars."]],
   // after the chocolate: Lars lugs the crate back to the grate, John rolls his eyes, and everyone heads home
-  exitLines:[['John',"Down the fire escape, Lars."]],
+  exitLines:[],   // (lines here play as you leave with the chocolate; empty = straight back to the map)
   strangerRematch:"Your friend wants his rematch.",
   after:"The cookie signal's up. The experiment can begin.",
   climbDown:"Climb down the fire escape",
@@ -172,15 +189,19 @@ const ALEX_WELCOME = {speaker:'Alex', place:'Home',
   go:"Let's go!",
   lookTitle:"Pick Joe's look", lookIntro:"First things first. What are you wearing today?", lookGo:"Looks good"};
 
+// ---------- Replays: once the cookies are baked, every game can be played again from whoever started it ----------
+const REPLAY={golf:"Play again", birkie:"Race again", fargo:"Hunt for cheap gas again", heist:"Run the heist again", jackc:"Build another one", logan:"Play again",
+  heistReset:"Back to roof A. Same crew, same chocolate thief. Let's go.", jackcAgain:"Another one? Love that. Grab the crane."};
+
 // ---------- Jack C: building a little log cabin in the meadow. Help him stack the walls and he makes you a gingerbread house to wear ----------
 const JACKC = {name:'Jack C', place:'The Building Site',
-  hello:["Oh hey! Welcome to the site.","Little log cabin. Saddle-notched corners, spruce logs, dried a whole year so they don't twist on me.","Walls go up today. The crane's rigged, I just need someone on the drop. You in?"],
+  hello:["Oh hey! Welcome to the site.","Little log cabin. Saddle-notched corners, spruce logs, dried a whole year so they don't twist on me.","Walls go up today. Seven logs. The crane's rigged, I just need someone on the drop. You in?"],
   help:"Help stack the logs", later:"Maybe later",
   title:"Raise the walls",
   hint:"Watch the swing. Tap DROP when the log's right over the wall.",
   drop:"Drop",
   nice:"Nice. Notches seated.", perfect:"Oh, that's PERFECT. Dead level.", off:"Whoa, too far over. No stress, grab another one.",
-  done:"Five courses, all square. Roof's on. Dude. Look at her.", doneBtn:"Done",
+  done:"Seven courses, all square. Roof's on. Dude. Look at her.", doneBtn:"Done",
   thanks:["You're a natural on the crane, man.","I had a pile of offcuts, so I built you a little something. A gingerbread house. Load-bearing icing. You wear it."],
   unlock:"🔓 New costume unlocked: Gingerbread House! Change outfits any time in ⚙ Settings.",
   after:"Come back when it snows. The woodstove goes in next. Cast iron. So excited."};
@@ -224,22 +245,29 @@ const WARDROBE = {title:"Suit up, Joe", intro:"It's a stealth mission. What are 
 // In a label, {X} / {Y} / {Z} become "the left crate", "the middle crate" or "the right crate", wherever that crate ended up.
 // To add an inside joke: a rule that asks the question, three labels that are the answer choices, and the right one.
 const VAULT_PUZZLES = [
+  // the one real logic riddle
   {rule:"\"Exactly ONE of these labels is true.\"",
    labels:{X:"The chocolate is in this crate.", Y:"The chocolate is NOT in this crate.", Z:"The chocolate is not in {X}."}, answer:'Y',
    hint:"Pretend the chocolate is in each crate, one at a time, and count how many labels would be true."},
-  {rule:"\"Every single label is a LIE.\"",
-   labels:{X:"The chocolate is in this crate.", Y:"The chocolate is in {X}.", Z:"The chocolate is not in this crate."}, answer:'Z',
-   hint:"If every label is a lie, flip each one around. Which crate says it DOESN'T have the chocolate?"},
-  {rule:"\"Exactly ONE of these labels is true.\"",
-   labels:{X:"Raisins are in this crate.", Y:"Raisins are in this crate.", Z:"Raisins are in {Y}."}, answer:'Y',
-   hint:"Try the chocolate in each crate and count the true labels. Only one crate makes exactly one true."},
-  {rule:"\"The chocolate's label is TRUE. Raisin labels LIE.\"",
-   labels:{X:"{Y} has raisins.", Y:"{Z} has the chocolate.", Z:"This crate has the chocolate."}, answer:'X',
-   hint:"Raisin crates always lie. Try the chocolate in each crate: the chocolate's label has to come out true, and the other two false."},
-  // An inside joke instead of logic: the question goes in the rule, the choices on the labels.
+  // inside jokes: the question goes in the rule, the choices on the labels
   {rule:"\"Only the real one knows: where was the cheapest gas on the road trip?\"",
    labels:{X:"Fargo", Y:"Bismarck", Z:"Minneapolis"}, answer:'X',
-   hint:"Think road trip. Think future home."},
+   hint:"Think road trip. Think $2.79."},
+  {rule:"\"Lars's personal-best long jump, 2019. How far?\"",
+   labels:{X:"4 feet", Y:"40 feet", Z:"He doesn't like to talk about it"}, answer:'X',
+   hint:"He told you right before he jumped. It was not 40."},
+  {rule:"\"Lars just lost. What does he say next?\"",
+   labels:{X:"Good game.", Y:"Best two out of three?", Z:"I wasn't even trying."}, answer:'Y',
+   hint:"It's always the same three words... and two numbers."},
+  {rule:"\"Why didn't Lars make the jump?\"",
+   labels:{X:"Bad shoes", Y:"John pushed him", Z:"Headwind"}, answer:'Z',
+   hint:"There was NO wind. He said it anyway."},
+  {rule:"\"Who taught John to yell SKOL?\"",
+   labels:{X:"Lars", Y:"The Vikings", Z:"Grp"}, answer:'Y',
+   hint:"They're big, they're loud, and they carried the flour fifty kilometers."},
+  {rule:"\"Where does the Birkie finish?\"",
+   labels:{X:"Cable", Y:"Fargo", Z:"Main Street, Hayward"}, answer:'Z',
+   hint:"The crowd goes nuts on the last street of the race."},
 ];
 
 // ---------- The Birkie trailhead: John sends the Vikings off with the flour ----------
@@ -345,7 +373,7 @@ const GOLF_TEXT = {
   chains:"Chains!",
   ace:"ACE!!! In one throw!",
   margieHole:{'-1':"Birdie. Obviously. Somebody paint my portrait.",'0':"Par. I let you have that one. You're welcome.",'1':"Bogey?! A cow made eye contact with me. Mid-throw."},
-  jackHole:{'-1':"BIRDIE. That's my first birdie since April 3rd. Writing it down.",'0':"Par. Par is 100th percentile for me. Logging it.",'1':"Bogey. Wind out of the northwest at four miles an hour. Statistically significant.",'2':"Double bogey. Updating the spreadsheet. Lowering my expectations column."},
+  jackHole:{'-1':"BIRDIE. That's my first birdie since April 3rd. Writing it down.",'0':"Par. Par is 100th percentile for me. Logging it.",'1':"Bogey. Wind out of the northwest at four miles an hour. Statistically significant.",'2':"Double bogey. Updating the spreadsheet. Lowering my expectations column.",'3':"Triple bogey. It went in the pond. Then a goose took it. Logging the goose.",'4':"Quadruple bogey. A personal record. Wrong direction, but a record."},
   win:["Okay, okay. You earned it. I'm still the best, but you earned it.","Jack, give them the milk."],
   jackWin:"Whole milk. 3.25% fat. I checked. Cookies deserve the data.",
   lose:["Good round though! Not MY round, but good! Want to go again?"],
@@ -453,15 +481,21 @@ const ROAD_VIKINGS = {
 
 const LOGAN_TEXT = {
   place:"The clover patch",
-  hello:["Oh, hey. Taking a quick break from my workout.","Interval six of twelve.","Anyway. Four-leaf clovers. I've found three this year. Statistically, there's one right... here... somewhere."],
-  help:"Help him look", later:"Leave him to it",
-  found:["...","Wait. WAIT. Right by your foot. You found one!","Here. You keep it. Pin it on. You're gonna need the luck."],
-  huntTitle:"Find the four-leaf clover",
-  huntIntro:"It's in here somewhere. Four leaves, not three. Count carefully.",
-  huntMiss:["Three leaves. Doesn't count.","Nope. Count the leaves.","So close. That's a three-leaf.","That one's lying to you. Three."],
-  huntHint:"Here, look... something's glinting over there.",
+  hello:["Oh, hey. Taking a quick break from my workout.","Interval six of twelve. Gracie Abrams on shuffle.","Here's my game: every clover I check, a new song comes on. Name the album. Get 8 in a row and I swear we'll find a four-leaf."],
+  help:"Play his game", later:"Leave him to it",
+  found:["...","Eight in a row. And WAIT. Right by your foot. A four-leaf!","Here. You keep it. Pin it on. You're gonna need the luck."],
+  foundAgain:"Eight in a row. Again. Statistically, you're a superfan.",
+  huntTitle:"Which album?",
+  huntIntro:"A song comes on. Which album is it from?",
+  streak:"{n} of 8 in a row",
+  huntRight:["Correct.","Yep.","Easy.","Nice ear.","Correct. Next clover."],
+  huntWrong:["Nope! That one's on the other album. Back to zero.","Wrong album. Start the streak over.","Hm. No. That's interval seven of shame."],
   huntLater:"Leave it for now",
   after:["Still on my break. Interval seven can wait.","Found a three-leaf. Doesn't count."],
+  // the two albums, and song titles from each (titles only)
+  albums:["The Secret of Us","Daughter From Hell"],
+  songs:[["Risk",0],["Blowing Smoke",0],["I Love You, I'm Sorry",0],["Close To You",0],["Free Now",0],["Good Luck Charlie",0],["Tough Love",0],["Felt Good About You",0],["Let It Happen",0],["Normal Thing",0],["That's So True",0],
+         ["Hit the Wall",1],["Sober",1],["Death Wish",1],["Knife",1],["Men Like You",1],["Humming",1],["What If It's Right?",1]],
 };
 // ---------- Alex's "where to next?" hints: shown if Joe stands still on the map for a bit ----------
 const HINTS = {
@@ -526,7 +560,7 @@ const KITCHEN = {place:'Home', speaker:'Your kitchen',
   // what everyone says if you talk to them in the kitchen before baking
   crowd:{Keelan:"Those are my eggs. Treat them with respect.", Alex:"I'm on dough-tasting duty.", 'Lil Q':"Scooted all the way over from Fargo for this. Rookie better deliver.", Jack:"Cookies per guest is 2.1 right now. I need it at 3.",
          Lars:"I'll time the oven. I have a watch with splits.", John:"I'll carry the tray. Or the whole oven.", 
-         Margie:"I brought the milk. I'm basically the main character.", Brian:"Nice kitchen. Very chill in here.", Logan:"I checked your yard. No clovers. Great cookies though.", Ethan:"Grill's preheating. Just in case.", Maureen:"Did you weigh the flour, or scoop it? ...Either way, dear. It smells wonderful.", Jackie:"You figured out the snacks. Proud of you. Don't make it weird.", 'Trail John':"Flour made it all fifty kilometers.", Viking:"SKOL! When do we eat?"},
+         Margie:"I brought the milk.", Brian:"Nice kitchen. Very chill in here.", Logan:"I checked your yard. No clovers. Great cookies though.", Ethan:"Grill's preheating. Just in case.", Maureen:"Did you weigh the flour, or scoop it? ...Either way, dear. It smells wonderful.", Jackie:"You figured out the snacks. Proud of you. Don't make it weird.", 'Trail John':"Flour made it all fifty kilometers.", Viking:"SKOL! When do we eat?"},
   // the baking card: one step per ingredient, in recipe order. target and tol are in cups.
   bakeTitle:"Bake the cookies",
   // Alex is your baking helper: she talks you through every step (her lines are the hint, good, and the oops lines below)
@@ -535,7 +569,6 @@ const KITCHEN = {place:'Home', speaker:'Your kitchen',
     {key:'sugar',    name:'Sugar',           kind:'pour', target:.75,  label:'¾ cup',   max:1.5, rate:.45, tol:.07, color:'#fbfbf7', hint:"Now the sugar from Fargo. Three quarters of a cup.", good:"Three quarters. Lil Q would be proud."},
     {key:'eggs',     name:'Eggs',            kind:'count',target:2,    label:'2 eggs',                                   hint:"Two eggs. Crack them in, then tell me when you're done.", good:"Two eggs, no shells. Look at you."},
     {key:'flour',    name:'Flour',           kind:'pour', target:2.25, label:'2¼ cups', max:3,   rate:.9,  tol:.12, color:'#f3eadb', hint:"Flour. Two and a quarter cups. It pours fast, careful.", good:"Two and a quarter. The Vikings' flour made it."},
-    {key:'stir',     name:'Stir it up',      kind:'rhythm', taps:8,                                                     hint:"Stir to the beat. Tap right when the ring hits the bowl.", good:"Now THAT is cookie dough. Don't eat it all."},
     {key:'scoop',    name:'Scoop the dough', kind:'scoop', balls:6,                                                      hint:"Scoop it onto the tray. Tap when the scoop is over a spot.", good:"Six perfect little dough balls. Evenly spaced!"},
     {key:'chocolate',name:'Chocolate chips', kind:'chips',                                                               hint:"Now the heist chocolate. Press the chips into the big one for Joe, just like the card.", good:"Worth every searchlight."},
     // only if you found Brian (needs: 'sprinkles')

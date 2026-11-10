@@ -377,7 +377,7 @@ function placeAtCheckpoint(){
   const cp=CHECKPOINTS[Math.min(2,heistStage())];
   for(const c of heist.crew){const [x,y]=cp[c.id]; c.x=x;c.y=y;c.dir='right';c.moving=false}
   const c=lead(); P.x=c.x;P.y=c.y;P.dir=c.dir; heist.trail=[{x:c.x,y:c.y}];
-  heist.guardY=GUARD.y0; heist.guardDir=1; heist.guardWait=0; heist.carry=null; heist.lightsOutT=0; heist.defuse=null; heist.defusing=false;
+  heist.guardY=GUARD.y0; heist.guardDir=1; heist.guardWait=0; heist.carry=null; heist.lever=null; heist.lightsOutT=0; heist.defuse=null; heist.defusing=false;
 }
 // followers walk the leader's path, spaced out, so they step where you stepped
 function moveFollowers(dt){
@@ -399,7 +399,8 @@ function moveFollowers(dt){
 // ---------- skills ----------
 function useSkill(){
   const id=lead().id;
-  if(id==='hero'&&heist.sonarCd<=0){sfx('ping'); heist.sonarT=4200; heist.sonarCd=1600; heist.sonarAt={x:P.x,y:P.y}; if(P.x>ROOF_C.x-10)heist.marked=true}   // pinging near the maze chalk-marks the tripwires
+  if(id==='hero'&&heist.sonarCd<=0){sfx('ping'); heist.sonarT=4200; heist.sonarCd=1600; heist.sonarAt={x:P.x,y:P.y}; if(P.x>ROOF_C.x-10)heist.marked=true;
+    const L=leverState(); if(heistStage()<1&&!L.found&&Math.hypot(P.x-TARP.x,P.y-TARP.y)<40){ L.found=true; say([[HEIST.crew.hero,HEIST.tarpFound]]) } }   // the sonar finds the cinder block under the tarp   // pinging near the maze chalk-marks the tripwires
   if(id==='lars'&&heist.sprintCd<=0){sfx('whoosh'); heist.sprintT=800; heist.sprintCd=1100}
   if(id==='john')flashPrompt(heist.carry?HEIST.johnHolding:'Nothing heavy here.')
 }
@@ -459,12 +460,48 @@ function briefing(){
   say([...HEIST.briefing.map(t=>[HEIST.stranger,t]),...HEIST.crewHello],()=>{ if(!have.heistHowTo)openHowTo() });
 }
 function hintOnce(key,who,text){ if(heist.hinted[key])return; heist.hinted[key]=true; say([[who,text]]) }
-// the log blocks the way: only John can lift it, and then he carries it everywhere until it's a bridge
+// the log blocks the way. It's wedged, so John can't just lift it: build a lever first.
+//  1. Joe pings his sonar at the tarp and finds a cinder block (anyone can carry it)   2. Lars squeezes behind the vents for a long board
+//  3. set the block by the log, lay the board over it   4. John pushes down on the lever, the log pops loose, and he carries it from there
+const TARP={x:22,y:150}, BOARD={x:104,y:148}, LEVER={block:{x:80,y:126}};
+function leverState(){ return heist.lever||(heist.lever={known:false, found:false, block:'tarp', blockBy:null, board:'wedged', boardBy:null}) }
+const leverBuilt=()=>{ const L=leverState(); return L.block==='placed'&&L.board==='placed' };
 function beamChoice(){
-  const H=HEIST;
-  showDialog({place:H.place,speaker:'',pages:[H.beamLook],menu:true,actions:[
-    {label:H.beamLift,fn:()=>{ if(lead().id!=='john')return say(lead().id==='lars'?H.beamTooHeavyLars:H.beamTooHeavy); closeDialog(); pickUpLog() }},
+  const H=HEIST, L=leverState(), me=lead().id, acts=[];
+  if(L.block==='carried'&&L.blockBy===me)acts.push({label:H.setBlock,fn:()=>{ L.block='placed'; L.blockBy=null; sfx('thud'); closeDialog(); if(leverBuilt())say(H.leverBuilt) }});
+  if(L.board==='carried'&&L.boardBy===me)acts.push({label:H.setBoard,fn:()=>{ if(L.block!=='placed')return say([[HEIST.crew[me]||'',H.needBlockFirst]]); L.board='placed'; L.boardBy=null; sfx('thud'); closeDialog(); say(H.leverBuilt) }});
+  if(leverBuilt())acts.push({label:H.pushLever,fn:()=>{ if(me!=='john')return say([['John',"Let me get this one."]]); closeDialog(); say(H.leverPop,()=>{ heist.lever.done=true; pickUpLog() }) }});
+  else acts.push({label:H.beamLift,fn:()=>{ if(me!=='john')return say(me==='lars'?H.beamTooHeavyLars:H.beamTooHeavy); L.known=true; say(H.leverTooHeavy) }});
+  acts.push({label:H.beamLeave,ghost:true,fn:closeDialog});
+  showDialog({place:H.place,speaker:'',pages:[L.known?H.beamLook+' '+H.leverStatus(L.block==='placed',L.board==='placed'):H.beamLook],menu:true,actions:acts});
+}
+function tarpChoice(){
+  const H=HEIST, L=leverState(), me=lead().id;
+  if(!L.found)return say([[me==='hero'?HEIST.crew.hero:'',me==='hero'?H.tarpPing:H.tarpLump]]);
+  showDialog({place:H.place,speaker:'',pages:[H.tarpFound],menu:true,actions:[
+    {label:H.takeBlock,fn:()=>{ if(heist.carry&&me==='john')return say([['John',"My hands are full."]]); L.block='carried'; L.blockBy=me; sfx('thud'); closeDialog() }},
     {label:H.beamLeave,ghost:true,fn:closeDialog}]});
+}
+function boardChoice(){
+  const H=HEIST, L=leverState(), me=lead().id;
+  if(me!=='lars')return say([['',H.boardStuck]]);
+  L.board='carried'; L.boardBy='lars'; sfx('thud'); say(H.boardGot);
+}
+function drawLeverBits(){   // the tarp, the board behind the vents, and the lever once it's set up
+  if(heistStage()>=1)return; const L=leverState(), F=(c,x,y,w,h)=>{ctx.fillStyle=c;ctx.fillRect(Math.round(x),Math.round(y),w,h)};
+  // the tarp (lumpy until the block's out from under it)
+  F('#2f5f9e',TARP.x-8,TARP.y-4,16,7); F('#3f72b4',TARP.x-7,TARP.y-4,14,1); if(L.block==='tarp'){F('#2a5590',TARP.x-4,TARP.y-6,8,3); F('#3f72b4',TARP.x-3,TARP.y-6,6,1)}
+  if(L.found&&L.block==='tarp'){F('#8b93a3',TARP.x-3,TARP.y-5,6,4); F('#b9c1cb',TARP.x-3,TARP.y-5,6,1); F('#5f6676',TARP.x-1,TARP.y-4,2,2)}   // revealed by the sonar
+  // the board, sticking out from behind the vents
+  if(L.board==='wedged'){F('#a8743f',BOARD.x-10,BOARD.y-3,20,3); F('#c98a4e',BOARD.x-10,BOARD.y-3,20,1); F('#6b4428',BOARD.x+9,BOARD.y-3,1,3)}
+  // the lever by the log
+  const b=LEVER.block; if(L.block==='placed'){F('#8b93a3',b.x-3,b.y-3,6,4); F('#b9c1cb',b.x-3,b.y-3,6,1); F('#5f6676',b.x-1,b.y-2,2,2)}
+  if(L.board==='placed'&&!L.done){ for(let k=0;k<22;k++)F(k%5?'#a8743f':'#8a5a34',b.x-16+k,b.y-3-Math.round((22-k)*.25)+ (k>15?Math.round((k-15)*.5):0),1,2) }
+}
+function drawHeldLeverBit(c){   // a block in Joe's (or whoever's) hands, the board on Lars's shoulder
+  const L=leverState(), F=(col,x,y,w,h)=>{ctx.fillStyle=col;ctx.fillRect(Math.round(x),Math.round(y),w,h)};
+  if(L.block==='carried'&&L.blockBy===c.id){F('#8b93a3',c.x-3,c.y-12,6,4); F('#b9c1cb',c.x-3,c.y-12,6,1)}
+  if(L.board==='carried'&&L.boardBy===c.id){F('#a8743f',c.x-12,c.y-(c.id==='lars'?32:28),24,2); F('#c98a4e',c.x-12,c.y-(c.id==='lars'?32:28),24,1)}
 }
 function pickUpLog(){ heist.carry={rot:'v'}; sfx('thud'); say([['John',HEIST.carryHint]]) }
 // at the edge of roof A: Lars wants to jump it; John has the log
@@ -502,7 +539,7 @@ function drawJumpEmotes(){
     if(on){F('#9fd2f0',J.x-8,J.y-20,2,3); F('#9fd2f0',J.x-7,J.y-21,1,1)} }                                                  // and a sweat drop
 }
 // ---------- the way home: a quick word, then down the grate ----------
-function heistExit(){ say(HEIST.exitLines,()=>goTo('world','fromCity')) }
+function heistExit(){ if(HEIST.exitLines.length)return say(HEIST.exitLines,()=>goTo('world','fromCity')); goTo('world','fromCity') }
 // the big breaker that runs the searchlights: lever up = on, lever down = off (after Lars flips it)
 function drawPowerSwitch(){
   const on=lightsOn(), x=FUSE.x-14, y=FUSE.y-48, F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x+dx,y+dy,w,h)};
@@ -574,7 +611,9 @@ function nextBanner(){ const b=banner.q.shift(); if(!b){$('roundBanner').hidden=
   $('roundTitle').textContent=b[0]; $('roundSub').textContent=b[1]; const el=$('roundBanner'); el.hidden=true; void el.offsetWidth; el.hidden=false; banner.t=1900; sfx('blip') }
 function bannerTick(dt){ if(banner.t>0){banner.t-=dt; if(banner.t<=0)nextBanner()} }
 function roundStart(n){ const r=HEIST.rounds[n-1]; if(r)showBanner(r.title,r.name) }
-function roundWon(n){ showBanner(HEIST.roundWon,HEIST.rounds[n-1].name); if(n<3)roundStart(n+1) }
+// after baking: run the whole heist again (the chocolate stays in your basket)
+function heistReplay(){ Object.assign(have,{heistStage:0,lasersOff:false,plankGate:false,confectionerBeat:false}); save(); say([[HEIST.stranger,REPLAY.heistReset]],()=>goTo('city','start')) }
+function roundWon(n){ if(n<3)roundStart(n+1) }   // (no "round won" banner: straight on to the next round)
 
 // ---------- the vault: three crates and a puzzle (VAULT_PUZZLES in story.js) ----------
 const vault={open:false, puzzle:null, order:[], choc:0};
@@ -610,12 +649,14 @@ const nearCrew=(z,id)=>heist.crew.some(c=>(!id||c.id===id)&&hit(R(c.x-4,c.y-3,8,
 function heistTrigger(){
   const feet=R(P.x-4,P.y-3,8,4), st=heistStage();
   if(Math.hypot(P.x-STRANGER.x,P.y-STRANGER.y)<16&&(!have.heistBriefed||st>=4||have.city))return {label:'Talk to '+HEIST.stranger, btn:'Talk', act:()=>{
-    if(have.city)return say([[HEIST.stranger,HEIST.after]]);
+    if(have.city&&have.heistStage>=5)return showDialog({place:HEIST.place,speaker:HEIST.stranger,pages:[HEIST.after],actions:have.baked?[{label:REPLAY.heist,fn:()=>{ closeDialog(); heistReplay() }},CLOSE]:[CLOSE]});
     if(st>=5)return showReward('city');
     if(st===4)return say([[HEIST.stranger,HEIST.strangerRematch],...HEIST.larsChallenge.slice(1,2)],()=>openLarsMenu());
     briefing()}};
   if(st<1&&hit(feet,LOG_DROP))return {label:HEIST.gapLabel, act:gapChoice};
   if(st<1&&!heist.carry&&hit(feet,R(LOOSE_BEAM.x-10,LOOSE_BEAM.y-6,LOOSE_BEAM.w+20,LOOSE_BEAM.h+12)))return {label:'Look at the log', act:beamChoice};
+  if(st<1&&leverState().block==='tarp'&&Math.hypot(P.x-TARP.x,P.y-TARP.y)<16)return {label:HEIST.tarpLabel, act:tarpChoice};
+  if(st<1&&leverState().board==='wedged'&&Math.hypot(P.x-BOARD.x,P.y-BOARD.y)<16)return {label:HEIST.boardLabel, act:boardChoice};
   if(st===1&&hit(feet,R(FUSE.x-14,FUSE.y-14,28,28)))return {label:heist.lightsOutT>0?HEIST.lightsAlreadyOut:HEIST.fuse, act:cutFuse};
   if(!gateOpen()&&hit(feet,R(PLANK_GATE.x-12,PLANK_GATE.y-2,PLANK_GATE.w+24,PLANK_GATE.h+4)))return {label:heist.keyHolder===lead().id?HEIST.gateUnlock:HEIST.gateCheck, act:checkGate};
   if(st===1&&!gateOpen()&&!heist.keyHolder&&!lightsOn()&&Math.hypot(P.x-KEY_SPOT.x,P.y-KEY_SPOT.y)<12)return {label:HEIST.grabKey, act:grabKey};
@@ -691,13 +732,13 @@ SCENES.city={ music:'heist',
     else if(st===1&&P.x>160&&!heist.hinted.lights){ heist.hinted.lights=true; renderCrewBar(); say([['Lars',HEIST.larsLights],['John',HEIST.holdTip]]) }
     else if(st>=2&&st<3&&P.x>356)hintOnce('lasers',HEIST.crew.hero,HEIST.heroLasers);
   },
-  drawPlayer:(x,y)=>{syncLeadFromP(); crewSprite(lead()); drawCarriedLog(lead()); drawHeldKey(lead())},
+  drawPlayer:(x,y)=>{syncLeadFromP(); crewSprite(lead()); drawCarriedLog(lead()); drawHeldKey(lead()); drawHeldLeverBit(lead())},
   under(){
     for(const c of cars){const x=c.x+(c.lane?18:6); ctx.fillStyle=c.v>0?'#ffe9a0':'#ff4a3a'; ctx.fillRect(x,c.y|0,1,1); ctx.fillRect(x+3,c.y|0,1,1)}
-    drawBeam(); drawGate(); drawKey(); drawGrate(); drawPowerSwitch(); drawLaserPanel();
+    drawBeam(); drawLeverBits(); drawGate(); drawKey(); drawGrate(); drawPowerSwitch(); drawLaserPanel();
   },
   ents(list){
-    heist.crew.forEach((c,i)=>{if(i!==heist.lead)list.push({y:c.y,draw:()=>{crewSprite(c); drawCarriedLog(c); drawHeldKey(c)}})});
+    heist.crew.forEach((c,i)=>{if(i!==heist.lead)list.push({y:c.y,draw:()=>{crewSprite(c); drawCarriedLog(c); drawHeldKey(c); drawHeldLeverBit(c)}})});
     list.push({y:STRANGER.y,draw:drawStranger});
     if(heistStage()<4)list.push({y:heist.guardY,draw:drawGuard});
   },
@@ -763,5 +804,5 @@ SCENES.city={ music:'heist',
   hud(){ const st=heistStage(); const steps=['Bridge the gap','Kill the lights, get everyone across',(lasersOff()?'Everybody to the fire escape hatch':'Shut off the lasers'),'Crack the vault','Beat Lars at anagrams','Done!'];
     if(st===1&&heist.lightsOutT>0)return `<span>Lights back in 0:${String(Math.ceil(heist.lightsOutT/1000)).padStart(2,'0')}</span>`;
     if(st===3&&!have.confectionerBeat)return '<span>Climb down the fire escape. Beat the Confectioner</span>';
-    return st>=5||have.city?'':`<span>${steps[st]}</span>` },
+    return st>=5?'':`<span>${steps[st]}</span>` },
 };

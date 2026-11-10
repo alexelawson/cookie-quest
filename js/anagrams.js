@@ -89,7 +89,7 @@ const ANAGRAM_SETS=[
   }},
 ];
 const ANAGRAM={TIME:60, POINTS:{3:100,4:400,5:1200,6:2000},
-  LARS:{FIRST:5000, GAP:[4300,7000], WEIGHTS:{3:3,4:3,5:1.2,6:.2}}};   // Lars finds a word every 4.3-7s: usually scores ~3,600 (2,500-5,000)
+  LARS:{FIRST:4000, GAP:[3400,5600], WEIGHTS:{3:2,4:3,5:1.8,6:.45}}};   // Lars finds a word every 3.4-5.6s, with more long ones: a real opponent, but beatable
 
 const ana={open:false, set:null, picked:[], found:[], larsFound:[], you:0, lars:0, t:0, larsT:0, running:false, };
 const anaWords=set=>Object.values(set.words).flat();

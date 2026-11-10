@@ -1,7 +1,7 @@
 // The laser panel: Doc Alex's gadget shows a pattern of lit squares for a moment, then Joe lights the same squares from memory.
-// Two rounds (the second one has more squares). A wrong square flashes red and the round starts over with a new pattern.
+// Three rounds, each with more squares. A wrong square flashes red and the round starts over with a new pattern.
 // Words live in story.js (HEIST.grid...).
-const LGRID={SIZE:4, ROUNDS:[4,6], SHOW_MS:2000};   // a 4x4 grid; how many squares light up each round; how long you get to look
+const LGRID={SIZE:5, ROUNDS:[6,8,10], SHOW_MS:2400};   // a 5x5 grid; how many squares light up each round; how long you get to look
 const lg={open:false, round:0, want:new Set(), got:new Set(), phase:'', t:0};
 function openLaserGrid(){
   Object.assign(lg,{open:true, round:0}); $('gridTitle').textContent=HEIST.gridTitle;

@@ -1,8 +1,8 @@
 // Jack C: building a little log cabin in the meadow above the kitchen, at the edge of the snow.
-// Help him stack five logs with the crane and he gives you a Gingerbread House costume. Words live in story.js (JACKC).
+// Help him stack seven logs with the crane and he gives you a Gingerbread House costume. Words live in story.js (JACKC).
 const JACKC_SITE={x:204, y:44};                  // the middle of the cabin's foundation
 const JACKC_SPOT={x:185, y:54};                  // where he stands
-const CRANE={LOGS:5, LOG_W:30, LOG_H:6, GROUND:84, BASE_X:64, SWING:34, SPEEDS:[1.5,1.8,2.1,2.4,2.7], OK:11, PERFECT:2};   // per log: how fast it swings (radians a second); how far off still sits, and how close is perfect
+const CRANE={LOGS:7, LOG_W:26, LOG_H:6, GROUND:84, BASE_X:64, SWING:38, SPEEDS:[1.9,2.2,2.5,2.8,3.1,3.4,3.7], OK:8, PERFECT:2, SWAY:5};   // SWAY: the stack sways in the wind more the taller it gets   // per log: how fast it swings (radians a second); how far off still sits, and how close is perfect
 
 // ---------- how he looks: shortish, clean-shaven, light-medium brown hair, a red plaid shirt, jeans, tan work boots, a tool belt with a hammer ----------
 const JACKC_PAL={H:'#a4744a',h:'#86592f',S:'#f0c6a0',s:'#e3b48e',E:'#2b2236',M:'#c9786a',r:'#eaa3a0',
@@ -51,7 +51,7 @@ function drawJackCrane(){   // a small crane beside the site (until the cabin's 
 }
 function talkJackC(){
   const J=JACKC;
-  if(have.gingerHouseCostume)return showDialog({place:J.place,speaker:J.name,pages:[J.after],actions:[CLOSE]});
+  if(have.gingerHouseCostume)return showDialog({place:J.place,speaker:J.name,pages:[J.after],actions:have.baked?[{label:REPLAY.jackc,fn:()=>{closeDialog(); say([[J.name,REPLAY.jackcAgain]],openCrane)}},CLOSE]:[CLOSE]});
   showDialog({place:J.place,speaker:J.name,pages:J.hello,actions:[{label:J.help,fn:()=>{closeDialog(); openCrane()}},{label:J.later,ghost:true,fn:closeDialog}]});
 }
 triggers.push({z:R(JACKC_SPOT.x-12,JACKC_SPOT.y-10,24,20), label:'Talk to Jack C', btn:'Talk', act:talkJackC});
@@ -59,7 +59,7 @@ solids.push(R(JACKC_SITE.x-11,JACKC_SITE.y-2,22,9), R(JACKC_SITE.x-9,JACKC_SITE.
 {const ents=SCENES.world.ents; SCENES.world.ents=function(list){ ents.call(this,list);
   list.push({y:JACKC_SITE.y+14,draw:drawJackSite},{y:JACKC_SITE.y-1,draw:drawJackCrane},{y:JACKC_SPOT.y,draw:()=>drawJackC(JACKC_SPOT.x,JACKC_SPOT.y,'down')}) }}
 
-// ---------- the crane game: stack five logs ----------
+// ---------- the crane game: stack seven logs ----------
 const cr={open:false, logs:[], t:0, raf:0, last:0, drop:null, done:false, fall:null, msgT:0};
 function openCrane(){
   Object.assign(cr,{open:true, logs:[], t:0, drop:null, done:false, fall:null}); const J=JACKC;
@@ -68,7 +68,8 @@ function openCrane(){
   $('crane').hidden=false; paused=true; prompt.hidden=true; craneLoop(); setTimeout(()=>$('craneBtn').focus({preventScroll:true}),0);
 }
 function closeCrane(){ cr.open=false; $('crane').hidden=true; paused=overlayOpen() }
-const craneTopX=()=>cr.logs.length?cr.logs[cr.logs.length-1]:CRANE.BASE_X;
+const craneSway=()=>Math.sin(cr.t/650)*CRANE.SWAY*cr.logs.length/CRANE.LOGS;                       // the taller the walls, the more they sway
+const craneTopX=()=>(cr.logs.length?cr.logs[cr.logs.length-1]:CRANE.BASE_X)+craneSway();
 const craneX=()=>CRANE.BASE_X+Math.sin(cr.t/1000*CRANE.SPEEDS[Math.min(cr.logs.length,CRANE.LOGS-1)])*CRANE.SWING;
 function craneDrop(){
   if(!cr.open)return; if(cr.done){ closeCrane(); return craneWon() }
@@ -78,7 +79,7 @@ function craneTick(dt){
   cr.t+=dt;
   if(cr.drop){ const d=cr.drop, ty=CRANE.GROUND-(cr.logs.length+1)*CRANE.LOG_H; d.y+=dt*.12;
     if(d.y>=ty){ const off=d.x-craneTopX(); cr.drop=null;
-      if(Math.abs(off)<=CRANE.OK){ cr.logs.push(d.x); sfx('thud'); $('craneMsg').textContent=Math.abs(off)<=CRANE.PERFECT?JACKC.perfect:JACKC.nice;
+      if(Math.abs(off)<=CRANE.OK){ cr.logs.push(d.x-craneSway()); sfx('thud'); $('craneMsg').textContent=Math.abs(off)<=CRANE.PERFECT?JACKC.perfect:JACKC.nice;
         if(cr.logs.length>=CRANE.LOGS){ cr.done=true; sfx('fanfare'); $('craneMsg').textContent=JACKC.done; $('craneBtn').textContent=JACKC.doneBtn; $('craneLater').hidden=true } }
       else { sfx('bad'); cr.fall={x:d.x, y:ty, dir:off>0?1:-1, t:0}; $('craneMsg').textContent=JACKC.off } } }
   if(cr.fall){ cr.fall.t+=dt; if(cr.fall.t>700)cr.fall=null }
@@ -105,7 +106,7 @@ function drawCrane(){
   // Jack C cheering on the right
   { const was=ctx; ctx=g; drawJackC(112,CRANE.GROUND+1,'down'); ctx=was; if(cr.done&&Math.floor(cr.t/300)%2)F('#f4d35e',108,CRANE.GROUND-24,2,2) }
   // the walls so far
-  cr.logs.forEach((x,i)=>drawLog(g,x,CRANE.GROUND-(i+1)*CRANE.LOG_H,0));
+  const sw=craneSway(); cr.logs.forEach((x,i)=>drawLog(g,x+sw*(i+1)/cr.logs.length,CRANE.GROUND-(i+1)*CRANE.LOG_H,0));
   if(cr.done){ const top=CRANE.GROUND-CRANE.LOGS*CRANE.LOG_H, cx=craneTopX(); for(let k=0;k<12;k++)F(k%2?'#7a2a2a':'#8a3a2a',cx-19+k*1.5,top-1-k,38-k*3,1); return }   // the roof goes on
   // the swinging log on its cable (or the one falling)
   const sx=craneX(), hx=cr.drop?cr.drop.x:sx;
@@ -117,8 +118,8 @@ function drawCrane(){
   if(!cr.drop&&!cr.fall){ g.globalAlpha=.25; F('#2b2236',sx,22,1,CRANE.GROUND-cr.logs.length*CRANE.LOG_H-22); g.globalAlpha=1 }
 }
 function craneWon(){
-  have.gingerHouseCostume=true; save(); sfx('reward'); renderBasket&&renderBasket();
-  showDialog({place:JACKC.place,speaker:JACKC.name,pages:[...JACKC.thanks,JACKC.unlock],actions:[CLOSE]});
+  const again=!!have.gingerHouseCostume; have.gingerHouseCostume=true; save(); sfx('reward'); renderBasket&&renderBasket();
+  showDialog({place:JACKC.place,speaker:JACKC.name,pages:again?[JACKC.thanks[0]]:[...JACKC.thanks,JACKC.unlock],actions:[CLOSE]});
 }
 $('craneBtn').addEventListener('pointerdown',e=>{e.preventDefault(); craneDrop()});
 $('craneBtn').addEventListener('keydown',e=>{ if(['Space','Enter'].includes(e.code)){e.preventDefault(); e.stopImmediatePropagation(); if(!e.repeat)craneDrop()} });

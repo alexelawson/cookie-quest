@@ -166,51 +166,49 @@ PORTRAITS['Logan']={size:32, bg:'#d6eec4', draw(g){ const F=px(g);
 }};
 function talkLogan(){
   const T=LOGAN_TEXT;
-  if(have.gear&&'clover' in have.gear) return showDialog({place:T.place,speaker:'Logan',pages:[T.after[Math.floor(Math.random()*T.after.length)]],actions:[CLOSE]});
+  if(have.gear&&'clover' in have.gear) return showDialog({place:T.place,speaker:'Logan',pages:[T.after[Math.floor(Math.random()*T.after.length)]],actions:have.baked?[{label:REPLAY.logan,fn:()=>{closeDialog(); openCloverHunt()}},CLOSE]:[CLOSE]});
   showDialog({place:T.place,speaker:'Logan',pages:T.hello,actions:[{label:T.help,fn:()=>{ closeDialog(); openCloverHunt() }},{label:T.later,ghost:true,fn:closeDialog}]});
 }
 const logan={searchT:0};
-// the clover hunt: a field of clovers pops up; one has four leaves. Tap it (or arrow keys + Enter). A few misses and it starts to glint.
-const HUNT={COLS:7, ROWS:5, HINT_AFTER:4};
-const hunt={open:false, four:0, misses:0};
-function drawHuntClover(g,leaves,seed,glint){
-  const r=k=>{const x=Math.sin(seed*91.7+k*12.9)*43758.5; return x-Math.floor(x)};
-  const F=(c,x,y,w=1,h=1)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};
-  g.clearRect(0,0,14,14);
-  for(let k=0;k<4;k++)F(r(k)<.5?'#4f8f3d':'#6aab50',Math.floor(r(k+5)*14),Math.floor(r(k+9)*6)+8,1,3);   // grass blades
-  const ox=3+Math.floor(r(1)*3)-1, oy=2+Math.floor(r(2)*3)-1, dark=r(3)<.5?'#2e7d32':'#2a7030', mid=r(4)<.5?'#5fbf5f':'#56b356', light='#a8ecb0';
-  const leaf=(a,b)=>{F(dark,ox+a,oy+b,3,3); F(mid,ox+a,oy+b,2,2); F(light,ox+a,oy+b,1,1)};
-  F(dark,ox+3,oy+5,1,4); F(dark,ox+4,oy+8,1,1);   // stem
-  if(leaves===4){leaf(0,0); leaf(4,0); leaf(0,4); leaf(4,4)}
-  else { const turn=Math.floor(r(6)*4); [[[0,1],[4,1],[2,-2]],[[0,0],[4,0],[2,4]],[[0,0],[0,4],[4,2]],[[4,0],[4,4],[0,2]]][turn].forEach(([a,b])=>leaf(a,b)) }   // three leaves, turned different ways
-  F('#1d5a2a',ox+3,oy+3,1,1);
-  if(glint){F('#fff3a8',ox+8,oy-1,1,3); F('#fff3a8',ox+7,oy,3,1)}
+// Logan's game: each clover he checks, a Gracie Abrams song comes on. Name the album. 8 right in a row and you find the four-leaf.
+const HUNT={STREAK:8};
+const hunt={open:false, n:0, song:null, deck:[], lock:false};
+function drawHuntClover(g,leaves){
+  const F=(c,x,y,w=1,h=1)=>{g.fillStyle=c;g.fillRect(x,y,w,h)}; g.clearRect(0,0,14,14);
+  const leaf=(a,b)=>{F('#2e7d32',3+a,2+b,3,3); F('#5fbf5f',3+a,2+b,2,2); F('#a8ecb0',3+a,2+b,1,1)};
+  F('#2e7d32',6,7,1,5); F('#2e7d32',7,11,1,1);
+  if(leaves===4){leaf(0,0); leaf(4,0); leaf(0,4); leaf(4,4)} else {leaf(0,1); leaf(4,1); leaf(2,-2)}
+}
+function huntDeal(){
+  const T=LOGAN_TEXT; if(!hunt.deck.length)hunt.deck=[...T.songs].sort(()=>Math.random()-.5);
+  hunt.song=hunt.deck.pop(); $('huntSong').textContent=hunt.song[0];
+  const c=$('huntClover').getContext('2d'); drawHuntClover(c,3);
+  $('huntStreak').textContent=T.streak.replace('{n}',hunt.n);
+  $('huntDots').replaceChildren(...Array.from({length:HUNT.STREAK},(_,k)=>{const d=document.createElement('i'); if(k<hunt.n)d.className='on'; return d}));
 }
 function openCloverHunt(){
-  const T=LOGAN_TEXT, n=HUNT.COLS*HUNT.ROWS; hunt.open=true; hunt.misses=0; hunt.four=Math.floor(Math.random()*n); hunt.seed=Math.floor(Math.random()*1000);
+  const T=LOGAN_TEXT; Object.assign(hunt,{open:true,n:0,deck:[],lock:false});
   $('cloverTitle').textContent=T.huntTitle; $('cloverMsg').textContent=T.huntIntro; $('cloverLater').textContent=T.huntLater;
   const face=$('cloverFace').getContext('2d'); face.clearRect(0,0,32,32); face.fillStyle=PORTRAITS.Logan.bg; face.fillRect(0,0,32,32); PORTRAITS.Logan.draw(face);
-  const btns=[...Array(n)].map((_,i)=>{const b=document.createElement('button'); b.type='button'; b.className='clov'; b.setAttribute('aria-label','Clover '+(i+1)); if(i===hunt.four)b.dataset.four='1';
-    const c=document.createElement('canvas'); c.width=c.height=14; drawHuntClover(c.getContext('2d'),i===hunt.four?4:3,hunt.seed+i,false); b.append(c);
-    b.onclick=()=>pickClover(i,b); return b});
-  $('cloverField').replaceChildren(...btns);
-  paused=true; prompt.hidden=true; $('cloverHunt').hidden=false; sfx('blip'); setTimeout(()=>btns[Math.floor(n/2)].focus({preventScroll:true}),0);
+  const field=$('cloverField'); field.innerHTML='<div class="hcard"><canvas id="huntClover" width="14" height="14" aria-hidden="true"></canvas><span class="hnote">♪</span><b id="huntSong"></b></div><div class="hdots" id="huntDots" aria-hidden="true"></div><small id="huntStreak"></small><div class="habums"></div>';
+  T.albums.forEach((a,k)=>{const b=document.createElement('button'); b.type='button'; b.className='btn halbum'; b.textContent=a; b.onclick=()=>huntPick(k); field.querySelector('.habums').append(b)});
+  huntDeal(); paused=true; prompt.hidden=true; $('cloverHunt').hidden=false; sfx('blip'); setTimeout(()=>field.querySelector('.halbum').focus({preventScroll:true}),0);
 }
-function pickClover(i,b){
-  const T=LOGAN_TEXT;
-  if(i===hunt.four){ closeCloverHunt(); have.gear=have.gear||{}; have.gear.clover=1; save(); sfx('reward');
-    return showDialog({place:T.place,speaker:'Logan',pages:T.found,actions:[{label:'OK',fn:()=>{closeDialog(); showItem('clover')}}]}) }
-  hunt.misses++; sfx('bad'); b.classList.remove('nope'); void b.offsetWidth; b.classList.add('nope');
-  $('cloverMsg').textContent=T.huntMiss[(hunt.misses-1)%T.huntMiss.length];
-  if(hunt.misses>=HUNT.HINT_AFTER){ const fb=$('cloverField').children[hunt.four]; drawHuntClover(fb.querySelector('canvas').getContext('2d'),4,hunt.seed+hunt.four,true); if(hunt.misses===HUNT.HINT_AFTER)$('cloverMsg').textContent=T.huntHint }
+function huntPick(k){
+  const T=LOGAN_TEXT; if(!hunt.open||hunt.lock)return;
+  if(k===hunt.song[1]){ hunt.n++; sfx('type',500+hunt.n*60); $('cloverMsg').textContent=T.huntRight[Math.floor(Math.random()*T.huntRight.length)];
+    if(hunt.n>=HUNT.STREAK){ const again=have.gear&&'clover' in have.gear; closeCloverHunt(); have.gear=have.gear||{}; have.gear.clover=1; save(); sfx('reward');
+      if(again)return showDialog({place:T.place,speaker:'Logan',pages:[T.foundAgain],actions:[CLOSE]});
+      return showDialog({place:T.place,speaker:'Logan',pages:T.found,actions:[{label:'OK',fn:()=>{closeDialog(); showItem('clover')}}]}) } }
+  else { hunt.n=0; sfx('bad'); $('cloverMsg').textContent=T.huntWrong[Math.floor(Math.random()*T.huntWrong.length)]; const c=$('cloverField').querySelector('.hcard'); c.classList.remove('nope'); void c.offsetWidth; c.classList.add('nope') }
+  hunt.lock=true; setTimeout(()=>{ hunt.lock=false; if(hunt.open)huntDeal() },350);
 }
 function closeCloverHunt(){ hunt.open=false; $('cloverHunt').hidden=true; paused=overlayOpen() }
 $('cloverLater').onclick=closeCloverHunt;
 addEventListener('keydown',e=>{ if(!hunt.open)return;
   if(e.code==='Escape'){e.preventDefault(); closeCloverHunt(); return}
-  const btns=[...$('cloverField').children], i=btns.indexOf(document.activeElement); if(i<0)return;
-  const d={ArrowLeft:-1,ArrowRight:1,ArrowUp:-HUNT.COLS,ArrowDown:HUNT.COLS,KeyA:-1,KeyD:1,KeyW:-HUNT.COLS,KeyS:HUNT.COLS}[e.code];
-  if(d){e.preventDefault(); e.stopImmediatePropagation(); btns[(i+d+btns.length)%btns.length].focus({preventScroll:true})}
+  if(['ArrowLeft','KeyA','Digit1'].includes(e.code)){e.preventDefault(); e.stopImmediatePropagation(); $('cloverField').querySelectorAll('.halbum')[0].focus({preventScroll:true}); if(e.code==='Digit1')huntPick(0)}
+  if(['ArrowRight','KeyD','Digit2'].includes(e.code)){e.preventDefault(); e.stopImmediatePropagation(); $('cloverField').querySelectorAll('.halbum')[1].focus({preventScroll:true}); if(e.code==='Digit2')huntPick(1)}
 },true);
 triggers.push({z:R(LOGAN.x-30,LOGAN.y-10,40,18), label:'Talk to Logan', btn:'Talk', act:talkLogan});
 

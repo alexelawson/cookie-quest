@@ -32,6 +32,7 @@ const NEAR_START=[2];   // the station straight ahead when you arrive is never B
 
 const fargo={fuel:FUEL.START, bob:0, introPending:false, warned:false, won:false,
   onFoot:false, car:null, alex:null, alexMood:'ok', moodT:0, wallet:0, strikes:0};
+const fargoDone=()=>have.fargo&&!fargo.replay;   // (after baking you can do the whole hunt again: fargo.replay)
 // have.fargoStage remembers progress across reloads: 'store' (pump done, go shopping), 'reward' (sugar not yet taken)
 let fargoTrees=[];
 
@@ -274,7 +275,7 @@ addEventListener('keyup',e=>{if(pump.open&&['Space','Enter'].includes(e.code)){e
 function pullIn(i){
   const s=STATIONS[i]; s.seen=true;
   if(i===fargo.bob){
-    if(have.fargo) return showDialog({place:FARGO.place,speaker:FARGO.bob,pages:[FARGO.after],actions:[CLOSE]});
+    if(fargoDone()) return showDialog({place:FARGO.place,speaker:FARGO.bob,pages:[FARGO.after],actions:have.baked?[{label:REPLAY.fargo,fn:()=>{closeDialog(); fargo.replay=true; have.fargoStage=null; fargoNewRun(); fargo.replay=true; save()}},CLOSE]:[CLOSE]});
     if(have.fargoStage==='reward') return showReward('fargo');
     if(have.fargoStage==='store') return showDialog({place:FARGO.place,speaker:FARGO.bob,pages:[FARGO.bobWaiting],actions:[CLOSE]});
     return showDialog({place:FARGO.place,speaker:FARGO.bob,pages:[...FARGO.bobHello,...FARGO.bobBet],actions:[{label:FARGO.fill,fn:()=>{closeDialog();openPump()}}]});
@@ -282,7 +283,7 @@ function pullIn(i){
   if(fargo.onFoot) return;
   showDialog({place:FARGO.place,speaker:s.name,pages:[FARGO.ask(s.price)],actions:[
     {label:FARGO.fill,fn:()=>{
-      if(have.fargo) return showDialog({place:FARGO.place,speaker:s.name,pages:[`Tank's full. At $${s.price} a gallon. Lil Q's is cheaper, ya know.`],actions:[CLOSE]});
+      if(fargoDone()) return showDialog({place:FARGO.place,speaker:s.name,pages:[`Tank's full. At $${s.price} a gallon. Lil Q's is cheaper, ya know.`],actions:[CLOSE]});
       showDialog({place:FARGO.place,speaker:s.name,pages:FARGO.wrong(s.price),actions:[{label:FARGO.retry,fn:()=>{closeDialog();goTo('fargo','fromHighway')}}]})}},
     {label:FARGO.keep,ghost:true,fn:closeDialog}]});
 }

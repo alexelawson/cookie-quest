@@ -43,11 +43,8 @@ r=await p.evaluate(()=>{bakePress(); const s=stepNow(); T.pour(s.target/s.rate);
   for(let k=0;k<3;k++)bakePress(); const many=$('bakeMsg').textContent; T.tick(600); bakePress(); eggsDone(); const few=$('bakeMsg').textContent; bakePress(); eggsDone(); const eggs=bake.state; bakePress();
   return {sugar,many,few,eggs,step:$('bakeStep').textContent}});
 ok('C sugar on the line; eggs: 3 is too many, 1 is too few, 2 is right',r.sugar==='good'&&r.many.includes('lot of eggs')&&r.few.includes('one more')&&r.eggs==='good'&&r.step.includes('Flour'),r.many+' | '+r.few);
-r=await p.evaluate(()=>{let s=stepNow(); T.pour(s.target/s.rate); const flour=bake.state; bakePress();
-  const step=$('bakeStep').textContent, btn=$('bakeBtn').textContent; T.onBeat(); T.onBeat(); const two=bake.stirs; T.offBeat(); const off=$('bakeMsg').textContent, after=bake.stirs;
-  for(let k=0;k<20&&bake.state==='rhythm';k++)T.onBeat(); return {flour,step,btn,two,off,after,stir:bake.state}});
-ok('C flour, then stir to the beat: taps on the beat count',r.flour==='good'&&r.step.includes('Stir')&&r.btn==='Stir!'&&r.two===2&&r.stir==='good',JSON.stringify(r));
-ok('C ...a tap off the beat takes one back and Alex says so',r.off.includes('Off the beat')&&r.after===1,r.off);
+r=await p.evaluate(()=>{let s=stepNow(); T.pour(s.target/s.rate); const flour=bake.state; const noStir=!bakeSteps().some(s=>s.kind==='rhythm'); return {flour,noStir}});
+ok('C flour, and there is no stirring step any more',r.flour==='good'&&r.noStir,JSON.stringify(r));
 r=await p.evaluate(()=>{bakePress(); const step=$('bakeStep').textContent; T.scoopGap(); const miss=$('bakeMsg').textContent, none=bake.tray.filter(Boolean).length; T.tick(400);
   T.scoopAt(0); const one=bake.tray.filter(Boolean).length; T.scoopAt(0); const taken=$('bakeMsg').textContent; T.tick(400);
   for(let i=1;i<6;i++)T.scoopAt(i); return {step,miss,none,one,taken,state:bake.state}});
@@ -118,7 +115,7 @@ await p.waitForTimeout(900);
 r.after=await p.evaluate(()=>({basket:$('basket').textContent, have:!!have.sprinkles}));
 ok('I Brian is chill and gives Joe sprinkles',r.lbl==='Talk to Brian'&&r.pages.join(' ').includes('sprinkles')&&r.reward==='Sprinkles'&&r.after.have&&r.after.basket.includes('Sprinkles'),r.pages.slice(-1)[0]);
 r=await p.evaluate(()=>{goTo('kitchen','fromDoor'); T.run(40); openBake(); const n=bakeSteps().length; bake.i=n-1; bakeSetup(); const step=$('bakeStep').textContent, btn=$('bakeBtn').textContent; for(let k=0;k<6;k++)bakePress(); return {n,step,btn,state:bake.state,crowd:CROWD.some(c=>c.name==='Brian')}});
-ok('I with sprinkles there is a shake-the-sprinkles step, and Brian comes to the party',r.n===8&&r.step.includes("Brian's sprinkles")&&r.btn==='Shake!'&&r.state==='good'&&r.crowd,r.step);
+ok('I with sprinkles there is a shake-the-sprinkles step, and Brian comes to the party',r.n===7&&r.step.includes("Brian's sprinkles")&&r.btn==='Shake!'&&r.state==='good'&&r.crowd,r.step);
 // J. the cupcake unlocks a cupcake costume; Settings > Change outfit works anywhere
 await fresh({welcomed:true});
 r=await p.evaluate(()=>{const before=WARDROBE.outfits.filter(o=>!o.unlock||have[o.unlock]).map(o=>o.id);
@@ -153,9 +150,9 @@ ok('N Oakleys, headband and carbon shoes can be found; each shows a card with it
 ok('N Settings lists the gear and can take it off',r.rows===3&&r.off===0);
 // O. the signpost, the Fargo signs, and the ice cream served with the cookies
 // O. Logan: talk, help him look, and he gives Joe a lucky clover
-r=await p.evaluate(()=>{P.x=LOGAN.x+6;P.y=LOGAN.y+2; T.run(1); const lbl=prompt.textContent; action(); const pages=[]; while(T.btns().includes('Next')){pages.push($('dtext').textContent);T.click('Next')} T.click('Help him look'); const hunt=!$('cloverHunt').hidden, n=$('cloverField').children.length; const wrong=[...$('cloverField').children].find(b=>!b.dataset.four); wrong.click(); const miss=$('cloverMsg').textContent, still=!$('cloverHunt').hidden&&!(have.gear&&have.gear.clover); $('cloverField').querySelector('[data-four]').click(); const found=$('dspeaker').textContent+': '+$('dtext').textContent; while(T.btns().includes('Next'))T.click('Next'); T.click('OK'); const card=$('itemName').textContent+' / '+$('itemBtn').textContent; $('itemBtn').click(); return {lbl,pages,found,hunt,n,miss,still,card,clover:have.gear&&have.gear.clover}});
+r=await p.evaluate(()=>{P.x=LOGAN.x+6;P.y=LOGAN.y+2; T.run(1); const lbl=prompt.textContent; action(); const pages=[]; while(T.btns().includes('Next')){pages.push($('dtext').textContent);T.click('Next')} T.click('Play his game'); const huntOpen=!$('cloverHunt').hidden, n=$('cloverField').querySelectorAll('.halbum').length, song=$('huntSong').textContent; $('cloverField').querySelectorAll('.halbum')[1-hunt.song[1]].click(); const miss=$('cloverMsg').textContent, still=!$('cloverHunt').hidden&&!(have.gear&&have.gear.clover)&&hunt.n===0; hunt.lock=false; huntDeal(); (()=>{for(let k=0;k<8&&hunt.open;k++){$('cloverField').querySelectorAll('.halbum')[hunt.song[1]].click(); hunt.lock=false; if(hunt.open)huntDeal()}})(); const found=$('dspeaker').textContent+': '+$('dtext').textContent; while(T.btns().includes('Next'))T.click('Next'); T.click('OK'); const card=$('itemName').textContent+' / '+$('itemBtn').textContent; $('itemBtn').click(); return {lbl,pages,found,hunt:huntOpen,n,song,miss,still,card,clover:have.gear&&have.gear.clover}});
 ok('O Logan is looking for four-leaf clovers and gives Joe one',r.lbl==='Talk to Logan'&&r.pages.join().includes('break from my workout')&&r.found.startsWith('Logan')&&r.clover===1&&r.card==='Lucky clover / Pin it on',r.found+' / '+r.card);
-ok('O helping him look opens a field of clovers; a three-leaf one doesn\'t count; the four-leaf one does',r.hunt&&r.n===35&&r.still&&r.miss.length>5,r.n+' clovers / '+r.miss);
+ok('O his game: a song title comes on, pick its album (2 choices); a wrong pick resets the streak; 8 in a row finds the four-leaf',r.hunt&&r.n===2&&r.song.length>2&&r.still&&r.miss.length>5,r.song+' / '+r.miss);
 // P. Alex's hint when Joe stands still, gone once he moves
 r=await p.evaluate(()=>{goTo('world','start'); T.run(40); closeDialog(); paused=false; P.x=60;P.y=150; T.run(Math.ceil(HINTS.AFTER_MS/16.7)+5); const shown=!$('hint').hidden, text=$('hintText').textContent; dirs.right=true; T.run(3); dirs.right=false; return {shown,text,gone:$('hint').hidden}});
 ok('P standing still: Alex says where to go next; moving hides it',r.shown&&r.text.includes('Keelan')&&r.gone,r.text);

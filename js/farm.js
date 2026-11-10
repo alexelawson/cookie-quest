@@ -76,7 +76,7 @@ function talkToKeelan(){
     opts.push({label:K.midQ,fn:()=>say([`${farm.penned.length} of ${FARM.HENS} in the pen. ${farm.loose.length} running around.`,
       farm.escapesLeft>0?"Get all twenty home at once and they'll settle down.":"They're worn out. They won't sneak out again. Round up the rest!"])});
   } else {
-    K.questions.forEach(q=>opts.push({label:q.q,fn:()=>say(q.a)}));
+    K.questions.forEach((q,i)=>{ if(i===1&&have.gaveCupcake)return; opts.push({label:q.q,fn:()=>say(q.a)}) });   // (once he's had the cupcake, no more "Can't you catch them?")
   }
   if(have.cupcake&&!have.gaveCupcake) opts.push({label:K.cupcakeQ,fn:()=>{
     have.gaveCupcake=true; save(); renderBasket(); say(K.cupcakeA)}});
