@@ -32,14 +32,20 @@ r=await p.evaluate(()=>{const w=STATIONS.findIndex((s,i)=>i!==fargo.bob); T.toLo
   const oldBob=fargo.bob; T.click('Try again'); T.run(40); return {lbl,ask,pages,fuel:fargo.fuel,seen:STATIONS.filter(s=>s.seen).length,cheap:STATIONS[fargo.bob].price}});
 ok('C pull into a pricier station',r.lbl==='Pull up to the pump'&&/\$\d\.\d\d a gallon/.test(r.ask),r.ask); ok('C filling there fails with the $2.79 joke',r.pages.join(' ').includes('2.79'));
 ok('C try again resets fuel and signs',r.fuel===30&&r.seen===0&&r.cheap==='2.79');
+// C2. the locals: drive up, ask for directions; their clues point to wherever Lil Q's is
+r=await p.evaluate(()=>{ const out=[]; for(const [i,l] of LOCALS.entries()){ P.x=l.x; P.y=l.y+12; T.run(1); const lbl=prompt.textContent; action(); out.push([lbl,$('dspeaker').textContent,$('dtext').textContent]); T.click('Close') }
+  const s=STATIONS[fargo.bob]; return {out, ns:s.lot.y+14<168?'north':'south', ew:s.lot.x+24<210?'west':'east', hud:String(SCENES.fargo.hud&&SCENES.fargo.hud())}});
+ok('C2 three locals: drive up and Ask for directions',r.out.every(o=>o[0]==='Ask for directions'),JSON.stringify(r.out.map(o=>o[0])));
+ok('C2 their clues match where Lil Q\'s is (north/south, east/west, the sign color)',r.out[0][2].includes(r.ns)&&r.out[1][2].includes(r.ew)&&r.out[2][2].includes('sign')&&(r.hud.includes('3/3 clues')||r.hud.includes('Found')),JSON.stringify(r).slice(0,300));
 // D. Bob + pump
 r=await p.evaluate(()=>{T.toLot(fargo.bob); action(); const hello=$('dtext').textContent; T.pages(); T.click('Fill up'); return {hello,pump:!$('pump').hidden}});
 ok('D Bob at the cheapest station',r.hello.includes('found it')); ok('D pump opens',r.pump);
-r=await p.evaluate(()=>{pump.cents=2995; pumpPress(); T.run(30); pumpRelease(); const over=pump.cents, msg=$('pumpMsg').textContent; T.run(90); return {over,msg,reset:pump.cents}});
-ok('D going over busts and resets',r.over>3000&&r.reset===0,'$'+(r.over/100).toFixed(2)+' -> '+r.msg);
-r=await p.evaluate(()=>{const t0=performance.now(); pump.cents=0; pumpPress(); let n=0; while(pump.cents<2950&&n<2000){T.run(1);n++} pumpRelease(); const fast=n*16.7/1000;
-  let taps=0; while(pump.cents<3000&&taps<200){pumpPress(); T.run(1); pumpRelease(); taps++} return {fast,taps,cents:pump.cents}});
-ok('D a full hold reaches ~$29.50 in a few seconds',r.fast>2&&r.fast<9,r.fast.toFixed(1)+'s'); ok('D single-frame taps land exactly on $30.00',r.cents===3000,r.taps+' taps');
+r=await p.evaluate(()=>{const spin0=pump.pos[0]; T.run(5); const moving=pump.pos[0]!==spin0, btn=$('pumpBtn').textContent;
+  pump.pos[0]=5.2; pumpPress(); const msg=$('pumpMsg').textContent, locked=pump.val[0]; T.run(70); return {moving,btn,msg,locked,after:pump.val[0],reel:pump.reel}});
+ok('D the pump is three spinning reels; STOP on the wrong number busts and that reel spins again',r.moving&&r.btn==='STOP'&&r.locked===5&&r.after===null&&r.reel===0&&r.msg.length>5,JSON.stringify(r));
+r=await p.evaluate(()=>{ const stopOn=(r,t)=>{ for(let k=0;k<400&&Math.floor(pump.pos[r])%reelLen(r)!==t;k++)T.run(1); pumpPress() };
+  stopOn(0,3); const m1=$('pumpMsg').textContent; stopOn(1,0); const m2=$('pumpMsg').textContent; stopOn(2,0); return {m1,m2,sale:$('pumpSale').textContent,done:pump.done} });
+ok('D stopping on 3, then 0, then .00 is exactly $30.00',r.done&&r.sale==='$30.00'&&r.m1.includes('Three')&&r.m2.includes('Thirty'),JSON.stringify(r));
 await p.waitForFunction(()=>!dlg.hidden&&$('dspeaker').textContent==='Lil Q',null,{timeout:8000});
 r=await p.evaluate(()=>{const ps=[]; while(true){ps.push($('dtext').textContent); if(!T.btns().includes('Next'))break; T.click('Next')} const line=ps.join(' '); T.click('Go inside'); const ask=[]; for(let k=0;k<10&&!dlg.hidden;k++){ask.push($('dspeaker').textContent+': '+$('dtext').textContent); T.click(T.btns()[0])} return {ask,line,onFoot:fargo.onFoot,car:!!fargo.car,alex:!!fargo.alex,stage:have.fargoStage,hud:$('hud').textContent,free:!blocked(P.x,P.y)}});
 ok('D exact $30 -> go inside',r.line.includes('Shop\'s open')&&r.stage==='store'); ok('D you and Alex get out, car parked',r.onFoot&&r.car&&r.alex&&r.free,r.hud);
@@ -72,8 +78,8 @@ ok('G reload mid-errand: parked at Bob\'s, on foot, no intro',!r.intro&&r.onFoot
 // H. keyboard at the pump doesn't move you or open dialogs
 await fresh(); r=await p.evaluate(()=>{T.enter(); T.pages(); T.click('Close'); T.toLot(fargo.bob); action(); T.pages(); T.click('Fill up'); return {x:P.x,y:P.y}});
 await p.keyboard.down('Space'); await p.waitForTimeout(400); await p.keyboard.up('Space'); await p.keyboard.press('ArrowLeft');
-r=await p.evaluate(o=>({cents:pump.cents,moved:P.x!==o.x||P.y!==o.y,dlg:dlg.hidden}),r);
-ok('H holding Space pumps; arrows ignored',r.cents>0&&!r.moved&&r.dlg,'$'+(r.cents/100).toFixed(2));
+r=await p.evaluate(o=>({locked:pump.val[0]!==null||pump.reel>0,moved:P.x!==o.x||P.y!==o.y,dlg:dlg.hidden}),r);
+ok('H Space stops a reel; arrows ignored',r.locked&&!r.moved&&r.dlg,JSON.stringify(r));
 // I. at every station: from where you get out, from where you get kicked out, and from the road, the door is reachable on foot
 r=await p.evaluate(()=>{const sc=SCENES.fargo, bad=[];
   const reach=(sx,sy,door)=>{const seen=new Set(), q=[[Math.round(sx),Math.round(sy)]];

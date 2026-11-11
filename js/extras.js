@@ -138,6 +138,16 @@ function drawSnowman(x,y){
   F('#6b4428',-7,-11,3,1); F('#6b4428',5,-12,3,1); F('#6b4428',-8,-12,1,1); F('#6b4428',7,-13,1,1);   // stick arms
 }
 solids.push(R(258,74,9,4));
+// a little green tractor working the sugar beet rows out back of Lil Q's (main map)
+function drawTractor(x,y,flip){
+  const F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(Math.round(x+(flip?-dx-w+1:dx)),Math.round(y+dy),w,h)}, bump=Math.floor(time/180)%2;
+  F('rgba(0,0,0,.2)',-6,2,14,2);
+  F('#2f7a3a',-5,-6+bump,10,5); F('#3f9a4a',-5,-6+bump,10,1); F('#9fd2f0',-1,-11+bump,5,5); F('#2f7a3a',-2,-12+bump,7,1); F('#1d1d22',-3,-10+bump,1,4);   // body, cab, exhaust
+  F('#1d1d22',-6,-3,5,5); F('#f4d35e',-5,-2,3,3); F('#1d1d22',3,-1,3,3); F('#f4d35e',4,0,1,1);                                     // big back wheel, small front wheel
+  if(Math.floor(time/400)%2)F('rgba(220,220,220,.6)',-4,-14+bump,2,2);                                                          // a puff of smoke
+}
+{const ents=SCENES.world.ents; SCENES.world.ents=function(list){ ents.call(this,list);
+  const t=time/9000, k=t-Math.floor(t), x=k<.5?246+k*2*84:330-(k-.5)*2*84, flip=k>=.5; list.push({y:266,draw:()=>drawTractor(x,266,flip)}) }}
 {const ents=SCENES.world.ents; SCENES.world.ents=function(list){ ents.call(this,list);
   for(const [cx,cy,ph] of [[146,32,0],[152,38,1.3],[140,40,2.2]]){ const x=cx+Math.sin(time/1500+ph)*5, fl=Math.cos(time/1500+ph)<0; list.push({y:cy,draw:()=>drawDuck(x,cy,fl,ph)}) }
   list.push({y:78,draw:()=>drawSnowman(262,78)}) }}

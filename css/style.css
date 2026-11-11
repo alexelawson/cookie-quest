@@ -452,3 +452,8 @@ h1::before,h1::after{content:'✦';color:var(--berry);font-size:.6em;vertical-al
 .habums{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
 .halbum{min-width:140px}
 @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+/* Lil Q's pump: three spinning reels */
+#pumpSale b{font-weight:inherit;display:inline-block;min-width:.6em;text-align:center}
+#pumpSale b.spin{color:#ffd84d;animation:reelBlink .25s steps(2) infinite}
+#pumpSale b.set{color:#7dff8a}
+@keyframes reelBlink{50%{opacity:.6}}

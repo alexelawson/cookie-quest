@@ -386,8 +386,15 @@ const GOLF_TEXT = {
 // ---------- Fargo: Lil Q (runs the cheapest gas station in the country) and Alex, your passenger ----------
 const FARGO = {
   place:'Fargo, ND', bob:'Lil Q',   // the gas station owner's name (the code calls her "bob")
-  intro:["We're running on fumes.","Somewhere in this town is the cheapest gas in the whole country: $2.79 a gallon. Everywhere else is $2.99 or more.","Drive past the stations to read their signs. Don't fill up until you find $2.79!"],
+  intro:["We're running on fumes.","Somewhere in this town is the cheapest gas in the whole country: $2.79 a gallon. Everywhere else is $2.99 or more.","The locals always know. Pull up and ask them for directions, then read the station signs. Don't fill up until you find $2.79!"],
   hudGoal:"Find $2.79",   // the reminder up top while you drive around
+  // locals who know where the cheap gas is (drive up to them). {dir}/{color}/{near} are filled in for wherever Lil Q's is this time
+  askLocal:"Ask for directions",
+  localNames:["Arnie","Marge","Gunnar"],
+  clueNS:d=>`Cheap gas? Oh ya, you betcha. That's on the ${d} side of town.`,
+  clueEW:d=>`Lil Q's? Sure, sure. It's over on the ${d} side. Can't miss it.`,
+  clueSign:(c,n)=>`Look for the ${c} sign, over by ${n}. Tell 'em Gunnar sent ya.`,
+  marquee:"COOKIES",   // what the Fargo Theatre's marquee says
   introSpeaker:'Alex',
   attendants:['Deb','Lars','Shelly','Ole','Marv'],
   // the signs on the gas station shops (keep them short: about 9 letters fits). Lil Q's always says LIL Q'S.
@@ -400,8 +407,10 @@ const FARGO = {
   bobHello:["Yo yo YO. Look who found it. Cheapest gas in the whole dang country.","They call me Lil Q. I rode my scooter here all the way from Elinor's. Three days. Top speed nineteen. No regrets.","Two seventy-nine a gallon. Lil Q don't play."],
   bobBet:["Here's the deal, rookie. Stop that pump on thirty dollars EXACTLY and Lil Q hooks you up with sugar.","Beets from out back. Sweetest in the Red River Valley. That's a bar. Write it down."],
   pumpTitle:"Lil Q's bet: stop on exactly $30.00",
-  pumpHint:"Hold to pump, let go to stop. Tap for the last few cents.",
-  bust:["Ohhh, a penny over! The pump don't lie, baby.","Over again! Lil Q resets. Lil Q forgives.","Thirty and WHAT?? Run it back.","Steady hands, rookie. Be the pump. Become the pump."],
+  pumpHint:"The numbers are spinning! Tap STOP to lock in each one: 3... 0... .00",
+  pumpBtn:"STOP",
+  pumpReel:["Three! Now the dollars: stop on 0.","Thirty! Now the cents: stop on 00."],
+  bust:["Ohhh, so close! Spin it again, baby.","Nope! Lil Q resets. Lil Q forgives.","Thirty and WHAT?? Run it back.","Steady hands, rookie. Be the pump. Become the pump."],
   pumpWin:["THIRTY. EVEN. Somebody get this rookie a record deal.","Pull up by the door, rookie. Shop's open."],
   // then Joe and Alex get out of the car (Alex's name pops up)
   snackAsk:[["Joe","Want anything from inside?"],["Alex","No, I'm good."],["Alex","..."],["Alex","I mean. If YOU'RE getting something."],["","(She definitely wants a snack.)"]],

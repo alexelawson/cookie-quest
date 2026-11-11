@@ -21,10 +21,15 @@ const STATIONS=[
   return {...s, lot, store, door, island:R(s.x+18,s.y+11,12,6), sign:{x:s.x+50,y:s.y+2},
     person:{x:s.x+38,y:s.y+20}, price:'', seen:false, name:''};
 });
-const HOUSES=[R(70,124,24,20),R(110,132,26,20),R(244,74,26,20),R(244,118,26,20),R(284,130,22,20),
+const HOUSES=[R(70,124,24,20),R(110,132,26,20),R(244,74,26,20),
   R(70,200,24,20),R(70,240,24,20),R(184,250,22,20),R(244,200,26,20),R(244,250,26,20),
-  R(8,86,24,18),R(412,80,28,20),R(412,210,28,20),R(80,8,26,20),R(260,10,26,20),R(412,250,28,20)];
+  R(8,86,24,18),R(412,80,28,20),R(412,210,28,20),R(260,10,26,20),R(412,250,28,20)];
 const TOWER={x:186,y:142};
+// landmarks: the Fargo Theatre on Broadway (the top road), the Fargodome, and an NDSU Bison statue
+const THEATRE=R(80,6,46,32), DOME=R(240,104,58,46), BISON=R(300,138,22,14);
+const LANDMARKS=[THEATRE,DOME,BISON];
+// locals who know where the cheap gas is: drive up and ask (each one gives a clue)
+const LOCALS=[{x:96,y:160,look:0},{x:238,y:28,look:1},{x:424,y:160,look:2}];
 const WELCOME=R(12,196,24,12);
 // green EXIT signs pointing back to the highway (the way out is the left end of the middle road)
 const EXIT_SIGNS=[{x:346,y:146,dir:'<'},{x:66,y:68,dir:'v'},{x:66,y:266,dir:'^'}];
@@ -37,7 +42,7 @@ const fargoDone=()=>have.fargo&&!fargo.replay;   // (after baking you can do the
 let fargoTrees=[];
 
 function fargoNewRun(){
-  fargo.fuel=FUEL.START; fargo.warned=false;
+  fargo.fuel=FUEL.START; fargo.warned=false; fargo.clues=[];
   const others=[...PRICES].sort(()=>Math.random()-.5), names=[...FARGO.attendants].sort(()=>Math.random()-.5);
   const pool=STATIONS.map((_,i)=>i).filter(i=>!NEAR_START.includes(i));
   fargo.bob=(have.fargoStage&&!have.fargo&&have.fargoBob!=null)?have.fargoBob:pool[Math.floor(Math.random()*pool.length)];
@@ -97,9 +102,39 @@ const fargoBg=document.createElement('canvas'); fargoBg.width=FW; fargoBg.height
   F('#8a8f9a',WELCOME.x+3,WELCOME.y+10,2,6); F('#8a8f9a',WELCOME.x+19,WELCOME.y+10,2,6);
   F('#2f5f9e',WELCOME.x,WELCOME.y,24,11); F('#ffffff',WELCOME.x,WELCOME.y,24,1); pixText(g,'FARGO',WELCOME.x+3,WELCOME.y+3,'#ffffff');
 })();
+// the landmarks, painted on the town
+(function(){
+  const g=fargoBg.getContext('2d'), F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};
+  // out back (along the bottom edge): Red River Valley sugar beet rows, a red barn with a white-trimmed door, a silo
+  for(const [x0,x1] of [[66,208],[236,378]]){ F('#6b5236',x0,318,x1-x0,18);
+    for(let y=320;y<336;y+=4)for(let x=x0+2;x<x1-2;x+=3){F('#3f7d2e',x,y,2,2); F('#5fa843',x,y,1,1); F('#e8dcc2',x+1,y+2,1,1)} }   // beet leaves, a peek of white beet
+  {const x=418,y=316; F('#a8322a',x,y+6,28,14); F('#c8443a',x,y+6,28,1); F('#5f564e',x-2,y,32,7); for(let k=0;k<4;k++)F('#4a433c',x-2+k,y+k,32-k*2,1);   // the barn
+   F('#ffffff',x+10,y+10,8,10); F('#a8322a',x+11,y+11,6,9); F('#ffffff',x+11,y+11,6,1); F('#ffffff',x+13,y+11,1,9); F('#ffffff',x+11,y+15,6,1);
+   F('#d6d3cc',x-10,y-6,8,26); F('#b4b2ad',x-10,y-6,8,2); F('#8a8f9a',x-9,y-8,6,2)}                                        // a silo
+  {const x=12,y=318; F('#2f6b3a',x,y+4,22,10); F('#f4d35e',x+2,y+9,4,5); F('#f4d35e',x+15,y+9,5,5); F('#1d1d22',x+3,y+11,3,3); F('#1d1d22',x+16,y+11,4,4); F('#9fd2f0',x+11,y,8,5); F('#2f6b3a',x+10,y-1,10,1)}   // a tractor in the field
+  // the Fargo Theatre: art-deco brick front, cream trim, a marquee over the doors (its bulbs and the tall blade sign are drawn live)
+  {const t=THEATRE; F('rgba(60,50,30,.25)',t.x+1,t.y+t.h,t.w,2);
+   F('#9a3f30',t.x,t.y+4,t.w,t.h-4); for(let y=t.y+6;y<t.y+t.h;y+=3)F('#8a3426',t.x,y,t.w,1);                   // brick
+   F('#efe2c0',t.x,t.y+3,t.w,2); F('#efe2c0',t.x+4,t.y,t.w-8,3); for(let x=t.x+6;x<t.x+t.w-6;x+=6)F('#d9c99a',x,t.y,2,3);   // stepped deco parapet
+   F('#efe2c0',t.x,t.y+4,2,t.h-4); F('#efe2c0',t.x+t.w-2,t.y+4,2,t.h-4);
+   for(let x=t.x+8;x<t.x+t.w-8;x+=8)F('#ffd98a',x,t.y+8,4,6);                                              // lit upstairs windows
+   F('#3a2a2a',t.x+10,t.y+t.h-8,t.w-20,8); F('#ffd98a',t.x+12,t.y+t.h-7,8,6); F('#ffd98a',t.x+t.w-20,t.y+t.h-7,8,6);   // glass doors
+   F('#8a1f1a',t.x+t.w/2-4,t.y+t.h,8,2)}                                                                     // a red carpet to the sidewalk
+  // the Fargodome: a big white dome on a grey base
+  {const d=DOME; F('rgba(60,50,30,.25)',d.x+2,d.y+d.h,d.w-2,3);
+   F('#b8bcc4',d.x,d.y+30,d.w,16); F('#9aa0aa',d.x,d.y+44,d.w,2); for(let x=d.x+3;x<d.x+d.w-3;x+=6)F('#7f8692',x,d.y+33,3,8);   // base with doors
+   for(let y=0;y<30;y++){const k=1-((30-y)/30)**2, w=Math.round(d.w*Math.sqrt(Math.max(0,k))); F(y<6?'#ffffff':'#eef1f5',d.x+(d.w-w)/2|0,d.y+y,w,1)}   // the dome
+   for(let x=d.x+8;x<d.x+d.w-6;x+=8)F('#d6dbe3',x,d.y+12,1,18); F('#d6dbe3',d.x+4,d.y+22,d.w-8,1);          // its ribs
+   F('#1f5a34',d.x+8,d.y+35,d.w-16,6); pixText(g,'FARGODOME',d.x+11,d.y+36,'#f4d35e')}
+  // the Bison statue on a little plinth
+  {const b=BISON; F('#8a8f9a',b.x+2,b.y+10,b.w-4,4); F('#b4b8c0',b.x+2,b.y+10,b.w-4,1); pixText(g,'NDSU',b.x+4,b.y+11,'#1f5a34');
+   const B='#5a3a22', D='#3e2716', L='#7a5232'; F(B,b.x+5,b.y+3,12,5); F(D,b.x+4,b.y+2,6,6); F(L,b.x+5,b.y+2,4,1); F(D,b.x+3,b.y+5,2,3);   // body, big humped head
+   F('#efe2c0',b.x+3,b.y+2,1,1); F('#efe2c0',b.x+7,b.y+1,1,1);                                                  // horns
+   F(D,b.x+6,b.y+8,2,2); F(D,b.x+14,b.y+8,2,2); F(B,b.x+17,b.y+4,2,1)}                                          // legs, tail
+})();
 // pine trees scattered where nothing else is
 (function(){
-  const blocked=r=>[...ROADS,...HOUSES,...STATIONS.flatMap(s=>[s.lot,s.store,R(s.sign.x-2,s.sign.y-2,22,24)]),R(TOWER.x-18,TOWER.y-40,36,46),R(0,160,40,60),WELCOME,...EXIT_SIGNS.map(s=>R(s.x,s.y,26,18))]
+  const blocked=r=>[...ROADS,...HOUSES,...STATIONS.flatMap(s=>[s.lot,s.store,R(s.sign.x-2,s.sign.y-2,22,24)]),R(TOWER.x-18,TOWER.y-40,36,46),...LANDMARKS,...LOCALS.map(l=>R(l.x-6,l.y-16,12,18)),R(0,160,40,60),WELCOME,...EXIT_SIGNS.map(s=>R(s.x,s.y,26,18))]
     .some(o=>hit(R(r.x-3,r.y-3,r.w+6,r.h+6),o));
   for(let n=0;n<400&&fargoTrees.length<16;n++){const x=8+rnd()*(FW-16)|0, y=16+rnd()*(FH-20)|0; const box=R(x-6,y-16,12,17);
     if(!blocked(box)&&!fargoTrees.some(([tx,ty])=>Math.abs(tx-x)<12&&Math.abs(ty-y)<14))fargoTrees.push([x,y])}
@@ -107,7 +142,7 @@ const fargoBg=document.createElement('canvas'); fargoBg.width=FW; fargoBg.height
 // wheat and sunflower fields on the open land (painted onto the town background)
 (function(){
   const g=fargoBg.getContext('2d'), F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};
-  const blocked=r=>[...ROADS,...HOUSES,...STATIONS.flatMap(s=>[s.lot,s.store,R(s.sign.x-2,s.sign.y-2,22,24)]),R(TOWER.x-18,TOWER.y-40,36,46),R(0,160,40,60),WELCOME,...EXIT_SIGNS.map(s=>R(s.x,s.y,26,18)),...fargoTrees.map(([x,y])=>R(x-6,y-16,12,17))]
+  const blocked=r=>[...ROADS,...HOUSES,...STATIONS.flatMap(s=>[s.lot,s.store,R(s.sign.x-2,s.sign.y-2,22,24)]),R(TOWER.x-18,TOWER.y-40,36,46),...LANDMARKS,...LOCALS.map(l=>R(l.x-6,l.y-16,12,18)),R(0,160,40,60),WELCOME,...EXIT_SIGNS.map(s=>R(s.x,s.y,26,18)),...fargoTrees.map(([x,y])=>R(x-6,y-16,12,17))]
     .some(o=>hit(R(r.x-4,r.y-4,r.w+8,r.h+8),o));
   let n=0; for(let k=0;k<300&&n<6;k++){const f=R(8+rnd()*(FW-60)|0,12+rnd()*(FH-40)|0,44,26); if(blocked(f))continue; n++;
     for(let x=f.x-2;x<=f.x+f.w+1;x+=6){F('#7a5a3a',x,f.y-3,1,3); F('#7a5a3a',x,f.y+f.h,1,3)} F('#9a7a5a',f.x-2,f.y-2,f.w+4,1); F('#9a7a5a',f.x-2,f.y+f.h+1,f.w+4,1);   // a split-rail fence
@@ -234,39 +269,75 @@ function drawSign(s){
   pixText(ctx, near?s.price:'?.??', x+2, y+4, near?(s.price===CHEAPEST?'#7dff8a':'#ffd84d'):'#58607a');
 }
 
-// ---------- the pump ----------
-const pump={open:false, cents:0, holding:false, heldMs:0, frac:0, lock:0, tries:0};
+// ---------- the Fargo Theatre's blade sign and marquee (drawn live so the bulbs chase) ----------
+function drawTheatreSign(){
+  const t=THEATRE, F=(c,x,y,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,h)}, on=Math.floor(time/200)%2;
+  F('#1d2433',t.x+4,t.y+16,t.w-8,8); F('#efe2c0',t.x+4,t.y+15,t.w-8,1); F('#efe2c0',t.x+4,t.y+24,t.w-8,1);       // the marquee
+  for(let x=t.x+5;x<t.x+t.w-4;x+=2){F((x/2+on)%2?'#fff3a8':'#a8762a',x,t.y+15,1,1); F((x/2+on+1)%2?'#fff3a8':'#a8762a',x,t.y+24,1,1)}
+  pixText(ctx,FARGO.marquee,t.x+t.w/2-textW(FARGO.marquee)/2|0,t.y+17,'#ffd84d');
+  const bx=t.x-9, by=t.y+1; F('#8a1f1a',bx,by,9,30); F('#c7372f',bx+1,by+1,7,28); F('#5a3a22',bx+8,by+4,2,2); F('#5a3a22',bx+8,by+22,2,2);   // the tall blade sign on the corner
+  for(let y=by+1;y<by+29;y+=2){F((y/2+on)%2?'#fff3a8':'#a8762a',bx,y,1,1); F((y/2+on+1)%2?'#fff3a8':'#a8762a',bx+8,y,1,1)}
+  [...'FARGO'].forEach((ch,i)=>pixText(ctx,ch,bx+3,by+2+i*5,'#ffd84d'));
+}
+// ---------- the locals: three people around town who know where the cheap gas is ----------
+const LOCAL_LOOKS=[{coat:'#3d6fb0',hat:'#c8322b',hair:'#e8e2d6',pants:'#4a4f60'},{coat:'#2f8a4a',hat:'#f4d35e',hair:'#6b4428',pants:'#3a5f9e'},{coat:'#7a4fa0',hat:'#1d1d22',hair:'#c99a66',pants:'#2a2a33'}];
+function drawLocal(x,y,i,asked){
+  const L=LOCAL_LOOKS[i], X=Math.round(x)-4, Y=Math.round(y)-16, F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(X+dx,Y+dy,w,h)}, wave=!asked&&Math.floor(time/400+i)%3===0;
+  F('rgba(0,0,0,.25)',0,15,9,2);
+  F(L.pants,2,10,2,5); F(L.pants,5,10,2,5); F('#3b2a1e',1,14,3,2); F('#3b2a1e',5,14,3,2);
+  F(L.coat,1,5,7,6); F('rgba(255,255,255,.2)',1,5,7,1); F(L.coat,0,6,1,4); F(L.coat,8,wave?2:6,1,wave?4:4);   // a coat; one arm waves you over
+  F('#f0c6a0',8,wave?1:9,1,1); F('#f0c6a0',0,10,1,1);
+  F('#f0c6a0',2,1,5,4); F(L.hair,1,1,1,3); F(L.hair,7,1,1,3); F('#2b2236',3,2,1,1); F('#2b2236',5,2,1,1); F('#b5654f',3,4,3,1);
+  F(L.hat,1,-1,7,2); F(L.hat,2,-2,5,1); F('#ffffff',4,-3,1,1);                                                   // a toque with a pom
+  if(!asked&&Math.floor(time/500)%2){F('#ffffff',9,-6,5,5); F('#2b2236',11,-5,1,2); F('#2b2236',11,-2,1,1); F('#ffffff',9,-1,1,1)}   // a "!" bubble until you've asked
+}
+// the clue each local gives, worked out from where Lil Q's is this time
+const BRAND_COLOR={'#c8322b':'red','#2f8a4a':'green','#2f6db0':'blue','#e08a2a':'orange','#7a4fa0':'purple','#d2a32a':'yellow'};
+function localClue(i){
+  const s=STATIONS[fargo.bob], cx=s.lot.x+24, cy=s.lot.y+14;
+  if(i===0)return FARGO.clueNS(cy<168?'north':'south');
+  if(i===1)return FARGO.clueEW(cx<210?'west':'east');
+  const near=[['the water tower',TOWER.x,TOWER.y],['the Fargo Theatre',THEATRE.x+23,THEATRE.y+16],['the Fargodome',DOME.x+29,DOME.y+23]].sort((a,b)=>Math.hypot(a[1]-cx,a[2]-cy)-Math.hypot(b[1]-cx,b[2]-cy))[0][0];
+  return FARGO.clueSign(BRAND_COLOR[s.brand]||'bright',near);
+}
+function askLocal(i){
+  fargo.clues=fargo.clues||[]; const first=!fargo.clues[i]; fargo.clues[i]=localClue(i);
+  showDialog({place:FARGO.place,speaker:FARGO.localNames[i],pages:[fargo.clues[i]],actions:[CLOSE]});
+  if(first)sfx('blip');
+}
+// ---------- the pump: Lil Q's bet. Three spinning reels on the display: stop them on 3, 0 and .00 for exactly $30.00 ----------
+const PUMP={SPEEDS:[7,10,14], TARGET:[3,0,0], CENTS:[0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95]};   // reel speeds (numbers a second); the cents reel steps by 5
+const pump={open:false, reel:0, pos:[0,0,0], val:[null,null,null], lock:0, tries:0, done:false};
+const reelLen=r=>r===2?PUMP.CENTS.length:10;
+const reelShow=r=>{const v=pump.val[r]!=null?pump.val[r]:Math.floor(pump.pos[r])%reelLen(r); return r===2?String(PUMP.CENTS[v]).padStart(2,'0'):String(v)};
 function openPump(){
-  pump.open=true; pump.cents=0; pump.frac=0; pump.holding=false; pump.lock=0; pump.tries=0;
-  $('pumpTitle').textContent=FARGO.pumpTitle; $('pumpMsg').textContent=FARGO.pumpHint; renderPump();
+  Object.assign(pump,{open:true,reel:0,pos:[Math.random()*10,Math.random()*10,Math.random()*20],val:[null,null,null],lock:0,tries:0,done:false});
+  $('pumpTitle').textContent=FARGO.pumpTitle; $('pumpMsg').textContent=FARGO.pumpHint; $('pumpBtn').textContent=FARGO.pumpBtn; renderPump();
   paused=true; prompt.hidden=true; $('pump').hidden=false; setTimeout(()=>$('pumpBtn').focus({preventScroll:true}),0);
 }
+function pumpCents(){ const d=[0,1,2].map(r=>pump.val[r]!=null?pump.val[r]:Math.floor(pump.pos[r])%reelLen(r)); return d[0]*1000+d[1]*100+PUMP.CENTS[d[2]] }
 function renderPump(){
-  $('pumpSale').textContent='$'+(pump.cents/100).toFixed(2);
-  $('pumpGal').textContent=(pump.cents/279).toFixed(3);
-  $('pump').classList.toggle('over',pump.cents>3000);
+  const cls=r=>r===pump.reel&&!pump.done?' class="spin"':pump.val[r]!=null?' class="set"':'';
+  $('pumpSale').innerHTML=`$<b${cls(0)}>${reelShow(0)}</b><b${cls(1)}>${reelShow(1)}</b>.<b${cls(2)}>${reelShow(2)}</b>`;
+  $('pumpGal').textContent=(pumpCents()/279).toFixed(3);
 }
-function pumpPress(){ if(!pump.open||pump.lock>0||pump.holding)return; pump.holding=true; pump.heldMs=0; $('pumpBtn').classList.add('on') }
-function pumpRelease(){
-  if(!pump.holding)return; pump.holding=false; $('pumpBtn').classList.remove('on');
-  if(pump.cents>3000){
-    $('pumpMsg').textContent=FARGO.bust[pump.tries++%FARGO.bust.length]; pump.lock=1300; sfx('buzz');
-  } else if(pump.cents===3000){
-    pump.lock=99999; $('pumpMsg').textContent='$30.00 on the nose!'; sfx('ding');
-    setTimeout(()=>{ $('pump').hidden=true; pump.open=false; have.fargoStage='store'; have.fargoBob=fargo.bob; save();
-      showDialog({place:FARGO.place,speaker:FARGO.bob,pages:FARGO.pumpWin,actions:[{label:FARGO.goInside,fn:()=>{closeDialog();parkAndGetOut(); say(FARGO.snackAsk)}}]}) },700);
-  }
+function pumpPress(){
+  if(!pump.open||pump.lock>0||pump.done)return; const r=pump.reel, v=Math.floor(pump.pos[r])%reelLen(r); pump.val[r]=v; $('pumpBtn').classList.add('on'); setTimeout(()=>$('pumpBtn').classList.remove('on'),120);
+  if(v!==PUMP.TARGET[r]){ sfx('buzz'); $('pumpMsg').textContent=FARGO.bust[pump.tries++%FARGO.bust.length]; pump.lock=1000; renderPump(); return }
+  sfx('ding'); pump.reel++; renderPump();
+  if(pump.reel<3){ $('pumpMsg').textContent=FARGO.pumpReel[pump.reel-1]; return }
+  pump.done=true; pump.lock=99999; $('pumpMsg').textContent='$30.00 on the nose!';
+  setTimeout(()=>{ $('pump').hidden=true; pump.open=false; have.fargoStage='store'; have.fargoBob=fargo.bob; save();
+    showDialog({place:FARGO.place,speaker:FARGO.bob,pages:FARGO.pumpWin,actions:[{label:FARGO.goInside,fn:()=>{closeDialog();parkAndGetOut(); say(FARGO.snackAsk)}}]}) },700);
 }
+function pumpRelease(){}
 function pumpTick(dt){
   if(!pump.open)return;
-  if(pump.lock>0&&pump.lock<99999){pump.lock-=dt; if(pump.lock<=0){pump.cents=0; pump.frac=0; $('pumpMsg').textContent=FARGO.pumpHint; renderPump()}}
-  if(pump.holding){
-    pump.heldMs+=dt; const rate=Math.min(650,12+pump.heldMs*.9);     // cents per second, speeds up the longer you hold
-    pump.frac+=rate*dt/1000; const add=Math.floor(pump.frac); if(add){pump.frac-=add; pump.cents+=add; renderPump(); if((pump.clickT=(pump.clickT||0)+dt)>70){pump.clickT=0; sfx('click')}}
-  }
+  if(pump.lock>0&&pump.lock<99999){ pump.lock-=dt; if(pump.lock<=0){ pump.val[pump.reel]=null; $('pumpMsg').textContent=pump.reel?FARGO.pumpReel[pump.reel-1]:FARGO.pumpHint } }   // a miss: that reel spins again
+  if(!pump.done&&pump.lock<=0){ const r=pump.reel; pump.pos[r]+=PUMP.SPEEDS[r]*dt/1000; if((pump.clickT=(pump.clickT||0)+dt)>90){pump.clickT=0; sfx('click')} }
+  renderPump();
 }
 $('pumpBtn').addEventListener('pointerdown',e=>{e.preventDefault();pumpPress()});
-['pointerup','pointerleave','pointercancel'].forEach(t=>$('pumpBtn').addEventListener(t,pumpRelease));
 // Space/Enter hold works too; runs before the normal controls so they don't also fire
 addEventListener('keydown',e=>{if(!pump.open)return; if(['Space','Enter'].includes(e.code)){e.preventDefault(); e.stopImmediatePropagation(); if(!e.repeat)pumpPress()} else if(e.code!=='Tab'){e.preventDefault(); e.stopImmediatePropagation()}},true);
 addEventListener('keyup',e=>{if(pump.open&&['Space','Enter'].includes(e.code)){e.preventDefault(); e.stopImmediatePropagation(); pumpRelease()}},true);
@@ -294,9 +365,9 @@ const onRoad=(x,y)=>ROADS.some(r=>x>=r.x&&x<=r.x+r.w&&y>=r.y&&y<=r.y+r.h)||STATI
 
 SCENES.fargo={ music:'fargo',
   w:FW, h:FH, bounds:R(0,0,FW,FH), bg:fargoBg,
-  get triggers(){ return fargo.onFoot?[]:FARGO_TRIGGERS },
+  get triggers(){ return fargo.onFoot?[]:[...FARGO_TRIGGERS,...LOCALS.map((l,i)=>({z:R(l.x-16,l.y-16,32,32), label:FARGO.askLocal, act:()=>askLocal(i)}))] },
   baseSolids:[...HOUSES, ...STATIONS.flatMap(s=>[s.store,s.island,R(s.sign.x+7,s.sign.y+14,4,4),R(s.person.x-3,s.person.y-3,6,4)]),
-    ...fargoTrees.map(([x,y])=>R(x-3,y-2,6,3)), R(TOWER.x-13,TOWER.y-4,26,5), R(WELCOME.x,WELCOME.y+10,24,6)],
+    ...fargoTrees.map(([x,y])=>R(x-3,y-2,6,3)), R(TOWER.x-13,TOWER.y-4,26,5), R(WELCOME.x,WELCOME.y+10,24,6), R(THEATRE.x,THEATRE.y+8,THEATRE.w,THEATRE.h-10), R(DOME.x+2,DOME.y+14,DOME.w-4,DOME.h-16), R(BISON.x+2,BISON.y+8,BISON.w-4,6), ...LOCALS.map(l=>R(l.x-3,l.y-3,6,4))],
   get solids(){ if(!fargo.onFoot||!fargo.car)return this.baseSolids; const c=fargo.car, a=fargo.alex;
     return [...this.baseSolids, c.dir==='up'||c.dir==='down'?R(c.x-6,c.y-11,12,22):R(c.x-11,c.y-6,22,12), ...(a?[R(a.x-3,a.y-3,6,4)]:[]), ...(fargo.jackie?[R(fargo.jackie.x-3,fargo.jackie.y-3,6,4)]:[])] },
   entries:{start:{x:20,y:180,dir:'right'}, fromHighway:{x:20,y:180,dir:'right'}},
@@ -329,7 +400,8 @@ SCENES.fargo={ music:'fargo',
   drawPlayer:(x,y)=>fargo.onFoot?drawPlayer(x,y):drawCar(x,y),
   ents(list){
     fargoTrees.forEach(([x,y])=>list.push({y,draw:()=>ctx.drawImage(pineSprite,x-6,y-17)}));
-    list.push({y:TOWER.y,draw:drawWaterTower});
+    list.push({y:TOWER.y,draw:drawWaterTower},{y:THEATRE.y+THEATRE.h,draw:drawTheatreSign});
+    LOCALS.forEach((l,i)=>list.push({y:l.y,draw:()=>drawLocal(l.x,l.y,l.look,fargo.clues&&fargo.clues[i])}));
     EXIT_SIGNS.forEach(e=>list.push({y:e.y+18,draw:()=>drawExitSign(e)}));
     STATIONS.forEach((s,i)=>list.push({y:s.person.y,draw:()=>i===fargo.bob?drawBob(s.person.x,s.person.y):drawAttendant(s.person.x,s.person.y,i)}));
     const b=STATIONS[fargo.bob]; list.push({y:b.y+26,draw:()=>drawBike(b.x+43,b.y+12)});
@@ -352,7 +424,8 @@ SCENES.fargo={ music:'fargo',
     const gauge=[...Array(bars)].map((_,i)=>`<i class="${i<on?'on fuel':''}"></i>`).join('');
     const seen=STATIONS.filter(s=>s.seen).map(s=>s.price).sort();
     const best=seen[0], found=best===CHEAPEST;
-    return `<span class="pips" title="Fuel">${fargo.fuel<=0?'EMPTY':'Fuel'} ${gauge}</span><span>${found?'Found $2.79! Pull in':FARGO.hudGoal+(best?' · best so far $'+best:'')}</span>`;
+    const n=(fargo.clues||[]).filter(Boolean).length;
+    return `<span class="pips" title="Fuel">${fargo.fuel<=0?'EMPTY':'Fuel'} ${gauge}</span><span>${found?'Found $2.79! Pull in':FARGO.hudGoal+(n?` · ${n}/3 clues`:' · ask the locals')}</span>`;
   },
 };
 fargoNewRun();
