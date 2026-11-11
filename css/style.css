@@ -457,3 +457,23 @@ h1::before,h1::after{content:'✦';color:var(--berry);font-size:.6em;vertical-al
 #pumpSale b.spin{color:#ffd84d;animation:reelBlink .25s steps(2) infinite}
 #pumpSale b.set{color:#7dff8a}
 @keyframes reelBlink{50%{opacity:.6}}
+
+/* ---------- a bigger game window ----------
+   On wide screens the title and basket share one line above the game, and the hint and buttons share one line below,
+   so the game gets almost all of the window's height. Full screen (the ⛶ button) uses the whole display. */
+.resetrow{align-items:center;flex-wrap:wrap}
+.resetrow .hint{margin-right:auto}
+@media (min-width:900px) and (min-height:520px){
+  .app{max-width:min(calc(100vw - 32px),max(340px,calc((100svh - 128px)*4/3)))}
+  header{flex-direction:row;justify-content:space-between;align-items:center;gap:12px}
+  h1{text-align:left;font-size:1.35rem}
+  .basket{flex:0 1 auto}
+  body{padding-block:8px}
+  .app{gap:8px}
+  .app:has(#crewbar:not([hidden])){max-width:min(calc(100vw - 32px),max(340px,calc((100svh - 186px)*4/3)))}   /* (room for the heist crew buttons) */
+}
+@media (max-width:899px){ .resetrow{justify-content:center} .resetrow .hint{width:100%;margin:0 0 4px;text-align:center} }
+/* full screen: no page around the game, it fills the display */
+:fullscreen body,body:fullscreen{padding:6px 12px}
+:fullscreen .app,.app:fullscreen{max-width:min(calc(100vw - 24px),calc((100vh - 112px)*4/3))}
+:fullscreen .app:has(#crewbar:not([hidden])){max-width:min(calc(100vw - 24px),calc((100vh - 170px)*4/3))}

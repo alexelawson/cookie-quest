@@ -88,6 +88,12 @@ $('settingsBtn').onclick=openSettings; $('settingsClose').onclick=closeSettings;
 // change outfit any time: on the rooftops it's the stealth outfit, everywhere else it's Joe's everyday look
 $('setOutfit').textContent=WARDROBE.changeOutfit;
 $('setOutfit').onclick=()=>{ $('settings').hidden=true; openWardrobe(()=>{ paused=overlayOpen() },scene===SCENES.city?'heist':'look',true) };
+// the full-screen button: shown only where the browser allows it
+{const fb=$('fullBtn'), can=document.fullscreenEnabled||document.webkitFullscreenEnabled;
+  if(can){ fb.hidden=false;
+    fb.onclick=()=>{ const d=document, el=d.documentElement; if(d.fullscreenElement||d.webkitFullscreenElement)(d.exitFullscreen||d.webkitExitFullscreen).call(d); else (el.requestFullscreen||el.webkitRequestFullscreen).call(el).catch?.(()=>{fb.hidden=true}) };
+    const sync=()=>{ fb.textContent=(document.fullscreenElement||document.webkitFullscreenElement)?'⛶ Exit full screen':'⛶ Full screen' };
+    document.addEventListener('fullscreenchange',sync); document.addEventListener('webkitfullscreenchange',sync) }}
 function start(){$('titlecard').hidden=true; paused=false; audioInit(); sceneMusic(); if(!have.welcomed)welcome()}
 // the first time you press Start: Alex explains everything, then you pick Joe's look
 function welcome(){

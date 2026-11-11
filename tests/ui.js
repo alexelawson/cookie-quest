@@ -11,12 +11,12 @@ let r=await p.evaluate(async()=>{ await document.fonts.ready;
   const box=id=>document.querySelector(id).getBoundingClientRect();
   const s=box('.screen'), bk=box('#basket'), h=box('h1');
   const tc=$('titleArt').getContext('2d').getImageData(0,0,128,96).data; let colors=new Set(); for(let i=0;i<tc.length;i+=4*7)colors.add(tc[i]+','+tc[i+1]+','+tc[i+2]);
-  return {pix:document.fonts.check('16px "Pixelify Sans"'), body:document.fonts.check('16px Nunito'), bottom:s.bottom, mid:s.left+s.width/2, bmid:bk.left+bk.width/2, hmid:h.left+h.width/2, colors:colors.size,
+  return {pix:document.fonts.check('16px "Pixelify Sans"'), body:document.fonts.check('16px Nunito'), bottom:s.bottom, mid:s.left+s.width/2, bmid:bk.left+bk.width/2, hmid:h.left+h.width/2, sw:s.width, sl:s.left, sr:s.right, hl:h.left, br:bk.right, noScroll:document.documentElement.scrollHeight<=innerHeight, colors:colors.size,
     google:[...document.querySelectorAll('link')].some(l=>/googleapis/.test(l.href))};
 });
 ok('A both fonts are embedded and load with no internet',r.pix&&r.body&&!r.google,JSON.stringify(r));
 ok('A the game window fits on a 1280x800 laptop screen',r.bottom<=800,'bottom '+r.bottom);
-ok('A title, basket and game share one center line',Math.abs(r.mid-r.bmid)<2&&Math.abs(r.mid-r.hmid)<2,`${r.mid} ${r.bmid} ${r.hmid}`);
+ok('A big game window: title and basket on one line above it (lined up with its edges), ~900px wide on a 1280x800 laptop, no scrolling',r.sw>=880&&Math.abs(r.hl-r.sl)<16&&Math.abs(r.br-r.sr)<16&&r.noScroll,JSON.stringify({w:r.sw,sl:r.sl,hl:r.hl,sr:r.sr,br:r.br}));
 ok('B the title screen draws the snowy night (lots of colors, so Joe, Grp, the kitchen and the tree are there)',r.colors>25,r.colors+' colors');
 await p.mouse.click(5,5); await p.waitForTimeout(100); r=await p.evaluate(()=>song);
 ok('B the title screen has its own music once you tap anything',r==='title',String(r));
