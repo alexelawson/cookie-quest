@@ -11,5 +11,6 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: 20 }
       - run: npm install --no-audit --no-fund
-      - run: npx playwright install --with-deps chromium
+      # (Ubuntu's package servers sometimes hiccup: try twice, then fall back to the browser alone; the runner already has what it needs)
+      - run: npx playwright install --with-deps chromium || (sleep 30 && npx playwright install --with-deps chromium) || npx playwright install chromium
       - run: npm test
