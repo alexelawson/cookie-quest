@@ -118,13 +118,9 @@ const HEIST = {
   gridNext:"Nice. One more, a little harder.",
   onlyJoe:"Only Joe has the gadget from Alex.",
   defuseCall:"Clutch defuse.",
-  stackUp:"Everybody on the yellow squares by the hatch first. {n} of 3 here.",
-  breach:"Everyone stacked? Breaching.",
   rounds:[{title:"ROUND 1", name:"The lab roof"},{title:"ROUND 2", name:"The searchlights"},{title:"ROUND 3", name:"The fire escape"}],
   roundWon:"ROUND WON",
-  lasersDone:"*click* Lasers off. Everybody to the fire escape hatch. Watch out for the guard.",
-  grate:"Pry open the fire escape hatch",
-  grateDone:"Hatch is open. Fire escape goes right down to him.",
+  lasersDone:"*click* Lasers off.",
   dropIn:"Climb down the fire escape",
   spottedLight:"A searchlight catches {who}!",
   spottedGuard:"\"Hey! Who's up there?!\"",
@@ -140,9 +136,7 @@ const HEIST = {
   villainNote:"Fine. Keep your chocolate. Why so salty?",   // the gingerbread Confectioner says this
   // the showdown at the bottom of the fire escape: the Confectioner dodges, you zap him three times with Doc Alex's gadget.
   bossIntro:[['The Confectioner',"Well, well, well. Uninvited guests."],['The Confectioner',"You want my chocolate? Over my dead dessert."],['John',"Joe. The gadget."]],
-  bossTitle:"The Confectioner",
-  bossHold:"He's dodging! Tap ZAP (or A) when he's in the crosshair. Three hits.",
-  bossBtn:"ZAP!",
+  bossHold:"Get right under him. When the line turns red, press A to zap. Three hits.",
   bossTaunts:["My HAT! It's... crunchy?!","Not the mustache! It's ICING now!","No... NO... not the sprinkles setting!"],   // after hit 1, hit 2 (the third hit starts the transformation)
   bossMiss:["Missed me!","Too slow, cookie boy!","Over here! Ha!","Is that a hair dryer? How adorable."],
   bossZap:"*ZAP!*",

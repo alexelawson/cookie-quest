@@ -394,12 +394,6 @@ h1::before,h1::after{content:'✦';color:var(--berry);font-size:.6em;vertical-al
 @media (max-width:520px){.titlecard p{display:none} .btn.big{font-size:1.05rem;padding:7px 24px}}
 @media (prefers-reduced-motion:reduce){.btn.pulse,.basket.wiggle{animation:none}}
 /* the Confectioner showdown */
-.bosscard{width:min(100%,360px);gap:6px}
-#bossArt{width:100%;height:auto;aspect-ratio:2/1;image-rendering:pixelated;image-rendering:crisp-edges;border-radius:6px;border:2px solid var(--darkLine)}
-#bossMsg{min-height:2.6em;font-size:.9rem!important;display:flex;align-items:center;justify-content:center}
-.bossbar{width:100%;height:12px;background:#11141f;border:2px solid var(--darkLine);border-radius:6px;overflow:hidden}
-.bossbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#5fd3ff,#ffffff);box-shadow:0 0 8px #7fe8ff}
-#bossBtn{touch-action:none;user-select:none;-webkit-user-select:none}
 /* item cards (gear and keepsakes) */
 .iart{background:radial-gradient(circle,rgba(239,195,90,.45),rgba(239,195,90,0) 70%);padding:6px 16px;border-radius:12px;animation:bob 1.4s ease-in-out infinite}
 .iart canvas{width:160px;height:120px;image-rendering:pixelated;image-rendering:crisp-edges;display:block}

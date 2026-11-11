@@ -4,7 +4,8 @@
 //   Lars = sprint (fast enough to dash between cover under the searchlights)
 //   John = lift (carries the log, rips off the grate)
 // Route: roof A (a log blocks the way to Doc Alex's rooftop lab: John lifts it and carries it; the briefing; then the log bridges the gap) -> roof B (searchlights; Lars
-//        hops cover to cover to the LIGHT POWER switch) -> roof C (a guard + a laser maze around the skylight) -> the Confectioner -> his riddle (the vault).
+//        hops cover to cover to the LIGHT POWER switch) -> roof C (a guard + a laser maze around the skylight) -> the Confectioner (right there on the roof) -> his riddle (the vault)
+//        -> the fire escape (it shows up with a blinking EXIT sign) -> Lars's anagrams.
 const CW=520, CH=200;
 const ROOF_A=R(6,30,112,156), ROOF_B=R(150,20,170,166), ROOF_C=R(352,26,160,160);
 const BEAM_SLOT=R(116,96,36,12);          // where the log bridges A -> B
@@ -14,7 +15,6 @@ const KEY_SPOT={x:230,y:176};             // the gate key, on a hook under a par
 const gateOpen=()=>!!have.plankGate||heistStage()>=2;
 const LIGHTS_OUT_MS=20000;                 // Lars's switch only kills the searchlights for this long; they stay off once the whole crew is on roof C
 const DEFUSE_MS=4000;                      // hold A this long at the laser panel (it keeps half if you let go past halfway)
-const STACK=R(448,52,52,22);               // the whole crew stands here before John opens the fire escape hatch
 const LOOSE_BEAM=R(41,117,34,7);          // the log, wedged between the water tank and the vents: it blocks the only way to Doc Alex until John lifts it
 // roof A: a water tank and a bank of vents split the roof; the only way through is a narrow gap between them
 const TANK=R(6,112,40,18), VENTS=R(70,112,48,14);
@@ -343,25 +343,26 @@ function drawBeam(){
   for(let x=s.x;x<s.x+s.w;x+=6){ctx.fillRect(x,s.y+2,3,1); ctx.fillRect(x,s.y+9,3,1)} ctx.fillRect(s.x,s.y+2,1,8); ctx.fillRect(s.x+s.w-1,s.y+2,1,8);
 }
 function drawCarriedLog(c){ if(!heist.carry||c.id!=='john')return; logV(Math.round(c.x)+3,Math.round(c.y)-32,30) }   // up on John's shoulder
-// the fire escape hatch on roof C (where the skylight was): a red steel lid with hazard stripes and a FIRE ESCAPE plate.
-// John pries it open (round 3), then everyone climbs down the fire escape ladder to the Confectioner.
-const HATCH_SPOTS=[[458,64],[474,66],[490,64]];   // where the three of them stand ("stack up") before John opens it
+// the fire escape on roof C (where the skylight was). It isn't there until the Confectioner's riddle is solved; then it pops up
+// all at once (a flash, a clank) with a blinking green EXIT sign, and walking up to it starts Lars's anagrams.
+function showFireEscape(){ have.heistStage=4; save(); heist.exitPop=700; sfx('thud'); }
 function drawGrate(){
-  const S=SKYLIGHT, F=(c,x,y,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,h)}, st=heistStage();
-  F('#2a2e3c',S.x-1,S.y-1,S.w+2,S.h+2);                                                     // the frame
-  if(st>=3){ F('#0b0c12',S.x,S.y,S.w,S.h); for(let y=S.y+2;y<S.y+S.h;y+=3)F('#8b93a3',S.x+4,y,S.w-8,1); F('#8b93a3',S.x+3,S.y,1,S.h); F('#8b93a3',S.x+S.w-4,S.y,1,S.h);   // open: the ladder going down
-    F('#a8322a',S.x+S.w+3,S.y+4,12,14); F('#c8443a',S.x+S.w+3,S.y+4,12,1); F('#1d1d22',S.x+S.w+3,S.y+17,12,1) }                          // the lid, tossed aside
-  else { F('#a8322a',S.x,S.y,S.w,S.h); F('#c8443a',S.x,S.y,S.w,1);
-    for(let x=S.x-S.h;x<S.x+S.w;x+=6)for(let k=0;k<S.h;k++){const px=x+k; if(px>=S.x&&px<S.x+S.w&&k<S.h)F('#f4d35e',px,S.y+S.h-1-k,1,1); if(px+1>=S.x&&px+1<S.x+S.w)F('#f4d35e',px+1,S.y+S.h-1-k,1,1)}   // hazard stripes
-    F('#5f6676',S.x+S.w/2-4,S.y+S.h/2-1,8,3); F('#c9ced4',S.x+S.w/2-3,S.y+S.h/2-1,6,1) }   // the handle
-  const pw=textW('EXIT')+4; F('#e8e2d6',S.x-pw-4,S.y+4,pw+2,9); F('#2b8a4a',S.x-pw-3,S.y+5,pw,7); pixText(ctx,'EXIT',S.x-pw-1,S.y+6,'#ffffff');   // a green EXIT plate beside it
+  if(heistStage()<4)return;
+  const S=SKYLIGHT, F=(c,x,y,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,h)};
+  F('#2a2e3c',S.x-1,S.y-1,S.w+2,S.h+2); F('#0b0c12',S.x,S.y,S.w,S.h);                                       // the hatch, open
+  for(let y=S.y+2;y<S.y+S.h;y+=3)F('#8b93a3',S.x+4,y,S.w-8,1); F('#8b93a3',S.x+3,S.y,1,S.h); F('#8b93a3',S.x+S.w-4,S.y,1,S.h);   // the ladder going down
+  F('#5f6676',S.x-2,S.y-8,1,8); F('#5f6676',S.x+S.w+1,S.y-8,1,8); F('#8b93a3',S.x-2,S.y-8,S.w+4,1);          // the railing
+  F('#a8322a',S.x+S.w+3,S.y+4,12,14); F('#c8443a',S.x+S.w+3,S.y+4,12,1); F('#1d1d22',S.x+S.w+3,S.y+17,12,1); // the red lid, tossed aside
 }
-// lasers off: yellow squares show where everybody stands, and an arrow points at the hatch (drawn on top of the dark)
-function drawHatchGuide(){
-  if(heistStage()!==2||!lasersOff())return; const S=SKYLIGHT, F=(c,x,y,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,h)};
-  for(const [x,y] of HATCH_SPOTS){ const on=crewPositions().some(c=>Math.abs(c.x-x)<6&&Math.abs(c.y-y)<5), col=on?'#7fd39a':'#f4d35e';
-    if(on||Math.floor(time/400)%2){F(col,x-5,y-3,10,1); F(col,x-5,y+2,10,1); F(col,x-5,y-3,1,6); F(col,x+4,y-3,1,6)} }
-  drawExitMark({x:S.x+S.w+3,y:S.y+8,dir:'left',text:'GO'});
+// the EXIT sign (over the dark, so it glows) and the pop when it first appears
+function drawFireEscapeSign(){
+  if(heistStage()<4)return;
+  const S=SKYLIGHT, F=(c,x,y,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,h)}, on=Math.floor(time/450)%2===0, w=textW('EXIT')+6, x=512-w-1, y=S.y-9;
+  F('#5f6676',x+w/2-1,y+10,2,4);                                                                             // its post (beside the hatch, clear of the neon sign)
+  if(on){ F('rgba(80,255,140,.18)',x-4,y-4,w+8,17); F('rgba(80,255,140,.12)',x-8,y-7,w+16,23) }              // the glow
+  F('#e8e2d6',x-1,y-1,w+2,11); F(on?'#2fbf5a':'#1d5a32',x,y,w,9); pixText(ctx,'EXIT',x+3,y+2,on?'#ffffff':'#9fc8aa');
+  if(heist.exitPop>0){ const k=heist.exitPop/700, r=Math.round((1-k)*40)+6; ctx.strokeStyle=`rgba(255,255,255,${k})`; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(S.x+S.w/2,S.y+S.h/2,r,0,Math.PI*2); ctx.stroke();
+    ctx.fillStyle=`rgba(255,255,255,${k*.5})`; const tf=ctx.getTransform(); ctx.fillRect(-tf.e,-tf.f,VW,VH) }
 }
 
 // ---------- crew control ----------
@@ -404,7 +405,7 @@ function useSkill(){
   if(id==='lars'&&heist.sprintCd<=0){sfx('whoosh'); heist.sprintT=800; heist.sprintCd=1100}
   if(id==='john')flashPrompt(heist.carry?HEIST.johnHolding:'Nothing heavy here.')
 }
-function flashPrompt(text){prompt.textContent=text; prompt.hidden=false; heist.promptT=1400}
+function flashPrompt(text,ms){prompt.textContent=text; prompt.hidden=false; heist.promptT=ms||1400}
 
 // ---------- hazards ----------
 function lightPosAt(L,t){ const a=t*L.speed/60+L.phase;
@@ -433,7 +434,7 @@ function checkHazards(){
     if(lightsOn()&&!inCover(p.x,p.y)) for(const L of LIGHTS){const l=lightPos(L); if(Math.hypot(p.x-l.x,p.y-7-l.y)<LIGHT_R-2)return {msg:HEIST.spottedLight, who:p.id}}
     // guard's flashlight cone (he faces the way he's walking)
     const gx=GUARD.x, gy=heist.guardY-6, along=(p.y-3-gy)*heist.guardDir, perp=Math.abs(p.x-gx);
-    if(heist.guardWait<=0&&along>0&&along<62&&perp<along*.5+3)return {msg:HEIST.spottedGuard, who:p.id};
+    if(heistStage()<3&&heist.guardWait<=0&&along>0&&along<62&&perp<along*.5+3)return {msg:HEIST.spottedGuard, who:p.id};
     const box=R(p.x-3,p.y-3,6,4);
     if(heistStage()<4&&!lasersOff())for(const [x1,y1,x2,y2] of laserSegs())if(segHitsBox(x1,y1,x2,y2,box))return {msg:HEIST.spottedLaser, who:p.id};
   }
@@ -594,16 +595,10 @@ function startDefuse(){
 }
 function defuseTick(){}
 function drawDefuse(){}
-function lasersOffNow(){ have.lasersOff=true; save(); sfx('chunk'); say([[HEIST.crew.hero,HEIST.lasersDone],['Lars',HEIST.defuseCall]]) }
+function lasersOffNow(){ have.lasersOff=true; have.heistStage=3; save(); sfx('chunk'); say([[HEIST.crew.hero,HEIST.lasersDone],['Lars',HEIST.defuseCall]],()=>openBoss()) }   // ...and the Confectioner shows up (confectioner.js)
 function drawLaserPanel(){ const p=LASER_PANEL, F=(c,x,y,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,h)}, off=lasersOff();
   F('rgba(0,0,0,.4)',p.x+1,p.y+p.h,p.w,2); F('#5f6676',p.x,p.y,p.w,p.h); F('#8b93a3',p.x,p.y,p.w,1);
   F('#1d2130',p.x+2,p.y+2,8,4); F(off?'#3fbf5a':(Math.floor(time/300)%2?'#ff3b4a':'#8a1f28'),p.x+3,p.y+3,2,2); F(off?'#2a3a2a':'#c9ced4',p.x+7,p.y+3,2,2) }
-const stacked=()=>crewPositions().filter(c=>hit(R(c.x-4,c.y-3,8,4),STACK)).length;
-function ripGrate(){
-  if(lead().id!=='john')return flashPrompt(HEIST.onlyJohn);
-  const n=stacked(); if(n<3)return say([['John',HEIST.stackUp.replace('{n}',n)]]);
-  have.heistStage=3; save(); sfx('thud'); say([['John',HEIST.breach],['John',HEIST.grateDone]],()=>roundWon(3));
-}
 // round banners: ROUND 1 / 2 / 3 when you get there, ROUND WON when you clear one
 const banner={q:[],t:0};
 function showBanner(title,sub){ banner.q.push([title,sub||'']); if(banner.t<=0)nextBanner() }
@@ -639,8 +634,8 @@ function vaultHint(){ $('vaultHint').hidden=true; $('vaultHintText').hidden=fals
 function pickCrate(i){
   if(!vault.open)return;
   if(i!==vault.choc){ sfx('bad'); $('vault').hidden=true; say(HEIST.raisins,()=>{ $('vault').hidden=false; paused=true }); return }
-  vault.open=false; $('vault').hidden=true; have.heistStage=4; save(); sfx('fanfare');
-  say([['',HEIST.gotIt],['The Confectioner',HEIST.villainNote,'Gingerbread Confectioner'],...HEIST.finale,...HEIST.larsChallenge],()=>openLarsMenu());
+  vault.open=false; $('vault').hidden=true; sfx('fanfare');
+  say([['',HEIST.gotIt],['The Confectioner',HEIST.villainNote,'Gingerbread Confectioner'],...HEIST.finale],showFireEscape);
 }
 $('vaultHint').onclick=vaultHint; [0,1,2].forEach(i=>$('crate'+i).onclick=()=>pickCrate(i));
 
@@ -661,8 +656,8 @@ function heistTrigger(){
   if(!gateOpen()&&hit(feet,R(PLANK_GATE.x-12,PLANK_GATE.y-2,PLANK_GATE.w+24,PLANK_GATE.h+4)))return {label:heist.keyHolder===lead().id?HEIST.gateUnlock:HEIST.gateCheck, act:checkGate};
   if(st===1&&!gateOpen()&&!heist.keyHolder&&!lightsOn()&&Math.hypot(P.x-KEY_SPOT.x,P.y-KEY_SPOT.y)<12)return {label:HEIST.grabKey, act:grabKey};
   if(st>=2&&st<4&&!lasersOff()&&hit(feet,R(LASER_PANEL.x-4,LASER_PANEL.y,LASER_PANEL.w+6,16)))return {label:HEIST.defuseLabel, act:startDefuse};
-  if(st===2&&hit(feet,R(SKYLIGHT.x-4,SKYLIGHT.y+SKYLIGHT.h,SKYLIGHT.w+8,12)))return {label:HEIST.grate+' ('+stacked()+'/3 stacked)', act:ripGrate};
-  if(st===3&&hit(feet,R(SKYLIGHT.x-4,SKYLIGHT.y+SKYLIGHT.h,SKYLIGHT.w+8,12)))return {label:HEIST.dropIn, act:()=>have.confectionerBeat?openVault():openBoss()};   // the Confectioner first (confectioner.js), then his riddle
+  if(st===3&&have.confectionerBeat&&!boss.on&&Math.hypot(P.x-(have.gingerX||460),P.y-AIM.Y)<18)return {label:'Talk to the Confectioner', btn:'Talk', act:openVault};   // (if his riddle got closed: he's still there)
+  if(st===4&&hit(feet,R(SKYLIGHT.x-4,SKYLIGHT.y+SKYLIGHT.h,SKYLIGHT.w+8,12)))return {label:HEIST.dropIn, act:()=>say(HEIST.larsChallenge,()=>openLarsMenu())};   // the fire escape: Lars wants his anagrams first
   return null;
 }
 
@@ -696,32 +691,35 @@ SCENES.city={ music:'heist',
   entries:{start:{x:40,y:156,dir:'up'}, fromStreet:{x:40,y:156,dir:'up'}},
   enter(){
     heist.lead=0; heist.follow=true; heist.hinted={}; heist.howToShown=false; heist.keyHolder=null; heist.sonarT=0; heist.sprintT=0; heist.marked=false;
+    boss.on=false; boss.parts=[]; boss.shots=[]; heist.exitPop=0;
     placeAtCheckpoint(); $('crewbar').hidden=false; buildCrewBar(); banner.q=[]; banner.t=0; $('roundBanner').hidden=true;
     if(heistStage()<3)roundStart(heistStage()+1);   // (Doc Alex waits at her lab bench: walk up to her for the briefing)
   },
   leave(){ $('crewbar').hidden=true; banner.q=[]; banner.t=0; $('roundBanner').hidden=true },
   speed:()=>heist.sprintT>0?.19:(lead().id==='lars'?.09:lead().id==='john'&&heist.carry?.06:.07),
   dynTrigger:()=>heistTrigger(),
-  ability:()=>useSkill(),
+  ability:()=>boss.on?bossFire():useSkill(),
   key(code){ const i={Digit1:0,Digit2:1,Digit3:2}[code]; if(i!=null){switchTo(i);return true} if(code==='KeyF'){toggleFollow();return true} return false },
-  abilityLabel:()=>HEIST.skills[lead().id],
+  abilityLabel:()=>boss.on&&boss.phase==='fight'?'Zap':HEIST.skills[lead().id],
   ambient(dt){
     anaTick(dt); jumpTick(dt); bannerTick(dt); if(heist.annoyT>0&&!heist.jump)heist.annoyT-=dt; if(heist.dazeT>0)heist.dazeT-=dt;
     for(const r of cityRain){r.y+=dt*.32;r.x-=dt*.08;if(r.y>CH){r.y=-4;r.x=Math.random()*(CW+40)}}
     for(const c of cars){c.y+=c.v*dt; if(c.y>CH+6)c.y=-6; if(c.y<-6)c.y=CH+6}
     nextFlash-=dt; if(nextFlash<=0){flashT=140; nextFlash=8000+Math.random()*9000} if(flashT>0)flashT-=dt;
-    for(const k of ['sonarT','sonarCd','sprintT','sprintCd','flashT','promptT'])if(heist[k]>0)heist[k]-=dt;
+    for(const k of ['sonarT','sonarCd','sprintT','sprintCd','flashT','promptT','exitPop'])if(heist[k]>0)heist[k]-=dt;
     if(heist.promptT<=0&&heist.promptT>-999){heist.promptT=-999; if(near)prompt.textContent=near.label; else prompt.hidden=true}
   },
   update(dt){
     if(!have.heistHowTo&&!heist.howToShown){ heist.howToShown=true; return openHowTo() }   // how to play, right as you arrive
     if(heist.outfitReact){heist.outfitReact=false; const r=WARDROBE.react[have.outfit]; if(r)return say(r)}
+    bossTick(dt);
+    if(confWaiting()&&!boss.on&&P.x>416&&dlg.hidden)return openBoss();   // (back after a reload)
     if(heistStage()>=4)return;
     // guard patrol: walks up and down, pauses at each end (flashlight off while he turns)
-    if(heist.guardWait>0)heist.guardWait-=dt;
-    else{heist.guardY+=heist.guardDir*GUARD.speed*dt;
-      if(heist.guardY>GUARD.y1){heist.guardY=GUARD.y1;heist.guardDir=-1;heist.guardWait=900}
-      if(heist.guardY<GUARD.y0){heist.guardY=GUARD.y0;heist.guardDir=1;heist.guardWait=900}}
+    if(heistStage()<3){ if(heist.guardWait>0)heist.guardWait-=dt;
+      else{heist.guardY+=heist.guardDir*GUARD.speed*dt;
+        if(heist.guardY>GUARD.y1){heist.guardY=GUARD.y1;heist.guardDir=-1;heist.guardWait=900}
+        if(heist.guardY<GUARD.y0){heist.guardY=GUARD.y0;heist.guardDir=1;heist.guardWait=900}}}
     moveFollowers(dt); lightsTick(dt); if(!dlg.hidden)return; defuseTick(dt);
     const hz=checkHazards(); if(hz)return caught(hz);
     // a few one-time hints as you reach each part
@@ -740,7 +738,8 @@ SCENES.city={ music:'heist',
   ents(list){
     heist.crew.forEach((c,i)=>{if(i!==heist.lead)list.push({y:c.y,draw:()=>{crewSprite(c); drawCarriedLog(c); drawHeldKey(c); drawHeldLeverBit(c)}})});
     list.push({y:STRANGER.y,draw:drawStranger});
-    if(heistStage()<4)list.push({y:heist.guardY,draw:drawGuard});
+    if(heistStage()<3)list.push({y:heist.guardY,draw:drawGuard});   // (he's gone once the lasers are off: the Confectioner shows up himself)
+    bossEnts(list);
   },
   over(){ drawJumpEmotes(); drawDefuse();
     const st=heistStage();
@@ -752,7 +751,7 @@ SCENES.city={ music:'heist',
       const gr=ctx.createRadialGradient(l.x,l.y,2,l.x,l.y,LIGHT_R+2); gr.addColorStop(0,'rgba(255,248,210,.6)'); gr.addColorStop(.75,'rgba(255,244,190,.32)'); gr.addColorStop(1,'rgba(255,244,190,0)');
       ctx.fillStyle=gr; ctx.beginPath(); ctx.ellipse(l.x,l.y,LIGHT_R+2,LIGHT_R+2,0,0,Math.PI*2); ctx.fill()}
     // guard flashlight cone
-    if(st<4&&heist.guardWait<=0){const gy=heist.guardY-6, d=heist.guardDir; ctx.fillStyle='rgba(255,236,150,.22)'; ctx.beginPath(); ctx.moveTo(GUARD.x,gy);
+    if(st<3&&heist.guardWait<=0){const gy=heist.guardY-6, d=heist.guardDir; ctx.fillStyle='rgba(255,236,150,.22)'; ctx.beginPath(); ctx.moveTo(GUARD.x,gy);
       ctx.lineTo(GUARD.x-31,gy+62*d); ctx.lineTo(GUARD.x+31,gy+62*d); ctx.fill()}
     // lasers: the visible ones always (with a flicker warning before the blinking row comes back on); the invisible ones only with sonar (then chalk-marked)
     const reveal=heist.sonarT>0?Math.min(1,heist.sonarT/600):0;
@@ -771,7 +770,9 @@ SCENES.city={ music:'heist',
     const hole=(x,y,r)=>{const gr=m.createRadialGradient(x-cx,y-cy,2,x-cx,y-cy,r); gr.addColorStop(0,'rgba(0,0,0,1)'); gr.addColorStop(1,'rgba(0,0,0,0)'); m.fillStyle=gr; m.fillRect(x-cx-r,y-cy-r,r*2,r*2)};
     for(const c of crewPositions())hole(c.x,c.y-8,34);
     if(lightsOn())for(const L of LIGHTS){const l=lightPos(L); hole(l.x,l.y,24)}
-    if(st<4)hole(GUARD.x,heist.guardY-6,26);
+    if(st<3)hole(GUARD.x,heist.guardY-6,26);
+    if(boss.on||st===3||st===4)hole(boss.on?boss.x:have.gingerX||460,AIM.Y-12,32);   // light on the Confectioner
+    if(st>=4)hole(SKYLIGHT.x+SKYLIGHT.w/2,SKYLIGHT.y,30);
     hole(STRANGER.x,STRANGER.y-8,24); hole(LAB.bench.x+16,LAB.bench.y,22);   // Doc Alex's lab glows
     if(st<4&&!lasersOff()){hole((BLINK.x1+BLINK.x2)/2,BLINK.y,22); hole(sliderGap(time)+8,SLIDER.y,20)}
     hole(LASER_PANEL.x+6,LASER_PANEL.y+4,14);
@@ -798,11 +799,11 @@ SCENES.city={ music:'heist',
     // crew on Hold get a little WAIT tag over their heads, so you can see who's staying put
     if(!heist.follow&&st<4)for(const c of heist.crew){ if(c===lead())continue; const w=textW('WAIT')+4, x=Math.round(c.x-w/2), y=Math.round(c.y-(c.id==='lars'?37:33));
       ctx.fillStyle='#1d2130'; ctx.fillRect(x,y,w,7); ctx.fillStyle='#f4d35e'; ctx.fillRect(x,y+7,w,1); ctx.fillRect(x+w/2-1|0,y+8,2,1); pixText(ctx,'WAIT',x+2,y+1,'#f4d35e') }
-    drawHatchGuide();
+    drawFireEscapeSign(); bossOver();
     if(heist.caughtWho){const c=heist.crew.find(c=>c.id===heist.caughtWho); if(c){ctx.fillStyle='#ff4a4a'; ctx.fillRect(c.x-1,c.y-34,3,7); ctx.fillRect(c.x-1,c.y-25,3,2)}}
   },
-  hud(){ const st=heistStage(); const steps=['Bridge the gap','Kill the lights, get everyone across',(lasersOff()?'Everybody to the fire escape hatch':'Shut off the lasers'),'Crack the vault','Beat Lars at anagrams','Done!'];
+  hud(){ const st=heistStage(); const steps=['Bridge the gap','Kill the lights, get everyone across','Shut off the lasers','Crack his riddle','Head for the fire escape','Done!'];
     if(st===1&&heist.lightsOutT>0)return `<span>Lights back in 0:${String(Math.ceil(heist.lightsOutT/1000)).padStart(2,'0')}</span>`;
-    if(st===3&&!have.confectionerBeat)return '<span>Climb down the fire escape. Beat the Confectioner</span>';
+    if(st===3&&!have.confectionerBeat)return `<span>Zap the Confectioner ${'●'.repeat(boss.hits)}${'○'.repeat(3-boss.hits)}</span>`;
     return st>=5?'':`<span>${steps[st]}</span>` },
 };
