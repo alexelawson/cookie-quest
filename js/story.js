@@ -71,7 +71,7 @@ const HEIST = {
   // ...and where he lands, he finds something (only the first time): a bonus for the cookies
   jumpIceCream:[['Lars',"Wait. What's this?"],['Lars',"A pint of Rosemary Maple ice cream. In the gutter. Still frozen."],['John',"...Why is that up here."],['Lars',"Don't question the rooftops, John."]],
   beamLeave:"Leave it",
-  // the log is wedged: John can't just lift it. Build a lever: a cinder block (under the tarp, Joe's sonar finds it) + a long board (behind the vents, only Lars fits)
+  // the log is wedged: John can't just lift it. Build a lever: a cinder block (under the tarp, Joe's sonar finds it) + a long board (up on the vents, only Lars can climb up)
   leverTooHeavy:[['John',"Hngh... nope. It's wedged in there solid. Even I can't budge it."],['John',"We need leverage. Something long and strong to pry with, and something to rest it on."]],
   leverStatus:(block,board)=>`Lever: ${block?'block ✓':'something to rest it on'} · ${board?'board ✓':'something long'}`,
   tarpLabel:"Look under the tarp",
@@ -79,9 +79,9 @@ const HEIST = {
   tarpPing:"Ping your Sonar (A) right here to see what's under it.",
   tarpFound:"A cinder block! That's the perfect thing to rest a lever on.",
   takeBlock:"Pick up the cinder block",
-  boardLabel:"Reach for the board",
-  boardStuck:"There's a long board wedged behind the vents. Way too tight to reach. Lars is skinny enough.",
-  boardGot:[['Lars',"Got it. Long, flat and sturdy. Like me."],['John',"..."]],
+  boardLabel:"Get the board off the vents",
+  boardStuck:"There's a long board way up on top of the vents. Too high to reach from here. Lars is agile enough to climb up and get it.",
+  boardGot:[['Lars',"Hup! Up and over. Got it."],['John',"Show-off."]],
   setBlock:"Set the block by the log",
   setBoard:"Lay the board over the block",
   needBlockFirst:"It needs something to rest on first.",

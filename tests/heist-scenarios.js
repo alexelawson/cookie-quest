@@ -45,7 +45,7 @@ ok('A the log: Lift it / Leave it',r.joe.l==='Look at the log'&&r.joe.menu.join(
 ok('A nobody can just lift it: Joe and Lars can\'t, and John says it\'s wedged and they need leverage',r.joe.said.includes('Step aside Joe')&&r.lars.said.includes('forklift')&&r.john.said.includes('leverage')&&r.stuckLog,r.john.said);
 const L=r.lever;
 ok('A lever: Joe walks to the tarp, it tells him to ping his sonar there, and the sonar finds a cinder block he can carry',L.toTarp==='ok'&&L.tarpLbl==='Look under the tarp'&&L.beforePing.includes('Sonar')&&L.found.includes('cinder block')&&L.joeHasBlock,JSON.stringify(L).slice(0,400));
-ok('A lever: only Lars fits behind the vents to get the board',L.johnBoard==='ok'&&L.johnTry.includes('Lars is skinny')&&L.larsBoard==='ok'&&L.larsHasBoard,L.johnTry+' | '+L.larsGot);
+ok('A lever: only Lars can climb up the vents to get the board',L.johnBoard==='ok'&&L.johnTry.includes('Lars is agile')&&L.larsBoard==='ok'&&L.larsHasBoard,L.johnTry+' | '+L.larsGot);
 ok('A lever: the board needs the block under it first; block, then board',L.boardFirst.includes('rest on first')&&L.blockSet&&L.boardSet.includes('Physics'),L.boardFirst+' | '+L.boardSet);
 ok('A lever: then John pushes down, the log pops loose and he carries it',L.menu2.includes('John: push down on the lever')&&L.pop.includes('pops loose')&&L.pop.includes('right behind you')&&r.carrying,L.pop);
 ok('A John keeps carrying the log; you can switch back and walk to Doc Alex with him following',r.switched&&r.w==='ok'&&r.johnNear,r.w);

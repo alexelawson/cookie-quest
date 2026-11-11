@@ -461,7 +461,7 @@ function briefing(){
 }
 function hintOnce(key,who,text){ if(heist.hinted[key])return; heist.hinted[key]=true; say([[who,text]]) }
 // the log blocks the way. It's wedged, so John can't just lift it: build a lever first.
-//  1. Joe pings his sonar at the tarp and finds a cinder block (anyone can carry it)   2. Lars squeezes behind the vents for a long board
+//  1. Joe pings his sonar at the tarp and finds a cinder block (anyone can carry it)   2. Lars climbs up the vents for a long board
 //  3. set the block by the log, lay the board over it   4. John pushes down on the lever, the log pops loose, and he carries it from there
 const TARP={x:22,y:150}, BOARD={x:104,y:148}, LEVER={block:{x:80,y:126}};
 function leverState(){ return heist.lever||(heist.lever={known:false, found:false, block:'tarp', blockBy:null, board:'wedged', boardBy:null}) }
@@ -492,7 +492,7 @@ function drawLeverBits(){   // the tarp, the board behind the vents, and the lev
   // the tarp (lumpy until the block's out from under it)
   F('#2f5f9e',TARP.x-8,TARP.y-4,16,7); F('#3f72b4',TARP.x-7,TARP.y-4,14,1); if(L.block==='tarp'){F('#2a5590',TARP.x-4,TARP.y-6,8,3); F('#3f72b4',TARP.x-3,TARP.y-6,6,1)}
   if(L.found&&L.block==='tarp'){F('#8b93a3',TARP.x-3,TARP.y-5,6,4); F('#b9c1cb',TARP.x-3,TARP.y-5,6,1); F('#5f6676',TARP.x-1,TARP.y-4,2,2)}   // revealed by the sonar
-  // the board, sticking out from behind the vents
+  // the board, lying up on the vents
   if(L.board==='wedged'){F('#a8743f',BOARD.x-10,BOARD.y-3,20,3); F('#c98a4e',BOARD.x-10,BOARD.y-3,20,1); F('#6b4428',BOARD.x+9,BOARD.y-3,1,3)}
   // the lever by the log
   const b=LEVER.block; if(L.block==='placed'){F('#8b93a3',b.x-3,b.y-3,6,4); F('#b9c1cb',b.x-3,b.y-3,6,1); F('#5f6676',b.x-1,b.y-2,2,2)}
