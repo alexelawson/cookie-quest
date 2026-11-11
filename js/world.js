@@ -4,7 +4,7 @@ const WW=384, WH=288, VW=224, VH=168;
 const cv=document.getElementById('game'); let ctx=cv.getContext('2d'); ctx.imageSmoothingEnabled=false;   // (let: draw() points it at the sprite layer for a moment to outline sprites)
 const R=(x,y,w,h)=>({x,y,w,h});
 const REG={farm:R(0,0,164,144), mill:R(220,0,164,144), city:R(0,170,164,118), fargo:R(220,170,164,118)};
-const trees=[[172,30],[172,64],[214,228],[110,154],[270,154]];
+const trees=[[172,30],[172,64],[214,228],[270,154]];
 // snowy pines around the Birkie trailhead, dark pines in Wylee Woods (the disc golf entrance)
 const pines=[[228,14],[244,30],[262,12],[284,26],[232,52],[268,48],[290,62],[352,10],[372,24],[358,44],[378,62],[346,30],[236,74]];
 const cedars=[[100,194],[62,224],[154,252]];   // mossy cedars in the city
@@ -74,7 +74,7 @@ const bg=document.createElement('canvas'); bg.width=WW; bg.height=WH;
   const meadow=(x,y)=>!(x>=220&&y<150)&&!(y>=166&&(x<166||x>=218))&&!(y>=148&&y<166);       // grass, not snow/sand/city/road
   for(let i=0;i<120;i++){const x=rnd()*WW|0, y=rnd()*WH|0; if(!meadow(x,y))continue; F('#5a9a3e',x,y,1,2); F('#5a9a3e',x+2,y,1,2); F('#62a245',x+1,y-1,1,3)}   // a few grass tufts
   // wildflowers, in a few tidy patches instead of everywhere
-  for(const [cx,cy,n] of [[156,138,9],[94,132,8],[150,14,7],[10,140,6]])for(let i=0;i<n;i++){
+  for(const [cx,cy,n] of [[150,14,7],[124,134,6]])for(let i=0;i<n;i++){
     const x=cx+(rnd()*16-8|0), y=cy+(rnd()*8-4|0), c=['#ffffff','#f4d35e','#f2a7c8','#c9b7f0'][i%4];
     F(c,x-1,y,1,1); F(c,x+1,y,1,1); F(c,x,y-1,1,1); F(c,x,y+1,1,1); F(i%4===1?'#e8742a':'#f4d35e',x,y,1,1)}
   F('#b9905c',93,63,54,54); for(let i=0;i<120;i++)F('#a67f4e',93+rnd()*54|0,63+rnd()*54|0,1,1);
@@ -116,7 +116,10 @@ const bg=document.createElement('canvas'); bg.width=WW; bg.height=WH;
     glass(b,'#2a6e6a','#235c58','#7fd8c8'); F('#ffe9a8',b.x+12,b.y+b.h-8,16,8); F('#d9c27a',b.x+19,b.y+b.h-8,1,8)}   // glowing lobby
   // the tall blue one: a stepped glass crown, and an elevator lobby (the way up to the rooftops)
   {const b=R(110,184,48,56); F('#1c2c44',b.x+6,b.y-8,b.w-12,4); F('#1c2c44',b.x-1,b.y-5,b.w+2,6); F('#4f8fd0',b.x+8,b.y-8,b.w-16,1);
-    glass(b,'#2c6a72','#24585f','#86dcd4'); F('#ffe9a8',126,b.y+b.h-10,16,10); F('#d9c27a',134,b.y+b.h-10,1,10); F('#9aa3b2',125,b.y+b.h-11,18,1)}
+    glass(b,'#2c6a72','#24585f','#86dcd4'); F('#ffe9a8',126,b.y+b.h-10,16,10); F('#d9c27a',134,b.y+b.h-10,1,10); F('#9aa3b2',125,b.y+b.h-11,18,1);
+    for(let k=0;k<20;k++)F(k%4<2?'#c8322b':'#f2efe6',124+k,b.y+b.h-14,1,4); F('#8a1f1a',124,b.y+b.h-10,20,1);           // a striped awning over the lobby
+    F('#1d2130',123,b.y+b.h-22,36,7); pixText(g,'ELEVATOR',124,b.y+b.h-21,'#7fe8ff');                  // a glowing ELEVATOR sign
+    F('#8a1f1a',128,b.y+b.h,12,4)}                                                                                     // and a red carpet out front
   // moss everywhere: in the sidewalk cracks, along the curbs, on the tower roofs
   for(let i=0;i<220;i++){const x=rnd()*164|0, y=170+rnd()*90|0; F(rnd()<.5?'#3a5e36':'#4a7442',x,y,1+(rnd()*3|0),1)}
   for(let x=0;x<70;x+=3)F(rnd()<.5?'#3a5e36':'#4a7442',x,231,2,1); for(let x=8;x<48;x+=2)F('#4a7442',x,229,1,1);
@@ -168,12 +171,18 @@ const bg=document.createElement('canvas'); bg.width=WW; bg.height=WH;
   // roads
   const road=(x,y,w,h)=>{F('#c9a46b',x,y,w,h); for(let i=0;i<w*h/30;i++)F('#b8935b',x+rnd()*w|0,y+rnd()*h|0,1,1);
     for(let i=0;i<w*h/140;i++)F(rnd()<.5?'#a9a39a':'#d8c49a',x+rnd()*w|0,y+rnd()*h|0,1,1);                                 // pebbles
-    if(w>h){F('#b38c58',x,y,w,1); F('#b38c58',x,y+h-1,w,1); for(let k=0;k<w;k+=3)if(rnd()<.5)F('#8cc866',x+k,y-1,1,1)}   // edges, grass creeping in
-    else {F('#b38c58',x,y,1,h); F('#b38c58',x+w-1,y,1,h)}};
+    if(w>h){F('#b38c58',x,y,w,1); F('#b38c58',x,y+h-1,w,1); F('#d6b67e',x,y+3,w,1); F('#d6b67e',x,y+h-4,w,1);           // edges, two worn wheel ruts
+      for(let k=0;k<w;k+=2){if(rnd()<.45)F('#8cc866',x+k,y-1,1,1); if(rnd()<.45)F('#7ab85a',x+k,y+h,1,1)}}               // grass creeping in on both sides
+    else {F('#b38c58',x,y,1,h); F('#b38c58',x+w-1,y,1,h); F('#d6b67e',x+3,y,1,h); F('#d6b67e',x+w-4,y,1,h);
+      for(let k=0;k<h;k+=2){if(rnd()<.45)F('#7ab85a',x-1,y+k,1,1); if(rnd()<.45)F('#7ab85a',x+w,y+k,1,1)}}};
   // one road across the middle, one down to Wylee Woods, and matching footpaths up to each place
   road(0,150,WW,14); road(186,164,12,124);
   const path=(x,y,w,h)=>{F('#c9a46b',x,y,w,h); for(let i=0;i<w*h/30;i++)F('#b8935b',x+rnd()*w|0,y+rnd()*h|0,1,1);
-    if(w<h){F('#b38c58',x,y,1,h); F('#b38c58',x+w-1,y,1,h)} else {F('#b38c58',x,y,w,1); F('#b38c58',x,y+h-1,w,1)}};
+    if(w<h){F('#b38c58',x,y,1,h); F('#b38c58',x+w-1,y,1,h); F('#d6b67e',x+w/2-1|0,y,2,h);                                 // edges and a lighter worn middle
+      for(let k=0;k<4;k++){F('#c9a46b',x-1-k,y+h-4+k,w+2+k*2,1)}                                                     // flares out where it meets the road
+      for(let k=0;k<h-4;k+=3){if(rnd()<.5)F('#7ab85a',x-1,y+k,1,1); if(rnd()<.5)F('#7ab85a',x+w,y+k,1,1)}
+      for(let k=6;k<h-6;k+=9)F('#a9a39a',x+(rnd()<.5?1:w-2),y+k,1,1)}                                                 // a few stones along the edge
+    else {F('#b38c58',x,y,w,1); F('#b38c58',x,y+h-1,w,1)}};
   path(43,74,10,76);     // the farm: road to the barn doors
   path(187,140,10,10);   // the kitchen: road to the porch steps
   path(311,74,10,76);    // the Birkie: road to the arch
@@ -181,7 +190,8 @@ const bg=document.createElement('canvas'); bg.width=WW; bg.height=WH;
   const track=(x,y,w,h)=>F('#c2b07a',x,y,w,h);
   track(12,98,31,3); track(10,22,3,79); track(10,20,34,3);
   // city streets: wet asphalt, dashed lines, puddles reflecting the lights, a manhole (it steams)
-  F('#22252f',72,164,12,92); F('#22252f',72,244,72,12); F('#3a3f50',71,164,1,80); F('#3a3f50',84,164,1,80);
+  F('#22252f',72,164,12,92); F('#22252f',72,244,72,12); F('#6a7088',71,164,1,80); F('#6a7088',84,164,1,80);
+  for(let x=71;x<86;x+=3)F('#e8e8e0',x,152,2,10);                                                                   // a crosswalk on the main road
   for(let y=168;y<244;y+=8)F('#c9a640',77,y,2,4); for(let x=88;x<144;x+=8)F('#c9a640',x,249,4,2);
   for(const [x,y,w] of [[74,186,8],[96,252,12],[74,232,6]]){F('#2e3a55',x,y,w,3); F('#f3d27a',x+2,y+1,w-5,1)}
   F('#14161f',75,214,6,4); F('#30343f',76,215,4,2);

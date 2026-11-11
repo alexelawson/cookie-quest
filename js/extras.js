@@ -110,14 +110,51 @@ function drawGear(c,g=ctx,look=null){
   }
 }
 
+// ---------- crabs on the Vancouver beaches: they scuttle sideways and wave their claws ----------
+const CRABS=[[16,239,0],[44,241,1.7],[62,237,3.1],[90,261,.8],[118,262,2.4],[146,261,4]];   // [x, y, phase]
+function drawCrab(x,y,ph){
+  const F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(Math.round(x+dx),Math.round(y+dy),w,h)}, claw=Math.floor(time/260+ph*3)%2;
+  F('rgba(0,0,0,.2)',-3,1,7,1);
+  F('#d9452f',-2,-2,5,3); F('#f06a4a',-1,-2,3,1); F('#a8322a',-2,0,5,1);                    // shell
+  F('#ffffff',-1,-4,1,1); F('#ffffff',1,-4,1,1); F('#1d1d22',-1,-4,1,1); F('#1d1d22',1,-4,1,1); F('#d9452f',-1,-3,1,1); F('#d9452f',1,-3,1,1);   // eyes on stalks
+  F('#d9452f',-4,-3-claw,2,2); F('#d9452f',3,-3-claw,2,2);                                   // claws, waving
+  F('#a8322a',-3,0,1,1); F('#a8322a',3,0,1,1); F('#a8322a',-3,1,1,1); F('#a8322a',3,1,1,1);  // legs
+}
+{const ents=SCENES.world.ents; SCENES.world.ents=function(list){ ents.call(this,list);
+  for(const [cx,cy,ph] of CRABS){ const x=cx+Math.sin(time/900+ph)*6, y=cy; list.push({y,draw:()=>drawCrab(x,y,ph)}) } }}
+
+// ---------- a few fun little things: ducks paddling on Brian's pond, a snowman by the Birkie lot ----------
+function drawDuck(x,y,flip,ph){
+  const F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(Math.round(x+(flip?-dx-w+1:dx)),Math.round(y+dy),w,h)}, bob=Math.floor(time/400+ph)%2;
+  F('rgba(255,255,255,.35)',-3,1,8,1);                                                            // a little wake
+  F('#f2efe6',-2,-2+bob,5,3); F('#d9d4c8',-2,0+bob,5,1); F('#2f8a4a',2,-4+bob,2,2); F('#f4a020',4,-3+bob,2,1); F('#1d1d22',3,-4+bob,1,1);
+}
+function drawSnowman(x,y){
+  const F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x+dx,y+dy,w,h)};
+  F('rgba(0,0,0,.15)',-5,0,11,2); F('#ffffff',-4,-7,9,7); F('#e6eef4',-4,-1,9,1); F('#ffffff',-3,-13,7,6); F('#ffffff',-2,-17,5,4);
+  F('#1d1d22',-1,-16,1,1); F('#1d1d22',1,-16,1,1); F('#f08a24',0,-15,2,1);                     // eyes, carrot nose
+  F('#c8322b',-3,-13,7,1); F('#c8322b',2,-12,2,3);                                                // a red scarf
+  F('#1d1d22',-3,-19,7,2); F('#1d1d22',-2,-22,5,3); F('#1d1d22',0,-10,1,1); F('#1d1d22',0,-8,1,1);   // top hat, buttons
+  F('#6b4428',-7,-11,3,1); F('#6b4428',5,-12,3,1); F('#6b4428',-8,-12,1,1); F('#6b4428',7,-13,1,1);   // stick arms
+}
+solids.push(R(258,74,9,4));
+{const ents=SCENES.world.ents; SCENES.world.ents=function(list){ ents.call(this,list);
+  for(const [cx,cy,ph] of [[146,32,0],[152,38,1.3],[140,40,2.2]]){ const x=cx+Math.sin(time/1500+ph)*5, fl=Math.cos(time/1500+ph)<0; list.push({y:cy,draw:()=>drawDuck(x,cy,fl,ph)}) }
+  list.push({y:78,draw:()=>drawSnowman(262,78)}) }}
+
 // ---------- a clear sign in front of each land ----------
 // wooden boards on two posts: [text, x, y] (top-left of the board). Fargo has its own blue road sign below.
-const LAND_SIGNS=[['THE FARM',58,132],['VANCOUVER',104,166]];
+const LAND_SIGNS=[['THE FARM',58,132],['THE BIRKIE',326,130]];
 {const g=bg.getContext('2d'), F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};
   for(const [t,x,y] of LAND_SIGNS){const w=textW(t)+8;
     F('rgba(0,0,0,.25)',x+2,y+16,w-2,2); F('#5a3a22',x+3,y+9,2,8); F('#5a3a22',x+w-5,y+9,2,8);
     F('#5a3a22',x,y,w,11); F('#f2e6c8',x+1,y+1,w-2,9); F('#d9c9a2',x+1,y+9,w-2,1); pixText(g,t,x+4,y+3,'#3b2a1e');
     solids.push(R(x+3,y+14,2,3),R(x+w-5,y+14,2,3))}}
+// Vancouver: a gateway over the street where it leaves the main road (two lamp posts and a sign)
+{const g=bg.getContext('2d'), F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)}, t='VANCOUVER', w=textW(t)+10, x=78-w/2|0, y=166;
+  for(const px of [x+2,x+w-4]){F('#3a3f50',px,y+2,2,14); F('#5a6278',px,y+2,1,14); F('#ffe9a8',px-1,y+15,4,2)}   // posts with little lamps
+  F('#1d2a44',x,y,w,10); F('#2f4a78',x+1,y+1,w-2,8); F('#c9a640',x,y,w,1); F('#c9a640',x,y+9,w,1); pixText(g,t,x+5,y+2,'#ffd84d');
+  solids.push(R(x+2,y+14,2,3),R(x+w-4,y+14,2,3))}
 // Fargo on the main map: the gas canopy (with Lil Q's price) and a tall theater-style FARGO sign, its bulbs chasing
 solids.push(R(226,208,3,4));
 function drawFargoTop(){
