@@ -85,7 +85,7 @@ r=await p.evaluate(()=>{have.heistStage=1; placeAtCheckpoint(); switchTo(0); if(
   return {res,said,st:have.heistStage,others:heist.crew.filter(c=>c.id!=='lars').map(c=>(c.x|0)+','+(c.y|0))}});
 ok('C crew holds while Lars dashes shadow to shadow and flips the switch: 20 seconds of dark',r.res.ok&&r.st===1&&r.said.join().includes('Twenty seconds'),JSON.stringify(r.res)+' '+(r.said.join(' / ')||''));
 // C2. the lights come back on if you're too slow; Lars can flip it again
-r=await p.evaluate(()=>{const hud=$('hud').textContent; const off=!lightsOn(); heist.lightsOutT=40; T.run(5); const back=dlg.hidden?'':$('dtext').textContent; T.clickThrough(); const on=lightsOn(); update(16.7); action(); T.clickThrough(); return {hud,off,back,on,again:heist.lightsOutT>0}});
+r=await p.evaluate(()=>{const hud=SCENES.city.hud().replace(/<[^>]+>/g,''); const off=!lightsOn(); heist.lightsOutT=40; T.run(5); const back=dlg.hidden?'':$('dtext').textContent; T.clickThrough(); const on=lightsOn(); update(16.7); action(); T.clickThrough(); return {hud,off,back,on,again:heist.lightsOutT>0}});
 ok('C the HUD counts down; when it runs out the lights come back on; Lars can flip it again',/Lights back in 0:\d\d/.test(r.hud)&&r.off&&r.back.includes('back up')&&r.on&&r.again,r.hud+' | '+r.back);
 // D. the gate on the plank is locked; the key's under the parked spotlight (only reachable in the dark); nobody mentions it until you try the gate
 r=await p.evaluate(()=>{const saidOut=heist.lightsOutT; heist.lightsOutT=0; const keyLit=lightsOn(); switchTo(0); const k={x:P.x,y:P.y};
