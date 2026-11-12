@@ -136,27 +136,29 @@ r=await p.evaluate(()=>{for(let k=0;k<60&&dlg.hidden;k++)update(16.7); const int
   hitOnce(); const taunt1=prompt.textContent, hit1=boss.hits, hud1=SCENES.city.hud(); hitOnce(); hitOnce(); const zap=boss.phase;
   P.y=AIM.Y; bossTick(16); const pushed=P.y>AIM.Y;
   for(let k=0;k<80;k++)bossTick(50);
-  const after=song; const win=T.clickThrough(); return {okMiss:HEIST.bossMiss.includes(missMsg),okTaunt:taunt1===HEIST.bossTaunts[0],bossSong,after,hud,hud1,lbl,intro,fighting,moves:new Set(moves).size,notLars,larsHits,missMsg,afterMiss,taunt1,hit1,zap,pushed,win,beat:!!have.confectionerBeat,vault:!$('vault').hidden}});
+  const after=song; const win=T.clickThrough(); return {okMiss:HEIST.bossMiss.includes(missMsg),okTaunt:taunt1===HEIST.bossTaunts[0],bossSong,after,hud,hud1,lbl,intro,fighting,moves:new Set(moves).size,notLars,larsHits,missMsg,afterMiss,taunt1,hit1,zap,pushed,win,beat:!!have.confectionerBeat,safe:!$('lasergrid').hidden}});
 ok('G0 he talks first, then the fight is on the roof (HUD counts the hits; A says Zap)',r.intro.some(l=>l.startsWith('The Confectioner:'))&&r.fighting&&r.hud.includes('Zap the Confectioner')&&r.hud.includes('○○○')&&r.lbl==='Zap',r.intro.join(' | ')+' / '+r.hud+' / '+r.lbl);
 ok('G0 he dodges side to side; only Joe can zap; out of line misses, right under him hits (and his hat turns to gingerbread)',r.moves>5&&r.larsHits===0&&r.notLars.includes('Only Joe')&&r.afterMiss===0&&r.okMiss&&r.hit1===1&&r.okTaunt&&r.hud1.includes('●○○'),JSON.stringify({m:r.moves,miss:r.missMsg,t:r.taunt1,h:r.hud1,l:r.notLars}));
 ok('G0 you can\'t walk up into him',r.pushed);
 ok('G0 the fight has its own music, and the heist music comes back after',r.bossSong==='boss'&&r.after==='heist',r.bossSong+' / '+r.after);
-ok('G0 three hits zap him into a gingerbread man (a big show), then his riddle (the vault) opens',r.zap==='zap'&&r.beat&&r.win.join().includes('gingerbread man')&&r.vault,r.win.join(' | '));
-// G. vault: three crates and a logic puzzle; raisins first, then the real thing
-r=await p.evaluate(()=>{action(); const open=!$('vault').hidden; const rule=$('vaultRule').textContent, labels=[0,1,2].map(i=>$('crateLabel'+i).textContent);
-  const wrong=vault.choc===0?1:0; pickCrate(wrong); const raisin=T.clickThrough(); const reopened=!$('vault').hidden;
-  $('vaultHint').click(); const hint=!$('vaultHintText').hidden&&$('vaultHintText').textContent;
-  pickCrate(vault.choc); const fin=[]; for(let i=0;i<30&&!dlg.hidden;i++){fin.push($('dspeaker').textContent+': '+$('dtext').textContent); $('dbtns').querySelector('button').click()} const st4=have.heistStage, ana0=!$('anagram').hidden;
+ok('G0 three hits zap him into a gingerbread man (a big show), then his safe opens',r.zap==='zap'&&r.beat&&r.win.join().includes('gingerbread man')&&r.safe,r.win.join(' | '));
+// G. the chocolate safe: the squares game again, but a bigger grid, four rounds, more squares each round
+r=await p.evaluate(()=>({okTitle:$('gridTitle').textContent===HEIST.safeTitle,okWatch:$('gridMsg').textContent===HEIST.gridWatch,n:$('lgrid').children.length,title:$('gridTitle').textContent,dots:$('gdots').children.length,first:lg.want.size,watch:$('gridMsg').textContent,hud:SCENES.city.hud()}));
+ok('G safe: a 6x6 grid, four rounds, starts at 7 squares (harder than the laser panel)',r.n===36&&r.okTitle&&r.dots===4&&r.first===7&&r.okWatch&&r.hud.includes('Crack his safe'),JSON.stringify(r));
+await p.waitForFunction(()=>lg.phase==='play',null,{timeout:5000});
+r=await p.evaluate(()=>{const wrong=[...Array(36).keys()].find(i=>!lg.want.has(i)); $('lgrid').children[wrong].click(); return {okMsg:$('gridMsg').textContent===HEIST.gridWrong,msg:$('gridMsg').textContent,round:lg.round}});
+ok('G a wrong square: red, and that round starts over',r.okMsg&&r.round===0,r.msg);
+const sizes=[]; for(let k=0;k<4;k++){ await p.waitForFunction(()=>lg.phase==='play',null,{timeout:6000}); sizes.push(await p.evaluate(()=>{const n=lg.want.size; for(const i of [...lg.want])$('lgrid').children[i].click(); return n})) }
+await p.waitForTimeout(700);
+ok('G each round has more squares: 7, 9, 11, 13',sizes.join()==='7,9,11,13',sizes.join());
+r=await p.evaluate(()=>{const closed=$('lasergrid').hidden; const fin=[]; for(let i=0;i<30&&!dlg.hidden;i++){fin.push($('dspeaker').textContent+': '+$('dtext').textContent); $('dbtns').querySelector('button').click()} const st4=have.heistStage, ana0=!$('anagram').hidden;
   const w=T.walkTo(474,64); update(16.7); const exitLbl=prompt.textContent; action(); const lars=[]; for(let i=0;i<10&&!dlg.hidden&&!T.btns().includes('Bring it');i++){lars.push($('dspeaker').textContent+': '+$('dtext').textContent); $('dbtns').querySelector('button').click()}
-  const ask=$('dtext').textContent, btns=T.btns(); const bring=[...$('dbtns').querySelectorAll('button')].find(b=>b.textContent==='Bring it'); if(!bring)return {open,rule,labels,raisin,reopened,hint,fin,st4,ana0,w,exitLbl,lars,ask,btns,dbg:true}; bring.click(); return {open,rule,labels,raisin,reopened,hint,fin,st4,ana0,w,exitLbl,lars,ask,btns,ana:!$('anagram').hidden,st:have.heistStage}});
-ok('G vault: a rule and three labeled crates',r.open&&r.rule.length>5&&r.labels.every(l=>l.length>2)&&!r.labels.join().includes('{'),r.rule+' | '+r.labels.join(' | '));
-ok('G raisins: John objects, choose again',r.raisin.join().includes('Raisins')&&r.reopened,r.raisin[0]);
-ok('G Lars gives a hint if you ask',!!r.hint,r.hint);
-ok('G the gingerbread man: "Why so salty?" Then the finale, and the fire escape shows up (no anagrams yet)',r.fin.some(l=>l.startsWith('The Confectioner:')&&l.includes('salty'))&&r.fin.some(l=>l.includes('final ingredient'))&&r.st4===4&&!r.ana0,JSON.stringify(r.fin.slice(-2)));
+  const ask=$('dtext').textContent, btns=T.btns(); const bring=[...$('dbtns').querySelectorAll('button')].find(b=>b.textContent==='Bring it'); if(!bring)return {closed,fin,st4,ana0,w,exitLbl,lars,ask,btns,dbg:true}; bring.click(); return {closed,fin,st4,ana0,w,exitLbl,lars,ask,btns,ana:!$('anagram').hidden,st:have.heistStage}});
+ok('G safe open: chocolate, "Why so salty?", the finale, and the fire escape shows up (no anagrams yet)',r.closed&&r.fin[0].includes('Chocolate')&&r.fin.some(l=>l.startsWith('The Confectioner:')&&l.includes('salty'))&&r.fin.some(l=>l.includes('final ingredient'))&&r.st4===4&&!r.ana0,JSON.stringify(r.fin.slice(-2)));
 ok('G walk to the fire escape: Lars challenges you to anagrams',r.w==='ok'&&r.exitLbl==='Climb down the fire escape'&&r.lars.some(l=>l.includes('Anagrams'))&&r.btns.join()==='Bring it'&&r.ana&&r.st===4,r.w+' / '+r.exitLbl+' / '+r.ask);
-// the right crate moves around, and the puzzles rotate
-r=await p.evaluate(()=>{const spots=new Set(), rules=new Set(); for(let k=0;k<40;k++){openVault(); spots.add(vault.choc); rules.add(vault.puzzle.rule); $('vault').hidden=true} vault.open=false; paused=false; return {spots:[...spots].sort().join(),rules:rules.size}});
-ok('G the chocolate crate is shuffled and the puzzle changes',r.spots==='0,1,2'&&r.rules>=3,JSON.stringify(r));
+// the laser panel is still the easier one
+r=await p.evaluate(()=>{openLaserGrid(); const o={n:$('lgrid').children.length,dots:$('gdots').children.length,first:lg.want.size,okTitle:$('gridTitle').textContent===HEIST.gridTitle}; closeLaserGrid(); return o});
+ok('G the laser panel is unchanged: 5x5, three rounds, starts at 6',r.n===25&&r.dots===3&&r.first===6&&r.okTitle,JSON.stringify(r));
 r=await p.evaluate(()=>{openAnagrams(); return 1});
 // lose to Lars first (do nothing), then rematch with new letters and win
 r=await p.evaluate(()=>{const set1=ana.set.letters; anaGo(); for(let i=0;i<60*62;i++)update(16.7); const res=$('anaResult').textContent; $('anaNext').click(); const gl=[]; for(let i=0;i<30&&!dlg.hidden&&!T.btns().includes('Bring it');i++){gl.push($('dspeaker').textContent+': '+$('dtext').textContent); $('dbtns').querySelector('button').click()} const again=T.btns(); [...$('dbtns').querySelectorAll('button')].find(b=>b.textContent==='Bring it').click();

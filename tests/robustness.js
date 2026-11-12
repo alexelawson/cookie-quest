@@ -16,7 +16,7 @@ const OVERLAYS=[
   ['how to play (heist)', ALL, ()=>{goTo('city','start'); setTimeout(openHowTo,900)}, '#howOk', 1200],
   ['gas pump', ALL, ()=>{goTo('fargo','fromHighway'); setTimeout(()=>{try{closeDialog()}catch(e){} openPump()},900)}, '#pumpBtn', 1200],
   ['snack shop', ALL, ()=>{goTo('fargo','fromHighway'); setTimeout(()=>{try{closeDialog()}catch(e){} have.fargoStage='store'; parkAndGetOut(); openShop()},900)}, '#giveBtn', 1200],
-  ['vault', {...ALL,heistStage:3,heistBriefed:true,heistHowTo:true}, ()=>{goTo('city','start'); setTimeout(()=>{try{closeDialog()}catch(e){} openVault()},900)}, '#crate2', 1200],
+  ['vault', {...ALL,heistStage:3,heistBriefed:true,heistHowTo:true}, ()=>{goTo('city','start'); setTimeout(()=>{try{closeDialog()}catch(e){} openVault()},900)}, '#lgrid button:last-child', 1200],
   ['anagrams', {...ALL,heistStage:4,heistBriefed:true,heistHowTo:true}, ()=>{goTo('city','start'); setTimeout(()=>{try{closeDialog()}catch(e){} openAnagrams()},900)}, '#anaStart', 1200],
   ['baking', ALL, ()=>{goTo('kitchen','fromDoor'); setTimeout(openBake,900)}, '#bakeBtn', 1200],
   ['ending: stats', {...ALL,baked:true}, ()=>{openEnding(); $('endSkip').click()}, '#endNext'],

@@ -4,7 +4,7 @@
 //   Lars = sprint (fast enough to dash between cover under the searchlights)
 //   John = lift (carries the log, rips off the grate)
 // Route: roof A (a log blocks the way to Doc Alex's rooftop lab: John lifts it and carries it; the briefing; then the log bridges the gap) -> roof B (searchlights; Lars
-//        hops cover to cover to the LIGHT POWER switch) -> roof C (a guard + a laser maze around the skylight) -> the Confectioner (right there on the roof) -> his riddle (the vault)
+//        hops cover to cover to the LIGHT POWER switch) -> roof C (a guard + a laser maze around the skylight) -> the Confectioner (right there on the roof) -> his safe (the memory squares again, harder)
 //        -> the fire escape (it shows up with a blinking EXIT sign) -> Lars's anagrams.
 const CW=520, CH=200;
 const ROOF_A=R(6,30,112,156), ROOF_B=R(150,20,170,166), ROOF_C=R(352,26,160,160);
@@ -610,34 +610,9 @@ function roundStart(n){ const r=HEIST.rounds[n-1]; if(r)showBanner(r.title,r.nam
 function heistReplay(){ Object.assign(have,{heistStage:0,lasersOff:false,plankGate:false,confectionerBeat:false}); save(); say([[HEIST.stranger,REPLAY.heistReset]],()=>goTo('city','start')) }
 function roundWon(n){ if(n<3)roundStart(n+1) }   // (no "round won" banner: straight on to the next round)
 
-// ---------- the vault: three crates and a puzzle (VAULT_PUZZLES in story.js) ----------
-const vault={open:false, puzzle:null, order:[], choc:0};
-const CRATE_POS=['the left crate','the middle crate','the right crate'];
-function openVault(){
-  // a different puzzle than last time, shuffled crates
-  const pool=VAULT_PUZZLES.filter(p=>p!==vault.puzzle); vault.puzzle=pool[Math.floor(Math.random()*pool.length)];
-  vault.order=['X','Y','Z'].sort(()=>Math.random()-.5); vault.choc=vault.order.indexOf(vault.puzzle.answer); vault.open=true;
-  const name=k=>CRATE_POS[vault.order.indexOf(k)], fill=t=>{const f=t.replace(/\{([XYZ])\}/g,(_,k)=>name(k)); return f[0].toUpperCase()+f.slice(1)};
-  $('vaultTitle').textContent=HEIST.vaultTitle; $('vaultNote').textContent=HEIST.vaultNote; $('vaultRule').textContent=vault.puzzle.rule;
-  vault.order.forEach((k,i)=>{ $('crateLabel'+i).textContent=fill(vault.puzzle.labels[k]) });
-  $('vaultHint').textContent=HEIST.vaultHint; $('vaultHint').hidden=false; $('vaultHintText').hidden=true; $('vaultHintText').textContent=vault.puzzle.hint;
-  drawCrates(); paused=true; prompt.hidden=true; $('vault').hidden=false; setTimeout(()=>$('crate0').focus({preventScroll:true}),0);
-}
-function drawCrates(){
-  [0,1,2].forEach(i=>{const c=$('crateArt'+i), g=c.getContext('2d'), F=(col,x,y,w,h)=>{g.fillStyle=col;g.fillRect(x,y,w,h)};
-    g.clearRect(0,0,c.width,c.height);
-    F('#8a5a34',2,6,28,22); F('#a26c40',2,6,28,3); F('#6a4224',2,16,28,2); F('#6a4224',2,6,2,22); F('#6a4224',28,6,2,22);
-    F('#efe2c4',11,10,10,5); F('#6a4224',12,12,8,1);   // stenciled label
-  });
-}
-function vaultHint(){ $('vaultHint').hidden=true; $('vaultHintText').hidden=false }
-function pickCrate(i){
-  if(!vault.open)return;
-  if(i!==vault.choc){ sfx('bad'); $('vault').hidden=true; say(HEIST.raisins,()=>{ $('vault').hidden=false; paused=true }); return }
-  vault.open=false; $('vault').hidden=true; sfx('fanfare');
-  say([['',HEIST.gotIt],['The Confectioner',HEIST.villainNote,'Gingerbread Confectioner'],...HEIST.finale],showFireEscape);
-}
-$('vaultHint').onclick=vaultHint; [0,1,2].forEach(i=>$('crate'+i).onclick=()=>pickCrate(i));
+// ---------- the chocolate safe: the memory panel again, but harder (SAFE_GRID in lasergrid.js) ----------
+function openVault(){ openLaserGrid(SAFE_GRID,HEIST.safeTitle,safeOpened) }
+function safeOpened(){ sfx('fanfare'); say([['',HEIST.gotIt],['The Confectioner',HEIST.villainNote,'Gingerbread Confectioner'],...HEIST.finale],showFireEscape) }
 
 // ---------- triggers ----------
 const nearCrew=(z,id)=>heist.crew.some(c=>(!id||c.id===id)&&hit(R(c.x-4,c.y-3,8,4),z));
@@ -802,7 +777,7 @@ SCENES.city={ music:'heist',
     drawFireEscapeSign(); bossOver();
     if(heist.caughtWho){const c=heist.crew.find(c=>c.id===heist.caughtWho); if(c){ctx.fillStyle='#ff4a4a'; ctx.fillRect(c.x-1,c.y-34,3,7); ctx.fillRect(c.x-1,c.y-25,3,2)}}
   },
-  hud(){ const st=heistStage(); const steps=['Bridge the gap','Kill the lights, get everyone across','Shut off the lasers','Crack his riddle','Head for the fire escape','Done!'];
+  hud(){ const st=heistStage(); const steps=['Bridge the gap','Kill the lights, get everyone across','Shut off the lasers','Crack his safe','Head for the fire escape','Done!'];
     if(st===1&&heist.lightsOutT>0)return `<span>Lights back in 0:${String(Math.ceil(heist.lightsOutT/1000)).padStart(2,'0')}</span>`;
     if(st===3&&!have.confectionerBeat)return `<span>Zap the Confectioner ${'●'.repeat(boss.hits)}${'○'.repeat(3-boss.hits)}</span>`;
     return st>=5?'':`<span>${steps[st]}</span>` },

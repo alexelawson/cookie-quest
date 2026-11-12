@@ -110,12 +110,12 @@ const HEIST = {
   heroLasers:"Tripwires. If only there was a better way to see them...",
   lasersOff:"Shut off the lasers",
   defuseLabel:"Hack the laser panel",
-  // the laser panel: a pattern of lit squares flashes, then you light the same ones from memory (two rounds)
+  // the laser panel (and the chocolate safe): a pattern of lit squares flashes, then you light the same ones from memory
   gridTitle:"Laser panel",
   gridWatch:"Memorize the lit squares...",
   gridGo:"Now light the same squares.",
   gridWrong:"Wrong square! Watch again.",
-  gridNext:"Nice. One more, a little harder.",
+  gridNext:"Nice. Next one has more squares.",
   onlyJoe:"Only Joe has the gadget from Alex.",
   defuseCall:"Clutch defuse.",
   rounds:[{title:"ROUND 1", name:"The lab roof"},{title:"ROUND 2", name:"The searchlights"},{title:"ROUND 3", name:"The fire escape"}],
@@ -128,10 +128,7 @@ const HEIST = {
   backToCheckpoint:"Back to the last checkpoint.",
   followTip:"{who} was following right behind you. Set the crew to Waiting first.",
   followTipYou:"You were tagging along right behind {lead}. Tap Crew: Following to set it to Waiting, and the others stay put while one person goes.",
-  vaultTitle:"The Confectioner's riddle",
-  vaultNote:"One crate has the chocolate. Two have raisins.",
-  vaultHint:"Ask Lars for a hint",
-  raisins:[['John',"Raisins. In a cookie. I am by no means a picky eater... but... ABSOLUTELY not."],['Lars',"John IS a picky eater... but... raisins is still a crime."]],
+  safeTitle:"The Confectioner's safe",   // the chocolate safe: the same squares game as the laser panel, but bigger and four rounds
   gotIt:"Chocolate. Lets GO!!",
   villainNote:"Fine. Keep your chocolate. Why so salty?",   // the gingerbread Confectioner says this
   // the showdown at the bottom of the fire escape: the Confectioner dodges, you zap him three times with Doc Alex's gadget.
@@ -141,7 +138,7 @@ const HEIST = {
   bossMiss:["Missed me!","Too slow, cookie boy!","Over here! Ha!","Is that a hair dryer? How adorable."],
   bossZap:"*ZAP!*",
   bossWin:[['',"A puff of powdered sugar. Where the Confectioner stood, there's a tiny gingerbread man."],['The Confectioner',"...What did you DO to me?!"],['Lars',"He's so small."],['John',"He smells amazing."],
-           ['The Confectioner',"Fine! The chocolate's in my vault. But you'll NEVER solve my riddle!"]],
+           ['The Confectioner',"Fine! The chocolate's in my safe. But you'll NEVER crack the lock!"]],
   finale:[['Doc Alex',"(on the radio) Great Scone!"],['Doc Alex',"You found it! The final ingredient!"],['Doc Alex',"The formula is complete. Thank you. "],['John',"Can we go home now? I'm cold."]],
   thanks:"Let's go bake",
   larsChallenge:[['Lars',"Hold up. Before we go home..."],['Lars',"Anagrams. Right now. Loser carries the chocolate down the fire escape. "],['John',"Oh no. Not this again."]],
@@ -232,37 +229,6 @@ const WARDROBE = {title:"Suit up, Joe", intro:"It's a stealth mission. What are 
          ginghouse:[['Lars',"Is he... a house?"],['John',"He's a gingerbread house, Lars. Keep up."],['Lars',"Can I live in him?"]],
          cupcake:[['John',"Oh no. He's a cupcake."],['Lars',"Every searchlight in the city is about to want a bite."],['John',"I'd eat him. Respectfully."]],
          disco:[['John',"Bro."],['John',"BRO. It's a heist, not a roller rink."],['Lars',"Is that a gold chain?"],['John',"The searchlights are gonna think you're a disco ball. Do NOT do the Hustle up there."]]}};
-
-// ---------- The vault puzzles (the heist's last lock) ----------
-// One is picked at random each time, and the crates are shuffled, so the right one moves around.
-// Each puzzle has three crates, X, Y and Z. `answer` is the one with the chocolate.
-// In a label, {X} / {Y} / {Z} become "the left crate", "the middle crate" or "the right crate", wherever that crate ended up.
-// To add an inside joke: a rule that asks the question, three labels that are the answer choices, and the right one.
-const VAULT_PUZZLES = [
-  // the one real logic riddle
-  {rule:"\"Exactly ONE of these labels is true.\"",
-   labels:{X:"The chocolate is in this crate.", Y:"The chocolate is NOT in this crate.", Z:"The chocolate is not in {X}."}, answer:'Y',
-   hint:"Pretend the chocolate is in each crate, one at a time, and count how many labels would be true."},
-  // inside jokes: the question goes in the rule, the choices on the labels
-  {rule:"\"Only the real one knows: where was the cheapest gas on the road trip?\"",
-   labels:{X:"Fargo", Y:"Bismarck", Z:"Minneapolis"}, answer:'X',
-   hint:"Think road trip. Think $2.79."},
-  {rule:"\"Lars's personal-best long jump, 2019. How far?\"",
-   labels:{X:"4 feet", Y:"40 feet", Z:"He doesn't like to talk about it"}, answer:'X',
-   hint:"He told you right before he jumped. It was not 40."},
-  {rule:"\"Lars just lost. What does he say next?\"",
-   labels:{X:"Good game.", Y:"Best two out of three?", Z:"I wasn't even trying."}, answer:'Y',
-   hint:"It's always the same three words... and two numbers."},
-  {rule:"\"Why didn't Lars make the jump?\"",
-   labels:{X:"Bad shoes", Y:"John pushed him", Z:"Headwind"}, answer:'Z',
-   hint:"There was NO wind. He said it anyway."},
-  {rule:"\"Who taught John to yell SKOL?\"",
-   labels:{X:"Lars", Y:"The Vikings", Z:"Grp"}, answer:'Y',
-   hint:"They're big, they're loud, and they carried the flour fifty kilometers."},
-  {rule:"\"Where does the Birkie finish?\"",
-   labels:{X:"Cable", Y:"Fargo", Z:"Main Street, Hayward"}, answer:'Z',
-   hint:"The crowd goes nuts on the last street of the race."},
-];
 
 // ---------- The Birkie trailhead: John sends the Vikings off with the flour ----------
 const BIRKIE = {

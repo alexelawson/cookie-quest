@@ -1,5 +1,5 @@
 // The Confectioner: once the lasers are off he pops up right there on roof C and dodges along the roof; Joe lines up under him and presses A to zap.
-// Three hits and he turns into a gingerbread man, then his riddle (the vault in city.js) guards the chocolate.
+// Three hits and he turns into a gingerbread man, then his safe (openVault in city.js) guards the chocolate.
 // Words live in story.js (HEIST.boss...).
 // a villainous pastry chef: tall white hat, monocle, curly black mustache, black chef's coat, pink apron with sprinkles
 const CONF_PAL={T:'#f7f5ef',t:'#d9d4c8',S:'#f0c6a0',s:'#d9a882',W:'#ffffff',E:'#2b2236',O:'#e0b030',M:'#1d1a22',d:'#7a2a2a',
