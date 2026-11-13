@@ -14,8 +14,7 @@ const OVERLAYS=[
   ['wardrobe', ALL, ()=>openWardrobe(()=>{},'look'), '#wardGo'],
   ['settings', ALL, ()=>$('settingsBtn').click(), '#settingsClose'],
   ['how to play (heist)', ALL, ()=>{goTo('city','start'); setTimeout(openHowTo,900)}, '#howOk', 1200],
-  ['gas pump', ALL, ()=>{goTo('fargo','fromHighway'); setTimeout(()=>{try{closeDialog()}catch(e){} openPump()},900)}, '#pumpBtn', 1200],
-  ['snack shop', ALL, ()=>{goTo('fargo','fromHighway'); setTimeout(()=>{try{closeDialog()}catch(e){} have.fargoStage='store'; parkAndGetOut(); openShop()},900)}, '#giveBtn', 1200],
+  ['scooter race how-to', ALL, ()=>goTo('scooter','start'), '#howOk', 1200],
   ['vault', {...ALL,heistStage:3,heistBriefed:true,heistHowTo:true}, ()=>{goTo('city','start'); setTimeout(()=>{try{closeDialog()}catch(e){} openVault()},900)}, '#lgrid button:last-child', 1200],
   ['anagrams', {...ALL,heistStage:4,heistBriefed:true,heistHowTo:true}, ()=>{goTo('city','start'); setTimeout(()=>{try{closeDialog()}catch(e){} openAnagrams()},900)}, '#anaStart', 1200],
   ['baking', ALL, ()=>{goTo('kitchen','fromDoor'); setTimeout(openBake,900)}, '#bakeBtn', 1200],
@@ -53,7 +52,7 @@ for(const [vpName,vp,touch] of [['desktop',{width:1280,height:800}],['phone',{wi
 
 // C. menus on top of menus: opening ⚙ Settings over another pop-up and closing it must not unpause the game underneath
 {const p=await page(); const stuck=[];
-  for(const [name,st,open] of [['baking',ALL,()=>{goTo('kitchen','fromDoor'); setTimeout(openBake,900)}],['snack shop',ALL,()=>{goTo('fargo','fromHighway'); setTimeout(()=>{try{closeDialog()}catch(e){} have.fargoStage='store'; parkAndGetOut(); openShop()},900)}],
+  for(const [name,st,open] of [['baking',ALL,()=>{goTo('kitchen','fromDoor'); setTimeout(openBake,900)}],['scooter race how-to',ALL,()=>goTo('scooter','start')],
     ['ending',{...ALL,baked:true},()=>openEnding()],['reward',ALL,()=>showReward('farm')],['dialog',ALL,()=>showDialog({pages:['hi'],actions:[CLOSE]})]]){
     await fresh(p,st); await p.evaluate(open); await p.waitForTimeout(1300);
     const r=await p.evaluate(()=>{$('settingsBtn').click(); $('settingsClose').click(); const x=P.x; dirs.right=true; for(let i=0;i<20;i++)update(16.7); dirs.right=false; return {paused,moved:P.x!==x}});

@@ -200,7 +200,7 @@ function drawSparkles(){ for(const s of sparkles){ const a=1-s.t/900; ctx.global
 // Drawn from Joe's own sketch: red comb and wattle, yellow beak, a white body streaked blue, purple and green, a yellow wing, a big red-brown and dark tail.
 const henHere=()=>gearWorn('hen');
 function henEnt(){
-  if(!henHere())return null;
+  if(!henHere()||scene===SCENES.scooter)return null;   // (no room on the scooter)
   if(scene===SCENES.fargo&&!fargo.onFoot){ const d=P.dir==='left'?-1:1; return {y:P.y+1, draw:()=>drawGrp(P.x-1-3*d,P.y+11,d,'fargo',true)} }   // riding shotgun
   const h=henPos(), f=h.x<P.x?1:h.x>P.x?-1:(P.dir==='left'?-1:1), hop=P.moving&&Math.floor(time/150)%2?1:0;
   return {y:h.y, draw:()=>drawGrp(h.x,h.y-hop,f,sceneName())};

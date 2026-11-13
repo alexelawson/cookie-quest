@@ -181,7 +181,7 @@ const ALEX_WELCOME = {speaker:'Alex', place:'Home',
   lookTitle:"Pick Joe's look", lookIntro:"First things first. What are you wearing today?", lookGo:"Looks good"};
 
 // ---------- Replays: once the cookies are baked, every game can be played again from whoever started it ----------
-const REPLAY={golf:"Play again", birkie:"Race again", fargo:"Hunt for cheap gas again", heist:"Run the heist again", jackc:"Build another one", logan:"Play again",
+const REPLAY={golf:"Play again", birkie:"Race again", fargo:"Race Lil Q again", heist:"Run the heist again", jackc:"Build another one", logan:"Play again",
   heistReset:"Back to roof A. Same crew, same chocolate thief. Let's go.", jackcAgain:"Another one? Love that. Grab the crane."};
 
 // ---------- Jack C: building a little log cabin in the meadow. Help him stack the walls and he makes you a gingerbread house to wear ----------
@@ -343,52 +343,52 @@ const GOLF_TEXT = {
   leave:"Head back to the road",
 };
 
-// ---------- Fargo: Lil Q (runs the cheapest gas station in the country) and Alex, your passenger ----------
+// ---------- Fargo: drive in, find Lil Q's (cheapest gas in the country), race her on scooters for the gas, then the snack run ----------
 const FARGO = {
   place:'Fargo, ND', bob:'Lil Q',   // the gas station owner's name (the code calls her "bob")
-  intro:["We're running on fumes.","Somewhere in this town is the cheapest gas in the whole country: $2.79 a gallon. Everywhere else is $2.99 or more.","The locals always know. Pull up and ask them for directions, then read the station signs. Don't fill up until you find $2.79!"],
-  hudGoal:"Find $2.79",   // the reminder up top while you drive around
-  // locals who know where the cheap gas is (drive up to them). {dir}/{color}/{near} are filled in for wherever Lil Q's is this time
-  askLocal:"Ask for directions",
-  localNames:["Arnie","Marge","Gunnar"],
-  clueNS:d=>`Cheap gas? Oh ya, you betcha. That's on the ${d} side of town.`,
-  clueEW:d=>`Lil Q's? Sure, sure. It's over on the ${d} side. Can't miss it.`,
-  clueSign:(c,n)=>`Look for the ${c} sign, over by ${n}. Tell 'em Gunnar sent ya.`,
+  intro:["We're running on fumes.","Lil Q's is somewhere in town. Cheapest gas in the whole country.","Look for her sign."],
+  hudGoal:"Find Lil Q's",   // the reminder up top while you drive around
   marquee:"COOKIES",   // what the Fargo Theatre's marquee says
   introSpeaker:'Alex',
-  attendants:['Deb','Lars','Shelly','Ole','Marv'],
-  // the signs on the gas station shops (keep them short: about 9 letters fits). Lil Q's always says LIL Q'S.
-  stationSigns:['GAS N GO','PRAIRIE','RED RIVER','BISON','STAR GAS'],
   bobSign:"LIL Q'S",
-  ask:p=>p==='2.79'?`$${p} a gallon. Fill 'er up?`:`$${p} a gallon. Fill 'er up? (Not $2.79...)`,
-  fill:"Fill up", keep:"Keep looking",
-  wrong:p=>[`Tank's full. At $${p} a gallon.`,"On your way out of town you pass a sign that says $2.79.","Oof."],
-  retry:"Try again",
-  bobHello:["Yo yo YO. Look who found it. Cheapest gas in the whole dang country.","They call me Lil Q. I rode my scooter here all the way from Elinor's. Three days. Top speed nineteen. No regrets.","Two seventy-nine a gallon. Lil Q don't play."],
-  bobBet:["Here's the deal, rookie. Stop that pump on thirty dollars EXACTLY and Lil Q hooks you up with sugar.","Beets from out back. Sweetest in the Red River Valley. That's a bar. Write it down."],
-  pumpTitle:"Lil Q's bet: stop on exactly $30.00",
-  pumpHint:"The numbers are spinning! Tap STOP to lock in each one: 3... 0... .00",
-  pumpBtn:"STOP",
-  pumpReel:["Three! Now the dollars: stop on 0.","Thirty! Now the cents: stop on 00."],
-  bust:["Ohhh, so close! Spin it again, baby.","Nope! Lil Q resets. Lil Q forgives.","Thirty and WHAT?? Run it back.","Steady hands, rookie. Be the pump. Become the pump."],
-  pumpWin:["THIRTY. EVEN. Somebody get this rookie a record deal.","Pull up by the door, rookie. Shop's open."],
+  pullIn:"Pull up to the pump",
+  bobHello:["Yo yo YO. Welcome to Lil Q's. Cheapest gas in the whole dang country.","They call me Lil Q. I rode my scooter here all the way from Elinor's. Three days. Top speed nineteen. No regrets.","Two seventy-nine a gallon. Lil Q don't play."],
+  // the race: Lil Q's deal
+  bobBet:["Here's the deal, rookie. Gas ain't free. Not even at two seventy-nine.","Race me. My scooter versus the spare one out back. Down Broadway to the Fargodome.","You win, Lil Q fills your tank. I win, you pump everybody's gas for a week."],
+  raceGo:"Race her", raceLater:"Not yet",
+  rematchHello:"Back for more? Lil Q's scooter is warmed up.",
+  howToTitle:"Scooter race",
+  howToWho:"<b>Lil Q</b><span>Top speed nineteen. She never brakes. She never stops talking.</span>",
+  howToSteps:["Press A (or Space) to kick. Kick when the dot is in the green.",
+    "Too early and you wobble. Too late and you barely move. Find the rhythm.",
+    "Tuck in right behind Lil Q to draft. When the draft bar fills, your next good kick is a SLINGSHOT."],
+  howToOk:"Let's ride",
+  raceKicks:{good:"Nice!", early:"Too early!", late:"Late", sling:"SLINGSHOT!", ready:"Slingshot ready!"},
+  raceTaunts:["Top speed nineteen, baby!","You hear that? That's the sound of you losing.","Lil Q don't brake.","Is that a scooter or a shopping cart?"],
+  raceLost:["Lil Q wins! As foretold.","Run it back, rookie?"],
+  rematch:"Run it back", raceQuit:"Later",
+  raceWon:["...","Nah. NAH. Rematch. ...Okay, fine. A deal's a deal.","*fills the tank* Thirty bucks of gas, on the house. Pull up by the door."],
+  replayWon:"Okay, okay. You're fast. Don't let it go to your head.",
   // then Joe and Alex get out of the car (Alex's name pops up)
   snackAsk:[["Joe","Want anything from inside?"],["Alex","No, I'm good."],["Alex","..."],["Alex","I mean. If YOU'RE getting something."],["","(She definitely wants a snack.)"]],
   goInside:"Go inside",
+  driveOff:"Get in the car",
+  enterSign:"ENTER",   // the blinking sign over the shop door
   bobWaiting:"Go on in, she's waiting. Wrong snack and Lil Q writes a diss track about you.",
   win:["Ginger ale AND Mott's? That's love, rookie. Lil Q respects it.","Here. Sugar, straight outta the Red River Valley. Peace."],
   thanks:"Thanks, Lil Q!",
   after:"Lil Q out. *revs scooter* *scooter goes meep*",
-  empty:"Out of gas! You're pushing the CR-V now.",
-  emptyAlex:"I'll steer.",
   leave:"Head back to the highway",
+  // the diner: where the plain pasta comes from (Jackie won't help without it)
+  diner:"DINER", dinerCook:"Deb", pullInDiner:"Pull up to the diner",
+  dinerHello:"Welcome to the Prairie Diner, hon. What'll it be?",
+  askPasta:"Plain pasta to go", dinerBye:"Just looking",
+  dinerPasta:["Plain pasta. No sauce. No butter.","...Hon, are you okay?","*hands you a warm bowl* On the house. You look like you need it."],
+  dinerAgain:"Come back anytime, hon. The pasta's always plain here.",
 
-  // ---- the snack stop: Alex (the passenger) ----
+  // ---- the snack stop: walk into Lil Q's shop with Alex, grab a drink and a snack off the shelves, bring them to her ----
   // Change her lines here. `correct` says which drink + snack she wants.
   shop:"Lil Q's Gas & Go",
-  wallet:20,          // dollars left after $30 of gas
-  wrongCost:3,        // each wrong pick costs this much
-  strikesOut:2,       // this many wrong picks and you get sent back outside
   correct:{drink:'gingerale', snack:'motts'},
   drinks:[
     {id:'coke',      name:'Coke',        react:"Coke? Close. But no."},
@@ -406,13 +406,13 @@ const FARGO = {
     {id:'motts',     name:"Mott's Berry Gummies", react:"Mott's!"},
   ],
   alexHello:"Okay. You know what I like. Don't mess this up.",
-  pickBoth:"Pick a drink and a snack.",
-  give:"Give to Alex",
+  grab:n=>`Grab the ${n}`, swap:n=>`Swap for the ${n}`,
+  give:"Give to Alex", talkAlex:"Talk to Alex",
+  needBoth:"A drink AND a snack, babe.",
   alexWin:"Ginger ale AND Mott's? You know me so well.",
-  strike:"That'll cost you.",
-  kickedOut:"Okay. Out. Go think about what you've done.",
-  alexOutside:"...",
   alexWaiting:"Snacks. Please. I've been in this car for nine hours.",
+  exitNow:"Head out the EXIT",
+  holding:"Holding",
 };
 // ---------- Joe's gear, hidden around the main map (where: GEAR in extras.js) ----------
 const GEAR_TEXT = {
@@ -428,14 +428,14 @@ const GEAR_TEXT = {
   jersey:  {name:"Vikings jersey (#18)", found:"A purple #18 Vikings jersey. Joe throws it on over his outfit.", wear:"Put it on", from:"From a football Viking"},
   tip:"(Take it off or put it back on any time in ⚙ Settings.)",
 };
-// ---------- Jackie (Fargo): shows up when Alex kicks Joe out of the shop. Very direct. ----------
+// ---------- Jackie (Fargo): in Lil Q's shop. Very direct. She'll help, but not on an empty stomach. ----------
 const JACKIE = {
-  kicked:["Hey. I'm Jackie. You just got kicked out of a gas station.","Here's what you do: stand here a second. Think about what she actually likes. Then go back in and try again. The door's right there."],
-  ok:"Okay, Jackie",
+  hungry:["Hey. I'm Jackie.","You look lost. I could help. But I can't think on an empty stomach.","Bowl of plain pasta. No sauce. No butter. The diner up the road makes it."],
+  thanks:["Plain pasta. Perfect. You get it."],
   hints:["She's been in a car for nine hours. Her stomach is not happy. Think gentle. Bubbly, but gentle.",
          "Snack: fruity. Chewy. Not chocolate, not chips. It comes in a little pouch.",
          "Ginger ale. Mott's berry gummies. I can't make it more obvious than that. Go."],
-  tryAgain:"Go back inside (try again)",
+  give:"Give her the pasta", talk:"Talk to Jackie",
 };
 // ---------- Logan (the clover field on the farm, by the barn path) ----------
 // The two football Vikings jogging laps on the main road. Talk to them as they run past: one line each time, in order.
@@ -472,7 +472,7 @@ const HINTS = {
   farm:"Eggs and butter: Keelan's at the farm, top left. His hens could use some help.",
   mill:"Flour: John's at the Birkie trailhead, top right, under the big arch.",
   city:"Chocolate: the rainy city, bottom left. Take the elevator up to the rooftops.",
-  fargo:"Sugar: Fargo, bottom right. Drive in and find the cheapest gas in town.",
+  fargo:"Sugar: Fargo, bottom right. Drive in and find Lil Q's.",
   golf:"Milk: Wylee Woods, straight down the road from the kitchen. Beat Margie and Jack.",
   home:"That's everything! Head home to the kitchen and let's bake.",
 };
@@ -484,7 +484,7 @@ const ENDING = {
     ['Joe','Joe','The Cookie King'],['Alex','Alex','Head Baker, Snack Critic'],['Keelan','Keelan','Eggs, Butter, Hen Wrangling'],
     ['Logan','Logan','Four-Leaf Clover Specialist'],['Maureen','Maureen','Head Taste Tester'],['Ethan','Ethan','Designated Grill Master'],['Brian','Brian','Sprinkles. Very Chill.'],['Jack C','Jack C','Cabin Builder, Crane Optimist','gingerHouseCostume'],['Trail John','John (the other one)','Flour, 50 km'],
     ['Lars','Lars','Long Jump (Attempted)'],['John','John','Heavy Lifting, Eye Rolling'],['Doc Alex','Doc Alex','Mad Scientist (Rooftop Division)'],
-    ['Lil Q','Lil Q','Exactly $30.00 of Gas'],['Jackie','Jackie','Straight Talk','metJackie'],['Margie','Margie','The Main Character (self-appointed)'],
+    ['Lil Q','Lil Q','Fastest Scooter in Fargo (disputed)'],['Jackie','Jackie','Straight Talk','metJackie'],['Margie','Margie','The Main Character (self-appointed)'],
     ['Jack','Jack','2.1 Cookies Per Guest'],[null,'The Vikings','SKOL'],[null,'The Hens','Uncooperative'],
   ],
   thanks:["Made with love by Alex","For Joe · Christmas 2026"],
@@ -569,7 +569,7 @@ const KITCHEN = {place:'Home', speaker:'Your kitchen',
     ['Ethan',"...Yeah. Yeah, these are legit. Grill master approved."],['Lars',"Oh thank goodness."],['John',"I was SO nervous."]],
   hug:"Alex runs over and gives Joe the biggest hug.",
   danceTitle:"THE COOKIE DANCE",
-  party:[['Alex',"THEY'RE PERFECT."],['Keelan',"Best eggs in the county."],['Lil Q',"Thirty bucks of gas. Worth every penny. Lil Q approves. *mic drop*"],
+  party:[['Alex',"THEY'RE PERFECT."],['Keelan',"Best eggs in the county."],['Lil Q',"Lost a scooter race to the rookie. Lil Q demands a rematch. *mic drop*"],
     ['Lars',"Okay. But next time i'm making that jump."],['John',"Can I have six? I'm having six."],
     ['Margie',"Milk for dunking. My idea."],['Jack',"Ten out of ten. Margin of error: zero."],['Brian',"Nice."],['John',"SKOL!!! (the Vikings taught me that)",'Trail John'],
     ['','Everyone agrees. There is only one Cookie Baking King.'],['','Joe gets a crown.'],['Alex',"And now... THE COOKIE DANCE. Everybody!"]],

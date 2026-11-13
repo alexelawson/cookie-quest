@@ -50,7 +50,7 @@ r=await p.evaluate(()=>{bakePress(); const step=$('bakeStep').textContent; T.sco
   for(let i=1;i<6;i++)T.scoopAt(i); return {step,miss,none,one,taken,state:bake.state}});
 ok('C scoop: dropping between spots misses, a full spot is taken, six on the spots is done',r.step.includes('Scoop')&&r.miss.includes('Missed')&&r.none===0&&r.one===1&&r.taken.includes('already')&&r.state==='good',JSON.stringify(r));
 r=await p.evaluate(()=>{bakePress(); const shape=bake.shape, want=[...shapeCells(shape)], msg=$('bakeMsg').textContent, card=KITCHEN.shapes[shape];
-  const wrong=[...Array(25).keys()].filter(i=>!want.includes(i)).slice(0,want.length); wrong.forEach(chipToggle); const bad=$('bakeMsg').textContent;
+  let wrong=[...Array(25).keys()].filter(i=>!want.includes(i)).slice(0,want.length); wrong=[...wrong,...want.slice(0,want.length-wrong.length)]; wrong.forEach(chipToggle);   /* (a big shape like the star leaves fewer empty cells than it has chips) */ const bad=$('bakeMsg').textContent;
   bakeAltPress(); const cleared=bake.chips.size; return {shape,want,msg,card,bad,cleared,cells:want.map(T.cellXY)}});
 ok('C chips: the card names the shape; a wrong pattern gets a nudge; Start over clears it',r.msg.includes(r.card)&&r.bad.includes("doesn't match")&&r.cleared===0,r.shape+' | '+r.bad);
 for(const c of r.cells.slice(0,-1)) await p.mouse.click(c.x,c.y);
@@ -159,16 +159,7 @@ ok('P standing still: Alex says where to go next; moving hides it',r.shown&&r.te
 // Q. the photo album in Settings shows locked photos as ?
 r=await p.evaluate(()=>{$('settingsBtn').click(); $('setAlbum').click(); const locked=!!$('ecard').querySelector('.plocked'), btn=$('endNext').textContent; $('endNext').click(); return {locked,btn,closed:$('ending').hidden,paused}});
 ok('Q Settings > Photo album: locked photos until you finish that stop',r.locked&&r.btn==='Close'&&r.closed&&!r.paused);
-// R. Jackie: get kicked out of the Fargo shop and she shows up to tell Joe what to do
-await fresh({farm:1});
-await p.evaluate(()=>{goTo('fargo','fromHighway'); T.run(40); try{closeDialog()}catch(e){} have.fargoStage='store'; parkAndGetOut(); paused=false; openShop();
-  for(let k=0;k<2;k++){shop.drink='coke'; shop.snack='snickers'; giveToAlex()}});
-await p.waitForTimeout(5000);
-r=await p.evaluate(()=>{const sp=$('dspeaker').textContent, t=$('dtext').textContent; while(T.btns().includes('Next'))T.click('Next'); T.click('Okay, Jackie'); const j=fargo.jackie;
-  P.x=j.x+8;P.y=j.y; T.run(1); const lbl=prompt.textContent; action(); const h1=$('dtext').textContent; closeDialog(); action(); const h2=$('dtext').textContent; closeDialog();
-  const g=STATIONS[fargo.bob]; P.x=g.door.x+8; P.y=g.door.y+4; T.run(1); const door=prompt.textContent; return {sp,t,lbl,h1,h2,door,met:have.metJackie,tryAgain:JACKIE.tryAgain}});
-ok('R kicked out: Jackie comes over and says to think, then go back in',r.sp==='Jackie'&&r.t.includes('kicked out')&&r.met,r.t);
-ok('R talking to Jackie gives a hint each time; the door says try again',r.lbl==='Talk to Jackie'&&r.h1!==r.h2&&r.door===r.tryAgain,r.h1.slice(0,40)+' / '+r.door);
+// (R. Jackie lives in tests/fargo-scenarios.js now: she's in Lil Q's shop)
 // P. Grp the rooster: only after the farm (Keelan's keepsake), then he follows Joe everywhere, dressed for each place
 await fresh({});
 r=await p.evaluate(()=>{const before=!!henEnt(); have.gear={hen:1}; const keep=scene; const out={};

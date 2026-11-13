@@ -98,45 +98,13 @@ canvas{border-radius:6px}
 .reset.armed{border-color:var(--berry);color:var(--paper);background:rgba(212,71,60,.3)}
 .reset:focus-visible{outline:3px solid var(--berry);outline-offset:2px}
 
-/* Gary's pump */
-.pump{position:absolute;inset:0;z-index:6;display:flex;align-items:center;justify-content:center;background:rgba(8,9,16,.55);padding:10px;border-radius:6px}
 .pcard{background:#d9dde3;color:var(--ink);border:3px solid var(--ink);border-radius:8px;padding:10px 14px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;width:min(100%,300px);box-shadow:0 10px 30px rgba(0,0,0,.5);animation:rin .25s ease-out}
 .pcard small{font-family:var(--pixel);font-size:.85rem;font-weight:600;color:var(--berry)}
-.pdisp{background:#141a14;border-radius:4px;padding:8px 10px;display:grid;gap:2px;width:100%}
-.pdisp div{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
-.lbl{font-family:var(--pixel);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:#7f9a7f}
-.led{font-family:var(--pixel);font-size:1.7rem;color:#8cff8c;font-variant-numeric:tabular-nums;text-shadow:0 0 6px rgba(140,255,140,.5)}
-.led.small{font-size:1rem}
-.pump.over .led{color:#ff7a6a;text-shadow:0 0 6px rgba(255,120,100,.5)}
 .pcard p{margin:0;font-size:.85rem;min-height:2.4em}
 .pbtn{font-family:var(--pixel);font-size:1rem;border:3px solid var(--ink);background:var(--gold);color:var(--ink);padding:10px 20px;border-radius:6px;cursor:pointer;touch-action:none;user-select:none;-webkit-user-select:none;width:100%}
 .pbtn.on{background:#e2a93f;transform:translateY(1px)}
 .pbtn:focus-visible{outline:3px solid var(--berry);outline-offset:2px}
-.pips i.on.fuel{background:var(--gold);border-color:var(--gold)}
 
-/* Gary's shop: pick a drink + snack for Alex */
-.shop{position:absolute;left:6px;right:6px;top:3%;z-index:7;background:var(--paper);color:var(--ink);border:3px solid var(--ink);border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:8px;box-shadow:0 10px 30px rgba(0,0,0,.5);animation:rin .25s ease-out}
-.shophead{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;font-family:var(--pixel);font-size:.85rem}
-.shophead h3{margin:0 auto 0 0;font-family:var(--pixel);font-weight:600;color:var(--berry);font-size:1.1rem}
-.shophead b{font-weight:600;font-variant-numeric:tabular-nums}
-.shophead .pips i{border-color:var(--ink)}
-.alexrow{display:flex;gap:10px;align-items:center}
-.alexrow canvas{width:80px;height:80px;image-rendering:pixelated;image-rendering:crisp-edges;flex:none;background:#e3d6bd;border-radius:6px}
-.alexrow p{margin:0;background:#fff;border:2px solid var(--ink);border-radius:8px;padding:6px 9px;font-size:.92rem;line-height:1.3;min-width:0;flex:1}
-.case{border-radius:6px;padding:6px;position:relative}
-.fridgecase{background:linear-gradient(#d6ecf5,#bcdcea);border:3px solid #8aa5b2;box-shadow:inset 0 0 0 2px rgba(255,255,255,.6)}
-.shelfcase{background:#e9d3ae;border:3px solid #9a6a42;border-bottom-width:6px}
-.caselbl{font-family:var(--pixel);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;opacity:.7}
-.items{display:grid;grid-template-columns:repeat(auto-fill,minmax(58px,1fr));gap:4px}
-.item{display:flex;flex-direction:column;align-items:center;gap:2px;background:rgba(255,255,255,.55);border:2px solid transparent;border-radius:6px;padding:4px 2px;cursor:pointer;font-family:var(--body);font-size:.68rem;line-height:1.1;color:var(--ink);min-width:0}
-.item canvas{width:32px;height:40px;image-rendering:pixelated;image-rendering:crisp-edges}
-.item span{text-align:center;overflow-wrap:anywhere}
-.item[aria-pressed="true"]{border-color:var(--berry);background:#fff6d6;box-shadow:0 0 0 2px var(--gold)}
-.item:focus-visible{outline:3px solid var(--berry);outline-offset:1px}
-.givebtn{align-self:stretch}
-.givebtn:disabled{opacity:.45;cursor:default}
-#fridge{grid-template-columns:repeat(5,minmax(0,1fr))}
-#shelf{grid-template-columns:repeat(3,minmax(0,1fr))}
 
 /* heist: crew switcher under the screen */
 .crewbar{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
@@ -437,11 +405,6 @@ h1::before,h1::after{content:'✦';color:var(--berry);font-size:.6em;vertical-al
 .habums{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
 .halbum{min-width:140px}
 @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
-/* Lil Q's pump: three spinning reels */
-#pumpSale b{font-weight:inherit;display:inline-block;min-width:.6em;text-align:center}
-#pumpSale b.spin{color:#ffd84d;animation:reelBlink .25s steps(2) infinite}
-#pumpSale b.set{color:#7dff8a}
-@keyframes reelBlink{50%{opacity:.6}}
 
 /* ---------- a bigger game window ----------
    On wide screens the title and basket share one line above the game, and the hint and buttons share one line below,
@@ -462,3 +425,4 @@ h1::before,h1::after{content:'✦';color:var(--berry);font-size:.6em;vertical-al
 :fullscreen body,body:fullscreen{padding:6px 12px}
 :fullscreen .app,.app:fullscreen{max-width:min(calc(100vw - 24px),calc((100vh - 112px)*4/3))}
 :fullscreen .app:has(#crewbar:not([hidden])){max-width:min(calc(100vw - 24px),calc((100vh - 170px)*4/3))}
+.hudpic{width:12px;height:15px;image-rendering:pixelated;vertical-align:middle;margin:0 2px}

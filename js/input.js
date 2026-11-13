@@ -7,9 +7,9 @@ addEventListener('keydown',e=>{
     const bs=[...$('dbtns').querySelectorAll('button')], i=bs.indexOf(document.activeElement), d=KEYMAP[e.code];
     const n=bs.length, step=(d==='down'||d==='right')?1:-1; if(n)bs[(i+step+n)%n].focus({preventScroll:true});
     e.preventDefault(); return}
-  if(dlg.hidden&&!paused&&scene.key&&scene.key(e.code)){e.preventDefault();return}
+  if(dlg.hidden&&!paused&&scene.key&&scene.key(e.code,e)){e.preventDefault();return}
   if(KEYMAP[e.code]){dirs[KEYMAP[e.code]]=true;e.preventDefault()}
-  if(['Space','Enter','KeyE'].includes(e.code)){if(document.activeElement&&document.activeElement.tagName==='BUTTON'&&(!dlg.hidden||!$('reward').hidden||!$('shop').hidden||!$('lasergrid').hidden||!$('anagram').hidden||!$('howto').hidden||!$('wardrobe').hidden||!$('bake').hidden||!$('crane').hidden||!$('settings').hidden))return; e.preventDefault(); action()}
+  if(['Space','Enter','KeyE'].includes(e.code)){if(document.activeElement&&document.activeElement.tagName==='BUTTON'&&(!dlg.hidden||!$('reward').hidden||!$('lasergrid').hidden||!$('anagram').hidden||!$('howto').hidden||!$('wardrobe').hidden||!$('bake').hidden||!$('crane').hidden||!$('settings').hidden))return; e.preventDefault(); action()}
 });
 let actionHeld=false;   // the action button held down (the heist's defuse)
 addEventListener('keydown',e=>{if(['Space','Enter','KeyE'].includes(e.code))actionHeld=true},true);

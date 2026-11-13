@@ -1,10 +1,10 @@
-// Extra people: Jackie (Fargo, after you get kicked out of the shop), Logan (the clover field on the farm),
+// Extra people: Jackie (Fargo, in Lil Q's shop), Logan (the clover field on the farm),
 // the Vikings and Lil Q passing by on the main road, and Alex's "where to next?" hints when you stand still.
 // Their lines are in story.js (JACKIE, LOGAN, HINTS).
 
-// ---------- Jackie: short, short brown hair, very direct ----------
-// Jackie: short, short brown hair (side-swept), very direct: one eyebrow up, flat mouth, arms crossed. 11 x 17 px.
-const JACKIE_PAL={H:'#6b4428',h:'#4f301b',L:'#8a5a38',S:'#f0c6a0',s:'#dcae88',E:'#2b2b2b',W:'#ffffff',B:'#3b2a1e',M:'#a8574a',T:'#2b2b33',t:'#3c3c48',J:'#3a5f9e'};
+// ---------- Jackie: short, short black hair, very direct ----------
+// Jackie: short, short black hair (side-swept), very direct: one eyebrow up, flat mouth, arms crossed. 11 x 17 px.
+const JACKIE_PAL={H:'#1e1b22',h:'#0f0d12',L:'#3a3640',S:'#f0c6a0',s:'#dcae88',E:'#2b2b2b',W:'#ffffff',B:'#1e1b22',M:'#a8574a',T:'#2b2b33',t:'#3c3c48',J:'#3a5f9e'};
 const JACKIE_SPR={
   down:["..HHHHHHH..",".HHHHLLHHH.",".HSSHHHHBH.",".HSWESSWEh.","..SSSsSSS..","..sSMMMSs..",
         "..TTTTTTT..",".TTTTTTTTT.",".TSSSSSSST.",".TsSSSSSsT.",".TtTTTTTtT."],
@@ -21,8 +21,8 @@ function drawJackie(x,y,dir='down'){
 PORTRAITS['Jackie']={size:32, bg:'#e8dcc8', draw(g){ const F=px(g);
   F('#2b2b33',5,25,22,7); F('#f0c6a0',13,21,6,4);
   F('#f0c6a0',10,7,12,15); F('#e3b08c',10,18,1,3); F('#e3b08c',21,18,1,3);
-  F('#6b4428',9,4,14,4); F('#6b4428',9,8,2,6); F('#6b4428',21,8,2,4); F('#6b4428',11,8,7,2); F('#8a5a38',12,5,6,1); F('#4f301b',9,12,2,3);   // pixie cut, fringe swept over
-  F('#3b2a1e',12,11,3,1); F('#3b2a1e',17,10,3,1);                                 // one eyebrow up
+  F('#1e1b22',9,4,14,4); F('#1e1b22',9,8,2,6); F('#1e1b22',21,8,2,4); F('#1e1b22',11,8,7,2); F('#3a3640',12,5,6,1); F('#0f0d12',9,12,2,3);   // black pixie cut, fringe swept over
+  F('#1e1b22',12,11,3,1); F('#1e1b22',17,10,3,1);                                 // one eyebrow up
   F('#ffffff',12,13,3,2); F('#ffffff',17,13,3,2); F('#5a3a22',13,13,2,2); F('#5a3a22',18,13,2,2);
   F('#d9a37f',15,16,2,2); F('#b5654f',13,19,6,1);                                  // flat, unimpressed mouth
 }};
@@ -242,18 +242,8 @@ function showHint(){ const t=nextHint(); if(!t)return; idle.shown=true;
   $('hintText').textContent=t; const g=$('hintFace').getContext('2d'); g.fillStyle='#e3d6bd'; g.fillRect(0,0,40,40); drawAlexFace(g,'ok'); $('hint').hidden=false; sfx('blip') }
 function hideHint(){ if(!$('hint').hidden)$('hint').hidden=true; idle.shown=false }
 
-// Jackie in Fargo: shows up outside once Alex kicks you out of the shop
-function jackieSpot(){ const g=STATIONS[fargo.bob]; return freeSpotNear(g.x+40, g.face==='up'?g.y+26:g.y+2) }
-function jackieArrives(){
-  fargo.jackie=jackieSpot(); have.metJackie=true; save(); fargo.thinkT=1600;
-  setTimeout(()=>{ if(fargo.onFoot&&fargo.jackie&&$('shop').hidden&&dlg.hidden&&have.fargoStage==='store')showDialog({place:FARGO.place,speaker:'Jackie',pages:JACKIE.kicked,actions:[{label:JACKIE.ok,fn:closeDialog}]}) },1700);   // unless Joe's already back inside
-}
-function talkJackie(){ const n=Math.min(fargo.jackieHint||0,JACKIE.hints.length-1); fargo.jackieHint=n+1;
-  showDialog({place:FARGO.place,speaker:'Jackie',pages:[JACKIE.hints[n]],actions:[CLOSE]}) }
-
 // every frame (from game.js), even while paused. Logan's search only counts down while Joe is still on the map.
 function peopleTick(dt){
-  if(fargo.thinkT>0)fargo.thinkT-=dt;
   if(paused&&!$('hint').hidden)hideHint();
   hintTick(dt);
 }
