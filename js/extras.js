@@ -187,8 +187,8 @@ function drawFargoTop(){
   for(const lx of [266,350]){F('#1d1d22',lx,236,1,20); F('#1d1d22',lx-1,255,3,1); F('#fff3c8',lx-1,234,3,3)}
 }
 
-// motorcyclists cruising the road on the way to Fargo: one lane each way. v = px per ms; off spaces them out
-const MOTOS=[{y:155,dir:1,v:.045,off:0,col:'#c8322b',vest:'#2b2b30'},{y:155,dir:1,v:.045,off:26,col:'#1d1d22',vest:'#5a3a22'},{y:162,dir:-1,v:.038,off:140,col:'#2f6db0',vest:'#2b2b30'},{y:155,dir:1,v:.045,off:260,col:'#e8742a',vest:'#2b2b30'}];
+// motorcyclists cruising Broadway (the street in front of the Fargo Theatre, below Fargo): all heading east in the near lane. v = px per ms; off spaces them out
+const MOTOS=[{y:279,dir:1,v:.035,off:0,col:'#c8322b',vest:'#2b2b30'},{y:279,dir:1,v:.035,off:22,col:'#1d1d22',vest:'#5a3a22'},{y:279,dir:1,v:.035,off:75,col:'#2f6db0',vest:'#2b2b30'},{y:279,dir:1,v:.035,off:120,col:'#e8742a',vest:'#2b2b30'}];
 function drawMoto(x,y,dir,col,vest){   // seen from the side-ish top: two wheels, a tank, a rider in a helmet and a leather vest
   const f=dir, X=Math.round(x), F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(X+(f>0?dx:-dx-w+1),Math.round(y)+dy,w,h)}, bob=Math.floor(time/120)%2;
   F('rgba(0,0,0,.22)',-7,1,15,2);
@@ -206,7 +206,7 @@ function drawMoto(x,y,dir,col,vest){   // seen from the side-ish top: two wheels
   SCENES.world.ents=function(list){ ents.call(this,list);
     for(const k in GEAR)if(!GEAR[k].give&&!(have.gear&&k in have.gear))list.push({y:GEAR[k].y,draw:()=>drawGearItem(k,GEAR[k].x,GEAR[k].y)});
     list.push({y:182,draw:()=>drawCar(270,176,'right',true)});   // the CR-V at Fargo, parked a step back from the road: walk up to it to drive into town
-    for(const m of MOTOS){ const span=WW+60, x=m.dir>0?((time*m.v+m.off)%span)-30:WW+30-((time*m.v+m.off)%span); list.push({y:m.y,draw:()=>drawMoto(x,m.y,m.dir,m.col,m.vest)}) }   // motorcyclists on the road into Fargo
+    for(const m of MOTOS){ const L=214, span=WW-L+20, d=(time*m.v+m.off)%span, x=m.dir>0?L+d:WW+10-d; if(x>L+4&&x<WW-2)list.push({y:m.y,draw:()=>drawMoto(x,m.y,m.dir,m.col,m.vest)}) }   // motorcyclists cruising Broadway, below Fargo
   }}
 
 // the lucky clover sheds little green sparkles as Joe walks; Grp the rooster trots along behind him
