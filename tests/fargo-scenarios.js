@@ -97,16 +97,18 @@ ok('H then the HUD says where to get it, and the EXIT arrow shows the way out',r
 // I. so: walk out (you've already been inside), get in the car, the diner, back
 r=await p.evaluate(()=>{T.toDoor(); for(let i=0;i<40&&scene===SCENES.lilqshop;i++){dirs.down=true; update(16.7)} dirs.down=false; T.settle();
   const out=scene===SCENES.fargo, onFoot=fargo.onFoot, stage=have.fargoStage; const c=fargo.car; const lbl=T.at(c.x,c.y+14); action(); const driving=!fargo.onFoot, hud=SCENES.fargo.hud();
-  P.x=DINER.lot.x+20; P.y=DINER.lot.y+14; update(16.7); action(); T.click('Plain pasta to go'); const lines=T.lines(); const card=!$('itemCard').hidden, cardName=$('itemName').textContent; $('itemBtn').click(); const got=!!have.fargoPasta;
+  P.x=DINER.lot.x+20; P.y=DINER.lot.y+14; update(16.7); action(); T.click('Plain pasta to go'); const lines=T.lines(); const card=!$('reward').hidden, cardName=$('rewardName').textContent; collectReward(); window._I={out,onFoot,stage,lbl,driving,hud,lines,card,cardName}; return 1});
+await p.waitForTimeout(800);
+r=await p.evaluate(()=>{const {out,onFoot,stage,lbl,driving,hud,lines,card,cardName}=window._I; const got=!!have.fargoPasta, inBasket=!!$('basket').querySelector('[data-key="fargoPasta"]');
   action(); const again=$('dtext').textContent; T.lines();
   const s=STATIONS[0]; P.x=s.lot.x+10;P.y=s.lot.y+22; update(16.7); action(); const parked=fargo.onFoot&&!!fargo.car; const g=s.door; const door=T.at(g.x+8,g.y+4); action(); T.settle();
-  return {out,onFoot,stage,lbl,driving,hud,lines,card,cardName,got,again,parked,door,inShop:scene===SCENES.lilqshop,shopHud:SCENES.lilqshop.hud()}});
+  return {out,onFoot,stage,lbl,driving,hud,lines,card,cardName,got,inBasket,again,parked,door,inShop:scene===SCENES.lilqshop,shopHud:SCENES.lilqshop.hud()}});
 ok('I you can walk out after you\'ve gone in: get in the car (HUD: the diner)',r.out&&r.onFoot&&r.stage==='store'&&r.lbl==='Get in the car'&&r.driving&&r.hud.includes('Diner'),r.hud);
-ok('I Deb hands over a bowl of plain pasta: a "you got something" card',r.lines.join().includes('warm bowl')&&r.card&&r.cardName==='Plain pasta'&&r.got&&r.again.includes('always plain'),r.cardName);
+ok('I Deb hands over a bowl of plain pasta: tap it into the basket',r.lines.join().includes('warm bowl')&&r.card&&r.cardName==='Plain pasta'&&r.got&&r.inBasket&&r.again.includes('always plain'),r.cardName);
 ok('I back to Lil Q\'s: park and go inside again; the HUD says you\'ve got the pasta',r.parked&&r.door==='Go inside'&&r.inShop&&r.shopHud.includes('Plain pasta'),r.shopHud);
 r=await p.evaluate(()=>{T.run(60); T.lines(); T.go(SHOP.JACKIE.x,SHOP.JACKIE.y+14); update(16.7); const lbl2=near&&near.label; action(); const fed=T.lines(); action(); const h2=T.lines(); action(); const h3=T.lines(); action(); const h4=T.lines();
-  return {lbl2,fed,h2,h3,h4,met:have.metJackie,fedSaved:have.jackieFed}});
-ok('I give Jackie the pasta: she eats, then a clue each time you talk (gentle, bubbly / fruity pouch / just tells you)',r.lbl2==='Give her the pasta'&&r.fed.join().includes('Plain pasta. Perfect')&&r.fed.join().includes('Bubbly')&&r.h2.join().includes('pouch')&&r.h3.join().includes("Mott's")&&r.h4.join().includes("Mott's")&&r.met&&r.fedSaved,[r.fed.join(),r.h2.join()].join(' / '));
+  return {lbl2,fed,h2,h3,h4,met:have.metJackie,fedSaved:have.jackieFed,outOfBasket:!$('basket').querySelector('[data-key="fargoPasta"]')}});
+ok('I give Jackie the pasta: she eats, then a clue each time you talk (gentle, bubbly / fruity pouch / just tells you)',r.lbl2==='Give her the pasta'&&r.fed.join().includes('Plain pasta. Perfect')&&r.fed.join().includes('Bubbly')&&r.h2.join().includes('pouch')&&r.h3.join().includes("Mott's")&&r.h4.join().includes("Mott's")&&r.met&&r.fedSaved&&r.outOfBasket,[r.fed.join(),r.h2.join()].join(' / '));
 
 // J. the right ones: Alex is thrilled, the EXIT sign lights up, out the door, Lil Q's sugar
 r=await p.evaluate(()=>{T.lines(); const ge=SHOP_ITEMS.find(i=>i.id==='gingerale'), mo=SHOP_ITEMS.find(i=>i.id==='motts');

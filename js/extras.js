@@ -148,8 +148,6 @@ function drawTractor(x,y,flip){
   if(Math.floor(time/400)%2)F('rgba(220,220,220,.6)',-4,-14+bump,2,2);                                                          // a puff of smoke
 }
 {const ents=SCENES.world.ents; SCENES.world.ents=function(list){ ents.call(this,list);
-  const t=time/9000, k=t-Math.floor(t), x=k<.5?246+k*2*84:330-(k-.5)*2*84, flip=k>=.5; list.push({y:266,draw:()=>drawTractor(x,266,flip)}) }}
-{const ents=SCENES.world.ents; SCENES.world.ents=function(list){ ents.call(this,list);
   for(const [cx,cy,ph] of [[146,32,0],[152,38,1.3],[140,40,2.2]]){ const x=cx+Math.sin(time/1500+ph)*5, fl=Math.cos(time/1500+ph)<0; list.push({y:cy,draw:()=>drawDuck(x,cy,fl,ph)}) }
   list.push({y:78,draw:()=>drawSnowman(262,78)}) }}
 
@@ -166,19 +164,27 @@ const LAND_SIGNS=[['THE FARM',58,132],['THE BIRKIE',326,130]];
   for(const px of [x+2,x+w-4]){F('#3a3f50',px,y+2,2,14); F('#5a6278',px,y+2,1,14); F('#ffe9a8',px-1,y+15,4,2)}   // posts with little lamps
   F('#1d2a44',x,y,w,10); F('#2f4a78',x+1,y+1,w-2,8); F('#c9a640',x,y,w,1); F('#c9a640',x,y+9,w,1); pixText(g,t,x+5,y+2,'#ffd84d');
   solids.push(R(x+2,y+14,2,3),R(x+w-4,y+14,2,3))}
-// Fargo on the main map: the gas canopy (with Lil Q's price) and a tall theater-style FARGO sign, its bulbs chasing
-solids.push(R(226,208,3,4));
+// Fargo on the main map (drawn on top): the theatre's teal FARGO marquee with chasing bulbs, its tall blade sign, the steel tower on its roof
 function drawFargoTop(){
-  const F=(c,x,y,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,h)};
-  F('rgba(0,0,0,.18)',246,191,50,2);
-  F('#c7372f',244,181,52,7); F('#e8584c',244,181,52,1); F('#f1f4f8',244,188,52,2); F('#8a8f9a',246,190,2,14); F('#8a8f9a',292,190,2,14);   // the canopy
-  F('#1d3f73',262,182,17,6); pixText(ctx,'2.79',263,182,'#ffd84d');                                                                // the price
-  // the sign: a red blade on a pole, F-A-R-G-O stacked, a border of bulbs
-  F('#5f6370',227,200,2,12); F('#3a3f4a',226,198,4,3);
-  F('#8a1f1a',222,166,10,33); F('#c7372f',223,167,8,31); F('#e8584c',223,167,1,31);
-  const on=Math.floor(time/220)%2;
-  for(let y=168;y<197;y+=3){F((y/3+on)%2?'#fff3a8':'#a8762a',222,y,1,1); F((y/3+on+1)%2?'#fff3a8':'#a8762a',231,y,1,1)}
-  [...'FARGO'].forEach((ch,i)=>pixText(ctx,ch,226-(ch==='M'?1:0),169+i*6,'#ffd84d'));
+  const F=(c,x,y,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,h)}, on=Math.floor(time/220)%2;
+  // the steel tower up on the roof
+  F('#3a3f4a',293,170,1,16); F('#3a3f4a',301,170,1,16); for(let y=172;y<186;y+=4){F('#3a3f4a',293,y,9,1); for(let k=0;k<4;k++)F('#3a3f4a',293+k*2,y+k,1,1)}
+  F('#5f9a98',296,172,3,20);
+  // the marquee: cream box, a teal panel with FARGO in salmon letters, little sign lines either side, bulbs along the top
+  F('rgba(0,0,0,.25)',262,240,66,2);
+  F('#efe6d2',262,226,66,14); F('#d9cdb4',262,238,66,2); F('#c9bca0',262,226,66,1);
+  F('#2f7a78',279,227,32,11); F('#3f9a96',279,227,32,1); F('#e9dcc4',279,227,1,11); F('#e9dcc4',310,227,1,11);
+  pixText(ctx,'FARGO',284,230,'#f6b08a');
+  for(const sx of [265,314])for(let k=0;k<3;k++)F('#7a2a22',sx,229+k*3,10,1);                       // "now showing"
+  F('#efe6d2',286,222,18,4); for(let k=0;k<4;k++)F('#c9bca0',288+k*4,222,2,4);                       // the crown on top
+  for(let x=263;x<328;x+=3)F(((x/3|0)+on)%2?'#fff3a8':'#a8762a',x,225,1,1);                            // chasing bulbs
+  // the blade sign, teal, F-A-R-G-O stacked, sticking out from the corner of the theatre
+  F('rgba(0,0,0,.2)',258,186,10,46); F('#2f7a78',255,184,10,46); F('#3f9a96',255,184,1,46); F('#1f5a58',264,184,1,46); F('#e9dcc4',255,184,10,1); F('#e9dcc4',255,229,10,1);
+  [...'FARGO'].forEach((ch,i)=>pixText(ctx,ch,258,188+i*8,'#efe6d2'));
+  for(let y=186;y<228;y+=3){F((y/3+on)%2?'#fff3a8':'#a8762a',255,y,1,1)}
+  // street lamps: black posts, a warm globe
+  for(const lx of [240,330]){F('#1d1d22',lx,168,1,14); F('#1d1d22',lx-1,181,3,1); F('#fff3c8',lx-1,165,3,3); F('#1d1d22',lx-1,164,3,1)}
+  for(const lx of [266,350]){F('#1d1d22',lx,236,1,20); F('#1d1d22',lx-1,255,3,1); F('#fff3c8',lx-1,234,3,3)}
 }
 
 // hook into the main map
@@ -186,7 +192,6 @@ function drawFargoTop(){
   SCENES.world.ents=function(list){ ents.call(this,list);
     for(const k in GEAR)if(!GEAR[k].give&&!(have.gear&&k in have.gear))list.push({y:GEAR[k].y,draw:()=>drawGearItem(k,GEAR[k].x,GEAR[k].y)});
     list.push({y:178,draw:()=>drawCar(270,172,'right',true)});   // the CR-V at Fargo, right off the road: walk up to it to drive into town
-    list.push({y:229,draw:()=>drawBike(340,217)});   // Lil Q's scooter, parked by her door
   }}
 
 // the lucky clover sheds little green sparkles as Joe walks; Grp the rooster trots along behind him

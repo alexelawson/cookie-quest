@@ -16,6 +16,7 @@ function basketSlot(key,label,got,cls=''){
 function renderBasket(){
   const b=$('basket'); b.replaceChildren(...ITEMS.map(i=>basketSlot(i.key,i.label,!!have[i.key])));
   const extras=[]; if(have.cupcake&&!have.gaveCupcake)extras.push(basketSlot('cupcake','Cupcake',true,'extra'));
+  if(have.fargoPasta&&!have.jackieFed)extras.push(basketSlot('fargoPasta',FARGO.pastaName,true,'extra'));   // Jackie's pasta, until you give it to her
   if(have.sprinkles)extras.push(basketSlot('sprinkles','Sprinkles',true,'bonus'));   // a bonus from Brian
   if(have.icecream)extras.push(basketSlot('icecream','Ice cream',true,'bonus'));    // a bonus from Lars's long jump
   if(extras.length){const d=document.createElement('span'); d.className='bdiv'; b.append(d,...extras)}
@@ -105,6 +106,8 @@ $('startBtn').onclick=start;
 // ---------- reward pop-up ----------
 // showReward('farm') shows the item art; tapping it flies it into the basket and marks it collected.
 const ART={
+  // Deb's bowl of plain pasta (for Jackie, in Fargo): steaming
+  fargoPasta(g){ drawPastaBowl(g,2,6,4); g.fillStyle='rgba(255,255,255,.75)'; for(const [x,y] of [[12,0],[20,2],[28,0]])g.fillRect(x,y,2,4) },
   cupcake(g){ const F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};
     // the hidden cupcake: striped pink wrapper, chocolate frosting swirl, a cherry
     F('#e9a6c0',12,17,16,10); F('#c77a9a',14,17,2,10); F('#c77a9a',19,17,2,10); F('#c77a9a',24,17,2,10); F('#d88fae',13,26,14,1);
@@ -169,6 +172,7 @@ const REWARDS={
   mill:{from:'From John (and the Vikings)', name:'Flour', hint:'Tap it to put it in your basket.'},
   icecream:{from:'From Lars (and a rooftop gutter)', name:'Rosemary Maple ice cream', hint:'A bonus! Tap it to put it in your basket.'},
   sprinkles:{from:'From Brian', name:'Sprinkles', hint:'A bonus! Tap them to put them in your basket.'},
+  fargoPasta:{from:FARGO.pastaFrom, name:FARGO.pastaName, hint:FARGO.pastaLine},
 };
 let rewardKey=null, rewardThen=null;
 function showReward(key,then){   // then: runs after the item lands in the basket

@@ -21,8 +21,7 @@ const solids=[
   R(108,16,52,30),                                           // Brian's pond (he's out in his boat)
   R(67,204,3,3),R(103,258,3,3),                              // city streetlamps
   R(8,178,40,52),R(110,184,48,56),R(0,244,72,44),R(72,264,92,24),R(94,224,6,4),   // city towers, the ocean, the steam clock
-  R(300,180,50,40),R(256,198,6,10),R(280,198,6,10),R(356,200,28,36),R(350,280,28,6), // Lil Q's, pumps, grain elevator, water tower
-  R(259,166,22,12),R(288,212,8,8),R(338,222,10,8),                                   // the CR-V, the ice chest, Lil Q's scooter
+  R(222,184,162,66),R(259,166,22,12),R(230,258,130,10),                              // downtown Fargo's buildings, the CR-V, the parked cars
   ...[...trees,...pines,...woods,...cedars].map(([x,y])=>R(x-3,y-3,6,4)),
 ];
 const triggers=[
@@ -139,48 +138,46 @@ const bg=document.createElement('canvas'); bg.width=WW; bg.height=WH;
   F('rgba(200,210,225,.18)',0,276,164,4);   // mist
   // the green bike lane next to the street
   F('#3f8a4a',86,170,4,74); for(let y=180;y<240;y+=22){F('#e8eef0',87,y,2,1); F('#e8eef0',86,y+2,1,2); F('#e8eef0',89,y+2,1,2)}
-  // fargo: flat prairie in summer. A tall theater-style FARGO sign by the road, Lil Q's little gas station,
-  // a grain elevator, the town water tower, and sugar beet rows running out to the edge
+  // fargo: downtown Broadway, like the real thing. A brick sidewalk along the main road (the CR-V is parked there: that's the way in),
+  // then a row of old brick buildings facing you: a tan one with balconies, the Fargo Theatre in the middle (red brick, a row of
+  // arched windows, the teal FARGO marquee), and brick storefronts with green awnings.
+  // In front of them: a sidewalk with lamps and planters, then the street with cars parked on an angle.
   F('#cdb978',220,170,164,118); soft(R(220,170,164,118),'#cdb978','lt');
-  for(let i=0;i<150;i++)F(['#bfa865','#d9c98e','#c4b06c'][i%3],220+rnd()*164|0,170+rnd()*118|0,2,1);
-  // the forecourt: one slab of asphalt from the road to the shop door
-  F('#9a9690',240,166,112,70); for(let i=0;i<150;i++)F(rnd()<.5?'#8f8b85':'#a5a19a',240+rnd()*112|0,166+rnd()*70|0,1,1);
-  F('#b5b1aa',240,166,112,1); F('#7f7b75',240,235,112,1); F('#7f7b75',240,166,1,70); F('#7f7b75',351,166,1,70);
-  for(let x=302;x<350;x+=12)F('#e2dfd8',x,224,1,10);                                         // parking spaces
-  // Lil Q's Gas & Go: white clapboard, a red-and-white awning, a big blue sign
-  F('rgba(0,0,0,.2)',302,220,50,2);
-  F('#f2efe6',300,184,50,36); for(let y=188;y<220;y+=3)F('#dcd7cc',300,y,50,1); F('#c9c4b8',349,184,1,36);
-  F('#e8742a',300,180,50,9); F('#c85a1a',302,181,46,7); F('#ffffff',300,180,50,1); F('#8a3a12',300,188,50,1); pixText(g,"LIL Q'S",310,182,'#ffffff');
-  for(let x=300;x<350;x+=4){F('#c7372f',x,189,2,4); F('#ffffff',x+2,189,2,4)} F('rgba(0,0,0,.15)',300,193,50,1);   // the awning
-  F('#9fd2f0',303,196,13,9); F('#cfeaf8',304,197,4,2); F('#9fd2f0',334,196,13,9); F('#cfeaf8',335,197,4,2);          // windows
-  F('#e9c46a',305,203,4,2); F('#e54b4b',310,203,4,2); F('#7fd39a',336,203,4,2); F('#f28cb8',341,203,4,2);           // snacks on the shelves
-  F('#6b6f7a',319,206,12,14); F('#8a8f9a',320,207,10,12); F('#f4d35e',327,213,1,2); F('#ffffff',321,209,8,3);     // the door, OPEN
-  F('#e54b7a',305,198,8,3); F('#ff9ab8',306,199,6,1);                                                              // an OPEN neon in the window
-  F('#ffffff',336,198,3,4); F('#f4d35e',340,198,5,4); F('#2f6db0',336,203,9,1);                                     // posters (gas, slushies)
-  F('#c9c4b8',300,219,50,1); F('#a8a39a',300,220,50,1);                                                            // the step along the front
-  // out front: an ice chest, a propane cage, a bench, a trash can, a newspaper box, a light pole on each corner of the lot
-  F('rgba(0,0,0,.18)',288,219,9,2); F('#e9eef3',288,212,8,7); F('#3d8ad6',288,214,8,2); F('#ffffff',289,212,6,1);
-  F('#8a8f9a',350,206,1,14); F('#c9ced4',344,206,7,1); for(let x=345;x<350;x+=2)F('#9aa0aa',x,207,1,12); F('#e9eef3',345,212,2,6); F('#e9eef3',348,212,2,6);   // propane
-  F('#7a4a24',304,222,12,2); F('#5a3418',305,224,1,2); F('#5a3418',314,224,1,2);                                    // bench
-  F('#5f6676',318,222,4,6); F('#4a505e',318,222,4,1); F('#3d8ad6',324,222,4,6); F('#ffffff',325,223,2,1);          // trash can, newspaper box
-  for(const lx of [241,351]){F('#5f6676',lx,170,1,22); F('#3a3f4a',lx-2,169,5,2); F('#fff6c8',lx-1,171,3,1)}       // light poles
-  for(const [x,y] of [[266,214],[300,228],[250,226],[284,232]])F('#8a8681',x,y,4,2);                                 // oil spots on the asphalt
-  // the pumps (the canopy over them is drawn on top, in over())
-  F('#c7372f',256,198,6,10); F('#c7372f',280,198,6,10); F('#f1f4f8',257,200,4,3); F('#f1f4f8',281,200,4,3); F('#2b2b2b',262,201,1,5); F('#2b2b2b',286,201,1,5);
-  // the grain elevator: three concrete silos and a head house on top
-  F('rgba(0,0,0,.25)',356,234,28,3);
-  for(const x of [356,365,374]){F('#d8d4cc',x,182,9,53); F('#ebe8e2',x+1,182,2,53); F('#b9b4aa',x+7,182,2,53); for(let y=186;y<234;y+=7)F('#c9c4ba',x,y,9,1)}
-  F('#c9c4ba',360,168,18,15); F('#e2ded6',361,168,6,15); F('#a8a39a',360,168,18,1); F('#b03a2e',360,171,18,3); F('#2b2f3a',366,176,5,4);   // head house
-  F('#8a8f9a',357,180,2,12); F('#8a8f9a',357,180,6,1);                                                                                  // the leg / spout
-  F('#6b6f7a',382,184,1,50); for(let y=186;y<234;y+=3)F('#6b6f7a',380,y,3,1);                                                          // a ladder up the side
-  for(const [x,y,h] of [[358,200,9],[369,194,14],[377,206,8]])F('rgba(150,90,50,.3)',x,y,1,h);                                         // rust streaks
-  // the water tower, FARGO painted on the tank
-  {const x=348, y=238; F('rgba(0,0,0,.2)',x+2,y+47,32,2);
-   for(const lx of [x+3,x+14,x+25]){F('#7a7f8a',lx,y+20,2,27); F('#5f6370',lx+1,y+20,1,27)} F('#7a7f8a',x+3,y+32,24,1); F('#7a7f8a',x+5,y+40,20,1);   // legs + cross braces
-   F('#9fb4c8',x,y+4,30,17); F('#c4d4e2',x+2,y+4,8,17); F('#7f93a8',x+25,y+4,5,17); F('#9fb4c8',x+3,y+2,24,2); F('#b4c6d6',x+8,y,14,2);   // tank, dome
-   F('#7f93a8',x,y+20,30,1); pixText(g,'FARGO',x+5,y+9,'#1d3f73')}
-  // sugar beet rows
-  for(let y=244;y<284;y+=8){F('#9a7b66',236,y,104,4); for(let x=240;x<338;x+=6){F('#7d2b52',x,y+1,3,2);F('#4f9a3c',x+1,y-2,1,3)}}
+  const paver=(x,y,w,h)=>{F('#b56a52',x,y,w,h); for(let yy=y;yy<y+h;yy+=3)for(let xx=x+((yy-y)/3%2?2:0);xx<x+w;xx+=4)F('#a05a44',xx,yy,1,3); for(let yy=y+2;yy<y+h;yy+=3)F('#c47c62',x,yy,w,1)};
+  paver(222,166,162,16);                                                                     // the brick sidewalk along the main road
+  // building 1 (left): tan brick, three floors of windows, little balconies
+  {const x=222, y=184, w=32, h=66; F('#c9b48a',x,y,w,h); for(let yy=y+2;yy<y+h;yy+=3)F('#b9a47a',x,yy,w,1); F('#8a7a5a',x,y,w,2); F('#e2d4b0',x,y+2,w,1);
+   for(let r=0;r<3;r++)for(let c=0;c<3;c++){const wx=x+3+c*10, wy=y+8+r*16; F('#e2d4b0',wx-1,wy-1,8,10); F('#3a4458',wx,wy,6,8); F('#9fb8d8',wx+1,wy+1,2,3); F('#5a3a2a',wx,wy+4,6,1)}
+   for(let r=0;r<2;r++){F('#2b2f3a',x+2,y+19+r*16,w-4,1); for(let k=x+2;k<x+w-2;k+=2)F('#2b2f3a',k,y+19+r*16,1,3)}   // balcony rails
+   F('#2b2f3a',x+4,y+56,24,10); F('#9fd2f0',x+5,y+57,10,6); F('#9fd2f0',x+17,y+57,10,6); F('#1d2130',x+15,y+57,2,9)}   // shop windows + door
+  // the Fargo Theatre: red brick, a parapet + cornice, five arched windows, the marquee, a dark lobby
+  {const x=254, y=184, w=82, h=66, B='#9a3b2e', b='#86302a';
+   F(B,x,y,w,h); for(let yy=y+2;yy<y+h;yy+=3)F(b,x,yy,w,1); for(let yy=y;yy<y+h;yy+=6)for(let xx=x+(yy/6%2?3:0);xx<x+w;xx+=6)F('#a8463a',xx,yy,2,1);
+   F('#7a2a22',x,y,w,2); F('#e9dcc4',x,y+10,w,3); for(let xx=x+1;xx<x+w;xx+=3)F('#c9b89c',xx,y+13,1,2); F('#bda88a',x,y+15,w,1);   // parapet, cornice with dentils
+   for(let k=0;k<5;k++){const ax=x+14+k*13, ay=y+20;   // (starting past the blade sign)                                                     // arched windows with cream trim
+     F('#e9dcc4',ax-1,ay+2,12,19); F('#e9dcc4',ax+1,ay,8,2); F('#e9dcc4',ax,ay+1,10,1);
+     F(b,ax,ay+3,10,6); F('#1f2230',ax+1,ay+9,8,11); F('#c99a6a',ax+2,ay+3,6,5); F('#e9dcc4',ax+4,ay+4,2,2);   // a diamond in the arch
+     for(let yy=ay+11;yy<ay+20;yy+=3)F('#5a4a3a',ax+1,yy,8,1); F('#5a4a3a',ax+5,ay+9,1,11); F('#8a6a4a',ax+2,ay+10,2,2)}
+   F('#e9dcc4',x,y+42,w,1);
+   F('#1d1d22',x+4,y+52,w-8,14); F('#2b2b30',x+6,y+54,w-12,12);                                         // the lobby under the marquee
+   for(const dx of [10,64]){F('#3a2a2a',x+dx,y+54,8,12); F('#c8322b',x+dx+1,y+55,6,7); F('#f4d35e',x+dx+3,y+57,2,2)}   // poster cases with a star
+   for(let k=0;k<4;k++)F('#6a6a74',x+24+k*9,y+55,7,11); for(let k=0;k<4;k++)F('#9aa0aa',x+27+k*9,y+59,1,3)}   // glass doors
+  // storefronts (right): brick, green awnings
+  for(const [x,w,col] of [[336,24,'#8a4a34'],[360,24,'#a8784e']]){const y=184, h=66;
+    F(col,x,y,w,h); for(let yy=y+2;yy<y+h;yy+=3)F('rgba(0,0,0,.08)',x,yy,w,1); F('rgba(0,0,0,.25)',x,y,w,2); F('#e2d4b0',x,y+2,w,1);
+    for(let r=0;r<3;r++)for(let c=0;c<2;c++){const wx=x+3+c*11, wy=y+7+r*12; F('#e2d4b0',wx-1,wy-1,8,9); F('#3a4458',wx,wy,6,7); F('#9fb8d8',wx+1,wy+1,2,2)}
+    F('#2f6a44',x+1,y+46,w-2,4); for(let k=x+1;k<x+w-1;k+=3)F('#3f8a58',k,y+46,1,4); F('#1f4a30',x+1,y+50,w-2,1);   // green awning
+    F('#2b2f3a',x+2,y+52,w-4,14); F('#9fd2f0',x+3,y+53,w-12,8); F('#5a3a22',x+w-8,y+52,5,14)}
+  // in front: the sidewalk (lamps, planters with little trees, a hydrant), then Broadway with cars parked on an angle
+  paver(222,250,162,8);
+  for(const px of [232,300,372]){F('#6a3a22',px-6,251,12,5); F('#7a4a2a',px-5,252,10,3)}                   // mulch planters
+  F('#c8322b',247,253,3,3); F('#e8584c',247,253,1,1);                                                     // hydrant
+  F('#5f5c58',220,258,164,22); for(let i=0;i<200;i++)F(rnd()<.5?'#56534f':'#6a6762',220+rnd()*164|0,258+rnd()*22|0,1,1);   // the street
+  F('#d6d3cc',220,258,164,1); for(let x=222;x<384;x+=10)F('#e2c75a',x,272,6,1);                           // curb, center line
+  for(const [x,col] of [[236,'#c8322b'],[262,'#e9eef3'],[318,'#2b2f3a'],[344,'#9aa0aa']]){                 // cars, parked on an angle
+    F('rgba(0,0,0,.25)',x+1,260,10,9); F(col,x,259,9,8); F(col,x+2,258,7,2); F('#9fd2f0',x+2,260,5,2); F('#1d1d22',x,266,2,2); F('#1d1d22',x+7,266,2,2)}
+  for(let x=222;x<384;x+=6)F('#e2dfd8',x,258,1,2);                                                       // parking lines
+  paver(222,280,162,8);
   // roads
   const road=(x,y,w,h)=>{F('#c9a46b',x,y,w,h); for(let i=0;i<w*h/30;i++)F('#b8935b',x+rnd()*w|0,y+rnd()*h|0,1,1);
     for(let i=0;i<w*h/140;i++)F(rnd()<.5?'#a9a39a':'#d8c49a',x+rnd()*w|0,y+rnd()*h|0,1,1);                                 // pebbles

@@ -136,7 +136,7 @@ function talkShopJackie(){
   have.metJackie=true;
   if(!have.jackieFed){
     if(!have.fargoPasta){ have.jackieAsked=true; save(); return say(JACKIE.hungry.map(t=>['Jackie',t])) }
-    have.jackieFed=true; save(); sfx('good'); lq.jackieN=1;
+    have.jackieFed=true; save(); renderBasket(); sfx('good'); lq.jackieN=1;   // (the pasta leaves the basket)
     return say([...JACKIE.thanks,JACKIE.hints[0]].map(t=>['Jackie',t]));
   }
   const n=Math.min(lq.jackieN,JACKIE.hints.length-1); lq.jackieN=n+1; save();

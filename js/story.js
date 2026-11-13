@@ -385,7 +385,7 @@ const FARGO = {
   askPasta:"Plain pasta to go", dinerBye:"Just looking",
   dinerPasta:["Plain pasta. No sauce. No butter.","...Hon, are you okay?","*hands you a warm bowl* On the house. You look like you need it."],
   dinerAgain:"Come back anytime, hon. The pasta's always plain here.",
-  pastaName:"Plain pasta", pastaFrom:"From Deb at the diner", pastaLine:"A warm bowl of plain pasta. No sauce, no butter. Jackie's going to love it.", pastaTake:"Take it",
+  pastaName:"Plain pasta", pastaFrom:"From Deb at the diner", pastaLine:"A warm bowl of plain pasta. No sauce, no butter. Tap it to put it in your basket (it's for Jackie).",
   hudPasta:"Diner (top left): plain pasta for Jackie",   // the reminder once Jackie's asked for it
 
   // ---- the snack stop: walk into Lil Q's shop with Alex, grab a drink and a snack off the shelves, bring them to her ----

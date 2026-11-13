@@ -287,20 +287,13 @@ function pullIn(){
 function pullInDiner(){
   if(have.fargoPasta) return showDialog({place:FARGO.place,speaker:FARGO.dinerCook,pages:[FARGO.dinerAgain],actions:[CLOSE]});
   showDialog({place:FARGO.place,speaker:FARGO.dinerCook,pages:[FARGO.dinerHello],actions:[
-    {label:FARGO.askPasta,fn:()=>{ showDialog({place:FARGO.place,speaker:FARGO.dinerCook,pages:FARGO.dinerPasta,actions:[{label:'OK',fn:()=>{closeDialog(); have.fargoPasta=true; save(); showPastaCard()}}]}) }},
+    {label:FARGO.askPasta,fn:()=>{ showDialog({place:FARGO.place,speaker:FARGO.dinerCook,pages:FARGO.dinerPasta,actions:[{label:'OK',fn:()=>{closeDialog(); showReward('fargoPasta')}}]}) }},
     {label:FARGO.dinerBye,ghost:true,fn:closeDialog}]});
 }
-// the pasta, as a "you got something" card (the same card as Joe's gear)
+// the pasta bowl (in the basket, over Joe's head, in Jackie's hands)
 function drawPastaBowl(g,x,y,s=1){ const F=(c,dx,dy,w,h)=>{g.fillStyle=c;g.fillRect(x+dx*s,y+dy*s,w*s,h*s)};   // a bowl, (x,y) = top-left, 9x7 at s=1
   F('#f4d35e',1,0,7,2); F('#e8c048',2,1,2,1); F('#fff0a0',5,0,2,1); F('#e8c048',6,1,1,1);   // pasta piled up
   F('#ffffff',0,2,9,2); F('#3d8ad6',0,2,9,1); F('#e9eef3',1,4,7,1); F('#c9ced4',2,5,5,1); F('#9aa0aa',3,6,3,1) }   // a white bowl with a blue rim
-function showPastaCard(){
-  const c=$('itemCanvas'); c.width=40; c.height=30; const g=c.getContext('2d'); g.imageSmoothingEnabled=false; g.clearRect(0,0,40,30);
-  drawPastaBowl(g,2,6,4); g.fillStyle='rgba(255,255,255,.7)'; for(const [x,y] of [[12,0],[20,2],[28,0]])g.fillRect(x,y,2,4);   // (and some steam)
-  $('itemFrom').textContent=FARGO.pastaFrom; $('itemName').textContent=FARGO.pastaName; $('itemLine').textContent=FARGO.pastaLine; $('itemTip').textContent=''; $('itemBtn').textContent=FARGO.pastaTake;
-  $('itemBtn').onclick=()=>{ $('itemCard').hidden=true; paused=overlayOpen() };
-  paused=true; prompt.hidden=true; $('itemCard').hidden=false; sfx('reward'); setTimeout(()=>$('itemBtn').focus({preventScroll:true}),0);
-}
 // Deb, the diner cook, out front: white apron, a hairnet, a spatula
 const DEB={x:132,y:86};   // (in the lot, beside the diner's sign)
 function drawDeb(x,y){ const X=Math.round(x)-5, Y=Math.round(y)-17, F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(X+dx,Y+dy,w,h)};
