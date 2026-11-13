@@ -409,7 +409,7 @@ const FARGO = {
     {id:'snickers',  name:'Snickers',          react:"Snickers. Nope."},
     {id:'motts',     name:"Mott's Berry Gummies", react:"Mott's!"},
     {id:'curry',     name:'Microwave Curry',   react:"Curry?! I have hated curry since the womb. You KNOW this."},
-    {id:'ramen',     name:'Spicy Instant Ramen', react:"SPICY RAMEN? I've hated spicy ramen since the womb. Who are you??"},
+    {id:'ramen',     name:'Spicy Instant Ramen', react:"I know YOU like this. But..."},
   ],
   alexHello:"Okay. You know what I like. Don't mess this up.",
   grab:n=>`Grab the ${n}`, swap:n=>`Swap for the ${n}`,

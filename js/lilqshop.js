@@ -145,7 +145,7 @@ function talkShopJackie(){
   say([['Jackie',JACKIE.hints[n]]]);
 }
 
-SCENES.lilqshop={ music:'fargo',
+SCENES.lilqshop={ place:FARGO.shop, music:'fargo',
   w:SHOP.W, h:SHOP.H, bounds:R(0,0,SHOP.W,SHOP.H), bg:shopBg, triggers:[],
   get solids(){ return [R(0,0,SHOP.W,40), R(SHOP.W-8,0,8,SHOP.H), COFFEE, SHOP.COUNTER, R(SHOP.COUNTER.x,SHOP.COUNTER.y-16,SHOP.W-SHOP.COUNTER.x,16),   // walls, coffee bar, the counter (and behind it)
     ...SHOP.GONDOLAS.map(g=>R(g.x,g.y-4,g.w,g.h+6)), ICE, R(84,152,10,4),

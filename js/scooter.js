@@ -89,7 +89,7 @@ function drawRaceArrow(){   // points from Joe to where to go next
   ctx.fillStyle=Math.floor(time/250)%2?'#fff3a8':'#f4d35e'; ctx.beginPath(); ctx.moveTo(4,0); ctx.lineTo(-3,-3); ctx.lineTo(-1,0); ctx.lineTo(-3,3); ctx.closePath(); ctx.fill(); ctx.restore();
 }
 
-SCENES.scooter={ music:'fargo',
+SCENES.scooter={ place:FARGO.place, music:'fargo',
   w:FW, h:FH, bounds:R(0,0,FW,FH), bg:fargoBg, triggers:[],
   get solids(){ return SCENES.fargo.baseSolids },
   entries:{start:{x:RACE_START.x,y:RACE_START.y,dir:'left'}},

@@ -327,7 +327,7 @@ const FARGO_TRIGGERS=[
 ];
 const onRoad=(x,y)=>onShortcut(x,y)||ROADS.some(r=>x>=r.x&&x<=r.x+r.w&&y>=r.y&&y<=r.y+r.h)||[...STATIONS.map(s=>s.lot),DINER.lot].some(l=>x>=l.x&&x<=l.x+l.w&&y>=l.y&&y<=l.y+l.h);
 
-SCENES.fargo={ music:'fargo',
+SCENES.fargo={ place:FARGO.place, music:'fargo',
   w:FW, h:FH, bounds:R(0,0,FW,FH), bg:fargoBg,
   get triggers(){ return fargo.onFoot?[]:FARGO_TRIGGERS },
   baseSolids:[...HOUSES, ...STATIONS.flatMap(s=>[s.store,s.island,R(s.sign.x+7,s.sign.y+14,4,4),R(s.person.x-3,s.person.y-3,6,4)]), DINER.bld, R(DEB.x-3,DEB.y-3,6,4),
