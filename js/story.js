@@ -115,7 +115,7 @@ const HEIST = {
   gridWatch:"Memorize the lit squares...",
   gridGo:"Now light the same squares.",
   gridWrong:"Wrong square! Watch again.",
-  gridNext:"Nice. Next one has more squares.",
+  gridNext:"Nice. Next board is bigger.",
   onlyJoe:"Only Joe has the gadget from Alex.",
   defuseCall:"Clutch defuse.",
   rounds:[{title:"ROUND 1", name:"The lab roof"},{title:"ROUND 2", name:"The searchlights"},{title:"ROUND 3", name:"The fire escape"}],
@@ -128,12 +128,13 @@ const HEIST = {
   backToCheckpoint:"Back to the last checkpoint.",
   followTip:"{who} was following right behind you. Set the crew to Waiting first.",
   followTipYou:"You were tagging along right behind {lead}. Tap Crew: Following to set it to Waiting, and the others stay put while one person goes.",
-  safeTitle:"The Confectioner's safe",   // the chocolate safe: the same squares game as the laser panel, but bigger and four rounds
   gotIt:"Chocolate. Lets GO!!",
+  pickUp:"Pick up the chocolate",
   villainNote:"Fine. Keep your chocolate. Why so salty?",   // the gingerbread Confectioner says this
   // the showdown at the bottom of the fire escape: the Confectioner dodges, you zap him three times with Doc Alex's gadget.
   bossIntro:[['The Confectioner',"Well, well, well. Uninvited guests."],['The Confectioner',"You want my chocolate? Over my dead dessert."],['John',"Joe. The gadget."]],
-  bossHold:"Get right under him. When the line turns red, press A to zap. Three hits.",
+  bossHold:"Get right under him. When the line turns red, press A to zap. Three hits. Watch out for candy canes.",
+  bossStun:"Ow! Candy cane to the head.",
   bossTaunts:["My HAT! It's... crunchy?!","Not the mustache! It's ICING now!","No... NO... not the sprinkles setting!"],   // after hit 1, hit 2 (the third hit starts the transformation)
   bossMiss:["Missed me!","Too slow, cookie boy!","Over here! Ha!","Is that a hair dryer? How adorable."],
   bossZap:"*ZAP!*",
@@ -160,8 +161,9 @@ const HEIST = {
   anagramRules:"Make words from the six letters. Longer words score more. Beat Lars before time runs out.",
   anagramStart:"Go!",
   anagramDone:"Collect the chocolate",
-  anagramRematch:"Rematch",
-  larsWins:[['Lars',"Ha! Again? New letters this time, if that helps."]],
+  anagramRematch:"Ugh. Fine.",   // (the button when Lars wins: then he dances, and Joe carries the chocolate)
+  larsWins:[['Lars',"HA! Loser carries the chocolate. Enjoy, Joe."],['John',"That thing weighs more than you, bro."]],
+  lugLines:["*huff*","Why is it so HEAVY","*thud*","1.21 gigacookies...","Almost... there..."],   // Joe, lugging the chocolate
   larsLoses:[['Lars',"...Best two out of three?"],['John',"No. You carry the chocolate, Lars."]],
   // after the chocolate: Lars lugs the crate back to the grate, John rolls his eyes, and everyone heads home
   exitLines:[],   // (lines here play as you leave with the chocolate; empty = straight back to the map)
@@ -218,6 +220,7 @@ const WARDROBE = {title:"Suit up, Joe", intro:"It's a stealth mission. What are 
     {id:'cupcake', name:"Cupcake",          line:"A whole cupcake. Frosting hat, sprinkles, cherry on top. Unlocked by finding the cupcake.", unlock:'cupcakeCostume'},
   ],
   changeOutfit:"Change outfit",   // the button in Settings
+  wearNow:"Wear it now", notNow:"Not now",   // when a new costume unlocks
   changeIntro:"Change it up any time. What are you wearing?",
   react:{tee:[['Lars',"Jeans and a t-shirt. For a heist."],['John',"Nobody ever suspects the guy in a t-shirt."]],
          crumb:[['Lars',"Who are you supposed to be?"],['John',"Captain Crumb. Protector of cookies. Enemy of the Confectioner."],['Lars',"Is that a whisk?"],['John',"It's a symbol of justice."]],
@@ -346,7 +349,7 @@ const GOLF_TEXT = {
 // ---------- Fargo: drive in, find Lil Q's (cheapest gas in the country), race her on scooters for the gas, then the snack run ----------
 const FARGO = {
   place:'Fargo, ND', bob:'Lil Q',   // the gas station owner's name (the code calls her "bob")
-  intro:["We're running on fumes.","Lil Q's is somewhere in town. Cheapest gas in the whole country.","Look for her sign."],
+  intro:["We're running on fumes.","Lil Q's is somewhere in town. Cheapest gas in the whole country.","Also I'm starving. Just so you know.","Look for her sign."],
   hudGoal:"Find Lil Q's",   // the reminder up top while you drive around
   marquee:"COOKIES",   // what the Fargo Theatre's marquee says
   introSpeaker:'Alex',
@@ -354,7 +357,7 @@ const FARGO = {
   pullIn:"Pull up to the pump",
   bobHello:["Yo yo YO. Welcome to Lil Q's. Cheapest gas in the whole dang country.","They call me Lil Q. I rode my scooter here all the way from Elinor's. Three days. Top speed nineteen. No regrets.","Two seventy-nine a gallon. Lil Q don't play."],
   // the race: Lil Q's deal
-  bobBet:["Here's the deal, rookie. Gas ain't free. Not even at two seventy-nine.","Race me. My scooter versus the spare one out back. Down Broadway to the Fargodome.","You win, Lil Q fills your tank. I win, you pump everybody's gas for a week."],
+  bobBet:["Here's the deal, rookie. Gas ain't free. Not even at two seventy-nine.","Race me. My scooter versus the spare one out back. Two laps around town.","You win, Lil Q fills your tank. I win, you pump everybody's gas for a week.","(And my snack shelf's right inside. Your girl in the car looks HUNGRY.)"],
   raceGo:"Race her", raceLater:"Not yet",
   rematchHello:"Back for more? Lil Q's scooter is warmed up.",
   howToTitle:"Scooter race",
@@ -363,11 +366,12 @@ const FARGO = {
     "Roads are fast. Grass is slow. The two dirt paths are shortcuts.",
     "Orange arrows on the road give you a burst of speed."],
   howToOk:"Let's ride",
-  raceCP:"Checkpoint", raceHome:"Back to Lil Q's!", raceBoost:"Boost!",
+  raceCP:"Checkpoint", raceHome:"Back to Lil Q's!", raceBoost:"Boost!", raceLap:"Lap", raceLap2:"Lap 2!",
+  raceCheer:["GO JOE!","One more lap! Then SNACKS.","You got this! (I'm so hungry.)"],   // Alex, cheering from the car at Lil Q's
   raceTaunts:["Top speed nineteen, baby!","You hear that? That's the sound of you losing.","Lil Q don't brake.","Is that a scooter or a shopping cart?"],
   raceLost:["Lil Q wins! As foretold.","Run it back, rookie?"],
   rematch:"Run it back", raceQuit:"Later",
-  raceWon:["...","Nah. NAH. Rematch. ...Okay, fine. A deal's a deal.","*fills the tank* Thirty bucks of gas, on the house. Pull up by the door."],
+  raceWon:["...","Nah. NAH. Rematch. ...Okay, fine. A deal's a deal.","*fills the tank* Thirty bucks of gas, on the house.","Your girl's been staring at my snack shelf through the window this WHOLE race."],
   replayWon:"Okay, okay. You're fast. Don't let it go to your head.",
   // then Joe and Alex get out of the car (Alex's name pops up)
   snackAsk:[["Joe","Want anything from inside?"],["Alex","No, I'm good."],["Alex","..."],["Alex","I mean. If YOU'RE getting something."],["","(She definitely wants a snack.)"]],
@@ -412,6 +416,7 @@ const FARGO = {
     {id:'ramen',     name:'Spicy Instant Ramen', react:"I know YOU like this. But..."},
   ],
   alexHello:"Okay. You know what I like. Don't mess this up.",
+  shopHint:"Drinks: the coolers in back. Snacks: the aisles (the sparkly ones).",   // the reminder when you walk in
   grab:n=>`Grab the ${n}`, swap:n=>`Swap for the ${n}`,
   give:"Give to Alex", talkAlex:"Talk to Alex",
   needBoth:"A drink AND a snack, babe.",
@@ -431,8 +436,10 @@ const GEAR_TEXT = {
   goggles: {name:"Lab goggles", found:"Doc Alex's spare goggles. Joe pushes them up on his head. Very scientific.", wear:"Put them on", from:"From Doc Alex"},
   disc:    {name:"Margie's lucky disc", found:"Margie's lucky disc. Joe slings it on his back.", wear:"Take it", from:"From Margie"},
   hat:     {name:"Trucker hat", found:"A Lil Q's Gas & Go trucker hat. Limited edition (there's one).", wear:"Put it on", from:"From Lil Q"},
+  gadget:  {name:"Doc Alex's gadget", found:"Shiny. Humming. Slightly warm. Laser panels hate it. So do villains.", wear:"Take it", from:"From Doc Alex"},
   jersey:  {name:"Vikings jersey (#18)", found:"A purple #18 Vikings jersey. Joe throws it on over his outfit.", wear:"Put it on", from:"From a football Viking"},
   tip:"(Take it off or put it back on any time in ⚙ Settings.)",
+  notNow:"Not now",
 };
 // ---------- Jackie (Fargo): in Lil Q's shop. Very direct. She'll help, but not on an empty stomach. ----------
 const JACKIE = {

@@ -20,7 +20,7 @@ const helpers=()=>{window.T={
   // the race, with a bot that steers along a route ('good': the shortcuts, cleanly; 'bad': the roads, wandering a lot)
   race:(how)=>{ const roads=[{x:222,y:180},{x:222,y:52},{x:103,y:52},{x:52,y:52},{x:52,y:302},{x:392,y:302},{x:392,y:180},{x:330,y:180}];
     const cuts=[{x:240,y:174},{x:240,y:168},{x:136,y:64},{x:103,y:52},{x:52,y:52},{x:52,y:302},{x:392,y:302},{x:392,y:290},{x:350,y:248},{x:350,y:222}];
-    const route=how==='good'?cuts:roads, slop=how==='good'?0:.3; raceReset(); race.phase='go'; let i=0,t=0;
+    const r1=how==='good'?[...cuts,{x:350,y:186}]:roads, route=[...r1,...r1], slop=how==='good'?0:.3; /* (two laps) */ raceReset(); race.phase='go'; let i=0,t=0;
     while(race.phase==='go'&&t<60000){ const w=route[Math.min(i,route.length-1)]; for(const k in dirs)dirs[k]=false; const dx=w.x-P.x, dy=w.y-P.y;
       if(Math.hypot(dx,dy)<5)i++; else { if(dx>2)dirs.right=true; if(dx<-2)dirs.left=true; if(dy>2)dirs.down=true; if(dy<-2)dirs.up=true }
       if(slop&&Math.random()<slop)for(const k in dirs)dirs[k]=false; update(16.7); t+=16.7 }
@@ -46,7 +46,7 @@ ok('C pull up to the pump: Lil Q offers the race for the gas',r.lbl==='Pull up t
 ok('C the race opens with a how-to card first',r.scene&&r.howto&&r.title==='Scooter race'&&r.phase==='count',r.title+' '+r.phase);
 r=await p.evaluate(()=>{const t0=race.t; T.run(10); const counting=race.phase==='count'&&race.t>t0; const x=P.x; dirs.left=true; T.run(5); const frozen=P.x===x; dirs.left=false;
   for(let i=0;i<160&&race.phase==='count';i++)update(16.7); const x2=P.x; dirs.left=true; T.run(10); dirs.left=false; const moves=P.x<x2; return {counting,frozen,go:race.phase,moves,hud:SCENES.scooter.hud()}});
-ok('C 3-2-1 countdown (you can\'t move yet), then GO: steer with the arrows; HUD says 1st/2nd and the next checkpoint',r.counting&&r.frozen&&r.go==='go'&&r.moves&&/1st|2nd/.test(r.hud)&&r.hud.includes('Checkpoint 1/3'),JSON.stringify(r));
+ok('C 3-2-1 countdown (you can\'t move yet), then GO: steer with the arrows; HUD says 1st/2nd and the next checkpoint',r.counting&&r.frozen&&r.go==='go'&&r.moves&&/1st|2nd/.test(r.hud)&&r.hud.includes('Checkpoint 1/3')&&r.hud.includes('Lap 1/2'),JSON.stringify(r));
 
 // D. the race: checkpoints in order, boosts, grass, the shortcuts
 r=await p.evaluate(()=>{raceReset(); race.phase='go';
@@ -113,13 +113,11 @@ ok('I give Jackie the pasta: she eats, then a clue each time you talk (gentle, b
 // J. the right ones: Alex is thrilled, the EXIT sign lights up, out the door, Lil Q's sugar
 r=await p.evaluate(()=>{T.lines(); const ge=SHOP_ITEMS.find(i=>i.id==='gingerale'), mo=SHOP_ITEMS.find(i=>i.id==='motts');
   T.go(ge.spot.x+ge.spot.w/2,ge.spot.y+6); update(16.7); action(); T.go(mo.spot.x+mo.spot.w/2,mo.spot.y+6); update(16.7); action();
-  T.toAlex(); update(16.7); action(); const win=T.lines(); const hud=SCENES.lilqshop.hud(), mood=lq.mood, stage=have.fargoStage;
-  update(16.7); const noGrab=(()=>{const it=SHOP_ITEMS[0]; return T.at(it.spot.x+it.spot.w/2,it.spot.y+6)})();
-  T.toDoor(); for(let i=0;i<40&&scene===SCENES.lilqshop;i++){dirs.down=true; update(16.7)} dirs.down=false; T.settle();
+  T.toAlex(); update(16.7); action(); const mood=lq.mood, stage=have.fargoStage; const win=T.lines(); T.settle();   // (and you're out the door on your own)
+  const hud='', noGrab=null;
   const out=scene===SCENES.fargo; const q=T.lines(); const thanks=T.btns(); if(!thanks.includes('Thanks, Lil Q!'))return {dbg:1,win,hud,mood,stage,noGrab,out,q,thanks,p:[P.x|0,P.y|0]}; T.click('Thanks, Lil Q!'); const reward=!$('reward').hidden; collectReward(); T.settle(); return {win,hud,mood,stage,noGrab,out,q,thanks,reward,done:!!have.fargo,car:!fargo.onFoot}});
-ok('J ginger ale + Mott\'s: "You know me so well", Alex happy, HUD says head out the EXIT',r.win.join().includes('You know me so well')&&r.mood==='happy'&&r.stage==='reward'&&r.hud.includes('EXIT'),r.hud);
-ok('J nothing left to grab once she\'s happy',!r.noGrab,r.noGrab);
-ok('J out the door: Lil Q hands over the sugar, then back in the car',r.out&&r.q.join().includes('Sugar')&&r.thanks.includes('Thanks, Lil Q!')&&r.reward&&r.done&&r.car,JSON.stringify(r));
+ok('J ginger ale + Mott\'s: "You know me so well", Alex happy',r.win.join().includes('You know me so well')&&r.mood==='happy'&&r.stage==='reward',r.win.join());
+ok('J then you\'re booted out of the shop on your own: Lil Q hands over the sugar, then back in the car',r.out&&r.q.join().includes('Sugar')&&r.thanks.includes('Thanks, Lil Q!')&&r.reward&&r.done&&r.car,JSON.stringify(r));
 
 // K. reload in the middle of the shop errand
 await fresh({welcomed:true,fargoIntro:true,fargoStage:'store'}); r=await p.evaluate(()=>{T.enter(); return {intro:!dlg.hidden,onFoot:fargo.onFoot,car:!!fargo.car,free:!blocked(P.x,P.y),hud:SCENES.fargo.hud()}});

@@ -4,7 +4,7 @@
 //   Lars = sprint (fast enough to dash between cover under the searchlights)
 //   John = lift (carries the log, rips off the grate)
 // Route: roof A (a log blocks the way to Doc Alex's rooftop lab: John lifts it and carries it; the briefing; then the log bridges the gap) -> roof B (searchlights; Lars
-//        hops cover to cover to the LIGHT POWER switch) -> roof C (a guard + a laser maze around the skylight) -> the Confectioner (right there on the roof) -> his safe (the memory squares again, harder)
+//        hops cover to cover to the LIGHT POWER switch) -> roof C (a guard + a laser maze around the skylight) -> the Confectioner (right there on the roof) -> the chocolate drops: pick it up
 //        -> the fire escape (it shows up with a blinking EXIT sign) -> Lars's anagrams.
 const CW=520, CH=200;
 const ROOF_A=R(6,30,112,156), ROOF_B=R(150,20,170,166), ROOF_C=R(352,26,160,160);
@@ -105,7 +105,9 @@ const cityBg=document.createElement('canvas'); cityBg.width=CW; cityBg.height=CH
 })();
 
 // ---------- crew sprites ----------
-function crewSprite(c,g=ctx){ ({hero:drawHero,lars:drawLars,john:drawJohn})[c.id](c,g); if(c.id==='hero'&&g===ctx)drawGear(c,g,heroLook()) }
+function crewSprite(c,g=ctx){
+  if(g===ctx&&heist.dance&&heist.dance.who===c.id){ const t=time; c={...c, y:c.y-(Math.floor(t/150)%2?2:0), dir:['down','left','down','right'][Math.floor(t/300)%4], moving:true, step:Math.floor(t/150)} }   // a little dance
+  ({hero:drawHero,lars:drawLars,john:drawJohn})[c.id](c,g); if(c.id==='hero'&&g===ctx)drawGear(c,g,heroLook()); if(g===ctx)drawDanceNotes(c) }
 function legs(c){ return [c.moving&&c.step%2?1:0, c.moving&&!(c.step%2)?1:0] }
 // Joe: whatever he picked in the wardrobe (WARDROBE in story.js). Colors and pieces for each outfit:
 const OUTFIT_LOOK={
@@ -255,6 +257,8 @@ function drawHero(c,g=ctx,look=heroLook()){
   if(L.head==='santa'){F('#c8322b',3,-3,6,3); F('#c8322b',8,-4,2,2); F('#ffffff',11,-5,2,2); F('#c8322b',10,-5,1,2); F('#ffffff',2,0,8,1)}
 }
 // ---------- the wardrobe: pick Joe's stealth outfit before going up ----------
+// a new costume: "Wear it now?" (the everyday look; in the heist, the heist outfit too)
+function outfitActions(id){ return [{label:WARDROBE.wearNow,fn:()=>{ closeDialog(); have.look=id; if(scene===SCENES.city)have.outfit=id; save(); sfx('pickup') }},{label:WARDROBE.notNow,ghost:true,fn:closeDialog}] }
 function openWardrobe(then,mode='heist',fromSettings=false){   // mode 'look' = Joe's everyday look at the start (adds the jersey)
   const W=WARDROBE, look=mode==='look', open=W.outfits.filter(o=>!o.unlock||have[o.unlock]), list=open, key=look?'look':'outfit';
   let pick=have[key]; if(!list.some(o=>o.id===pick))pick=list[0].id;   // (an old save might still say 'jersey')
@@ -458,7 +462,8 @@ const say=(lines,done)=>{ // lines: [[speaker,text],...] (or [speaker,text,face]
 };
 function briefing(){
   have.heistBriefed=true; save();
-  say([...HEIST.briefing.map(t=>[HEIST.stranger,t]),...HEIST.crewHello],()=>{ if(!have.heistHowTo)openHowTo() });
+  say(HEIST.briefing.map(t=>[HEIST.stranger,t]),()=>{ have.gear=have.gear||{}; have.gear.gadget=1; save(); sfx('pickup');   // Doc Alex hands Joe the gadget: a "you got something" card
+    showItem('gadget',()=>say(HEIST.crewHello,()=>{ if(!have.heistHowTo)openHowTo() }),true) });
 }
 function hintOnce(key,who,text){ if(heist.hinted[key])return; heist.hinted[key]=true; say([[who,text]]) }
 // the log blocks the way. It's wedged, so John can't just lift it: build a lever first.
@@ -610,9 +615,37 @@ function roundStart(n){ const r=HEIST.rounds[n-1]; if(r)showBanner(r.title,r.nam
 function heistReplay(){ Object.assign(have,{heistStage:0,lasersOff:false,plankGate:false,confectionerBeat:false}); save(); say([[HEIST.stranger,REPLAY.heistReset]],()=>goTo('city','start')) }
 function roundWon(n){ if(n<3)roundStart(n+1) }   // (no "round won" banner: straight on to the next round)
 
-// ---------- the chocolate safe: the memory panel again, but harder (SAFE_GRID in lasergrid.js) ----------
-function openVault(){ openLaserGrid(SAFE_GRID,HEIST.safeTitle,safeOpened) }
-function safeOpened(){ sfx('fanfare'); say([['',HEIST.gotIt],['The Confectioner',HEIST.villainNote,'Gingerbread Confectioner'],...HEIST.finale],showFireEscape) }
+// ---------- the chocolate: it drops on the roof when the Confectioner's beaten. Pick it up, then the fire escape shows up ----------
+const chocSpot=()=>({x:Math.max(432,Math.min(488,(have.gingerX||460)+(((have.gingerX||460)>470)?-16:16))), y:AIM.Y+12});
+function drawChocolate(x,y,s=1){   // a big gold-foil-wrapped block of chocolate; (x,y) = bottom middle. s: 1 on the ground/held, 2 when Joe's lugging it
+  const W=14*s, H=9*s, X=Math.round(x-W/2), Y=Math.round(y-H), F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(X+dx,Y+dy,w,h)};
+  F('rgba(0,0,0,.25)',1,H,W,2);
+  F('#5a3018',0,0,W,H); F('#7a4424',0,0,W,1); for(let k=1;k<4;k++)F('#4a2612',Math.round(W*k/4),1,1,H-2);   // the chocolate, in squares
+  F('#e0b030',0,Math.round(H*.35),W,Math.round(H*.45)); F('#ffe98a',0,Math.round(H*.35),W,1); F('#b88a20',0,Math.round(H*.8)-1,W,1);   // the gold foil band
+  F('#c8322b',Math.round(W/2)-2*s,Math.round(H*.35),4*s,Math.round(H*.45));                               // a red seal
+  if(Math.floor(time/300)%4===0){F('#ffffff',W-2,-2,1,3); F('#ffffff',W-3,-1,3,1)}                           // a glint
+}
+function pickUpChocolate(){ have.chocHeld=true; save(); sfx('pickup'); say([['',HEIST.gotIt],['The Confectioner',HEIST.villainNote,'Gingerbread Confectioner'],...HEIST.finale],showFireEscape) }
+
+// ---------- after Lars's anagrams: whoever wins does a little dance. Lose and Joe lugs the chocolate down the fire escape ----------
+const DANCE_MS=2600;
+function startDance(who,then){ heist.dance={who,t:0,then}; for(const k in dirs)dirs[k]=false; sfx('fanfare') }
+function danceTick(dt){ const d=heist.dance; d.t+=dt; if(d.t>=DANCE_MS){ heist.dance=null; d.then&&d.then() } }
+// Joe hauls the (enormous) chocolate over to the hatch: a few steps, drops it, picks it up, a few more steps... then down the ladder
+function startLug(){ if(lead().id!=='hero')switchTo(0); const S=SKYLIGHT; P.x=S.x+S.w/2-44; P.y=S.y+S.h+10; P.dir='right'; heist.lug={t:0,phase:'walk',k:0,said:0}; heist.follow=true }
+function lugTick(dt){
+  const L=heist.lug, S=SKYLIGHT, tx=S.x+S.w/2; L.t+=dt;
+  if(L.phase==='walk'){ P.moving=true; P.x+=.02*dt; P.dir='right'; if(L.t>900){ L.phase='drop'; L.t=0; sfx('thud'); flashPrompt(HEIST.lugLines[L.said++%HEIST.lugLines.length],900) } if(P.x>=tx){ P.x=tx; L.phase='down'; L.t=0 } }
+  else if(L.phase==='drop'){ P.moving=false; if(L.t>650){ L.phase='walk'; L.t=0 } }
+  else if(L.phase==='down'){ P.moving=false; P.y-=.012*dt; if(L.t>1100){ heist.lug=null; have.heistStage=5; save(); showReward('city',heistExit) } }   // ...and down the ladder he goes
+}
+function drawLug(){   // the chocolate, huge, over (or on the ground in front of) Joe, plus a sweat drop
+  const L=heist.lug; if(!L)return;
+  if(L.phase==='drop')drawChocolate(P.x+10,P.y+2,2); else drawChocolate(P.x,P.y-24,2);
+  if(Math.floor(time/300)%2){ctx.fillStyle='#9fd2f0'; ctx.fillRect(Math.round(P.x)-7,Math.round(P.y)-20,1,2); ctx.fillRect(Math.round(P.x)+7,Math.round(P.y)-17,1,2)}
+}
+function drawDanceNotes(c){ if(!heist.dance||heist.dance.who!==c.id)return; const F=(col,x,y,w,h)=>{ctx.fillStyle=col;ctx.fillRect(Math.round(x),Math.round(y),w,h)};
+  for(let k=0;k<3;k++){ const ph=(time/700+k/3)%1, x=c.x-8+k*7+Math.sin(time/200+k)*2, y=c.y-30-ph*12; ctx.globalAlpha=1-ph; F('#f4d35e',x,y,1,4); F('#f4d35e',x-2,y+3,2,2); F('#f4d35e',x+1,y,2,1) } ctx.globalAlpha=1 }
 
 // ---------- triggers ----------
 const nearCrew=(z,id)=>heist.crew.some(c=>(!id||c.id===id)&&hit(R(c.x-4,c.y-3,8,4),z));
@@ -631,7 +664,7 @@ function heistTrigger(){
   if(!gateOpen()&&hit(feet,R(PLANK_GATE.x-12,PLANK_GATE.y-2,PLANK_GATE.w+24,PLANK_GATE.h+4)))return {label:heist.keyHolder===lead().id?HEIST.gateUnlock:HEIST.gateCheck, act:checkGate};
   if(st===1&&!gateOpen()&&!heist.keyHolder&&!lightsOn()&&Math.hypot(P.x-KEY_SPOT.x,P.y-KEY_SPOT.y)<12)return {label:HEIST.grabKey, act:grabKey};
   if(st>=2&&st<4&&!lasersOff()&&hit(feet,R(LASER_PANEL.x-4,LASER_PANEL.y,LASER_PANEL.w+6,16)))return {label:HEIST.defuseLabel, act:startDefuse};
-  if(st===3&&have.confectionerBeat&&!boss.on&&Math.hypot(P.x-(have.gingerX||460),P.y-AIM.Y)<18)return {label:'Talk to the Confectioner', btn:'Talk', act:openVault};   // (if his riddle got closed: he's still there)
+  if(st===3&&have.confectionerBeat&&!boss.on&&!have.chocHeld){ const c=chocSpot(); if(Math.hypot(P.x-c.x,P.y-c.y)<14)return {label:HEIST.pickUp, btn:'Grab', act:pickUpChocolate} }   // the chocolate, on the roof
   if(st===4&&hit(feet,R(SKYLIGHT.x-4,SKYLIGHT.y+SKYLIGHT.h,SKYLIGHT.w+8,12)))return {label:HEIST.dropIn, act:()=>say(HEIST.larsChallenge,()=>openLarsMenu())};   // the fire escape: Lars wants his anagrams first
   return null;
 }
@@ -666,12 +699,13 @@ SCENES.city={ music:'heist',
   entries:{start:{x:40,y:156,dir:'up'}, fromStreet:{x:40,y:156,dir:'up'}},
   enter(){
     heist.lead=0; heist.follow=true; heist.hinted={}; heist.howToShown=false; heist.keyHolder=null; heist.sonarT=0; heist.sprintT=0; heist.marked=false;
-    boss.on=false; boss.parts=[]; boss.shots=[]; heist.exitPop=0;
+    boss.on=false; boss.parts=[]; boss.shots=[]; boss.canes=[]; boss.stun=0; heist.exitPop=0; heist.dance=null; heist.lug=null;
+    if(have.heistBriefed){ have.gear=have.gear||{}; if(!('gadget' in have.gear))have.gear.gadget=1 }   // (from before the gadget was a thing you hold)
     placeAtCheckpoint(); $('crewbar').hidden=false; buildCrewBar(); banner.q=[]; banner.t=0; $('roundBanner').hidden=true;
     if(heistStage()<3)roundStart(heistStage()+1);   // (Doc Alex waits at her lab bench: walk up to her for the briefing)
   },
   leave(){ $('crewbar').hidden=true; banner.q=[]; banner.t=0; $('roundBanner').hidden=true },
-  speed:()=>heist.sprintT>0?.19:(lead().id==='lars'?.09:lead().id==='john'&&heist.carry?.06:.07),
+  speed:()=>heist.dance||heist.lug?0:heist.sprintT>0?.19:(lead().id==='lars'?.09:lead().id==='john'&&heist.carry?.06:.07),
   dynTrigger:()=>heistTrigger(),
   ability:()=>boss.on?bossFire():useSkill(),
   key(code){ const i={Digit1:0,Digit2:1,Digit3:2}[code]; if(i!=null){switchTo(i);return true} if(code==='KeyF'){toggleFollow();return true} return false },
@@ -689,7 +723,9 @@ SCENES.city={ music:'heist',
     if(heist.outfitReact){heist.outfitReact=false; const r=WARDROBE.react[have.outfit]; if(r)return say(r)}
     bossTick(dt);
     if(confWaiting()&&!boss.on&&P.x>416&&dlg.hidden)return openBoss();   // (back after a reload)
-    if(heistStage()>=4)return;
+    if(heist.dance)return danceTick(dt);
+    if(heist.lug)return lugTick(dt);
+    if(heistStage()>=3){ moveFollowers(dt); return }   // (the crew keeps following you once the lasers are off)
     // guard patrol: walks up and down, pauses at each end (flashlight off while he turns)
     if(heistStage()<3){ if(heist.guardWait>0)heist.guardWait-=dt;
       else{heist.guardY+=heist.guardDir*GUARD.speed*dt;
@@ -705,7 +741,8 @@ SCENES.city={ music:'heist',
     else if(st===1&&P.x>160&&!heist.hinted.lights){ heist.hinted.lights=true; renderCrewBar(); say([['Lars',HEIST.larsLights],['John',HEIST.holdTip]]) }
     else if(st>=2&&st<3&&P.x>356)hintOnce('lasers',HEIST.crew.hero,HEIST.heroLasers);
   },
-  drawPlayer:(x,y)=>{syncLeadFromP(); crewSprite(lead()); drawCarriedLog(lead()); drawHeldKey(lead()); drawHeldLeverBit(lead())},
+  drawPlayer:(x,y)=>{syncLeadFromP(); if(heist.lug&&heist.lug.phase==='down'){ctx.globalAlpha=Math.max(0,1-heist.lug.t/1100)} crewSprite(lead()); ctx.globalAlpha=1; drawCarriedLog(lead()); drawHeldKey(lead()); drawHeldLeverBit(lead());
+    if(heist.lug)drawLug(); else if(have.chocHeld&&heistStage()===4)drawChocolate(lead().x,lead().y-24) },   // carrying the chocolate
   under(){
     for(const c of cars){const x=c.x+(c.lane?18:6); ctx.fillStyle=c.v>0?'#ffe9a0':'#ff4a3a'; ctx.fillRect(x,c.y|0,1,1); ctx.fillRect(x+3,c.y|0,1,1)}
     drawBeam(); drawLeverBits(); drawGate(); drawKey(); drawGrate(); drawPowerSwitch(); drawLaserPanel();
@@ -715,6 +752,7 @@ SCENES.city={ music:'heist',
     list.push({y:STRANGER.y,draw:drawStranger});
     if(heistStage()<3)list.push({y:heist.guardY,draw:drawGuard});   // (he's gone once the lasers are off: the Confectioner shows up himself)
     bossEnts(list);
+    if(heistStage()===3&&have.confectionerBeat&&!boss.on&&!have.chocHeld){ const c=chocSpot(); list.push({y:c.y,draw:()=>drawChocolate(c.x,c.y)}) }   // the chocolate, on the roof
   },
   over(){ drawJumpEmotes(); drawDefuse();
     const st=heistStage();

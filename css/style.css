@@ -379,9 +379,9 @@ h1::before,h1::after{content:'✦';color:var(--berry);font-size:.6em;vertical-al
 .crewbar .follow.nudge{animation:nudge .9s ease-in-out infinite;border-color:var(--gold);box-shadow:0 0 0 2px var(--gold)}
 @keyframes nudge{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
 /* the laser panel memory grid */
-.gridcard{max-width:330px}
-.lgrid{display:grid;grid-template-columns:repeat(var(--cols,5),44px);gap:6px;justify-content:center;margin:6px auto}
-.lsq{width:44px;height:44px;border-radius:6px;border:2px solid #3a4258;background:#151827;cursor:pointer;transition:background .08s}
+.gridcard{max-width:340px}
+.lgrid{display:grid;grid-template-columns:repeat(var(--cols,5),var(--sq,44px));gap:5px;justify-content:center;margin:6px auto}
+.lsq{width:var(--sq,44px);height:var(--sq,44px);border-radius:6px;border:2px solid #3a4258;background:#151827;cursor:pointer;transition:background .08s}
 .lsq:hover:not(:disabled){border-color:#7fe8ff}
 .lsq:focus-visible{outline:3px solid var(--gold);outline-offset:1px}
 .lsq.lit{background:#7fe8ff;border-color:#e9fbff;box-shadow:0 0 12px #7fe8ff}
@@ -390,7 +390,7 @@ h1::before,h1::after{content:'✦';color:var(--berry);font-size:.6em;vertical-al
 .gdots{display:flex;gap:6px;justify-content:center}
 .gdots i{width:10px;height:10px;border-radius:50%;background:#3a4258}
 .gdots i.now{background:var(--gold)} .gdots i.done{background:#7fd39a}
-@media (max-width:520px){ .lgrid{grid-template-columns:repeat(var(--cols,5),38px);gap:5px} .lsq{width:38px;height:38px} }
+@media (max-width:520px){ .lgrid{gap:4px} .lsq{width:calc(var(--sq,44px) - 4px);height:calc(var(--sq,44px) - 4px)} .lgrid{grid-template-columns:repeat(var(--cols,5),calc(var(--sq,44px) - 4px))} }
 #craneArt{width:256px;height:192px;image-rendering:pixelated;border:2px solid var(--ink);border-radius:6px;background:#a9d4f0}
 @media (max-width:520px){ #craneArt{width:192px;height:144px} }
 /* Logan's which-album game */
@@ -426,3 +426,5 @@ h1::before,h1::after{content:'✦';color:var(--berry);font-size:.6em;vertical-al
 :fullscreen .app,.app:fullscreen{max-width:min(calc(100vw - 24px),calc((100vh - 112px)*4/3))}
 :fullscreen .app:has(#crewbar:not([hidden])){max-width:min(calc(100vw - 24px),calc((100vh - 170px)*4/3))}
 .hudpic{width:16px;height:20px;image-rendering:pixelated;vertical-align:middle;margin:0 2px}
+
+#itemNo{margin-left:8px}

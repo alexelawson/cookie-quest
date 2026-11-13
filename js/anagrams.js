@@ -150,7 +150,7 @@ function anaEnd(){
   $('anaResult').textContent=won?`Joe wins, ${ana.you} to ${ana.lars}!`:ana.you===ana.lars?`A tie at ${ana.you}. Tie goes to Lars, apparently.`:`Lars wins, ${ana.lars} to ${ana.you}.`;
   $('anaMissed').textContent=`The six-letter word${best.length>1?'s were':' was'}: ${best.join(', ')}.`;
   $('anaNext').textContent=won?HEIST.anagramDone:HEIST.anagramRematch;
-  $('anaNext').onclick=()=>{ $('anagram').hidden=true; ana.open=false; larsGameOver(won) };
+  $('anaNext').onclick=()=>{ $('anagram').hidden=true; ana.open=false; paused=overlayOpen(); larsGameOver(won) };   // (unpaused, so the dance plays)
   setTimeout(()=>$('anaNext').focus({preventScroll:true}),0);
 }
 $('anaStart').onclick=anaGo; $('anaEnter').onclick=anaSubmit; $('anaBack').onclick=anaBack; $('anaClear').onclick=anaClear;

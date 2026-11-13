@@ -127,7 +127,7 @@ function giveSnacks(){
   const C=FARGO.correct;
   if(lq.drink===C.drink&&lq.snack===C.snack){
     lq.mood='happy'; lq.moodT=99999; lq.drink=null; lq.snack=null; have.fargoStage='reward'; save(); sfx('fanfare');
-    return say([['Alex',FARGO.alexWin]]);
+    return say([['Alex',FARGO.alexWin]],()=>{ fargo.fromShop=true; goTo('fargo','fromShop') });   // and out you go: Lil Q's waiting
   }
   const lines=[]; if(lq.drink!==C.drink){lines.push(FARGO.drinks.find(x=>x.id===lq.drink).react); lq.drink=null}
   if(lq.snack!==C.snack){lines.push(FARGO.snacks.find(x=>x.id===lq.snack).react); lq.snack=null}   // the wrong ones go back on the shelf
@@ -170,7 +170,10 @@ SCENES.lilqshop={ place:FARGO.shop, music:'fargo',
   },
   under(){   // the products you can grab: gone from the shelf while you're holding them; a little glint on the one you're next to
     const near=!shopDone()&&shopNearItem();
-    for(const it of SHOP_ITEMS){ if(held(it.id))continue; const {x,y}=itemXY(it);
+    for(const it of SHOP_ITEMS){ const {x,y}=itemXY(it), w=it.kind==='drink'?15:7;   // a yellow price tag under every one you can grab
+      if(!shopDone()){ ctx.fillStyle='#f4d35e'; ctx.fillRect(x+Math.floor(w/2)-2,y+1,5,2); ctx.fillStyle='#1d2130'; ctx.fillRect(x+Math.floor(w/2)-1,y+1,1,1) }
+      if(held(it.id))continue;
+      if(!shopDone()&&Math.floor((time+it.id.length*397+(it.k||it.door||0)*211)/180)%14===0){ ctx.fillStyle='#ffffff'; const sx=x+w-1, sy=y-9; ctx.fillRect(sx,sy-2,1,5); ctx.fillRect(sx-2,sy,5,1) }   // and a twinkle now and then
       if(it.kind==='drink'){drawMini(ctx,it.id,x,y); drawMini(ctx,it.id,x+8,y)} else drawMini(ctx,it.id,x,y);
       if(near===it){ ctx.fillStyle=Math.floor(time/250)%2?'#ffffff':'#ffd84d'; const w=it.kind==='drink'?15:7; ctx.fillRect(x-2,y-11,w+4,1); ctx.fillRect(x-2,y+1,w+4,1); ctx.fillRect(x-2,y-11,1,13); ctx.fillRect(x+w+1,y-11,1,13) } }   // a flashing box around the one you're next to
   },
@@ -196,6 +199,7 @@ SCENES.lilqshop={ place:FARGO.shop, music:'fargo',
     if(shopDone())return `<span>${FARGO.exitNow}</span>`;
     const nm=id=>id?`<img class="hudpic" src="${itemPic[id]}" alt="">`+[...FARGO.drinks,...FARGO.snacks].find(x=>x.id===id).name:'—';
     const pasta=have.fargoPasta&&!have.jackieFed?` · ${FARGO.pastaName}`:have.jackieAsked&&!have.fargoPasta?`</span><span>${FARGO.hudPasta}`:'';
+    if(!lq.drink&&!lq.snack&&!pasta)return `<span>${FARGO.shopHint}</span>`;   // (until you grab something: where things are)
     return `<span>${FARGO.holding}: ${nm(lq.drink)} · ${nm(lq.snack)}${pasta}</span>`;
   },
 };

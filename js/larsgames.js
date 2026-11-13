@@ -26,7 +26,8 @@ function openHowTo(){   // agent select: the crew, their roles and powers; pick 
 function openLarsMenu(){
   showDialog({place:HEIST.place,speaker:'Lars',pages:[HEIST.larsPick],actions:[{label:HEIST.larsReady,fn:()=>{closeDialog(); openAnagrams()}}]});
 }
+// win: Joe does a little dance, Lars carries the chocolate, and out you go. Lose: Lars dances, and Joe lugs the chocolate down himself.
 function larsGameOver(won){
-  if(won){ have.heistStage=5; save(); say(HEIST.larsLoses,()=>showReward('city',heistExit)) }
-  else say(HEIST.larsWins,()=>openLarsMenu());
+  if(won) startDance('hero',()=>{ have.heistStage=5; save(); say(HEIST.larsLoses,()=>showReward('city',heistExit)) });
+  else startDance('lars',()=>say(HEIST.larsWins,startLug));
 }

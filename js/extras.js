@@ -10,7 +10,7 @@
 const EXITS={
   kitchen:[{z:R(100,160,24,8), mark:{x:112,y:158,dir:'down'}, go:()=>goTo('world','fromKitchen')}],
   golf:   [{z:R(96,160,32,8),  mark:{x:112,y:160,dir:'down'}, when:()=>!golf.active, go:()=>goTo('world','fromGolf')}],
-  fargo:  [{z:R(0,166,6,28),   mark:{x:6,y:179,dir:'left'},  when:()=>!fargo.onFoot, markWhen:()=>P.x>56,   // (no arrow on top of the car when you've just pulled in)
+  fargo:  [{z:R(0,166,6,28),   when:()=>!fargo.onFoot,   // (no arrow here: the LEAVE FARGO highway sign points the way)
            go:()=>goTo('world','fromFargo')}],
   city:   [{z:LADDER,          mark:{x:21,y:170,dir:'down'}, go:()=>goTo('world','fromCity')}],
 };
@@ -54,6 +54,7 @@ const GEAR={
   disc:    {give:true, from:'golf'},     // Margie's "lucky" disc, on his back
   hat:     {give:true, from:'fargo'},    // a Lil Q's Gas & Go trucker hat
   jersey:  {give:true, from:'mill'},     // a purple #18 Vikings jersey, from a football Viking after the Birkie
+  gadget:  {give:true},                  // Doc Alex's gadget: handed over at the briefing (city.js). Joe holds it (always in the heist)
 };
 // after a stop's reward lands in the basket: that stop's keepsake scene (once), then carry on
 function giveKeepsake(key,then){
@@ -108,6 +109,14 @@ function drawGear(c,g=ctx,look=null){
     else if(c.dir==='left'){F('#1d1d22',2,4,5,1); F('#e0603a',2,4,2,1)}
     else if(c.dir==='right'){F('#1d1d22',5,4,5,1); F('#7a4fa0',8,4,2,1)}
     else F('#1d1d22',2,4,8,1);   // the strap round the back
+  }
+  if(have.gear.gadget&&(gearWorn('gadget')||scene===SCENES.city)&&g===ctx){   // Doc Alex's gadget, in his hand: chrome, a glowing cyan tip, a twinkle
+    const glow=Math.floor(time/220)%2?'#bff6ff':'#5fe0ff', d=c.dir, hy=12;
+    if(d==='down'){F('#1d2130',10,hy-1,4,4); F('#d6dbe3',10,hy-1,3,3); F('#ffffff',10,hy-1,1,1); F(glow,11,hy+2,2,2)}
+    else if(d==='right'){F('#1d2130',8,hy,6,3); F('#d6dbe3',8,hy,5,2); F('#ffffff',8,hy,2,1); F(glow,13,hy,2,2)}
+    else if(d==='left'){F('#1d2130',-2,hy,6,3); F('#d6dbe3',-1,hy,5,2); F('#ffffff',2,hy,2,1); F(glow,-3,hy,2,2)}
+    else {F('#d6dbe3',0,hy,2,2); F(glow,0,hy-1,1,1)}
+    if(Math.floor(time/500)%3===0){ const sx=d==='left'?-3:d==='up'?0:13; F('#ffffff',sx,hy-4,1,3); F('#ffffff',sx-1,hy-3,3,1) }
   }
 }
 
@@ -263,7 +272,7 @@ const drawHenrietta=drawGrp;   // (older name)
 // called from game.js every frame
 function extrasTick(){ sceneExitTick(); gearTick() }
 function extrasAlways(dt){ cloverTick(dt) }
-function extrasDraw(){ for(const e of exitsHere())if(!e.markWhen||e.markWhen())drawExitMark(e.mark); drawSparkles(); drawNearMark(); drawThink() }
+function extrasDraw(){ for(const e of exitsHere())if(e.mark&&(!e.markWhen||e.markWhen()))drawExitMark(e.mark); drawSparkles(); drawNearMark(); drawThink() }
 
 // ---------- settings: take gear off / put it back on ----------
 function renderGearSettings(){
@@ -275,6 +284,14 @@ function renderGearSettings(){
 // ---------- item cards: a big picture of whatever Joe just found or was given ----------
 // Each painter draws on a 40 x 30 canvas (shown at 4x), like the ingredient cards.
 const GEAR_ART={
+  gadget(F){ // Doc Alex's gadget: a chrome zapper with a glowing cyan dome, dials, and an antenna
+    F('#1d2130',6,10,26,13); F('#c9ced4',7,11,24,11); F('#eef1f5',7,11,24,2); F('#9aa0aa',7,20,24,2);    // the body
+    F('#5f6676',2,14,5,5); F('#3a3f4a',0,15,3,3);                                                       // the grip end
+    F('#1d2130',30,12,6,9); F('#5fe0ff',31,13,4,7); F('#bff6ff',31,13,2,3);                            // the glowing tip
+    F('#e54b4b',10,14,3,3); F('#f4d35e',15,14,3,3); F('#7dff8a',20,14,3,3);                              // buttons
+    F('#3a3f4a',24,14,4,4); F('#c9ced4',25,15,2,2);                                                     // a dial
+    F('#9aa0aa',14,3,1,8); F('#e54b4b',13,1,3,3); F('#ffffff',13,1,1,1);                                 // the antenna
+    F('#ffffff',36,9,1,4); F('#ffffff',35,10,3,1); F('#bff6ff',38,16,1,1); F('#bff6ff',37,22,2,1) },   // sparkles
   oakleys(F){ // sporty wraparound shades with prism lenses
     F('#1d1d22',4,10,32,3); F('#1d1d22',2,12,3,4); F('#1d1d22',35,12,3,4); F('#1d1d22',18,13,4,3);
     F('#e0603a',5,13,13,7); F('#7a4fa0',22,13,13,7); F('#f4a04a',5,13,13,2); F('#a070d0',22,13,13,2); F('#1d1d22',5,20,13,1); F('#1d1d22',22,20,13,1);
@@ -308,7 +325,7 @@ const GEAR_ART={
     F('#ffc62f',13,11,2,10); F('#ffc62f',12,12,1,1);                                                  // the 1
     F('#ffc62f',18,11,7,2); F('#ffc62f',18,15,7,2); F('#ffc62f',18,19,7,2); F('#ffc62f',18,11,2,10); F('#ffc62f',23,11,2,10) },   // the 8
 };
-function showItem(k,then){
+function showItem(k,then,noAsk){   // noAsk: just "OK" (no "Not now")
   const T=GEAR_TEXT[k], c=$('itemCanvas'), g=c.getContext('2d'); g.imageSmoothingEnabled=false; g.clearRect(0,0,c.width,c.height);
   const F=(col,x,y,w,h)=>{g.fillStyle=col;g.fillRect(x,y,w,h)};
   c.width=k==='hen'?26:40; c.height=k==='hen'?20:30; g.imageSmoothingEnabled=false;   // Grp gets a smaller canvas, so he shows up bigger
@@ -316,6 +333,10 @@ function showItem(k,then){
   $('itemFrom').textContent=T.from||GEAR_TEXT.place; $('itemName').textContent=T.name; $('itemLine').textContent=T.found||'';
   $('itemTip').textContent=k==='hen'?'':GEAR_TEXT.tip; $('itemBtn').textContent=T.wear||'OK';
   $('itemBtn').onclick=()=>{ $('itemCard').hidden=true; paused=overlayOpen(); then&&then() };
+  // the "Wear it?" question: a second button that keeps it in the bag (have.gear[k]=0: put it on any time in Settings)
+  let no=$('itemNo'); if(!no){ no=document.createElement('button'); no.id='itemNo'; no.className='btn ghost'; $('itemBtn').after(no) }
+  no.hidden=!!noAsk||k==='hen'; no.textContent=GEAR_TEXT.notNow;
+  no.onclick=()=>{ have.gear[k]=0; save(); $('itemCard').hidden=true; paused=overlayOpen(); then&&then() };
   paused=true; prompt.hidden=true; $('itemCard').hidden=false; sfx('reward');
   setTimeout(()=>$('itemBtn').focus({preventScroll:true}),0);
 }

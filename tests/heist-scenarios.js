@@ -5,7 +5,7 @@ const b=await chromium.launch();const p=await b.newPage();const errs=[];p.on('pa
 const URL='file://'+path.resolve(__dirname,'../index.html');
 const helpers=()=>{window.T={
   btns:()=>[...$('dbtns').querySelectorAll('button')].map(b=>b.textContent),
-  clickThrough:()=>{const seen=[]; for(let i=0;i<30&&!dlg.hidden;i++){seen.push($('dspeaker').textContent+': '+$('dtext').textContent); [...$('dbtns').querySelectorAll('button')][0].click()} return seen},
+  clickThrough:()=>{const seen=[]; for(let i=0;i<30&&(!dlg.hidden||!$('itemCard').hidden);i++){ if(!$('itemCard').hidden){seen.push('CARD: '+$('itemName').textContent); $('itemBtn').click(); continue} seen.push($('dspeaker').textContent+': '+$('dtext').textContent); [...$('dbtns').querySelectorAll('button')][0].click()} return seen},   // (and the "you got something" card)
   run:n=>{for(let i=0;i<n;i++)update(16.7)},
   // walk the current leader to (x,y); stops if a dialog opens (e.g. caught)
   walkTo:(x,y,max=900)=>{for(let i=0;i<max;i++){if(!dlg.hidden){if($('dspeaker').textContent==='Spotted!')return 'dialog'; T.hints.push(T.clickThrough().join(' / ')); continue} const dx=x-P.x,dy=y-P.y; if(Math.hypot(dx,dy)<1.5)break;
@@ -38,7 +38,7 @@ let r=await p.evaluate(()=>{T.enter(); for(let k=0;k<5&&$('howto').hidden;k++)up
   const carrying=!!heist.carry; switchTo(0); const switched=heist.lead===0;
   const w=T.path([[58,100],[46,78]]); const J=heist.crew.find(c=>c.id==='john'), johnNear=Math.hypot(J.x-P.x,J.y-P.y)<40;
   update(16.7); const lbl=prompt.textContent; action(); const face=!$('dportrait').hidden; const lines=T.clickThrough(); const howAgain=!$('howto').hidden; update(16.7); T.walkTo(58,100);
-  return {lever,stuckLog,howAgain,auto,blockedW,stuckY,hint,joe,lars,john,carrying,switched,w,johnNear,lbl,face,lines,how,rows,ctl,sel,onOne,lead:heist.lead,banner:$('roundTitle').textContent,bar:!$('crewbar').hidden,hud:$('hud').textContent,lab:$('alabel').textContent}});
+  return {lever,stuckLog,howAgain,auto,blockedW,stuckY,hint,joe,lars,john,carrying,switched,w,johnNear,lbl,face,lines,how,rows,ctl,sel,onOne,lead:heist.lead,gadget:have.gear&&have.gear.gadget,banner:$('roundTitle').textContent,bar:!$('crewbar').hidden,hud:$('hud').textContent,lab:$('alabel').textContent}});
 ok('A no briefing pops up on its own',!r.auto);
 ok('A the log blocks the way to Doc Alex; John says so',r.blockedW!=='ok'&&r.stuckY>125&&r.hint.includes('blocking'),r.blockedW+' | '+r.hint);
 ok('A the log: Lift it / Leave it',r.joe.l==='Look at the log'&&r.joe.menu.join()==='Lift it,Leave it',r.joe.menu.join(' | '));
@@ -51,7 +51,7 @@ ok('A lever: then John pushes down, the log pops loose and he carries it',L.menu
 ok('A John keeps carrying the log; you can switch back and walk to Doc Alex with him following',r.switched&&r.w==='ok'&&r.johnNear,r.w);
 ok('A walk up to Doc Alex (Alex as a mad scientist) and she briefs the crew',r.lbl==='Talk to Doc Alex'&&r.face&&r.lines[0].startsWith('Doc Alex')&&r.lines.join().includes('formula')&&r.lines.some(l=>l.startsWith('John'))&&r.lines.some(l=>l.startsWith('Lars')),r.lines.length+' lines');
 ok('A agent select shows right as you arrive (3 agents, roles, powers, controls, LOCK IN), not again after the briefing',!r.howAgain&&r.how&&r.rows===3&&r.ctl.includes('Space')&&r.ctl.includes('F)')&&r.sel==='Agent select|LOCK IN|Initiator,Duelist,Sentinel'&&r.onOne===1&&r.lead===0,r.sel);
-ok('A Doc Alex hands Joe her gadget',r.lines.join().includes('Laser panels hate it')&&r.lines.join().includes('GIGACOOKIES'));
+ok('A Doc Alex hands Joe her gadget: a "you got something" card, and he holds it',r.lines.join().includes('Laser panels hate it')&&r.lines.join().includes('GIGACOOKIES')&&r.lines.includes("CARD: Doc Alex's gadget")&&r.gadget===1,r.lines.slice(-4).join(' | '));
 ok('A crew bar + objective + skill label',r.bar&&r.hud.includes('Bridge')&&r.lab==='Sonar',r.hud+' / '+r.lab);
 // B. the gap: Lars tries the long jump (and finds ice cream), then John lays the log across
 r=await p.evaluate(()=>{T.hints=[]; const w=T.walkTo(98,102); update(16.7); const lbl=prompt.textContent; action(); const menu=T.btns();
@@ -115,14 +115,15 @@ r=await p.evaluate(()=>{placeAtCheckpoint(); heist.marked=true; if(heist.follow)
   action(); const open=!$('lasergrid').hidden, watch=$('gridMsg').textContent, lit=$('lgrid').querySelectorAll('.lit').length, locked=$('lgrid').children[0].disabled;
   return {res,lbl,notJohn,johnGrid,open,watch,lit,locked,pos:(P.x|0)+','+(P.y|0)}});
 ok('E Joe (crew on Hold) times the blink and the slider, dodges the guard, and gets through the maze',r.res.ok,JSON.stringify(r.res)+' at '+r.pos);
-ok('E past the maze: only Joe can hack the laser panel; it opens a grid that shows a pattern to memorize',r.lbl==='Hack the laser panel'&&r.notJohn.includes('Only Joe')&&!r.johnGrid&&r.open&&r.watch.includes('Memorize')&&r.lit===6&&r.locked,JSON.stringify(r));
+ok('E past the maze: only Joe can hack the laser panel; it opens a grid that shows a pattern to memorize',r.lbl==='Hack the laser panel'&&r.notJohn.includes('Only Joe')&&!r.johnGrid&&r.open&&r.watch.includes('Memorize')&&r.lit===7&&r.locked,JSON.stringify(r));
 await p.waitForTimeout(2700);
 r=await p.evaluate(()=>{ const go=$('gridMsg').textContent, open=!$('lgrid').children[0].disabled, want=[...lg.want], wrong=[...Array(16).keys()].find(i=>!lg.want.has(i));
   $('lgrid').children[wrong].click(); return {go,open,wrongMsg:$('gridMsg').textContent,bad:$('lgrid').querySelectorAll('.bad').length,want}});
 ok('E after a moment the squares go dark and you tap them; a wrong square flashes red and it shows again',r.go.includes('same squares')&&r.open&&r.wrongMsg.includes('Wrong')&&r.bad===1,JSON.stringify(r));
-const solve=async()=>{ await p.waitForTimeout(2700); return p.evaluate(()=>{ for(const i of [...lg.want])$('lgrid').children[i].click(); return {msg:$('gridMsg').textContent,round:lg.round} }) };
+const solve=async()=>{ await p.waitForTimeout(2700); return p.evaluate(()=>{ const board=$('lgrid').children.length, n=lg.want.size; for(const i of [...lg.want])$('lgrid').children[i].click(); return {msg:$('gridMsg').textContent,round:lg.round,board,n} }) };
 await p.waitForTimeout(900); let g1=await solve(); await p.waitForTimeout(900); let g2=await solve(); await p.waitForTimeout(900); let g3=await solve(); await p.waitForTimeout(700);
 r=await p.evaluate(()=>({said:T.clickThrough(),off:!!have.lasersOff,closed:$('lasergrid').hidden}));
+ok('E the board grows each round (5x5, 6x6, 7x7) with more squares (7, 10, 14)',[g1.board,g2.board,g3.board].join()==='25,36,49'&&[g1.n,g2.n,g3.n].join()==='7,10,14',JSON.stringify([g1,g2,g3]));
 ok('E three rounds from memory shut every laser off',g1.round===1&&g1.msg.includes('Nice')&&g2.round===2&&g3.round===3&&r.off&&r.closed&&r.said[0].includes('Lasers off'),JSON.stringify([g1,g2,g3,r.said[0]]));
 r=await p.evaluate(()=>{const L=[]; SCENES.city.ents(L); const guardGone=!L.some(e=>e.draw===drawGuard); const on=boss.on, ph=boss.phase, st=have.heistStage;
   update(16.7); const lbl=prompt.hidden?'':prompt.textContent; return {on,ph,st,lbl,guardGone,boss:!!document.getElementById('boss')}});
@@ -132,39 +133,28 @@ r=await p.evaluate(()=>{for(let k=0;k<60&&dlg.hidden;k++)update(16.7); const int
   const bossSong=song; const moves=[]; for(let k=0;k<20;k++){bossTick(50); moves.push(Math.round(boss.x))}
   switchTo(1); boss.cool=0; bossFire(); const notLars=prompt.textContent, larsHits=boss.hits; switchTo(0);
   boss.pause=0; boss.cool=0; P.y=AIM.Y+24; P.x=boss.x>460?AIM.MIN:AIM.MAX; bossFire(); const missMsg=prompt.textContent, afterMiss=boss.hits;
-  const hitOnce=()=>{ boss.cool=0; boss.pause=0; P.x=boss.x; P.y=AIM.Y+24; bossFire() };
+  const hitOnce=()=>{ boss.cool=0; boss.pause=0; boss.stun=0; boss.canes=[]; P.x=boss.x; P.y=AIM.Y+24; bossFire() };
+  boss.canes=[{x:P.x,y:P.y-30}]; boss.stun=0; for(let k=0;k<12&&!boss.stun;k++)bossTick(16.7); const stunned=boss.stun>0, stunMsg=prompt.textContent; boss.cool=0; const h0=boss.hits; P.x=boss.x; bossFire(); const noFireStunned=boss.hits===h0; boss.stun=0;
   hitOnce(); const taunt1=prompt.textContent, hit1=boss.hits, hud1=SCENES.city.hud(); hitOnce(); hitOnce(); const zap=boss.phase;
   P.y=AIM.Y; bossTick(16); const pushed=P.y>AIM.Y;
   for(let k=0;k<80;k++)bossTick(50);
-  const after=song; const win=T.clickThrough(); return {okMiss:HEIST.bossMiss.includes(missMsg),okTaunt:taunt1===HEIST.bossTaunts[0],bossSong,after,hud,hud1,lbl,intro,fighting,moves:new Set(moves).size,notLars,larsHits,missMsg,afterMiss,taunt1,hit1,zap,pushed,win,beat:!!have.confectionerBeat,safe:!$('lasergrid').hidden}});
+  const after=song; const win=T.clickThrough(); return {okMiss:HEIST.bossMiss.includes(missMsg),okTaunt:taunt1===HEIST.bossTaunts[0],bossSong,after,hud,hud1,lbl,intro,fighting,moves:new Set(moves).size,notLars,larsHits,missMsg,afterMiss,taunt1,hit1,zap,pushed,win,beat:!!have.confectionerBeat,stunned,stunMsg,noFireStunned,choc:(()=>{const c=chocSpot(); P.x=c.x; P.y=c.y+2; update(16.7); return near&&near.label})()}});
 ok('G0 he talks first, then the fight is on the roof (HUD counts the hits; A says Zap)',r.intro.some(l=>l.startsWith('The Confectioner:'))&&r.fighting&&r.hud.includes('Zap the Confectioner')&&r.hud.includes('○○○')&&r.lbl==='Zap',r.intro.join(' | ')+' / '+r.hud+' / '+r.lbl);
 ok('G0 he dodges side to side; only Joe can zap; out of line misses, right under him hits (and his hat turns to gingerbread)',r.moves>5&&r.larsHits===0&&r.notLars.includes('Only Joe')&&r.afterMiss===0&&r.okMiss&&r.hit1===1&&r.okTaunt&&r.hud1.includes('●○○'),JSON.stringify({m:r.moves,miss:r.missMsg,t:r.taunt1,h:r.hud1,l:r.notLars}));
 ok('G0 you can\'t walk up into him',r.pushed);
 ok('G0 the fight has its own music, and the heist music comes back after',r.bossSong==='boss'&&r.after==='heist',r.bossSong+' / '+r.after);
-ok('G0 three hits zap him into a gingerbread man (a big show), then his safe opens',r.zap==='zap'&&r.beat&&r.win.join().includes('gingerbread man')&&r.safe,r.win.join(' | '));
-// G. the chocolate safe: the squares game again, but a bigger grid, four rounds, more squares each round
-r=await p.evaluate(()=>({okTitle:$('gridTitle').textContent===HEIST.safeTitle,okWatch:$('gridMsg').textContent===HEIST.gridWatch,n:$('lgrid').children.length,title:$('gridTitle').textContent,dots:$('gdots').children.length,first:lg.want.size,watch:$('gridMsg').textContent,hud:SCENES.city.hud()}));
-ok('G safe: a 6x6 grid, four rounds, starts at 7 squares (harder than the laser panel)',r.n===36&&r.okTitle&&r.dots===4&&r.first===7&&r.okWatch&&r.hud.includes('Crack his safe'),JSON.stringify(r));
-await p.waitForFunction(()=>lg.phase==='play',null,{timeout:5000});
-r=await p.evaluate(()=>{const wrong=[...Array(36).keys()].find(i=>!lg.want.has(i)); $('lgrid').children[wrong].click(); return {okMsg:$('gridMsg').textContent===HEIST.gridWrong,msg:$('gridMsg').textContent,round:lg.round}});
-ok('G a wrong square: red, and that round starts over',r.okMsg&&r.round===0,r.msg);
-const sizes=[]; for(let k=0;k<4;k++){ await p.waitForFunction(()=>lg.phase==='play',null,{timeout:6000}); sizes.push(await p.evaluate(()=>{const n=lg.want.size; for(const i of [...lg.want])$('lgrid').children[i].click(); return n})) }
-await p.waitForTimeout(700);
-ok('G each round has more squares: 7, 9, 11, 13',sizes.join()==='7,9,11,13',sizes.join());
-r=await p.evaluate(()=>{const closed=$('lasergrid').hidden; const fin=[]; for(let i=0;i<30&&!dlg.hidden;i++){fin.push($('dspeaker').textContent+': '+$('dtext').textContent); $('dbtns').querySelector('button').click()} const st4=have.heistStage, ana0=!$('anagram').hidden;
+ok('G0 he throws candy canes: one to the head stuns you (no zapping while you see stars)',r.stunned&&r.stunMsg.includes('Candy cane')&&r.noFireStunned,r.stunMsg);
+ok('G0 three hits zap him into a gingerbread man (a big show), and the chocolate drops on the roof',r.zap==='zap'&&r.beat&&r.win.join().includes('gingerbread man')&&r.choc==='Pick up the chocolate',r.choc+' / '+r.win.join(' | '));
+// G. pick up the chocolate; the fire escape shows up; the crew still follows; walk over and Lars challenges you
+r=await p.evaluate(()=>{action(); const fin=T.clickThrough(); const st4=have.heistStage, held=!!have.chocHeld;
+  if(!heist.follow)toggleFollow(); const L=heist.crew.find(c=>c.id==='lars'), before=Math.hypot(L.x-P.x,L.y-P.y); T.walkTo(436,100); T.run(80); const after=Math.hypot(L.x-P.x,L.y-P.y);
   const w=T.walkTo(474,64); update(16.7); const exitLbl=prompt.textContent; action(); const lars=[]; for(let i=0;i<10&&!dlg.hidden&&!T.btns().includes('Bring it');i++){lars.push($('dspeaker').textContent+': '+$('dtext').textContent); $('dbtns').querySelector('button').click()}
-  const ask=$('dtext').textContent, btns=T.btns(); const bring=[...$('dbtns').querySelectorAll('button')].find(b=>b.textContent==='Bring it'); if(!bring)return {closed,fin,st4,ana0,w,exitLbl,lars,ask,btns,dbg:true}; bring.click(); return {closed,fin,st4,ana0,w,exitLbl,lars,ask,btns,ana:!$('anagram').hidden,st:have.heistStage}});
-ok('G safe open: chocolate, "Why so salty?", the finale, and the fire escape shows up (no anagrams yet)',r.closed&&r.fin[0].includes('Chocolate')&&r.fin.some(l=>l.startsWith('The Confectioner:')&&l.includes('salty'))&&r.fin.some(l=>l.includes('final ingredient'))&&r.st4===4&&!r.ana0,JSON.stringify(r.fin.slice(-2)));
-ok('G walk to the fire escape: Lars challenges you to anagrams',r.w==='ok'&&r.exitLbl==='Climb down the fire escape'&&r.lars.some(l=>l.includes('Anagrams'))&&r.btns.join()==='Bring it'&&r.ana&&r.st===4,r.w+' / '+r.exitLbl+' / '+r.ask);
-// the laser panel is still the easier one
-r=await p.evaluate(()=>{openLaserGrid(); const o={n:$('lgrid').children.length,dots:$('gdots').children.length,first:lg.want.size,okTitle:$('gridTitle').textContent===HEIST.gridTitle}; closeLaserGrid(); return o});
-ok('G the laser panel is unchanged: 5x5, three rounds, starts at 6',r.n===25&&r.dots===3&&r.first===6&&r.okTitle,JSON.stringify(r));
+  const btns=T.btns(); const bring=[...$('dbtns').querySelectorAll('button')].find(b=>b.textContent==='Bring it'); if(bring)bring.click(); return {fin,st4,held,before:Math.round(before),after:Math.round(after),w,exitLbl,lars,btns,ana:!$('anagram').hidden,st:have.heistStage}});
+ok('G pick up the chocolate: "Why so salty?", the finale, and the fire escape shows up',r.held&&r.fin[0].includes('Chocolate')&&r.fin.some(l=>l.includes('salty'))&&r.fin.some(l=>l.includes('final ingredient'))&&r.st4===4,JSON.stringify(r.fin.slice(-2)));
+ok('G the crew keeps following you after the lasers (the old bug)',r.after<40,r.before+' -> '+r.after);
+ok('G walk to the fire escape: Lars challenges you to anagrams',r.w==='ok'&&r.exitLbl==='Climb down the fire escape'&&r.lars.some(l=>l.includes('Anagrams'))&&r.btns.join()==='Bring it'&&r.ana&&r.st===4,r.w+' / '+r.exitLbl);
+r=await p.evaluate(()=>{$('anagram').hidden=true; ana.open=false; return 1});
 r=await p.evaluate(()=>{openAnagrams(); return 1});
-// lose to Lars first (do nothing), then rematch with new letters and win
-r=await p.evaluate(()=>{const set1=ana.set.letters; anaGo(); for(let i=0;i<60*62;i++)update(16.7); const res=$('anaResult').textContent; $('anaNext').click(); const gl=[]; for(let i=0;i<30&&!dlg.hidden&&!T.btns().includes('Bring it');i++){gl.push($('dspeaker').textContent+': '+$('dtext').textContent); $('dbtns').querySelector('button').click()} const again=T.btns(); [...$('dbtns').querySelectorAll('button')].find(b=>b.textContent==='Bring it').click();
-  return {set1,res,gl,again,open:!$('anagram').hidden,set2:ana.set.letters}});
-ok('G doing nothing loses to Lars, and he gloats',r.res.startsWith('Lars wins')&&r.gl.join().includes('Again'),r.res);
-ok('G rematch uses different letters',r.again.join()==='Bring it'&&r.open&&r.set2!==r.set1,r.set1+' -> '+r.set2);
 r=await p.evaluate(()=>{const seen=new Set(); for(let k=0;k<30;k++){$('anagram').hidden=true; ana.open=false; openAnagrams(); seen.add(ana.set.letters)} return seen.size});
 ok('G lots of different letter sets',r>=8,r+' sets seen in 30 games');
 r=await p.evaluate(()=>{$('anagram').hidden=true; ana.open=false; openAnagrams(); anaGo(); const seen=[]; for(let i=0;i<60*20;i++){update(16.7); const t=$('anaLarsWord').textContent; if(t&&!seen.includes(t))seen.push(t)}
@@ -175,10 +165,10 @@ r=await p.evaluate(()=>{$('anagram').hidden=true; ana.open=false; return 1});
 r=await p.evaluate(()=>{openAnagrams(); anaGo(); const type=w=>{for(const ch of w){const i=ana.letters.findIndex((l,j)=>l===ch&&!ana.picked.includes(j)); ana.picked.push(i)} anaSubmit(); return $('anaMsg').textContent};
   const msgs=[type('ZZZ'.slice(0,0)+ana.set.letters.slice(0,3).split('').reverse().join(''))];
   const ws=[...ana.set.words[6],...ana.set.words[5]]; for(const w of ws)msgs.push(type(w)); const dup=type(ws[0]);
-  for(let i=0;i<60*62;i++)update(16.7); const res=$('anaResult').textContent; $('anaNext').click(); const lines=T.clickThrough();
-  return {msgs,dup,res,lines,reward:!$('reward').hidden,name:$('rewardName').textContent,st:have.heistStage,lars:ana.lars,you:ana.you}});
+  for(let i=0;i<60*62;i++)update(16.7); const res=$('anaResult').textContent; $('anaNext').click(); const dancer=heist.dance&&heist.dance.who; T.run(Math.ceil(DANCE_MS/16.7)+5); const lines=T.clickThrough();
+  return {msgs,dup,res,lines,dancer,reward:!$('reward').hidden,name:$('rewardName').textContent,st:have.heistStage,lars:ana.lars,you:ana.you}});
 ok('G real words score, repeats don\'t',r.msgs.slice(1).every(m=>m.includes('+'))&&r.dup.includes('Already'),r.msgs.slice(0,3).join(' | '));
-ok('G beat Lars -> chocolate',r.res.startsWith('Joe wins')&&r.lines.join().includes('two out of three')&&r.reward&&r.name==='Chocolate'&&r.st===5,`${r.you} vs ${r.lars}: ${r.res}`);
+ok('G beat Lars: Joe does a little dance, Lars carries it, chocolate',r.dancer==='hero'&&r.res.startsWith('Joe wins')&&r.lines.join().includes('two out of three')&&r.reward&&r.name==='Chocolate'&&r.st===5,`${r.you} vs ${r.lars}: ${r.res}`);
 if(await p.evaluate(()=>$('reward').hidden)){console.log(R.join('\n'));console.log('stopped before reward', errs);process.exit(1)}
 await p.click('#rewardArt',{force:true}); await p.waitForTimeout(900);
 r=await p.evaluate(()=>({city:!!have.city,basket:$('basket').textContent}));
@@ -193,4 +183,11 @@ r=await p.evaluate(()=>{T.enter(); const sp=dlg.hidden?'':$('dspeaker').textCont
 // J. checkpoints are safe to stand on
 r=await p.evaluate(()=>{const bad=[]; for(let st=0;st<3;st++){have.heistStage=st; placeAtCheckpoint(); T.clickThrough(); for(let i=0;i<900;i++){update(16.7); if(!dlg.hidden){if($('dspeaker').textContent==='Spotted!'){bad.push(st+': '+$('dtext').textContent); T.clickThrough(); break} T.clickThrough()}}} return bad});
 ok('J standing still at each checkpoint never gets you caught',r.length===0,r.join('; '));
+// K. lose to Lars: he dances, then Joe lugs the (huge) chocolate to the fire escape himself, and that's it: no rematch needed
+await fresh(); await p.evaluate(()=>{Object.assign(have,{heistStage:4,heistBriefed:true,heistHowTo:true,lasersOff:true,confectionerBeat:true,chocHeld:true}); save()}); await p.reload(); await p.click('#startBtn'); await p.evaluate(()=>skipWelcome()); await p.evaluate(helpers);
+r=await p.evaluate(()=>{T.enter(); T.clickThrough(); openAnagrams(); anaGo(); for(let i=0;i<60*62;i++)update(16.7); const res=$('anaResult').textContent; $('anaNext').click(); const dancer=heist.dance&&heist.dance.who;
+  const frozen=(()=>{const x=P.x; dirs.right=true; T.run(10); dirs.right=false; return P.x===x})(); T.run(Math.ceil(DANCE_MS/16.7)+5); const gloat=T.clickThrough(); const lugging=!!heist.lug;
+  let t=0; while(heist.lug&&t<20000){update(16.7); t+=16.7} return {res,dancer,frozen,gloat,lugging,t:Math.round(t),reward:!$('reward').hidden,name:$('rewardName').textContent,st:have.heistStage}});
+ok('K lose to Lars: he does a little dance (you can\'t walk off mid-dance), then gloats',r.res.startsWith('Lars wins')&&r.dancer==='lars'&&r.frozen&&r.gloat.join().includes('Loser carries'),r.gloat.join(' | '));
+ok('K then Joe lugs the giant chocolate over and down the fire escape himself, and you get the chocolate anyway',r.lugging&&r.t>2000&&r.t<15000&&r.reward&&r.name==='Chocolate'&&r.st===5,JSON.stringify(r));
 console.log(R.join('\n')); console.log('page errors:',errs.length?errs:'none'); await b.close()})();

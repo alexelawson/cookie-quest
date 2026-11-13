@@ -119,7 +119,7 @@ function drawCrane(){
 }
 function craneWon(){
   const again=!!have.gingerHouseCostume; have.gingerHouseCostume=true; save(); sfx('reward'); renderBasket&&renderBasket();
-  showDialog({place:JACKC.place,speaker:JACKC.name,pages:again?[JACKC.thanks[0]]:[...JACKC.thanks,JACKC.unlock],actions:[CLOSE]});
+  showDialog({place:JACKC.place,speaker:JACKC.name,pages:again?[JACKC.thanks[0]]:[...JACKC.thanks,JACKC.unlock],actions:again?[CLOSE]:outfitActions('ginghouse')});   // a new costume: wear it now?
 }
 $('craneBtn').addEventListener('pointerdown',e=>{e.preventDefault(); craneDrop()});
 $('craneBtn').addEventListener('keydown',e=>{ if(['Space','Enter'].includes(e.code)){e.preventDefault(); e.stopImmediatePropagation(); if(!e.repeat)craneDrop()} });
