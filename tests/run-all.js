@@ -10,12 +10,13 @@ lines.push(`syntax: ${js.length} files checked${failed?`, ${failed} broken`:', a
 const suites=['sprites','ui','farm-scenarios','birkie-scenarios','golf-scenarios','heist-scenarios','fargo-scenarios','kitchen-scenarios','full-playthrough','robustness'];
 if(!failed)for(const s of suites){
   const t0=Date.now(); let r=spawnSync(process.execPath,[path.join(__dirname,s+'.js')],{encoding:'utf8',timeout:15*60*1000});
+  if(!/^PASS /m.test(r.stdout||'')&&!/^FAIL /m.test(r.stdout||'')){ const again=spawnSync(process.execPath,[path.join(__dirname,s+'.js')],{encoding:'utf8',timeout:15*60*1000}); if(/^PASS /m.test(again.stdout||''))r=again }   // a crash before any test ran (the browser didn't start on the CI machine): try once more
   if(/^FAIL /m.test(r.stdout||'')){ const again=spawnSync(process.execPath,[path.join(__dirname,s+'.js')],{encoding:'utf8',timeout:15*60*1000}); if(!/^FAIL /m.test(again.stdout||''))r=again }   // the hens and the wind are random: a failure has to happen twice in a row to count
   const out=(r.stdout||'')+(r.stderr||''), pass=(out.match(/^PASS /gm)||[]).length, fails=out.split('\n').filter(l=>l.startsWith('FAIL ')), pe=/page errors: none/.test(out);
   const crashed=!pass&&!fails.length, bad=fails.length||!pe||crashed;
   if(bad)failed++;
   lines.push(`${bad?'✗':'✓'} ${s.padEnd(18)} ${pass} passed${fails.length?`, ${fails.length} FAILED`:''}${pe?'':', page errors or crash'}  (${((Date.now()-t0)/1000).toFixed(0)}s)`);
   for(const f of fails)lines.push('    '+f.slice(0,220));
-  if(crashed||!pe)lines.push('    '+out.split('\n').filter(l=>/error|Error/.test(l)).slice(0,4).join('\n    '));
+  if(crashed||!pe)lines.push('    '+out.split('\n').filter(l=>l.trim()).slice(-12).join('\n    '));   // (the last lines of what it printed, so a crash says why)
 }
 console.log(lines.join('\n')); console.log(failed?`\n${failed} problem(s).`:'\nEverything passed.'); process.exit(failed?1:0);

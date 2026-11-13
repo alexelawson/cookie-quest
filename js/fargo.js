@@ -90,6 +90,9 @@ const fargoBg=document.createElement('canvas'); fargoBg.width=FW; fargoBg.height
   F('#8a8f9a',WELCOME.x+3,WELCOME.y+10,2,6); F('#8a8f9a',WELCOME.x+19,WELCOME.y+10,2,6);
   F('#2f5f9e',WELCOME.x,WELCOME.y,24,11); F('#ffffff',WELCOME.x,WELCOME.y,24,1); pixText(g,'FARGO',WELCOME.x+3,WELCOME.y+3,'#ffffff');
 })();
+// white arrows painted on the road, pointing out of town (the road at the left edge)
+(function(){ const g=fargoBg.getContext('2d'), F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};
+  for(const ax of [16,90,160]){ const y=183; F('#e9e6df',ax+2,y,10,2); for(let k=0;k<4;k++)F('#e9e6df',ax+k,y+1-k,1,2*k+1>0?1:1), F('#e9e6df',ax+k,y-k+1,1,1), F('#e9e6df',ax+k,y+k,1,1); F('#e9e6df',ax,y,1,2) } })();
 // the shortcuts: packed dirt with a worn middle and grassy edges
 (function(){ const g=fargoBg.getContext('2d'), F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};
   for(const [x1,y1,x2,y2] of SHORTCUTS){ const n=Math.ceil(Math.hypot(x2-x1,y2-y1));
@@ -246,15 +249,28 @@ function drawWaterTower(){
 }
 // the name board on each shop (Bob's moves around, so it's drawn live)
 function textW(t){let w=0; for(const ch of t){const m=GLYPH[ch]; w+=(ch==='.'?2:(m?m.length/5:3)+1)} return w-1}
+// the road signs pointing the way out of town: green highway boards, HWY and a big arrow
 function drawExitSign(e){
   const F=(c,x,y,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,h)}, x=e.x, y=e.y;
-  F('#8a8f9a',x+12,y+10,2,8); F('#1d6b3a',x,y,26,11); F('#ffffff',x,y,26,1); F('#ffffff',x,y+10,26,1);
-  pixText(ctx,'EXIT',x+2,y+3,'#ffffff');
-  const ax=x+19, ay=y+3, W=c=>(dx,dy,w=1,h=1)=>F(c,ax+dx,ay+dy,w,h), A=W('#ffffff');   // the arrow, 5x5
-  if(e.dir==='<'){A(0,2,6,1); A(1,1,1,3); A(2,0,1,5)}
-  else if(e.dir==='v'){A(2,0,1,5); A(1,3,3,1); A(0,2,5,1)}
-  else {A(2,0,1,5); A(1,1,3,1); A(0,2,5,1)}
+  F('rgba(0,0,0,.2)',x+12,y+17,4,2); F('#8a8f9a',x+12,y+12,2,6);
+  F('#ffffff',x-1,y-1,28,14); F('#1d6b3a',x,y,26,12); F('#2a8a4c',x,y,26,1);
+  pixText(ctx,'HWY',x+2,y+4,'#ffffff');
+  const ax=x+17, ay=y+2, A=(dx,dy,w=1,h=1)=>F('#ffffff',ax+dx,ay+dy,w,h);   // a big arrow, 8x8
+  if(e.dir==='<'){A(1,4,7,1); A(1,3,7,1); A(0,3,1,2); A(1,2,1,4); A(2,1,1,6); A(3,0,1,8)}
+  else if(e.dir==='v'){A(3,0,2,7); A(0,4,8,1); A(1,5,6,1); A(2,6,4,1); A(3,7,2,1)}
+  else {A(3,1,2,7); A(0,3,8,1); A(1,2,6,1); A(2,1,4,1); A(3,0,2,1)}
 }
+// the way out: an overhead highway sign across the road at the left edge of town (drawn on top, so the car drives under it)
+function drawHighwayGantry(){
+  const F=(c,x,y,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,h)}, t='LEAVE FARGO', w=textW(t)+20, x=46, y=150;
+  F('#6b6f7a',x+2,y+14,2,4); F('#6b6f7a',x+w-4,y+14,2,4); F('#6b6f7a',x+2,y+42,2,8); F('#6b6f7a',x+w-4,y+42,2,8);   // the posts, either side of the road
+  F('rgba(0,0,0,.25)',x+2,y+15,w,2);
+  F('#ffffff',x-1,y-1,w+2,16); F('#1d6b3a',x,y,w,14); F('#2a8a4c',x,y,w,1);
+  const on=Math.floor(time/400)%2, A=(dx,dy,ww=1,hh=1)=>F(on?'#ffd84d':'#ffffff',x+3+dx,y+3+dy,ww,hh);
+  A(1,4,7,1); A(1,3,7,1); A(0,3,1,2); A(1,2,1,4); A(2,1,1,6); A(3,0,1,8);                              // the arrow, blinking
+  pixText(ctx,t,x+13,y+5,'#ffffff');
+}
+
 function drawShopSign(s){
   if(!s.signText)return; const st=s.store, w=textW(s.signText)+4, x=Math.round(st.x+(st.w-w)/2), y=s.face==='up'?st.y+st.h-8:st.y;
   ctx.fillStyle=s.brand; ctx.fillRect(x,y,w,8); ctx.fillStyle='rgba(255,255,255,.35)'; ctx.fillRect(x,y,w,1); pixText(ctx,s.signText,x+2,y+2,'#ffffff');
@@ -363,6 +379,7 @@ SCENES.fargo={ music:'fargo',
       ctx.fillStyle='rgba(0,0,0,.08)'; ctx.fillRect(s.x+6,s.y+8,40,14);
       ctx.fillStyle='rgba(241,244,248,.6)'; ctx.fillRect(s.x+8,s.y+3,32,10); ctx.fillStyle=s.brand; ctx.fillRect(s.x+8,s.y+11,32,2);   // see-through so the car shows
     }
+    drawHighwayGantry();
     if(have.fargoStage==='store'&&fargo.onFoot)drawEnterSign();
     if(have.fargoPasta&&!have.jackieFed&&fargo.onFoot){ ctx.fillStyle='rgba(29,33,48,.55)'; ctx.fillRect(Math.round(P.x)-6,Math.round(P.y)-36,13,10); drawPastaBowl(ctx,Math.round(P.x)-4,Math.round(P.y)-35) }   // carrying the pasta
     ctx.fillStyle='rgba(120,100,60,.35)';    // a little summer dust drifting across the plains
