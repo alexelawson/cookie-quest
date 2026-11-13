@@ -187,11 +187,26 @@ function drawFargoTop(){
   for(const lx of [266,350]){F('#1d1d22',lx,236,1,20); F('#1d1d22',lx-1,255,3,1); F('#fff3c8',lx-1,234,3,3)}
 }
 
+// motorcyclists cruising the road on the way to Fargo: one lane each way. v = px per ms; off spaces them out
+const MOTOS=[{y:155,dir:1,v:.045,off:0,col:'#c8322b',vest:'#2b2b30'},{y:155,dir:1,v:.045,off:26,col:'#1d1d22',vest:'#5a3a22'},{y:162,dir:-1,v:.038,off:140,col:'#2f6db0',vest:'#2b2b30'},{y:155,dir:1,v:.045,off:260,col:'#e8742a',vest:'#2b2b30'}];
+function drawMoto(x,y,dir,col,vest){   // seen from the side-ish top: two wheels, a tank, a rider in a helmet and a leather vest
+  const f=dir, X=Math.round(x), F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(X+(f>0?dx:-dx-w+1),Math.round(y)+dy,w,h)}, bob=Math.floor(time/120)%2;
+  F('rgba(0,0,0,.22)',-7,1,15,2);
+  F('#1d1d22',-7,-3,4,4); F('#1d1d22',4,-3,4,4); F('#9aa0aa',-6,-2,2,2); F('#9aa0aa',5,-2,2,2);       // wheels
+  F('#9aa0aa',-4,-2,9,1); F(col,-2,-5,6,3); F('#ffffff',-1,-5,2,1); F('#c9ced4',5,-6,1,4); F('#1d1d22',4,-7,2,1);   // frame, tank, forks, bars
+  F('#3a3f4a',-5,-4,3,1);                                                                               // exhaust
+  F('#3a5a8a',-3,-7,5,2); F('#3a5a8a',1,-6,2,3); F('#1d1d22',1,-4,3,1);                                   // jeans, knee bent, a boot on the peg
+  F(vest,-4,-12,5,6); F('#5a3a22',-4,-12,1,6); F('#e9eef3',1,-11,1,2);                                    // leather vest (a white tee showing)
+  F('#e9eef3',1,-10,3,1); F('#f0c6a0',3,-9,2,1); F('#f0c6a0',4,-8,1,1);                                   // an arm out to the handlebars
+  F('#1d1d22',-4,-17,5,5); F(col,-4,-17,5,1); F('#4a4f5a',-4,-13,5,1); F('#9fd2f0',0,-15,2,2); F('#ffffff',0,-15,1,1);   // helmet with a visor
+  if(Math.floor(time/90)%2)F('rgba(200,200,200,.5)',-9,-3,2,1);                                        // a puff of exhaust
+}
 // hook into the main map
 {const ents=SCENES.world.ents;
   SCENES.world.ents=function(list){ ents.call(this,list);
     for(const k in GEAR)if(!GEAR[k].give&&!(have.gear&&k in have.gear))list.push({y:GEAR[k].y,draw:()=>drawGearItem(k,GEAR[k].x,GEAR[k].y)});
-    list.push({y:178,draw:()=>drawCar(270,172,'right',true)});   // the CR-V at Fargo, right off the road: walk up to it to drive into town
+    list.push({y:182,draw:()=>drawCar(270,176,'right',true)});   // the CR-V at Fargo, parked a step back from the road: walk up to it to drive into town
+    for(const m of MOTOS){ const span=WW+60, x=m.dir>0?((time*m.v+m.off)%span)-30:WW+30-((time*m.v+m.off)%span); list.push({y:m.y,draw:()=>drawMoto(x,m.y,m.dir,m.col,m.vest)}) }   // motorcyclists on the road into Fargo
   }}
 
 // the lucky clover sheds little green sparkles as Joe walks; Grp the rooster trots along behind him

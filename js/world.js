@@ -21,14 +21,14 @@ const solids=[
   R(108,16,52,30),                                           // Brian's pond (he's out in his boat)
   R(67,204,3,3),R(103,258,3,3),                              // city streetlamps
   R(8,178,40,52),R(110,184,48,56),R(0,244,72,44),R(72,264,92,24),R(94,224,6,4),   // city towers, the ocean, the steam clock
-  R(222,184,162,66),R(259,166,22,12),R(230,258,130,10),                              // downtown Fargo's buildings, the CR-V, the parked cars
+  R(222,184,162,66),R(259,170,22,12),R(230,258,130,10),                              // downtown Fargo's buildings, the CR-V, the parked cars
   ...[...trees,...pines,...woods,...cedars].map(([x,y])=>R(x-3,y-3,6,4)),
 ];
 const triggers=[
   {z:R(320,70,24,18),  label:'Talk to John', btn:'Talk', act:()=>talkJohn()},
   {z:R(86,36,26,16),   label:'Talk to Brian', btn:'Talk', act:()=>talkBrian()},
   {z:R(124,240,20,12), label:'Take the elevator up', act:()=>openWardrobe(()=>{ heist.outfitReact=true; goTo('city','fromStreet') })},
-  {z:R(258,158,24,8),  label:'Drive into Fargo',   act:()=>goTo('fargo','fromHighway')},   // the CR-V, parked right off the road
+  {z:R(256,160,28,10), label:'Drive into Fargo',   act:()=>goTo('fargo','fromHighway')},   // the CR-V, parked on the sidewalk side, a step off the road
   {z:R(182,142,20,10), label:'Enter your kitchen', act:()=>goTo('kitchen','fromDoor')},
   {z:R(184,276,16,10), label:'Go to the disc golf course', act:()=>goTo('golf','fromRoad')},
   // Keelan's trigger moves with him; see farm.js
