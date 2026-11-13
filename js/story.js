@@ -398,6 +398,8 @@ const FARGO = {
     {id:'gingerale', name:'Ginger Ale',  react:"Ginger ale!"},
     {id:'pepsi',     name:'Pepsi',       react:"Pepsi. Who even are you right now."},
     {id:'pedialyte', name:'Pedialyte',   react:"Pedialyte? Do I look hungover to you?"},
+    {id:'energy',    name:'Energy Drink', react:"An energy drink? I want to sleep in the car, not vibrate."},
+    {id:'water',     name:'Water',        react:"Water. Healthy. Boring. No."},
   ],
   snacks:[
     {id:'pringles',  name:'Pringles Original', react:"Pringles. Bold choice. Wrong, but bold."},
@@ -406,6 +408,8 @@ const FARGO = {
     {id:'almondjoy', name:'Almond Joy',        react:"Almond Joy?! Do you know me at all?"},
     {id:'snickers',  name:'Snickers',          react:"Snickers. Nope."},
     {id:'motts',     name:"Mott's Berry Gummies", react:"Mott's!"},
+    {id:'curry',     name:'Microwave Curry',   react:"Curry?! I have hated curry since the womb. You KNOW this."},
+    {id:'ramen',     name:'Spicy Instant Ramen', react:"SPICY RAMEN? I've hated spicy ramen since the womb. Who are you??"},
   ],
   alexHello:"Okay. You know what I like. Don't mess this up.",
   grab:n=>`Grab the ${n}`, swap:n=>`Swap for the ${n}`,

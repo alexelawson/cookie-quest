@@ -515,6 +515,18 @@ const ITEM_ART={
     F('#ffffff',5,8,6,5); F('#f2f2ee',5,12,6,1); F('#6b3f22',6,9,4,3); F('#8a5a34',7,9,2,1); F('#ffffff',7,10,2,1) },   // a split chocolate bar, coconut inside
   snickers(g){ itemBar(g,'#5a3220','#3e2216','#7a4a30'); const F=itemF(g);
     F('#2f6db0',4,9,8,3); F('#ffffff',5,10,6,1); F('#c8322b',4,8,8,1); F('#c8322b',4,12,8,1) },
+  energy(g){ itemCan(g,'#1d1d22','#0c0c10','#3a3a44'); const F=itemF(g); F('#7dff8a',4,8,8,1); F('#7dff8a',6,9,2,1); F('#7dff8a',7,10,2,1); F('#7dff8a',6,11,2,1); F('#7dff8a',7,12,2,1); F('#7dff8a',4,14,8,1) },   // a lightning bolt
+  water(g){ const F=itemF(g); F('rgba(0,0,0,.2)',4,19,9,1);
+    F('#3d8ad6',6,0,4,2); F('#cfe8f5',6,2,4,2); F('#dff0f7',4,4,8,15); F('#b9d8ea',4,4,1,15); F('#b9d8ea',11,4,1,15); F('#ffffff',6,5,1,12);
+    F('#3d8ad6',4,9,8,4); F('#ffffff',5,10,3,1); for(let y=7;y<18;y+=3)F('#c4e2ee',4,y,8,1) },   // a clear bottle with a blue label
+  curry(g){ const F=itemF(g); F('rgba(0,0,0,.2)',1,19,14,1);
+    F('#f4a62a',1,4,14,15); F('#c8801a',14,4,1,15); F('#ffc85a',1,4,14,1); F('#8a3a12',1,4,14,3);   // a box (orange), a dark band on top
+    F('#f6f2ea',3,9,10,7); F('#e8a23a',4,11,8,4); F('#c8622a',5,12,2,1); F('#9a4a1a',9,13,2,1); F('#5fbf6a',7,10,2,1); F('#ffffff',5,9,4,1) },   // a bowl of curry on the front
+  ramen(g){ const F=itemF(g); F('rgba(0,0,0,.2)',2,19,12,1);
+    F('#c9ced4',2,3,12,2); F('#e9eef3',3,3,6,1);                                              // foil lid
+    F('#f6f2ea',2,5,12,14); F('#c9c4b8',13,5,1,14); F('#ffffff',3,5,1,13); F('#c8322b',2,9,12,5); F('#8e0b21',2,13,12,1);   // a white cup, a red band
+    F('#f4d35e',5,10,2,3); F('#ff8a3a',6,9,1,2); F('#f4d35e',9,10,2,3); F('#ff8a3a',10,9,1,2);   // flames: SPICY
+    F('#f4d35e',4,15,8,1) },
   motts(g){ const F=itemF(g); F('rgba(0,0,0,.2)',2,19,12,1);
     F('#7a2b5a',3,2,10,16); F('#5e2046',3,2,1,16); F('#5e2046',12,2,1,16); F('#9a3d74',4,2,1,15); F('#5e2046',7,2,2,1);   // a purple pouch with a tear notch
     F('#f2e6ee',4,5,8,8); for(const [x,y,c] of [[5,6,'#e54b4b'],[8,6,'#3d8ad6'],[6,9,'#f4d35e'],[9,9,'#a03d6a'],[5,11,'#2fbf5a'],[9,11,'#e8742a']])F(c,x,y,2,2);   // gummies in the window

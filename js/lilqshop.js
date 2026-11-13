@@ -28,6 +28,7 @@ const MINI={
   bread:{t:'bag',c:['#f6efe2','#d9cfba','#ffffff'],b:'#e54b4b'}, soup:{t:'can',c:['#e54b4b','#b03030','#ff8080'],b:'#ffffff'}, oil:{t:'bottle',c:['#2b2f3a','#1d2130','#4a505e'],cap:'#f4d35e',b:'#f4d35e'},
   candyA:{t:'bar',c:['#e54b4b','#b03030','#ff8080'],b:'#ffffff'}, candyB:{t:'bar',c:['#f4d35e','#c9a83a','#fff0a0'],b:'#5a3220'}, candyC:{t:'bar',c:['#7a4fa0','#5a3580','#a37fc8'],b:'#ffffff'},
   gum:{t:'pouch',c:['#3fa59a','#2a7a72','#7fd8cc'],b:'#ffffff'},
+  curry:{t:'box',c:['#f4a62a','#c8801a','#ffc85a'],b:'#8a3a12'}, ramen:{t:'cup',c:['#f6f2ea','#c9c4b8','#ffffff'],b:'#c8322b'},
 };
 // draw one at (x = left, y = bottom)
 function drawMini(g,id,x,y){
@@ -39,6 +40,7 @@ function drawMini(g,id,x,y){
   else if(m.t==='bar'){ F(D,0,-4,7,4); F(B,1,-4,5,4); F(L,1,-4,5,1); F(m.b,2,-3,3,1) }
   else if(m.t==='pouch'){ F(B,0,-8,5,8); F(D,4,-8,1,8); F(L,1,-8,1,7); F(m.b,1,-6,3,3); F('#e54b4b',1,-6,1,1); F('#3d8ad6',3,-5,1,1); F('#f4d35e',2,-4,1,1) }
   else if(m.t==='carton'){ F(L,1,-9,3,1); F(B,0,-8,5,8); F(D,0,-8,1,8); F(m.b,0,-5,5,2) }
+  else if(m.t==='cup'){ F('#c9ced4',0,-8,5,1); F(B,0,-7,5,7); F(D,4,-7,1,7); F(L,1,-7,1,6); F(m.b,0,-5,5,2); F('#f4d35e',1,-4,1,1); F('#ff8a3a',3,-4,1,1) }   // a cup of noodles: foil lid, a red band, flames
   else if(m.t==='box'){ F(B,0,-9,6,9); F(D,5,-9,1,9); F(L,0,-9,6,1); F(m.b,1,-6,3,3) }
 }
 const lq={drink:null, snack:null, mood:'ok', moodT:0, alex:{x:112,y:156}, jackieN:0};
@@ -47,7 +49,7 @@ const COOLER_DOORS=[['water','water','water'],['sportsB','pedialyte','sports'],[
 // the aisles: [left side, right side] of each gondola, top to bottom (5 spots a side). The ones you can grab are FARGO.snacks.
 const GONDOLA_STOCK=[
   [['chipsA','pringles','chipsB','chipsC','pretzel'],['chipsB','cheetos','chipsA','smartfood','chipsC']],
-  [['cereal','cerealB','soup','bread','oil'],['soup','cereal','bread','cerealB','oil']],
+  [['cereal','cerealB','curry','bread','oil'],['ramen','cereal','soup','cerealB','oil']],   // (curry and spicy ramen: Alex will not be pleased)
   [['candyA','almondjoy','candyB','gum','candyC'],['candyB','snickers','candyC','motts','gum']],
 ];
 const SLOT_Y=k=>SHOP.GONDOLAS[0].y+11+k*11;   // the bottom of each shelf spot

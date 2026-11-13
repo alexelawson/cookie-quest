@@ -112,7 +112,7 @@ function drawGear(c,g=ctx,look=null){
 }
 
 // ---------- crabs on the Vancouver beaches: they scuttle sideways and wave their claws ----------
-const CRABS=[[16,239,0],[44,241,1.7],[62,237,3.1],[90,261,.8],[118,262,2.4],[146,261,4]];   // [x, y, phase]
+const CRABS=[[44,241,1.7],[118,262,2.4]];   // [x, y, phase]
 function drawCrab(x,y,ph){
   const F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(Math.round(x+dx),Math.round(y+dy),w,h)}, claw=Math.floor(time/260+ph*3)%2;
   F('rgba(0,0,0,.2)',-3,1,7,1);
@@ -187,26 +187,11 @@ function drawFargoTop(){
   for(const lx of [266,350]){F('#1d1d22',lx,236,1,20); F('#1d1d22',lx-1,255,3,1); F('#fff3c8',lx-1,234,3,3)}
 }
 
-// motorcyclists cruising Broadway (the street in front of the Fargo Theatre, below Fargo): all heading east in the near lane. v = px per ms; off spaces them out
-const MOTOS=[{y:279,dir:1,v:.035,off:0,col:'#c8322b',vest:'#2b2b30'},{y:279,dir:1,v:.035,off:22,col:'#1d1d22',vest:'#5a3a22'},{y:279,dir:1,v:.035,off:75,col:'#2f6db0',vest:'#2b2b30'},{y:279,dir:1,v:.035,off:120,col:'#e8742a',vest:'#2b2b30'}];
-function drawMoto(x,y,dir,col,vest){   // seen from the side-ish top: two wheels, a tank, a rider in a helmet and a leather vest
-  const f=dir, X=Math.round(x), F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(X+(f>0?dx:-dx-w+1),Math.round(y)+dy,w,h)}, bob=Math.floor(time/120)%2;
-  F('rgba(0,0,0,.22)',-7,1,15,2);
-  F('#1d1d22',-7,-3,4,4); F('#1d1d22',4,-3,4,4); F('#9aa0aa',-6,-2,2,2); F('#9aa0aa',5,-2,2,2);       // wheels
-  F('#9aa0aa',-4,-2,9,1); F(col,-2,-5,6,3); F('#ffffff',-1,-5,2,1); F('#c9ced4',5,-6,1,4); F('#1d1d22',4,-7,2,1);   // frame, tank, forks, bars
-  F('#3a3f4a',-5,-4,3,1);                                                                               // exhaust
-  F('#3a5a8a',-3,-7,5,2); F('#3a5a8a',1,-6,2,3); F('#1d1d22',1,-4,3,1);                                   // jeans, knee bent, a boot on the peg
-  F(vest,-4,-12,5,6); F('#5a3a22',-4,-12,1,6); F('#e9eef3',1,-11,1,2);                                    // leather vest (a white tee showing)
-  F('#e9eef3',1,-10,3,1); F('#f0c6a0',3,-9,2,1); F('#f0c6a0',4,-8,1,1);                                   // an arm out to the handlebars
-  F('#1d1d22',-4,-17,5,5); F(col,-4,-17,5,1); F('#4a4f5a',-4,-13,5,1); F('#9fd2f0',0,-15,2,2); F('#ffffff',0,-15,1,1);   // helmet with a visor
-  if(Math.floor(time/90)%2)F('rgba(200,200,200,.5)',-9,-3,2,1);                                        // a puff of exhaust
-}
 // hook into the main map
 {const ents=SCENES.world.ents;
   SCENES.world.ents=function(list){ ents.call(this,list);
     for(const k in GEAR)if(!GEAR[k].give&&!(have.gear&&k in have.gear))list.push({y:GEAR[k].y,draw:()=>drawGearItem(k,GEAR[k].x,GEAR[k].y)});
     list.push({y:182,draw:()=>drawCar(270,176,'right',true)});   // the CR-V at Fargo, parked a step back from the road: walk up to it to drive into town
-    for(const m of MOTOS){ const L=214, span=WW-L+20, d=(time*m.v+m.off)%span, x=m.dir>0?L+d:WW+10-d; if(x>L+4&&x<WW-2)list.push({y:m.y,draw:()=>drawMoto(x,m.y,m.dir,m.col,m.vest)}) }   // motorcyclists cruising Broadway, below Fargo
   }}
 
 // the lucky clover sheds little green sparkles as Joe walks; Grp the rooster trots along behind him
