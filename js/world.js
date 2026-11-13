@@ -22,13 +22,14 @@ const solids=[
   R(67,204,3,3),R(103,258,3,3),                              // city streetlamps
   R(8,178,40,52),R(110,184,48,56),R(0,244,72,44),R(72,264,92,24),R(94,224,6,4),   // city towers, the ocean, the steam clock
   R(300,180,50,40),R(256,198,6,10),R(280,198,6,10),R(356,200,28,36),R(350,280,28,6), // Lil Q's, pumps, grain elevator, water tower
+  R(259,166,22,12),R(288,212,8,8),R(338,222,10,8),                                   // the CR-V, the ice chest, Lil Q's scooter
   ...[...trees,...pines,...woods,...cedars].map(([x,y])=>R(x-3,y-3,6,4)),
 ];
 const triggers=[
   {z:R(320,70,24,18),  label:'Talk to John', btn:'Talk', act:()=>talkJohn()},
   {z:R(86,36,26,16),   label:'Talk to Brian', btn:'Talk', act:()=>talkBrian()},
   {z:R(124,240,20,12), label:'Take the elevator up', act:()=>openWardrobe(()=>{ heist.outfitReact=true; goTo('city','fromStreet') })},
-  {z:R(315,220,20,12), label:'Drive into Fargo',   act:()=>goTo('fargo','fromHighway')},
+  {z:R(258,158,24,8),  label:'Drive into Fargo',   act:()=>goTo('fargo','fromHighway')},   // the CR-V, parked right off the road
   {z:R(182,142,20,10), label:'Enter your kitchen', act:()=>goTo('kitchen','fromDoor')},
   {z:R(184,276,16,10), label:'Go to the disc golf course', act:()=>goTo('golf','fromRoad')},
   // Keelan's trigger moves with him; see farm.js
@@ -149,11 +150,21 @@ const bg=document.createElement('canvas'); bg.width=WW; bg.height=WH;
   // Lil Q's Gas & Go: white clapboard, a red-and-white awning, a big blue sign
   F('rgba(0,0,0,.2)',302,220,50,2);
   F('#f2efe6',300,184,50,36); for(let y=188;y<220;y+=3)F('#dcd7cc',300,y,50,1); F('#c9c4b8',349,184,1,36);
-  F('#2f6db0',300,180,50,9); F('#1d3f73',302,181,46,7); F('#ffffff',300,180,50,1); pixText(g,"LIL Q'S",310,182,'#ffffff');
+  F('#e8742a',300,180,50,9); F('#c85a1a',302,181,46,7); F('#ffffff',300,180,50,1); F('#8a3a12',300,188,50,1); pixText(g,"LIL Q'S",310,182,'#ffffff');
   for(let x=300;x<350;x+=4){F('#c7372f',x,189,2,4); F('#ffffff',x+2,189,2,4)} F('rgba(0,0,0,.15)',300,193,50,1);   // the awning
   F('#9fd2f0',303,196,13,9); F('#cfeaf8',304,197,4,2); F('#9fd2f0',334,196,13,9); F('#cfeaf8',335,197,4,2);          // windows
   F('#e9c46a',305,203,4,2); F('#e54b4b',310,203,4,2); F('#7fd39a',336,203,4,2); F('#f28cb8',341,203,4,2);           // snacks on the shelves
   F('#6b6f7a',319,206,12,14); F('#8a8f9a',320,207,10,12); F('#f4d35e',327,213,1,2); F('#ffffff',321,209,8,3);     // the door, OPEN
+  F('#e54b7a',305,198,8,3); F('#ff9ab8',306,199,6,1);                                                              // an OPEN neon in the window
+  F('#ffffff',336,198,3,4); F('#f4d35e',340,198,5,4); F('#2f6db0',336,203,9,1);                                     // posters (gas, slushies)
+  F('#c9c4b8',300,219,50,1); F('#a8a39a',300,220,50,1);                                                            // the step along the front
+  // out front: an ice chest, a propane cage, a bench, a trash can, a newspaper box, a light pole on each corner of the lot
+  F('rgba(0,0,0,.18)',288,219,9,2); F('#e9eef3',288,212,8,7); F('#3d8ad6',288,214,8,2); F('#ffffff',289,212,6,1);
+  F('#8a8f9a',350,206,1,14); F('#c9ced4',344,206,7,1); for(let x=345;x<350;x+=2)F('#9aa0aa',x,207,1,12); F('#e9eef3',345,212,2,6); F('#e9eef3',348,212,2,6);   // propane
+  F('#7a4a24',304,222,12,2); F('#5a3418',305,224,1,2); F('#5a3418',314,224,1,2);                                    // bench
+  F('#5f6676',318,222,4,6); F('#4a505e',318,222,4,1); F('#3d8ad6',324,222,4,6); F('#ffffff',325,223,2,1);          // trash can, newspaper box
+  for(const lx of [241,351]){F('#5f6676',lx,170,1,22); F('#3a3f4a',lx-2,169,5,2); F('#fff6c8',lx-1,171,3,1)}       // light poles
+  for(const [x,y] of [[266,214],[300,228],[250,226],[284,232]])F('#8a8681',x,y,4,2);                                 // oil spots on the asphalt
   // the pumps (the canopy over them is drawn on top, in over())
   F('#c7372f',256,198,6,10); F('#c7372f',280,198,6,10); F('#f1f4f8',257,200,4,3); F('#f1f4f8',281,200,4,3); F('#2b2b2b',262,201,1,5); F('#2b2b2b',286,201,1,5);
   // the grain elevator: three concrete silos and a head house on top
@@ -161,6 +172,8 @@ const bg=document.createElement('canvas'); bg.width=WW; bg.height=WH;
   for(const x of [356,365,374]){F('#d8d4cc',x,182,9,53); F('#ebe8e2',x+1,182,2,53); F('#b9b4aa',x+7,182,2,53); for(let y=186;y<234;y+=7)F('#c9c4ba',x,y,9,1)}
   F('#c9c4ba',360,168,18,15); F('#e2ded6',361,168,6,15); F('#a8a39a',360,168,18,1); F('#b03a2e',360,171,18,3); F('#2b2f3a',366,176,5,4);   // head house
   F('#8a8f9a',357,180,2,12); F('#8a8f9a',357,180,6,1);                                                                                  // the leg / spout
+  F('#6b6f7a',382,184,1,50); for(let y=186;y<234;y+=3)F('#6b6f7a',380,y,3,1);                                                          // a ladder up the side
+  for(const [x,y,h] of [[358,200,9],[369,194,14],[377,206,8]])F('rgba(150,90,50,.3)',x,y,1,h);                                         // rust streaks
   // the water tower, FARGO painted on the tank
   {const x=348, y=238; F('rgba(0,0,0,.2)',x+2,y+47,32,2);
    for(const lx of [x+3,x+14,x+25]){F('#7a7f8a',lx,y+20,2,27); F('#5f6370',lx+1,y+20,1,27)} F('#7a7f8a',x+3,y+32,24,1); F('#7a7f8a',x+5,y+40,20,1);   // legs + cross braces
@@ -322,7 +335,7 @@ const yurt=archSprite(36,32,g=>{const F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x
 const SCENES={};
 SCENES.world={ music:()=>farm.active?'chase':'world',
   w:WW, h:WH, bounds:R(2,10,WW-4,WH-12), bg, solids, triggers,
-  entries:{start:{x:192,y:156,dir:'down'}, fromKitchen:{x:192,y:157,dir:'down'}, fromCity:{x:134,y:256,dir:'down'}, fromFargo:{x:325,y:238,dir:'down'}, fromGolf:{x:192,y:266,dir:'up'}, fromMill:{x:316,y:92,dir:'down'}},
+  entries:{start:{x:192,y:156,dir:'down'}, fromKitchen:{x:192,y:157,dir:'down'}, fromCity:{x:134,y:256,dir:'down'}, fromFargo:{x:270,y:158,dir:'down'}, fromGolf:{x:192,y:266,dir:'up'}, fromMill:{x:316,y:92,dir:'down'}},
   hud:()=>farmHud(),
   dynTrigger:()=>farmTrigger(),
   ambient(dt){

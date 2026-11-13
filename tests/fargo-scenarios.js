@@ -9,7 +9,7 @@ const helpers=()=>{window.T={
   lines:()=>{const l=[]; for(let i=0;i<20&&!dlg.hidden;i++){l.push($('dspeaker').textContent+': '+$('dtext').textContent); if(!T.btns().includes('Next')&&T.btns().length>1)break; [...$('dbtns').querySelectorAll('button')][0].click()} return l},
   run:(n)=>{for(let i=0;i<n;i++)update(16.7)},
   settle:()=>{for(let i=0;i<60;i++)update(16.7)},
-  enter:()=>{P.x=325;P.y=226;update(16.7);action();T.settle()},
+  enter:()=>{P.x=270;P.y=161;update(16.7);action();T.settle()},
   walkTo:(x,y,max=800)=>{for(let i=0;i<max;i++){const dx=x-P.x,dy=y-P.y; if(Math.hypot(dx,dy)<2)break; for(const k in dirs)dirs[k]=false;
      if(dx>1)dirs.right=true;if(dx<-1)dirs.left=true;if(dy>1)dirs.down=true;if(dy<-1)dirs.up=true; update(16.7); if(!dlg.hidden)break} for(const k in dirs)dirs[k]=false; return Math.hypot(x-P.x,y-P.y)<3},
   at:(x,y)=>{P.x=x;P.y=y;update(16.7); return near&&near.label},
@@ -17,7 +17,14 @@ const helpers=()=>{window.T={
   toAlex:()=>{T.go(156,140); return T.walkTo(172,138)},
   toDoor:()=>{T.go(106,150); return T.walkTo(112,152)},
   // the race, with a bot that kicks every `every` ms (420 is right in the green)
-  race:(every)=>{raceReset(); race.phase='go'; race.t=0; let t=0,next=0; while(race.phase==='go'&&t<90000){ if(t>=next){raceKick(); next=t+every} SCENES.scooter.ambient(16.7); t+=16.7 } return {won:race.won,t:Math.round(t),gap:Math.round(race.x-race.qx)}},
+  // the race, with a bot that steers along a route ('good': the shortcuts, cleanly; 'bad': the roads, wandering a lot)
+  race:(how)=>{ const roads=[{x:222,y:180},{x:222,y:52},{x:103,y:52},{x:52,y:52},{x:52,y:302},{x:392,y:302},{x:392,y:180},{x:330,y:180}];
+    const cuts=[{x:240,y:174},{x:240,y:168},{x:136,y:64},{x:103,y:52},{x:52,y:52},{x:52,y:302},{x:392,y:302},{x:392,y:290},{x:350,y:248},{x:350,y:222}];
+    const route=how==='good'?cuts:roads, slop=how==='good'?0:.3; raceReset(); race.phase='go'; let i=0,t=0;
+    while(race.phase==='go'&&t<60000){ const w=route[Math.min(i,route.length-1)]; for(const k in dirs)dirs[k]=false; const dx=w.x-P.x, dy=w.y-P.y;
+      if(Math.hypot(dx,dy)<5)i++; else { if(dx>2)dirs.right=true; if(dx<-2)dirs.left=true; if(dy>2)dirs.down=true; if(dy<-2)dirs.up=true }
+      if(slop&&Math.random()<slop)for(const k in dirs)dirs[k]=false; update(16.7); t+=16.7 }
+    for(const k in dirs)dirs[k]=false; return {won:race.won,t:Math.round(t),cp:race.cp}},
 }};
 const fresh=async(st)=>{await p.goto(URL);await p.evaluate(s=>{localStorage.clear(); if(s)localStorage.setItem('cookie-quest-v1',JSON.stringify(s))},st);await p.reload();await p.click('#startBtn'); await p.evaluate(()=>{try{skipWelcome()}catch(e){}});await p.evaluate(helpers)};
 const R=[];const ok=(n,c,x='')=>R.push((c?'PASS ':'FAIL ')+n+(x?'  ('+x+')':''));
@@ -28,44 +35,41 @@ let r=await p.evaluate(()=>{T.enter(); const intro=T.lines(); return {scene:scen
 ok('A drive into Fargo: Alex says to look for Lil Q\'s sign',r.scene&&r.intro[0].startsWith('Alex')&&r.intro.join().includes("Lil Q's"),r.intro.join(' | '));
 ok('A one gas station (Lil Q\'s), a diner, no fuel gauge',r.stations===1&&r.diner&&r.hud.includes("Find Lil Q's")&&!r.hud.includes('Fuel'),r.hud);
 
-// B. the diner hands over plain pasta
-r=await p.evaluate(()=>{P.x=DINER.lot.x+20; P.y=DINER.lot.y+14; update(16.7); const lbl=near&&near.label; action(); const hello=$('dtext').textContent, btns=T.btns(); T.click('Plain pasta to go'); const lines=T.lines(); const got=!!have.fargoPasta;
-  action(); const again=$('dtext').textContent; T.lines(); return {lbl,hello,btns,lines,got,again}});
-ok('B pull up to the diner: Deb gives you a bowl of plain pasta',r.lbl==='Pull up to the diner'&&r.btns.includes('Plain pasta to go')&&r.got&&r.lines.join().includes('warm bowl'),r.lines.join(' | '));
-ok('B and next time she just says hi',r.again.includes('always plain'),r.again);
+// B. the diner: Deb's out front (we'll come back for the pasta once Jackie asks, after going into the shop)
+r=await p.evaluate(()=>{P.x=DINER.lot.x+20; P.y=DINER.lot.y+14; update(16.7); const lbl=near&&near.label; action(); const hello=$('dtext').textContent, btns=T.btns(); T.click('Just looking'); return {lbl,hello,btns,closed:dlg.hidden,got:!!have.fargoPasta}});
+ok('B pull up to the diner: Deb offers plain pasta (you can say no for now)',r.lbl==='Pull up to the diner'&&r.btns.includes('Plain pasta to go')&&r.closed&&!r.got,r.hello);
 
 // C. Lil Q: the deal, then the race scene (how-to first)
 r=await p.evaluate(()=>{const s=STATIONS[0]; P.x=s.lot.x+10;P.y=s.lot.y+22; update(16.7); const lbl=near&&near.label; action(); const said=[]; while(T.btns().includes('Next')){said.push($('dtext').textContent);T.click('Next')} said.push($('dtext').textContent);
   const btns=T.btns(); T.click('Race her'); T.settle(); const howto=!$('howto').hidden, title=$('howTitle').textContent; $('howOk').click(); return {lbl,said,btns,scene:scene===SCENES.scooter,howto,title,phase:race.phase,stage:have.fargoStage}});
 ok('C pull up to the pump: Lil Q offers the race for the gas',r.lbl==='Pull up to the pump'&&r.said.join().includes('Race me')&&r.btns.join()==='Race her,Not yet'&&r.stage==='race',r.btns.join());
 ok('C the race opens with a how-to card first',r.scene&&r.howto&&r.title==='Scooter race'&&r.phase==='count',r.title+' '+r.phase);
-r=await p.evaluate(()=>{const t0=race.t; T.run(10); const counting=race.phase==='count'&&race.t>t0; const x=race.x; raceKick(); const noKick=race.v===0; for(let i=0;i<160&&race.phase==='count';i++)update(16.7);
-  P.x=999; dirs.right=true; update(16.7); dirs.right=false; const arrowsDontMove=Math.abs(P.x-race.x)<.01; return {counting,noKick,go:race.phase,arrowsDontMove,hud:SCENES.scooter.hud(),lbl:SCENES.scooter.abilityLabel()}});
-ok('C 3-2-1 countdown (kicking early does nothing), then GO; A says Kick; arrows don\'t move you',r.counting&&r.noKick&&r.go==='go'&&r.arrowsDontMove&&r.lbl==='Kick'&&r.hud.includes('mph'),JSON.stringify(r));
+r=await p.evaluate(()=>{const t0=race.t; T.run(10); const counting=race.phase==='count'&&race.t>t0; const x=P.x; dirs.left=true; T.run(5); const frozen=P.x===x; dirs.left=false;
+  for(let i=0;i<160&&race.phase==='count';i++)update(16.7); const x2=P.x; dirs.left=true; T.run(10); dirs.left=false; const moves=P.x<x2; return {counting,frozen,go:race.phase,moves,hud:SCENES.scooter.hud()}});
+ok('C 3-2-1 countdown (you can\'t move yet), then GO: steer with the arrows; HUD says 1st/2nd and the next checkpoint',r.counting&&r.frozen&&r.go==='go'&&r.moves&&/1st|2nd/.test(r.hud)&&r.hud.includes('Checkpoint 1/3'),JSON.stringify(r));
 
-// D. the kick rhythm
+// D. the race: checkpoints in order, boosts, grass, the shortcuts
 r=await p.evaluate(()=>{raceReset(); race.phase='go';
-  raceKick(); const v1=race.v; for(let i=0;i<6;i++)SCENES.scooter.ambient(16.7); raceKick(); const early=race.v<v1&&race.wob>0;     // ~100ms later: too early
-  race.kt=420; const v2=race.v; raceKick(); const good=race.v-v2;                                                              // in the green
-  race.kt=900; const v3=race.v; raceKick(); const late=race.v-v3;                                                              // way late
-  return {early,good:+good.toFixed(3),late:+late.toFixed(3)}});
-ok('D kicks: too early wobbles you (slower), in the green is a full kick, late is a weak one',r.early&&r.good>r.late&&r.late>0,JSON.stringify(r));
-r=await p.evaluate(()=>{raceReset(); race.phase='go'; race.qx=race.x+20; race.qv=0; let t=0; while(t<1600&&!race.ready){ race.qx=race.x+20; SCENES.scooter.ambient(16.7); t+=16.7 } const ready=race.ready, tFill=Math.round(t);
-  race.kt=420; const v=race.v; raceKick(); const boost=race.v-v; return {ready,tFill,boost:+boost.toFixed(3),used:!race.ready&&race.draft===0}});
-ok('D drafting right behind Lil Q fills the bar; the next good kick is a SLINGSHOT',r.ready&&r.tFill<=1500&&r.boost>.1&&r.used,JSON.stringify(r));
-r=await p.evaluate(()=>({perfect:T.race(420),mash:T.race(150),late:T.race(800),edge:T.race(505)}));
-ok('D a steady rhythm in the green wins; mashing or kicking late loses',r.perfect.won&&!r.mash.won&&!r.late.won,JSON.stringify(r));
-ok('D (a sloppy rhythm at the very edge of the green loses unless you draft)',!r.edge.won,JSON.stringify(r.edge));
+  const cp2=RACE_CPS[1]; P.x=cp2.x; P.y=cp2.y; update(16.7); const skipped=race.cp===0;                           // the second one doesn't count before the first
+  const cp1=RACE_CPS[0]; P.x=cp1.x; P.y=cp1.y; update(16.7); const first=race.cp===1;
+  P.x=335; P.y=180; update(16.7); const noFinish=race.phase==='go';                                              // can't finish without all three
+  const road=SCENES.scooter.speed(); P.x=150; P.y=120; const grass=SCENES.scooter.speed(); P.x=188; P.y=116; const path=SCENES.scooter.speed();
+  const pad=RACE_PADS[0]; P.x=pad.x; P.y=pad.y; update(16.7); const boosted=race.boost>0&&SCENES.scooter.speed()>road;
+  return {skipped,first,noFinish,road,grass,path,boosted}});
+ok('D checkpoints only count in order, and you can\'t finish without all three',r.skipped&&r.first&&r.noFinish,JSON.stringify(r));
+ok('D roads + dirt paths are fast, grass is slow, the orange arrows boost you',r.road>r.grass&&r.path===r.road&&r.boosted,JSON.stringify(r));
+r=await p.evaluate(()=>({good:T.race('good'),bad:T.race('bad')}));
+ok('D a clean run with the shortcuts beats Lil Q; a wandering one on the roads loses',r.good.won&&!r.bad.won,JSON.stringify(r));
 
 // E. losing: rematch or later
-r=await p.evaluate(()=>{T.race(800); for(let i=0;i<80&&dlg.hidden;i++)SCENES.scooter.ambient(16.7); const lost=$('dtext').textContent; while(T.btns().includes('Next'))T.click('Next'); const btns=T.btns(); T.click('Run it back'); const again=race.phase==='count'&&scene===SCENES.scooter;
-  T.race(800); for(let i=0;i<80&&dlg.hidden;i++)SCENES.scooter.ambient(16.7); T.lines(); T.click('Later'); T.settle(); return {lost,btns,again,back:scene===SCENES.fargo,car:!fargo.onFoot,hud:SCENES.fargo.hud(),stage:have.fargoStage}});
+r=await p.evaluate(()=>{T.race('bad'); for(let i=0;i<80&&dlg.hidden;i++)SCENES.scooter.ambient(16.7); const lost=$('dtext').textContent; while(T.btns().includes('Next'))T.click('Next'); const btns=T.btns(); T.click('Run it back'); const again=race.phase==='count'&&scene===SCENES.scooter;
+  T.race('bad'); for(let i=0;i<80&&dlg.hidden;i++)SCENES.scooter.ambient(16.7); T.lines(); T.click('Later'); T.settle(); return {lost,btns,again,back:scene===SCENES.fargo,car:!fargo.onFoot,hud:SCENES.fargo.hud(),stage:have.fargoStage}});
 ok('E lose: Lil Q gloats; Run it back restarts the race',r.lost.includes('Lil Q wins')||r.btns.includes('Run it back'),r.lost);
 ok('E Later: back in the car by her lot, HUD says race her',r.again&&r.back&&r.car&&r.stage==='race'&&r.hud.includes('Race Lil Q'),r.hud);
 
 // F. back to Lil Q: "back for more?" then the win
 r=await p.evaluate(()=>{const s=STATIONS[0]; P.x=s.lot.x+10;P.y=s.lot.y+22; update(16.7); action(); const hello=$('dtext').textContent; T.click('Race her'); T.settle();
-  T.race(420); for(let i=0;i<80&&dlg.hidden;i++)SCENES.scooter.ambient(16.7); const won=T.lines(); T.settle(); const ask=T.lines();
+  T.race('good'); for(let i=0;i<80&&dlg.hidden;i++)SCENES.scooter.ambient(16.7); const won=T.lines(); T.settle(); const ask=T.lines();
   return {hello,howtoAgain:!$('howto').hidden,won,ask,scene:scene===SCENES.fargo,onFoot:fargo.onFoot,stage:have.fargoStage,hud:SCENES.fargo.hud()}});
 ok('F rematch: no how-to the second time',r.hello.includes('Back for more')&&!r.howtoAgain,r.hello);
 ok('F win: Lil Q fills the tank; parked at her shop, Alex asks for a snack',r.won.join().includes('A deal\'s a deal')&&r.scene&&r.onFoot&&r.stage==='store'&&r.ask.join().includes('She definitely wants a snack'),r.ask.join(' | '));
@@ -85,20 +89,27 @@ ok('G walk up to the fridge and grab a drink; grabbing another swaps it',r.w1&&r
 ok('G bring Alex just a drink: "A drink AND a snack"',r.giveLbl==='Give to Alex'&&r.need.join().includes('A drink AND a snack'),r.need.join());
 ok('G HUD shows what you\'re holding; wrong pair: her reactions, they go back on the shelf, still in the shop',r.hud.includes('Sprite')&&r.hud.includes('Cheetos')&&r.wrong.join().includes('Sprite??')&&r.wrong.join().includes('orange')&&r.cleared&&r.wrongN===1&&r.stage==='store',r.wrong.join(' | '));
 
-// H. Jackie: no help without pasta (we got it at the diner, so take that away first to check)
-r=await p.evaluate(()=>{const had=have.fargoPasta; have.fargoPasta=false; T.go(SHOP.JACKIE.x,SHOP.JACKIE.y+14); update(16.7); const lbl=near&&near.label; action(); const hungry=T.lines(); have.fargoPasta=had; update(16.7); const lbl2=near&&near.label; action(); const fed=T.lines(); action(); const h2=T.lines(); action(); const h3=T.lines(); action(); const h4=T.lines();
-  return {lbl,hungry,lbl2,fed,h2,h3,h4,met:have.metJackie,fedSaved:have.jackieFed}});
+// H. Jackie: no help without pasta
+r=await p.evaluate(()=>{T.go(SHOP.JACKIE.x,SHOP.JACKIE.y+14); update(16.7); const lbl=near&&near.label; action(); const hungry=T.lines(); const hud=SCENES.lilqshop.hud(); return {lbl,hungry,hud,asked:have.jackieAsked,exitMark:EXITS.lilqshop[0].markWhen()}});
 ok('H Jackie won\'t help on an empty stomach: plain pasta from the diner',r.lbl==='Talk to Jackie'&&r.hungry.join().includes('plain pasta')&&r.hungry.join().includes('diner'),r.hungry.join(' | '));
-ok('H with the pasta: she takes it, then a clue each time you talk (gentle, bubbly / fruity pouch / just tells you)',r.lbl2==='Give her the pasta'&&r.fed.join().includes('Plain pasta. Perfect')&&r.fed.join().includes('Bubbly')&&r.h2.join().includes('pouch')&&r.h3.join().includes("Mott's")&&r.h4.join().includes("Mott's")&&r.met&&r.fedSaved,[r.fed.join(),r.h2.join()].join(' / '));
+ok('H then the HUD says where to get it, and the EXIT arrow shows the way out',r.asked&&r.hud.includes('Diner')&&r.exitMark,r.hud);
 
-// I. leave before you're done (to get pasta, say): the car's right there
+// I. so: walk out (you've already been inside), get in the car, the diner, back
 r=await p.evaluate(()=>{T.toDoor(); for(let i=0;i<40&&scene===SCENES.lilqshop;i++){dirs.down=true; update(16.7)} dirs.down=false; T.settle();
-  const out=scene===SCENES.fargo, onFoot=fargo.onFoot, stage=have.fargoStage; const c=fargo.car; const lbl=T.at(c.x,c.y+14); action(); const driving=!fargo.onFoot;
-  const s=STATIONS[0]; P.x=s.lot.x+10;P.y=s.lot.y+22; update(16.7); action(); const parked=fargo.onFoot&&!!fargo.car; const g=s.door; const door=T.at(g.x+8,g.y+4); action(); T.settle(); return {out,onFoot,stage,lbl,driving,parked,door,inShop:scene===SCENES.lilqshop}});
-ok('I you can walk out before you\'re done, get in the car, and come back (park, go inside again)',r.out&&r.onFoot&&r.stage==='store'&&r.lbl==='Get in the car'&&r.driving&&r.parked&&r.door==='Go inside'&&r.inShop,JSON.stringify(r));
+  const out=scene===SCENES.fargo, onFoot=fargo.onFoot, stage=have.fargoStage; const c=fargo.car; const lbl=T.at(c.x,c.y+14); action(); const driving=!fargo.onFoot, hud=SCENES.fargo.hud();
+  P.x=DINER.lot.x+20; P.y=DINER.lot.y+14; update(16.7); action(); T.click('Plain pasta to go'); const lines=T.lines(); const card=!$('itemCard').hidden, cardName=$('itemName').textContent; $('itemBtn').click(); const got=!!have.fargoPasta;
+  action(); const again=$('dtext').textContent; T.lines();
+  const s=STATIONS[0]; P.x=s.lot.x+10;P.y=s.lot.y+22; update(16.7); action(); const parked=fargo.onFoot&&!!fargo.car; const g=s.door; const door=T.at(g.x+8,g.y+4); action(); T.settle();
+  return {out,onFoot,stage,lbl,driving,hud,lines,card,cardName,got,again,parked,door,inShop:scene===SCENES.lilqshop,shopHud:SCENES.lilqshop.hud()}});
+ok('I you can walk out after you\'ve gone in: get in the car (HUD: the diner)',r.out&&r.onFoot&&r.stage==='store'&&r.lbl==='Get in the car'&&r.driving&&r.hud.includes('Diner'),r.hud);
+ok('I Deb hands over a bowl of plain pasta: a "you got something" card',r.lines.join().includes('warm bowl')&&r.card&&r.cardName==='Plain pasta'&&r.got&&r.again.includes('always plain'),r.cardName);
+ok('I back to Lil Q\'s: park and go inside again; the HUD says you\'ve got the pasta',r.parked&&r.door==='Go inside'&&r.inShop&&r.shopHud.includes('Plain pasta'),r.shopHud);
+r=await p.evaluate(()=>{T.run(60); T.lines(); T.go(SHOP.JACKIE.x,SHOP.JACKIE.y+14); update(16.7); const lbl2=near&&near.label; action(); const fed=T.lines(); action(); const h2=T.lines(); action(); const h3=T.lines(); action(); const h4=T.lines();
+  return {lbl2,fed,h2,h3,h4,met:have.metJackie,fedSaved:have.jackieFed}});
+ok('I give Jackie the pasta: she eats, then a clue each time you talk (gentle, bubbly / fruity pouch / just tells you)',r.lbl2==='Give her the pasta'&&r.fed.join().includes('Plain pasta. Perfect')&&r.fed.join().includes('Bubbly')&&r.h2.join().includes('pouch')&&r.h3.join().includes("Mott's")&&r.h4.join().includes("Mott's")&&r.met&&r.fedSaved,[r.fed.join(),r.h2.join()].join(' / '));
 
 // J. the right ones: Alex is thrilled, the EXIT sign lights up, out the door, Lil Q's sugar
-r=await p.evaluate(()=>{T.run(60); T.lines(); const ge=SHOP_ITEMS.find(i=>i.id==='gingerale'), mo=SHOP_ITEMS.find(i=>i.id==='motts');
+r=await p.evaluate(()=>{T.lines(); const ge=SHOP_ITEMS.find(i=>i.id==='gingerale'), mo=SHOP_ITEMS.find(i=>i.id==='motts');
   T.go(ge.spot.x+ge.spot.w/2,ge.spot.y+6); update(16.7); action(); T.go(mo.spot.x+mo.spot.w/2,mo.spot.y+6); update(16.7); action();
   T.toAlex(); update(16.7); action(); const win=T.lines(); const hud=SCENES.lilqshop.hud(), mood=lq.mood, stage=have.fargoStage;
   update(16.7); const noGrab=(()=>{const it=SHOP_ITEMS[0]; return T.at(it.spot.x+it.spot.w/2,it.spot.y+6)})();
@@ -117,7 +128,7 @@ ok('K reload after meeting Lil Q: driving, HUD says race her',r.car&&r.hud.inclu
 // L. after baking: race Lil Q again (nothing else changes)
 await fresh({welcomed:true,fargoIntro:true,fargo:true,baked:true,raceHowTo:true});
 r=await p.evaluate(()=>{T.enter(); const s=STATIONS[0]; P.x=s.lot.x+10;P.y=s.lot.y+22; update(16.7); action(); const btns=T.btns(); T.click('Race Lil Q again'); T.settle(); const inRace=scene===SCENES.scooter;
-  T.race(420); for(let i=0;i<80&&dlg.hidden;i++)SCENES.scooter.ambient(16.7); const said=T.lines(); T.settle(); return {btns,inRace,said,back:scene===SCENES.fargo,car:!fargo.onFoot,stage:have.fargoStage||null}});
+  T.race('good'); for(let i=0;i<80&&dlg.hidden;i++)SCENES.scooter.ambient(16.7); const said=T.lines(); T.settle(); return {btns,inRace,said,back:scene===SCENES.fargo,car:!fargo.onFoot,stage:have.fargoStage||null}});
 ok('L after baking: race Lil Q again; win and you\'re back on the road',r.btns.includes('Race Lil Q again')&&r.inRace&&r.said.join().includes("You're fast")&&r.back&&r.car&&!r.stage,JSON.stringify(r));
 
 // M. the way out of town still works, and the hen doesn't ride the scooter

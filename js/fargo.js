@@ -14,6 +14,11 @@ const STATIONS=[
   const lot=R(s.x,s.y,48,28), store=R(s.x+4,s.y+28,40,20), door=R(s.x+16,s.y+20,16,9);   // the shop door, from the lot side
   return {...s, lot, store, door, island:R(s.x+18,s.y+11,12,6), sign:{x:s.x+50,y:s.y+2}, person:{x:s.x+38,y:s.y+20}, price:CHEAPEST, seen:true, name:FARGO.bob, signText:FARGO.bobSign};
 });
+// two dirt-path shortcuts across the fields (handy in the scooter race): [x1,y1, x2,y2], about 9 px wide. 45-degree diagonals, so the arrow keys can follow them
+const SHORTCUTS=[[240,168,136,64],[392,290,350,248],[350,248,350,214]];
+const segDist=(x,y,[x1,y1,x2,y2])=>{const dx=x2-x1,dy=y2-y1,t=Math.max(0,Math.min(1,((x-x1)*dx+(y-y1)*dy)/(dx*dx+dy*dy))); return Math.hypot(x-(x1+t*dx),y-(y1+t*dy))};
+const onShortcut=(x,y)=>SHORTCUTS.some(sc=>segDist(x,y,sc)<5);
+const shortcutBoxes=SHORTCUTS.flatMap(([x1,y1,x2,y2])=>{const n=Math.ceil(Math.hypot(x2-x1,y2-y1)/6); return [...Array(n+1)].map((_,k)=>R(x1+(x2-x1)*k/n-6,y1+(y2-y1)*k/n-6,12,12))});
 // the diner (top left): plain pasta for Jackie. A little parking lot, the diner below it.
 const DINER={lot:R(90,64,48,28), bld:R(92,92,44,22)};
 const HOUSES=[R(70,124,24,20),R(110,132,26,20),R(244,74,26,20),
@@ -85,6 +90,13 @@ const fargoBg=document.createElement('canvas'); fargoBg.width=FW; fargoBg.height
   F('#8a8f9a',WELCOME.x+3,WELCOME.y+10,2,6); F('#8a8f9a',WELCOME.x+19,WELCOME.y+10,2,6);
   F('#2f5f9e',WELCOME.x,WELCOME.y,24,11); F('#ffffff',WELCOME.x,WELCOME.y,24,1); pixText(g,'FARGO',WELCOME.x+3,WELCOME.y+3,'#ffffff');
 })();
+// the shortcuts: packed dirt with a worn middle and grassy edges
+(function(){ const g=fargoBg.getContext('2d'), F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};
+  for(const [x1,y1,x2,y2] of SHORTCUTS){ const n=Math.ceil(Math.hypot(x2-x1,y2-y1));
+    for(let k=0;k<=n;k++){const x=x1+(x2-x1)*k/n, y=y1+(y2-y1)*k/n; F('#9a8a5a',x-5|0,y-5|0,10,10)}
+    for(let k=0;k<=n;k++){const x=x1+(x2-x1)*k/n, y=y1+(y2-y1)*k/n; F('#b8a070',x-4|0,y-4|0,8,8)}
+    for(let k=0;k<=n;k+=2){const x=x1+(x2-x1)*k/n, y=y1+(y2-y1)*k/n; F('#cdb688',x-1|0,y-1|0,2,2); if(rnd()<.3)F('#8a7a4a',x-3+rnd()*6|0,y-3+rnd()*6|0,1,1)} }
+})();
 // the diner: a cream and teal box with a red stripe, big windows, a DINER sign on the roof
 (function(){
   const g=fargoBg.getContext('2d'), F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)}, L=DINER.lot, b=DINER.bld;
@@ -128,7 +140,7 @@ const fargoBg=document.createElement('canvas'); fargoBg.width=FW; fargoBg.height
 })();
 // pine trees scattered where nothing else is
 (function(){
-  const blocked=r=>[...ROADS,...HOUSES,...STATIONS.flatMap(s=>[s.lot,s.store,R(s.sign.x-2,s.sign.y-2,22,24)]),R(TOWER.x-18,TOWER.y-40,36,46),...LANDMARKS,DINER.lot,DINER.bld,R(0,160,40,60),WELCOME,...EXIT_SIGNS.map(s=>R(s.x,s.y,26,18))]
+  const blocked=r=>[...ROADS,...HOUSES,...STATIONS.flatMap(s=>[s.lot,s.store,R(s.sign.x-2,s.sign.y-2,22,24)]),R(TOWER.x-18,TOWER.y-40,36,46),...LANDMARKS,DINER.lot,DINER.bld,...shortcutBoxes,R(0,160,40,60),WELCOME,...EXIT_SIGNS.map(s=>R(s.x,s.y,26,18))]
     .some(o=>hit(R(r.x-3,r.y-3,r.w+6,r.h+6),o));
   for(let n=0;n<400&&fargoTrees.length<16;n++){const x=8+rnd()*(FW-16)|0, y=16+rnd()*(FH-20)|0; const box=R(x-6,y-16,12,17);
     if(!blocked(box)&&!fargoTrees.some(([tx,ty])=>Math.abs(tx-x)<12&&Math.abs(ty-y)<14))fargoTrees.push([x,y])}
@@ -136,7 +148,7 @@ const fargoBg=document.createElement('canvas'); fargoBg.width=FW; fargoBg.height
 // wheat and sunflower fields on the open land (painted onto the town background)
 (function(){
   const g=fargoBg.getContext('2d'), F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};
-  const blocked=r=>[...ROADS,...HOUSES,...STATIONS.flatMap(s=>[s.lot,s.store,R(s.sign.x-2,s.sign.y-2,22,24)]),R(TOWER.x-18,TOWER.y-40,36,46),...LANDMARKS,DINER.lot,DINER.bld,R(0,160,40,60),WELCOME,...EXIT_SIGNS.map(s=>R(s.x,s.y,26,18)),...fargoTrees.map(([x,y])=>R(x-6,y-16,12,17))]
+  const blocked=r=>[...ROADS,...HOUSES,...STATIONS.flatMap(s=>[s.lot,s.store,R(s.sign.x-2,s.sign.y-2,22,24)]),R(TOWER.x-18,TOWER.y-40,36,46),...LANDMARKS,DINER.lot,DINER.bld,...shortcutBoxes,R(0,160,40,60),WELCOME,...EXIT_SIGNS.map(s=>R(s.x,s.y,26,18)),...fargoTrees.map(([x,y])=>R(x-6,y-16,12,17))]
     .some(o=>hit(R(r.x-4,r.y-4,r.w+8,r.h+8),o));
   let n=0; for(let k=0;k<300&&n<6;k++){const f=R(8+rnd()*(FW-60)|0,12+rnd()*(FH-40)|0,44,26); if(blocked(f))continue; n++;
     for(let x=f.x-2;x<=f.x+f.w+1;x+=6){F('#7a5a3a',x,f.y-3,1,3); F('#7a5a3a',x,f.y+f.h,1,3)} F('#9a7a5a',f.x-2,f.y-2,f.w+4,1); F('#9a7a5a',f.x-2,f.y+f.h+1,f.w+4,1);   // a split-rail fence
@@ -275,8 +287,28 @@ function pullIn(){
 function pullInDiner(){
   if(have.fargoPasta) return showDialog({place:FARGO.place,speaker:FARGO.dinerCook,pages:[FARGO.dinerAgain],actions:[CLOSE]});
   showDialog({place:FARGO.place,speaker:FARGO.dinerCook,pages:[FARGO.dinerHello],actions:[
-    {label:FARGO.askPasta,fn:()=>{ have.fargoPasta=true; save(); sfx('ding'); showDialog({place:FARGO.place,speaker:FARGO.dinerCook,pages:FARGO.dinerPasta,actions:[CLOSE]}) }},
+    {label:FARGO.askPasta,fn:()=>{ showDialog({place:FARGO.place,speaker:FARGO.dinerCook,pages:FARGO.dinerPasta,actions:[{label:'OK',fn:()=>{closeDialog(); have.fargoPasta=true; save(); showPastaCard()}}]}) }},
     {label:FARGO.dinerBye,ghost:true,fn:closeDialog}]});
+}
+// the pasta, as a "you got something" card (the same card as Joe's gear)
+function drawPastaBowl(g,x,y,s=1){ const F=(c,dx,dy,w,h)=>{g.fillStyle=c;g.fillRect(x+dx*s,y+dy*s,w*s,h*s)};   // a bowl, (x,y) = top-left, 9x7 at s=1
+  F('#f4d35e',1,0,7,2); F('#e8c048',2,1,2,1); F('#fff0a0',5,0,2,1); F('#e8c048',6,1,1,1);   // pasta piled up
+  F('#ffffff',0,2,9,2); F('#3d8ad6',0,2,9,1); F('#e9eef3',1,4,7,1); F('#c9ced4',2,5,5,1); F('#9aa0aa',3,6,3,1) }   // a white bowl with a blue rim
+function showPastaCard(){
+  const c=$('itemCanvas'); c.width=40; c.height=30; const g=c.getContext('2d'); g.imageSmoothingEnabled=false; g.clearRect(0,0,40,30);
+  drawPastaBowl(g,2,6,4); g.fillStyle='rgba(255,255,255,.7)'; for(const [x,y] of [[12,0],[20,2],[28,0]])g.fillRect(x,y,2,4);   // (and some steam)
+  $('itemFrom').textContent=FARGO.pastaFrom; $('itemName').textContent=FARGO.pastaName; $('itemLine').textContent=FARGO.pastaLine; $('itemTip').textContent=''; $('itemBtn').textContent=FARGO.pastaTake;
+  $('itemBtn').onclick=()=>{ $('itemCard').hidden=true; paused=overlayOpen() };
+  paused=true; prompt.hidden=true; $('itemCard').hidden=false; sfx('reward'); setTimeout(()=>$('itemBtn').focus({preventScroll:true}),0);
+}
+// Deb, the diner cook, out front: white apron, a hairnet, a spatula
+const DEB={x:132,y:86};   // (in the lot, beside the diner's sign)
+function drawDeb(x,y){ const X=Math.round(x)-5, Y=Math.round(y)-17, F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(X+dx,Y+dy,w,h)};
+  F('rgba(0,0,0,.2)',1,16,9,2); F('#3a4458',3,12,2,4); F('#3a4458',6,12,2,4); F('#1d1d22',2,15,3,1); F('#1d1d22',6,15,3,1);
+  F('#3fa59a',1,6,9,7); F('#ffffff',3,6,5,7); F('#e9eef3',3,11,5,2); F('#f0c6a0',0,7,1,4); F('#f0c6a0',10,7,1,4);   // teal uniform, white apron
+  F('#9aa0aa',10,3,1,5); F('#5f6676',9,2,3,2);                                                               // spatula
+  F('#f0c6a0',2,1,7,5); F('#c99a66',1,0,9,2); F('#e9eef3',2,-1,7,2); F('#2b2b2b',4,3,1,1); F('#2b2b2b',6,3,1,1); F('#b5654f',4,5,3,1);   // face, hair under a hairnet
+  if(!have.fargoPasta&&have.jackieAsked&&Math.floor(time/400)%2){ F('#ffffff',11,-9,7,7); F('#1d2130',14,-8,1,3); F('#1d2130',14,-4,1,1) }   // "!" once Jackie's asked for pasta
 }
 // back outside with Alex's snacks: Lil Q gives you the sugar
 function lilQWins(){ showDialog({place:FARGO.place,speaker:FARGO.bob,pages:FARGO.win,actions:[{label:FARGO.thanks,fn:()=>{closeDialog();backInTheCar();showReward('fargo')}}]}) }
@@ -284,12 +316,12 @@ const FARGO_TRIGGERS=[
   ...STATIONS.map(s=>({z:s.lot, label:FARGO.pullIn, act:pullIn})),
   {z:DINER.lot, label:FARGO.pullInDiner, act:pullInDiner},
 ];
-const onRoad=(x,y)=>ROADS.some(r=>x>=r.x&&x<=r.x+r.w&&y>=r.y&&y<=r.y+r.h)||[...STATIONS.map(s=>s.lot),DINER.lot].some(l=>x>=l.x&&x<=l.x+l.w&&y>=l.y&&y<=l.y+l.h);
+const onRoad=(x,y)=>onShortcut(x,y)||ROADS.some(r=>x>=r.x&&x<=r.x+r.w&&y>=r.y&&y<=r.y+r.h)||[...STATIONS.map(s=>s.lot),DINER.lot].some(l=>x>=l.x&&x<=l.x+l.w&&y>=l.y&&y<=l.y+l.h);
 
 SCENES.fargo={ music:'fargo',
   w:FW, h:FH, bounds:R(0,0,FW,FH), bg:fargoBg,
   get triggers(){ return fargo.onFoot?[]:FARGO_TRIGGERS },
-  baseSolids:[...HOUSES, ...STATIONS.flatMap(s=>[s.store,s.island,R(s.sign.x+7,s.sign.y+14,4,4),R(s.person.x-3,s.person.y-3,6,4)]), DINER.bld,
+  baseSolids:[...HOUSES, ...STATIONS.flatMap(s=>[s.store,s.island,R(s.sign.x+7,s.sign.y+14,4,4),R(s.person.x-3,s.person.y-3,6,4)]), DINER.bld, R(DEB.x-3,DEB.y-3,6,4),
     ...fargoTrees.map(([x,y])=>R(x-3,y-2,6,3)), R(TOWER.x-13,TOWER.y-4,26,5), R(WELCOME.x,WELCOME.y+10,24,6), R(THEATRE.x,THEATRE.y+8,THEATRE.w,THEATRE.h-10), R(DOME.x+2,DOME.y+14,DOME.w-4,DOME.h-16), R(BISON.x+2,BISON.y+8,BISON.w-4,6)],
   get solids(){ if(!fargo.onFoot||!fargo.car)return this.baseSolids; const c=fargo.car, a=fargo.alex;
     return [...this.baseSolids, c.dir==='up'||c.dir==='down'?R(c.x-6,c.y-11,12,22):R(c.x-11,c.y-6,22,12), ...(a?[R(a.x-3,a.y-3,6,4)]:[])] },
@@ -327,6 +359,7 @@ SCENES.fargo={ music:'fargo',
     list.push({y:TOWER.y,draw:drawWaterTower},{y:THEATRE.y+THEATRE.h,draw:drawTheatreSign});
     EXIT_SIGNS.forEach(e=>list.push({y:e.y+18,draw:()=>drawExitSign(e)}));
     STATIONS.forEach(s=>list.push({y:s.person.y,draw:()=>drawBob(s.person.x,s.person.y)}));
+    list.push({y:DEB.y,draw:()=>drawDeb(DEB.x,DEB.y)});
     const b=STATIONS[fargo.bob]; list.push({y:b.y+26,draw:()=>drawBike(b.x+43,b.y+12)});
     if(fargo.onFoot&&fargo.car){const c=fargo.car, a=fargo.alex; list.push({y:c.y+5,draw:()=>drawCar(c.x,c.y,c.dir,true)});
       if(a)list.push({y:a.y,draw:()=>drawAlex(a.x,a.y,fargo.alexMood)})}
@@ -338,12 +371,14 @@ SCENES.fargo={ music:'fargo',
       ctx.fillStyle='rgba(241,244,248,.6)'; ctx.fillRect(s.x+8,s.y+3,32,10); ctx.fillStyle=s.brand; ctx.fillRect(s.x+8,s.y+11,32,2);   // see-through so the car shows
     }
     if(have.fargoStage==='store'&&fargo.onFoot)drawEnterSign();
+    if(have.fargoPasta&&!have.jackieFed&&fargo.onFoot){ ctx.fillStyle='rgba(29,33,48,.55)'; ctx.fillRect(Math.round(P.x)-6,Math.round(P.y)-36,13,10); drawPastaBowl(ctx,Math.round(P.x)-4,Math.round(P.y)-35) }   // carrying the pasta
     ctx.fillStyle='rgba(120,100,60,.35)';    // a little summer dust drifting across the plains
     for(let i=0;i<14;i++){const sx=(i*97+time*.03*(1+i%3))%FW, sy=(i*53+Math.sin(time/700+i)*6+FH)%FH; ctx.fillRect(sx|0,sy|0,1,1)}
   },
   hud(){
-    if(fargo.onFoot) return have.fargoStage==='store'?`<span>${FARGO.goInside}: get Alex a snack</span>`:'';
+    if(fargo.onFoot) return have.fargoStage!=='store'?'':have.jackieAsked&&!have.fargoPasta?`<span>${FARGO.hudPasta}</span>`:`<span>${FARGO.goInside}: get Alex a snack</span>`;
     if(fargoDone())return '';
+    if(have.fargoStage==='store'&&have.jackieAsked&&!have.fargoPasta)return `<span>${FARGO.hudPasta}</span>`;
     return `<span>${have.fargoStage==='race'?'Race Lil Q':have.fargoStage==='store'?"Back to Lil Q's":FARGO.hudGoal}</span>`;
   },
 };

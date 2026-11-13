@@ -34,10 +34,11 @@ function drawExitMark(m){
 // the bouncing arrow over Joe's head when there's something to do right here
 function drawNearMark(){
   if(!near||paused||fade.next||scene===SCENES.birkie)return;
-  const x=Math.round(P.x), y=Math.round(P.y)-(have.crown?33:28)+Math.round(Math.sin(time/150)*2), F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x+dx,y+dy,w,h)};
-  F('#1d2130',-4,-1,9,1); F('#1d2130',-4,0,1,1); F('#1d2130',4,0,1,1);
-  for(let i=0;i<4;i++){F('#1d2130',-4+i,i,1,1); F('#1d2130',4-i,i,1,1); F('#f4d35e',-3+i,i,7-i*2,1)}
-  F('#1d2130',0,4,1,1);
+  const x=Math.round(P.x), y=Math.round(P.y)-(have.crown?36:31)+Math.round(Math.sin(time/150)*2), F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x+dx,y+dy,w,h)};
+  const glow=Math.floor(time/300)%2?'#fff3a8':'#f4d35e';   // a bigger bouncing arrow over Joe's head that flashes: "you can do something here"
+  F('#1d2130',-6,-2,13,1);
+  for(let i=0;i<7;i++){F('#1d2130',-6+i,i-1,1,1); F('#1d2130',6-i,i-1,1,1); if(i<6)F(i<2?'#ffffff':glow,-5+i,i-1,11-i*2,1)}
+  F('#1d2130',0,6,1,1);
 }
 
 // ---------- Joe's gear ----------
@@ -183,7 +184,10 @@ function drawFargoTop(){
 // hook into the main map
 {const ents=SCENES.world.ents;
   SCENES.world.ents=function(list){ ents.call(this,list);
-    for(const k in GEAR)if(!GEAR[k].give&&!(have.gear&&k in have.gear))list.push({y:GEAR[k].y,draw:()=>drawGearItem(k,GEAR[k].x,GEAR[k].y)}) }}
+    for(const k in GEAR)if(!GEAR[k].give&&!(have.gear&&k in have.gear))list.push({y:GEAR[k].y,draw:()=>drawGearItem(k,GEAR[k].x,GEAR[k].y)});
+    list.push({y:178,draw:()=>drawCar(270,172,'right',true)});   // the CR-V at Fargo, right off the road: walk up to it to drive into town
+    list.push({y:229,draw:()=>drawBike(340,217)});   // Lil Q's scooter, parked by her door
+  }}
 
 // the lucky clover sheds little green sparkles as Joe walks; Grp the rooster trots along behind him
 const sparkles=[], henTrail=[]; let sparkleT=0, henScene=null;

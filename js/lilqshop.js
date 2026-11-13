@@ -117,6 +117,7 @@ function drawHatStand(){ const x=HATS.x, y=HATS.y, F=(c,dx,dy,w,h)=>{ctx.fillSty
   F('rgba(0,0,0,.2)',-3,0,7,2); F('#5f6676',0,-13,1,13); F('#5f6676',-2,-1,5,1);
   for(const [dx,dy] of [[-4,-13],[1,-10],[-4,-7]]){F('#e8742a',dx,dy,4,2); F('#ffffff',dx+1,dy,2,1); F('#c85a1a',dx-1,dy+2,5,1)} }
 
+function itemXY(it){ if(it.kind==='drink')return {x:SHOP.COOLER.x+it.door*SHOP.COOLER.w+3, y:SHOP.COOLER.y+9+it.row*9}; const g=SHOP.GONDOLAS[it.gi]; return {x:it.side?g.x+6:g.x, y:SLOT_Y(it.k)} }
 function shopNearItem(){ const f=R(P.x-4,P.y-3,8,4); return SHOP_ITEMS.find(it=>hit(f,it.spot)) }
 function grabItem(it){ sfx('pickup'); if(it.kind==='drink')lq.drink=it.id; else lq.snack=it.id }
 function giveSnacks(){
@@ -134,7 +135,7 @@ function giveSnacks(){
 function talkShopJackie(){
   have.metJackie=true;
   if(!have.jackieFed){
-    if(!have.fargoPasta)return say(JACKIE.hungry.map(t=>['Jackie',t]));
+    if(!have.fargoPasta){ have.jackieAsked=true; save(); return say(JACKIE.hungry.map(t=>['Jackie',t])) }
     have.jackieFed=true; save(); sfx('good'); lq.jackieN=1;
     return say([...JACKIE.thanks,JACKIE.hints[0]].map(t=>['Jackie',t]));
   }
@@ -167,19 +168,21 @@ SCENES.lilqshop={ music:'fargo',
   },
   under(){   // the products you can grab: gone from the shelf while you're holding them; a little glint on the one you're next to
     const near=!shopDone()&&shopNearItem();
-    for(const it of SHOP_ITEMS){ if(held(it.id))continue;
-      let x,y; if(it.kind==='drink'){x=SHOP.COOLER.x+it.door*SHOP.COOLER.w; y=SHOP.COOLER.y+9+it.row*9; drawMini(ctx,it.id,x+3,y); drawMini(ctx,it.id,x+11,y); x+=3}
-      else {const g=SHOP.GONDOLAS[it.gi]; x=it.side?g.x+6:g.x; y=SLOT_Y(it.k); drawMini(ctx,it.id,x,y)}
-      if(near===it&&Math.floor(time/250)%2){ctx.fillStyle='#ffffff'; ctx.fillRect(x+1,y-10,1,1); ctx.fillRect(x+2,y-11,1,1)} }
+    for(const it of SHOP_ITEMS){ if(held(it.id))continue; const {x,y}=itemXY(it);
+      if(it.kind==='drink'){drawMini(ctx,it.id,x,y); drawMini(ctx,it.id,x+8,y)} else drawMini(ctx,it.id,x,y);
+      if(near===it){ ctx.fillStyle=Math.floor(time/250)%2?'#ffffff':'#ffd84d'; const w=it.kind==='drink'?15:7; ctx.fillRect(x-2,y-11,w+4,1); ctx.fillRect(x-2,y+1,w+4,1); ctx.fillRect(x-2,y-11,1,13); ctx.fillRect(x+w+1,y-11,1,13) } }   // a flashing box around the one you're next to
   },
   ents(list){
     list.push({y:lq.alex.y,draw:()=>drawAlex(lq.alex.x,lq.alex.y,lq.mood)});
-    list.push({y:SHOP.JACKIE.y,draw:()=>drawJackie(SHOP.JACKIE.x,SHOP.JACKIE.y,'down')});
+    list.push({y:SHOP.JACKIE.y,draw:()=>{ drawJackie(SHOP.JACKIE.x,SHOP.JACKIE.y,'down'); if(have.jackieFed){ drawPastaBowl(ctx,SHOP.JACKIE.x-4,SHOP.JACKIE.y-9); if(Math.floor(time/600)%2){ctx.fillStyle='rgba(255,255,255,.7)'; ctx.fillRect(SHOP.JACKIE.x-1,SHOP.JACKIE.y-13,1,3); ctx.fillRect(SHOP.JACKIE.x+2,SHOP.JACKIE.y-14,1,3)}} }});   // (eating her pasta once you've brought it)
     list.push({y:HATS.y,draw:drawHatStand});
   },
   over(){
-    const h=[lq.drink,lq.snack].filter(Boolean);   // what Joe's carrying, over his head
-    h.forEach((id,i)=>{const x=Math.round(P.x-h.length*4+i*8), y=Math.round(P.y)-26; ctx.fillStyle='rgba(29,33,48,.55)'; ctx.fillRect(x-1,y-10,9,11); drawMini(ctx,id,x,y)});
+    const it=!shopDone()&&!paused&&shopNearItem();   // a big name tag over the one you're next to
+    if(it&&!held(it.id)){ const t=it.name.toUpperCase(), w=textW(t)+8, {x:ix,y:iy}=itemXY(it), g=SHOP.GONDOLAS[it.gi], x0=it.kind==='drink'?Math.round(ix+7-w/2):it.side?g.x-w-2:g.x+g.w+2, x=Math.max(2,Math.min(SHOP.W-w-2,x0)), y=it.kind==='drink'?49:iy-8;   // (drinks: just under Joe's feet. snacks: on the far side of the shelf from Joe, so it never covers him)
+      ctx.fillStyle='#1d2130'; ctx.fillRect(x-1,y-1,w+2,11); ctx.fillStyle='#f4d35e'; ctx.fillRect(x,y,w,9); pixText(ctx,t,x+4,y+2,'#1d2130') }
+    const h=[lq.drink,lq.snack,have.fargoPasta&&!have.jackieFed&&'pasta'].filter(Boolean);   // what Joe's carrying, over his head
+    h.forEach((id,i)=>{const x=Math.round(P.x-h.length*5+i*10), y=Math.round(P.y)-26; ctx.fillStyle='rgba(29,33,48,.55)'; ctx.fillRect(x-1,y-10,11,11); if(id==='pasta')drawPastaBowl(ctx,x,y-8); else drawMini(ctx,id,x+1,y)});
     if(!have.jackieFed&&have.fargoPasta&&Math.floor(time/500)%2){ const x=SHOP.JACKIE.x+4, y=SHOP.JACKIE.y-26; ctx.fillStyle='#ffffff'; ctx.fillRect(x,y,7,7); ctx.fillStyle='#1d2130'; ctx.fillRect(x+3,y+1,1,3); ctx.fillRect(x+3,y+5,1,1) }   // "!" once you have her pasta
     // the EXIT sign by the door: lights up (and blinks) once Alex is happy
     const on=shopDone()&&Math.floor(time/400)%2===0, x=SHOP.DOOR.x+SHOP.DOOR.w+4, y=150;
@@ -190,7 +193,9 @@ SCENES.lilqshop={ music:'fargo',
   hud(){
     if(shopDone())return `<span>${FARGO.exitNow}</span>`;
     const nm=id=>id?`<img class="hudpic" src="${itemPic[id]}" alt="">`+[...FARGO.drinks,...FARGO.snacks].find(x=>x.id===id).name:'—';
-    return `<span>${FARGO.holding}: ${nm(lq.drink)} · ${nm(lq.snack)}</span>`;
+    const pasta=have.fargoPasta&&!have.jackieFed?` · ${FARGO.pastaName}`:have.jackieAsked&&!have.fargoPasta?`</span><span>${FARGO.hudPasta}`:'';
+    return `<span>${FARGO.holding}: ${nm(lq.drink)} · ${nm(lq.snack)}${pasta}</span>`;
   },
 };
-EXITS.lilqshop=[{z:R(SHOP.DOOR.x,164,SHOP.DOOR.w,4), mark:{x:112,y:160,dir:'down'}, markWhen:shopDone, go:()=>{ fargo.fromShop=true; goTo('fargo','fromShop') }}];
+// (the EXIT arrow shows once Alex is happy, or once Jackie's sent you off to the diner)
+EXITS.lilqshop=[{z:R(SHOP.DOOR.x,164,SHOP.DOOR.w,4), mark:{x:112,y:160,dir:'down'}, markWhen:()=>shopDone()||(have.jackieAsked&&!have.fargoPasta), go:()=>{ fargo.fromShop=true; goTo('fargo','fromShop') }}];
