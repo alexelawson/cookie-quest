@@ -119,11 +119,12 @@ ok('I with sprinkles there is a shake-the-sprinkles step, and Brian comes to the
 // J. the cupcake unlocks a cupcake costume; Settings > Change outfit works anywhere
 await fresh({welcomed:true});
 r=await p.evaluate(()=>{const before=WARDROBE.outfits.filter(o=>!o.unlock||have[o.unlock]).map(o=>o.id);
-  P.x=CUPCAKE.x; P.y=CUPCAKE.y+4; update(16.7); const pages=[]; while(T.btns().includes('Next')){pages.push($('dtext').textContent);T.click('Next')} pages.push($('dtext').textContent); T.click('Close');
+  P.x=CUPCAKE.x; P.y=CUPCAKE.y+4; update(16.7); const pages=[]; while(T.btns().includes('Next')){pages.push($('dtext').textContent);T.click('Next')} pages.push($('dtext').textContent); const ask=T.btns().join(); T.click('Not now'); const lookAfterNo=have.look||null;
   $('settingsBtn').click(); $('setOutfit').click(); const ids=[...$('outfits').children].map(b=>b.dataset.id); const title=$('wardTitle').textContent;
   [...$('outfits').children].find(b=>b.dataset.id==='cupcake').click(); $('wardGo').click(); update(16.7);
-  return {before,pages,ids,title,look:have.look,paused,avant:ids.includes('avant')}});
+  return {before,pages,ask,lookAfterNo,ids,title,look:have.look,paused,avant:ids.includes('avant')}});
 ok('J Avant Guard is there; Cupcake is locked until you find the cupcake',r.avant&&!r.before.includes('cupcake')&&r.pages.join(' ').includes('unlocked'),r.pages.slice(-1)[0]);
+ok('J a new costume asks: Wear it now / Not now (Not now leaves Joe as he was)',r.ask==='Wear it now,Not now'&&r.lookAfterNo!=='cupcake',r.ask);
 ok('J Settings > Change outfit: pick the Cupcake costume any time',r.ids.includes('cupcake')&&r.look==='cupcake'&&!r.paused&&r.title.includes('look'),r.ids.join(','));
 
 // L. background music: each place has its own song; the Cookie Dance has Jingle Bells; Settings can turn music off
