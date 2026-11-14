@@ -21,7 +21,7 @@ const PHOTO_W=64, PHOTO_H=48, photoCache={};
 const joeAt=(x,y,dir='down')=>{const c={x,y,dir,moving:false,step:0}; drawJoeJersey(c,ctx); drawGear(c,ctx,null)};
 const PHOTO_SCENES={
   farm(F){ F('#7cc35a',0,0,64,48); for(let i=0;i<40;i++)F('#6bb04c',(i*29)%64,(i*17)%48,2,1);
-    F('#b8433a',2,2,24,16); F('#8f2e27',0,0,28,4); F('#f2efe6',11,9,6,9); F('#e8c35a',30,30,10,6); F('#d9b04a',30,30,10,1);
+    ctx.drawImage(barnSprite,0,-8,34,39); F('#e8c35a',36,30,10,6); F('#d9b04a',36,30,10,1); F('#c9a640',36,33,10,1);
     drawKeelan({x:16,y:44,dir:'down',moving:false,step:0}); joeAt(46,44); drawHen(52,24,1); drawHen(44,18,-1); drawHen(58,36,-1); drawHen(40,26,1) },
   mill(F){ F('#eef3f7',0,0,64,48); for(let i=0;i<30;i++)F('#ffffff',(i*23)%64,(i*13)%48,1,1);
     F('#8a8f9a',6,2,2,14); F('#8a8f9a',56,2,2,14); F('#1d3f73',6,2,52,8); F('#c8322b',6,2,52,1); pixText(ctx,'BIRKIE',20,4,'#ffffff');
@@ -34,7 +34,8 @@ const PHOTO_SCENES={
   golf(F){ F('#7cc35a',0,0,64,48); for(let y=0;y<48;y+=8)F('#86cb63',0,y,64,4);
     F('#8a8f9a',51,6,2,16); F('#c9ced4',47,6,10,2); F('#e8b04a',47,8,10,1); for(let x=48;x<56;x+=2)F('#c9ced4',x,9,1,6); F('#8a8f9a',47,14,10,3);
     drawMargie(14,44); drawJack(28,44); joeAt(44,44); F('#f4d35e',38,20,5,2) },
-  kitchen(F){ F('#b98352',0,0,64,48); for(let y=0;y<48;y+=6)F('#a5703f',0,y,64,1); F('#ecd2ac',0,0,64,10); F('#8a5a34',0,10,64,2);
+  kitchen(F){ F('#96643c',0,0,64,48); for(let y=0;y<48;y+=6)F('#6b4426',0,y,64,1); F('#ece3cf',0,0,64,12); F('#5a3d26',0,0,64,2); F('#3f2a19',0,12,64,1);
+    F('#9a9488',48,2,14,10); F('#bdb7aa',48,2,14,1); F('#5a3d26',46,1,18,2); F('#1d1814',52,5,6,7); F('#e8642a',53,8,4,4); F('#f4a03a',54,9,2,3); F('#69736a',2,6,22,6); F('#c9975e',2,5,22,1);
     drawAlex(24,44,'happy'); joeAt(38,44); drawCrown(38,20);
     F('#e54b7a',28,14,3,3); F('#e54b7a',32,14,3,3); F('#e54b7a',27,16,9,3); F('#e54b7a',29,19,5,2); F('#e54b7a',31,21,1,1);
     for(const [x,y] of [[6,40],[54,36],[8,20],[56,16]])drawCookie(x,y) },

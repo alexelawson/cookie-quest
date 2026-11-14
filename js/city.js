@@ -65,21 +65,46 @@ const cityBg=document.createElement('canvas'); cityBg.width=CW; cityBg.height=CH
 (function(){
   const g=cityBg.getContext('2d'), F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};
   F('#05060c',0,0,CW,CH);                                                         // the street, way down there
+  // lower rooftops all around, far below: dark slabs with a rim, a few skylights and lit windows, the odd rooftop garden
+  for(let x=-6;x<CW;){ const w=22+rnd()*30|0; for(const y0 of [-4,186]){ const h=22+(rnd()*6|0), y=y0+(rnd()*4|0);
+      F('#0a0d18',x,y,w,h); F('#151a2a',x,y,w,1); F('#151a2a',x,y,1,h); F('#070910',x+w-1,y,1,h);
+      for(let k=0;k<4;k++){const wx=x+3+rnd()*(w-8)|0, wy=y+3+rnd()*(h-7)|0; F(rnd()<.6?'#3a3420':'#1d3a40',wx,wy,3,2); if(rnd()<.4)F(rnd()<.6?'#f3d27a':'#8fe8dc',wx,wy,1,1)}
+      if(rnd()<.3){F('#16301e',x+w-9,y+3,6,4); F('#1f4a2a',x+w-8,y+3,3,1)} }
+    x+=w+2+(rnd()*3|0) }
   for(const [x0,w] of [[118,32],[320,32]]){
     F('#0b0d16',x0,0,w,CH); for(let y=0;y<CH;y+=12)F('#1d2030',x0+w/2-1,y,1,6);                                      // the road and its center line
+    F('#151826',x0+4,0,2,CH); F('#151826',x0+w-6,0,2,CH);                                                             // sidewalks
     for(let y=4;y<CH;y+=7)for(const sx of [x0+1,x0+w-4]){F('#123230',sx,y,3,5); F('#1d4a46',sx,y,3,1); if(rnd()<.35)F(rnd()<.5?'#f3d27a':'#8fe8dc',sx+1,y+1,1,2)}   // teal glass walls down at street level, a few lit windows
     for(let k=0;k<6;k++){const y=rnd()*CH|0; F(['rgba(255,80,160,.25)','rgba(90,200,255,.22)','rgba(255,200,90,.2)'][k%3],x0+5,y,w-10,2)}   // neon reflected in the wet road
+    for(const cy of [22,188]){ for(let k=x0+7;k<x0+w-7;k+=3)F('#2a2e40',k,cy,2,5) }                                    // crosswalks
+    for(const ly of [50,128]){ const gr=g.createRadialGradient(x0+7,ly,0,x0+7,ly,11); gr.addColorStop(0,'rgba(255,214,140,.32)'); gr.addColorStop(1,'rgba(255,214,140,0)'); g.fillStyle=gr; g.fillRect(x0,ly-11,w,22); F('#ffe9a8',x0+6,ly,1,1) }   // streetlamps
   }
   for(const r of [ROOF_A,ROOF_B,ROOF_C]){
-    F('#141724',r.x-4,r.y-4,r.w+8,r.h+8); F('#2e3346',r.x-3,r.y-3,r.w+6,r.h+6); F('#3e445a',r.x-3,r.y-3,r.w+6,1);   // parapet: dark wall, a lit top edge
-    F('#232737',r.x,r.y,r.w,r.h);                                                                // wet tar roof
-    for(let i=0;i<r.w*r.h/10;i++)F(rnd()<.5?'#1f2332':'#292e40',r.x+rnd()*r.w|0,r.y+rnd()*r.h|0,1,1);                 // gravel
+    F('rgba(0,0,0,.5)',r.x-2,r.y+r.h+4,r.w+8,3);
+    F('#141724',r.x-4,r.y-4,r.w+8,r.h+8); F('#30364a',r.x-3,r.y-3,r.w+6,r.h+6); F('#4a5168',r.x-3,r.y-3,r.w+6,1); F('#4a5168',r.x-3,r.y-3,1,r.h+6); F('#22273a',r.x-3,r.y+r.h+2,r.w+6,1);   // parapet: dark wall, a lit coping
+    for(let x=r.x+10;x<r.x+r.w;x+=24)F('#22273a',x,r.y-3,1,3);                                   // coping joints
+    F('#262b3d',r.x,r.y,r.w,r.h);                                                                // wet tar roof
+    for(let i=0;i<r.w*r.h/9;i++)F(rnd()<.5?'#21263a':'#2d3348',r.x+rnd()*r.w|0,r.y+rnd()*r.h|0,1,1);                 // gravel
+    F('rgba(0,0,0,.28)',r.x,r.y,r.w,3); F('rgba(0,0,0,.2)',r.x,r.y,3,r.h);                                              // the parapet's shadow
     for(let i=0;i<6;i++){const px=r.x+4+rnd()*(r.w-30)|0, py=r.y+6+rnd()*(r.h-16)|0, pw=10+rnd()*16|0;                // puddles with a sheen
-      F('#1a2030',px,py,pw,3); F('#2f3a55',px+2,py,pw-6,1)}
-    for(let x=r.x+14;x<r.x+r.w-8;x+=28)F('#262b3c',x,r.y+2,1,r.h-4);                                                  // roofing seams
+      F('#1a2030',px,py,pw,3); F('#1a2030',px+2,py-1,pw-5,1); F('#1a2030',px+1,py+3,pw-4,1); F('#34405e',px+2,py,pw-6,1); F('#4a5a80',px+3,py+1,2,1)}
+    for(let x=r.x+14;x<r.x+r.w-8;x+=28){F('#2a2f42',x,r.y+2,1,r.h-4); F('#20253a',x+1,r.y+2,1,r.h-4)}                  // roofing seams
     for(let i=0;i<30;i++)F(rnd()<.5?'#2f4a35':'#3a5a3e',r.x+rnd()*r.w|0,r.y+(rnd()<.5?1:r.h-2),2,1);                    // moss along the edges
     F('#3a3f52',r.x+r.w-4,r.y+6,2,r.h-12); F('#4a5064',r.x+r.w-4,r.y+6,1,r.h-12);                                     // a drainpipe
+    for(const [dx,dy] of [[.3,.2],[.7,.8]]){const x=r.x+r.w*dx|0, y=r.y+r.h*dy|0; F('#1a1e2c',x-2,y-1,5,3); F('#1a1e2c',x-1,y-2,3,5); F('#0c0e16',x-1,y-1,3,3); F('#3a4058',x-1,y-2,3,1)}   // roof drains
+    F('#3a4058',r.x+5,r.y+1,r.w-30,1); for(let x=r.x+20;x<r.x+r.w-30;x+=38){F('#4a5168',x,r.y,4,3); F('#6b7390',x,r.y,4,1)}     // a conduit along the top wall, junction boxes
   }
+  // hazard stripes where the roofs get bridged
+  const hazard=(x,y,h)=>{for(let k=0;k<h;k+=2)F(k%4?'#1d1d22':'#c9a640',x,y+k,2,2)};
+  hazard(ROOF_A.x+ROOF_A.w-3,BEAM_SLOT.y-2,BEAM_SLOT.h+4); hazard(ROOF_B.x+1,BEAM_SLOT.y-2,BEAM_SLOT.h+4); hazard(ROOF_B.x+ROOF_B.w-3,PLANK_BC.y-2,PLANK_BC.h+4); hazard(ROOF_C.x+1,PLANK_BC.y-2,PLANK_BC.h+4);
+  // roof A: Doc Alex's plan, chalked on the tar (a box, an arrow, a cookie), and a cable snaking from the coil
+  {const C='rgba(220,230,240,.5)', x=72, y=40; F(C,x,y,14,1); F(C,x,y+9,14,1); F(C,x,y,1,10); F(C,x+13,y,1,10); F(C,x+16,y+4,7,1); F(C,x+21,y+3,1,3); F(C,x+22,y+4,1,1);
+    F(C,x+27,y+2,4,1); F(C,x+26,y+3,6,4); F(C,x+27,y+7,4,1); F('#262b3d',x+28,y+4,1,1); F('#262b3d',x+30,y+5,1,1);
+    for(let k=0;k<22;k++)F('#12141e',62+k,47+Math.round(Math.sin(k/3)*1.5),1,1)}
+  // roof C: the old candy works. A faded peppermint swirl painted on the roof, candy-striped pipes down the side
+  {const cx=386, cy=96; for(let a=0;a<360;a+=3)for(let r=3;r<15;r++){const t=(a+r*9)*Math.PI/180; if(Math.floor((a+r*9)/45)%2)F('rgba(232,120,150,.16)',cx+Math.cos(a*Math.PI/180)*r|0,cy+Math.sin(a*Math.PI/180)*r|0,1,1)}
+    for(let a=0;a<360;a+=4)F('rgba(240,230,235,.22)',cx+Math.cos(a*Math.PI/180)*15|0,cy+Math.sin(a*Math.PI/180)*15|0,1,1)}
+  for(let y=ROOF_C.y+8;y<ROOF_C.y+ROOF_C.h-8;y+=4){F(((y-ROOF_C.y)>>2)%2?'#e8e2d6':'#c8322b',ROOF_C.x+ROOF_C.w-8,y,2,4)} F('#8a8478',ROOF_C.x+ROOF_C.w-9,ROOF_C.y+6,4,2);
   const plank=p=>{F('#4a3420',p.x,p.y,p.w,p.h); for(let x=p.x;x<p.x+p.w;x+=5)F('#3a2816',x,p.y,1,p.h); F('#5e4430',p.x,p.y,p.w,1)};
   plank(PLANK_BC);
   const ac=(r)=>{const {x,y,w,h}=r; F('rgba(0,0,0,.45)',x+2,y+h,w,3); F('#6f7686',x,y,w,h); F('#8b93a3',x,y,w,1); F('#4a5064',x+2,y+2,Math.min(8,w-4),h-4);

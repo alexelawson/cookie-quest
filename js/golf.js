@@ -86,12 +86,21 @@ const golfBgs=HOLES.map((h,i)=>{
   // the circle (putting range)
   g.strokeStyle='rgba(255,255,255,.35)'; g.setLineDash([3,3]); g.beginPath(); g.arc(b.x,b.y,GOLF.PUTT_RANGE,0,Math.PI*2); g.stroke(); g.setLineDash([]);
   if(i===0){ // the creamery
-    const r=CREAMERY; F('rgba(0,0,0,.15)',r.x,r.y+r.h,r.w,3);
-    F('#b7412e',r.x,r.y+6,r.w,r.h-6); for(let x=r.x+2;x<r.x+r.w;x+=4)F('#a5392a',x,r.y+8,1,r.h-8);
-    F('#7a2a22',r.x-2,r.y,r.w+4,8); for(let y=r.y+1;y<r.y+8;y+=2)F('#6a2219',r.x-2,y,r.w+4,1); F('#f1e3c9',r.x-2,r.y+7,r.w+4,1);
-    F('#f1e3c9',r.x+16,r.y+14,12,16); F('#5a2a20',r.x+17,r.y+15,10,15); F('#f1e3c9',r.x+21,r.y+15,2,15);
-    F('#fffaf0',r.x+3,r.y+10,10,8); F('#3d8ad6',r.x+4,r.y+12,8,1); F('#3d8ad6',r.x+4,r.y+15,8,1); F('#2b2b2b',r.x+5,r.y+13,1,1);   // a MILK sign, sort of
-    F('#c9ced4',r.x+r.w+2,r.y-2,8,22); F('#e8eef0',r.x+r.w+3,r.y-2,3,22); F('#8a8f9a',r.x+r.w+2,r.y-4,8,3); F('#8a8f9a',r.x+r.w+2,r.y+19,8,1);   // silo
+    // a small gambrel-roof barn with an ice cream cone on its sign, and a concrete-stave silo
+    const r=CREAMERY, cx=r.x+r.w/2; F('rgba(0,0,0,.18)',r.x,r.y+r.h,r.w+12,3);
+    {const x=r.x+r.w+1, y=r.y-4; F('#c9c4b8',x,y+5,10,r.h-1); F('#dedad0',x+2,y+5,3,r.h-1); F('#a8a396',x+8,y+5,2,r.h-1); for(let k=y+8;k<y+r.h+4;k+=5)F('#8a8578',x,k,10,1);
+      F('#c9ced4',x,y+2,10,3); F('#e9eef3',x+1,y,8,2); F('#e9eef3',x+3,y-1,4,1); F('#9aa0aa',x+7,y+1,2,4)}
+    const half=k=>k<5?7+k*2.6:19+(k-5)*.45;                                       // the gambrel's two slopes
+    F('#b7412e',r.x,r.y+12,r.w,r.h-12); for(let k=0;k<12;k++){const hw=Math.round(half(k)); F('#b7412e',cx-hw,r.y+k,hw*2,1)}
+    for(let x=r.x+2;x<r.x+r.w;x+=4)F('#a5392a',x,r.y+12,1,r.h-12); for(let x=cx-16;x<cx+17;x+=4)F('#a5392a',x,r.y+5,1,7);
+    for(let k=0;k<12;k++){const hw=Math.round(half(k)); F('#3a3f4a',cx-hw-2,r.y+k,3,1); F('#3a3f4a',cx+hw-1,r.y+k,3,1); F('#f1e3c9',cx-hw+1,r.y+k,1,1); F('#f1e3c9',cx+hw-2,r.y+k,1,1)}   // roof edge, white trim
+    F('#3a3f4a',cx-8,r.y-1,16,2); F('#f1e3c9',r.x,r.y+12,r.w,1); F('#f1e3c9',r.x,r.y+12,1,r.h-12); F('#f1e3c9',r.x+r.w-1,r.y+12,1,r.h-12); F('#8a8478',r.x,r.y+r.h-1,r.w,1);
+    F('#f1e3c9',cx-4,r.y+3,8,7); F('#3a2418',cx-3,r.y+4,6,5); F('#e0b84a',cx-3,r.y+7,6,2);                              // the hayloft door
+    F('#f1e3c9',cx-7,r.y+15,14,15); F('#8a2a20',cx-6,r.y+16,12,14); F('#f1e3c9',cx-1,r.y+16,2,14);                      // sliding doors, white X braces
+    for(let k=0;k<6;k++){F('#f1e3c9',cx-6+k,r.y+17+k*2,1,2); F('#f1e3c9',cx-2-k,r.y+17+k*2,1,2); F('#f1e3c9',cx+1+k,r.y+17+k*2,1,2); F('#f1e3c9',cx+5-k,r.y+17+k*2,1,2)}
+    F('#fffaf0',r.x+3,r.y+14,10,12); F('#8a5a34',r.x+3,r.y+14,10,1); F('#8a5a34',r.x+3,r.y+25,10,1);                    // the sign: an ice cream cone
+    F('#f2a7c8',r.x+6,r.y+16,4,3); F('#f2a7c8',r.x+5,r.y+17,6,2); F('#fbd0e0',r.x+6,r.y+16,2,1); F('#d9a05a',r.x+6,r.y+19,4,2); F('#d9a05a',r.x+7,r.y+21,2,2); F('#b8803c',r.x+7,r.y+20,1,1); F('#c8322b',r.x+8,r.y+15,1,1);
+    F('#f1e3c9',r.x+32,r.y+15,9,8); F('#9fc4dc',r.x+33,r.y+16,7,6); F('#f1e3c9',r.x+36,r.y+16,1,6); F('#f1e3c9',r.x+33,r.y+18,7,1);   // a window
   }
   return c;
 });

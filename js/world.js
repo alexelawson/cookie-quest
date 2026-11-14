@@ -312,12 +312,14 @@ const drawBarn=()=>ctx.drawImage(barnSprite,16,2);
 // Trees are drawn as sprites, depth-sorted with people, so you can walk behind them.
 const treeSprite=document.createElement('canvas'); treeSprite.width=16; treeSprite.height=20;
 (function(){const g=treeSprite.getContext('2d'); const F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};
-  F('rgba(0,0,0,.18)',2,17,12,3);                                                        // shadow on the ground
-  F('#5a3d26',6,13,4,6); F('#7a5232',7,13,1,5); F('#4a3020',9,14,1,5); F('#5a3d26',5,18,6,1);   // trunk with bark + root flare
-  F('#24532c',1,5,14,9); F('#24532c',2,3,12,12); F('#24532c',4,1,8,15);                  // dark outer canopy
-  F('#2f6b36',2,4,12,9); F('#2f6b36',4,2,8,12);                                          // mid
-  F('#3d8443',3,3,8,6); F('#3d8443',5,2,6,8); F('#4d9a50',4,3,4,3); F('#4d9a50',8,5,2,2); F('#6ab563',5,3,2,1);   // light from the top left
-  F('#1f472a',9,10,4,2); F('#1f472a',3,12,3,1); F('#24532c',12,8,2,3);                   // shade underneath
+  // a round sugar maple: a trunk with a root flare, a canopy of leaf clumps lit from the top left
+  F('rgba(0,0,0,.18)',2,17,12,3);
+  F('#5a3d26',6,12,4,7); F('#7a5232',7,12,1,6); F('#4a3020',9,13,1,6); F('#5a3d26',5,18,6,1); F('#4a3020',6,12,4,1);
+  const cols=['#1f472a','#24532c','#2f6b36','#3d8443','#4d9a50','#6ab563'];
+  for(let y=0;y<15;y++)for(let x=0;x<16;x++){ const dx=(x-7.5)/7.8, dy=(y-7)/7.2, d=dx*dx+dy*dy; if(d>1)continue;
+    const light=(-dx*.55-dy*.75), clump=(((x+1)>>2)+((y+((x>>2)%2)*2)>>2))%2?.16:-.12;   // light from the top left, broken into clumps
+    let k=Math.round(2.4+light*2.6+clump*2.2); if(d>.78)k=Math.min(k,1+(light>0.2?1:0)); F(cols[Math.max(0,Math.min(5,k))],x,y,1,1) }
+  F('#1f472a',5,13,2,1); F('#1f472a',9,13,2,1); F('#6ab563',4,3,2,1); F('#6ab563',7,2,1,1);
 })();
 const drawTree=(x,y)=>ctx.drawImage(treeSprite,x-8,y-19);
 // Brian: medium brown hair, buzzed super short, gray tee, jeans. Very chill.
