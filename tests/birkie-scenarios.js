@@ -53,11 +53,11 @@ ok('G every obstacle leaves a way through (pile-ups are jumpable, with room eith
 ok('G the finish: across the lake, over the International Bridge, then Main Street',r.order);
 r=await p.evaluate(()=>{T.only=null; T.setup(2200,0); birk.gustT=1; birk.said.gust=0; for(let i=0;i<5;i++)update(16.7); const warned=!!birk.gust, dir=birk.gust&&birk.gust.dir; for(let i=0;i<60;i++)update(16.7); return {warned,dir,lane:birk.lane,msg:birk.msg}});
 ok('G on the lake a gust is coming (blowing snow), then it shoves you a lane',r.warned&&r.lane===r.dir,JSON.stringify(r));
-r=await p.evaluate(()=>({names:BIRK_SECTIONS.map(s=>s.name).join('|'),kinds:VIKING_KINDS.map(v=>v.kind).join(',')}));
-ok('G real landmarks: Firetower, Mosquito Brook, Highway OO, "That" hill, Hatchery; Norse and football Vikings',/Firetower/.test(r.names)&&/Mosquito/.test(r.names)&&/OO/.test(r.names)&&/Hatchery/.test(r.names)&&r.kinds==='norse,football,norse,football',r.names);
+r=await p.evaluate(()=>({names:BIRK_SECTIONS.map(s=>s.name).join('|')+'|'+FEEDS.map(f=>f.name).join('|'),order:(()=>{const at=n=>BIRK_SECTIONS.find(s=>s.name.includes(n)).y; return at('Powerline')<at('Timber')&&at('Timber')<at('Bobblehead')&&at('Bobblehead')<at('Firetower')&&at('Firetower')<FEEDS[0].y&&FEEDS[0].y<OO.y&&OO.y<FEEDS[1].y&&FEEDS[1].y<BROOK.y&&BROOK.y<at('That')&&at('That')<FEEDS[2].y&&FEEDS[2].y<at('Lake')})(),kinds:VIKING_KINDS.map(v=>v.kind).join(',')}));
+ok('G real landmarks in their real order (Powerlines, Timber Trail, Bobblehead, Firetower, Boedecker, OO, Gravel Pit, Mosquito Brook, "That" hill, Hatchery Creek, the lake); Norse and football Vikings',r.order&&/BOEDECKER/.test(r.names)&&/GRAVEL PIT/.test(r.names)&&/Firetower/.test(r.names)&&/Mosquito/.test(r.names)&&/OO/.test(r.names)&&/HATCHERY/.test(r.names)&&r.kinds==='norse,football,norse,football',r.names);
 // K. the feed cup swings between two lanes; John and the Vikings talk in a pop-up like the rest of the game
 r=await p.evaluate(()=>{const f=FEEDS[1]; const lanes=new Set(); for(let t=0;t<BIRK.CUP_SWING*4;t+=100)lanes.add(cupLane(f,t));
-  T.only=null; T.setup(600,0); birkSay('Test from John'); draw(); const john=!$('radio').hidden&&$('radioWho').textContent.startsWith('John')&&$('radioText').textContent==='Test from John';
+  T.only=null; T.setup(900,0); birkSay('Test from John'); draw(); const john=!$('radio').hidden&&$('radioWho').textContent.startsWith('John')&&$('radioText').textContent==='Test from John';
   birk.t=0; birk.said={}; for(let y=0;y<3000;y+=400)birk.said['sweep'+Math.floor(y/400)]=1; birk.msgT=0; birk.vikingT=1; T.run(2); draw(); const vik=!$('radio').hidden&&/Viking/.test($('radioWho').textContent), line=$('radioText').textContent;
   const all=[...Object.values(BIRKIE.vikings).flat(),...Object.values(BIRKIE.footballVikings).flat()].includes(line); return {two:lanes.size===2,john,vik,line,all,fc:BIRKIE.vikings.feed.some(l=>/Flat Coke/.test(l))}});
 ok('K the volunteer swings the cup between two lanes',r.two);
@@ -88,4 +88,10 @@ r=await p.evaluate(()=>{const o=OBSTACLES.find(o=>o.kind==='pileup'), out={};
     out[name]=crashed }
   birk.running=false; return out});
 ok('G2 a pile-up catches you in every lane, and a jump clears it',r.left&&r.mid&&r.right&&!r.jump,JSON.stringify(r));
+// L. new: the banana at OO, the corner box, Bobblehead's snowmobilers
+r=await p.evaluate(()=>{T.only=null; try{closeDialog()}catch(e){} $('reward').hidden=true; paused=false; birkStart(); T.setup(BANANA.y-12,0); birk.banana=false; birk.bananaLane=0; birk.lane=0; birk.lx=0; birk.energy=50; birk.msgT=0; T.run(40); const got=birk.energy>55, msg=birk.msg;
+  T.setup(BANANA.y-12,0); birk.banana=false; birk.bananaLane=1; birk.lane=-1; birk.lx=-16; birk.energy=50; T.run(40); const missed=birk.energy<=50;
+  T.setup(540,0); const hudUp=SCENES.birkie.hud(); T.setup(660,0); const hudDown=SCENES.birkie.hud(); return {got,msg,missed,hudUp,hudDown}});
+ok('L Highway OO: ski through the banana\'s lane for a little boost (miss it and nothing happens)',r.got&&/Banana/.test(r.msg)&&r.missed,JSON.stringify(r));
+ok('L the corner box says how far along you are and what the trail is doing',/K · Climb/.test(r.hudUp)&&/K · Downhill/.test(r.hudDown),r.hudUp);
 console.log(R.join('\n')); console.log('page errors:',errs.length?errs:'none'); await b.close()})();

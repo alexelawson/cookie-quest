@@ -59,7 +59,7 @@ r=await p.evaluate(()=>{T.hints=[]; const w=T.walkTo(98,102); update(16.7); cons
   for(let i=0;i<300;i++){SCENES.city.ambient(16.7); maxX=Math.max(maxX,L.x); air=Math.max(air,(heist.jump&&heist.jump.air)||0); annoyed=annoyed||heist.annoyT>0} const landed=Math.round(L.x); const cut=[...cut1,'JUMP '+Math.round(maxX)+' air '+Math.round(air)+' land '+landed+' annoyed '+annoyed,...T.clickThrough()].join(' / '); const ice=!$('reward').hidden&&$('rewardName').textContent; if(ice)collectReward();
   return {w,hint:T.hints.join(' / '),lbl,menu,cut,ice,st1:have.heistStage||0}});
 await p.waitForTimeout(1000);
-ok('B John points out the gap',r.hint.includes('gap'),r.hint);
+ok('B no hint about the gap any more (that line is gone)',!r.hint.includes('get across'),r.hint);
 ok('B at the gap: Lars / the log / not yet',r.w==='ok'&&r.lbl==='Cross the gap'&&r.menu.join()==='Lars: long-jump it,John: lay the log across,Not yet',r.lbl+' | '+r.menu.join(' | '));
 ok('B Lars really runs and jumps, boings back, John is annoyed',r.cut.includes('Headwind')&&/JUMP 12\d air 1\d land 112 annoyed true/.test(r.cut)&&!r.st1,r.cut);
 ok('B ...and Lars lands next to a pint of Rosemary Maple ice cream',r.ice==='Rosemary Maple ice cream'&&r.cut.includes('Rosemary Maple'),r.ice);

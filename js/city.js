@@ -736,8 +736,6 @@ SCENES.city={ music:'heist',
     // a few one-time hints as you reach each part
     const st=heistStage();
     if(st<1&&!heist.carry&&P.y<146)hintOnce('log','John',HEIST.johnLog);
-    else if(!have.heistBriefed&&heist.carry&&P.y<108)hintOnce('who','John',HEIST.whoIsThat);
-    else if(st<1&&have.heistBriefed&&heist.carry&&P.x>70&&P.y<110)hintOnce('gap','John',HEIST.johnGap);
     else if(st===1&&P.x>160&&!heist.hinted.lights){ heist.hinted.lights=true; renderCrewBar(); say([['Lars',HEIST.larsLights],['John',HEIST.holdTip]]) }
     else if(st>=2&&st<3&&P.x>356)hintOnce('lasers',HEIST.crew.hero,HEIST.heroLasers);
   },
@@ -815,7 +813,7 @@ SCENES.city={ music:'heist',
     drawFireEscapeSign(); bossOver();
     if(heist.caughtWho){const c=heist.crew.find(c=>c.id===heist.caughtWho); if(c){ctx.fillStyle='#ff4a4a'; ctx.fillRect(c.x-1,c.y-34,3,7); ctx.fillRect(c.x-1,c.y-25,3,2)}}
   },
-  hud(){ const st=heistStage(); const steps=['Bridge the gap','Kill the lights, get everyone across','Shut off the lasers','Crack his safe','Head for the fire escape','Done!'];
+  hud(){ const st=heistStage(); const steps=['Bridge the gap','Kill the lights, get everyone across','Shut off the lasers','Pick up the chocolate','Head for the fire escape','Done!'];
     if(st===1&&heist.lightsOutT>0)return `<span>Lights back in 0:${String(Math.ceil(heist.lightsOutT/1000)).padStart(2,'0')}</span>`;
     if(st===3&&!have.confectionerBeat)return `<span>Zap the Confectioner ${'●'.repeat(boss.hits)}${'○'.repeat(3-boss.hits)}</span>`;
     return st>=5?'':`<span>${steps[st]}</span>` },
