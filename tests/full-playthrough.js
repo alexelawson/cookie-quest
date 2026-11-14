@@ -38,7 +38,7 @@ for(const key of order){
 
 // 3. the secrets, found the real way: walking, talking
 r=await p.evaluate(()=>{ goTo('world','start'); T.run(40); const out={};
-  for(const k of ['oakleys','headband','shoes']){T.at(GEAR[k].x,GEAR[k].y); out[k]=have.gear&&have.gear[k]; if(!$('itemCard').hidden)$('itemBtn').click()}
+  for(const k of ['headband','shoes']){T.at(GEAR[k].x,GEAR[k].y); out[k]=have.gear&&have.gear[k]; if(!$('itemCard').hidden)$('itemBtn').click()}
   T.at(LOGAN.x+6,LOGAN.y+2); action(); T.pages(); T.click(LOGAN_TEXT.help); (()=>{for(let k=0;k<8&&hunt.open;k++){$('cloverField').querySelectorAll('.halbum')[hunt.song[1]].click(); hunt.lock=false; if(hunt.open)huntDeal()}})(); T.pages(); T.click('OK'); $('itemBtn').click(); out.clover=have.gear.clover;
   T.at(CUPCAKE.x,CUPCAKE.y); out.cupcake=!!have.cupcake; while(!dlg.hidden)[...$('dbtns').querySelectorAll('button')][0].click();
   talkBrian(); T.pages(); [...$('dbtns').querySelectorAll('button')][0].click();
@@ -75,7 +75,7 @@ ok('5 the crown, the Cookie Dance (Jingle Bells), then the credits',r.crown&&r.d
 r=await p.evaluate(()=>{$('endSkip').click(); const stats=$('ecard').textContent; $('endNext').click(); const secret=$('ecard').textContent; $('endNext').click();
   const album=[]; for(let i=0;i<6;i++){album.push(!!$('ecard').querySelector('.polaroid canvas')); const n=$('ecard').querySelectorAll('.pnav button')[1]; if(i<5)n.click()}
   $('endNext').click(); return {stats,secret,album,note:$('ecard').textContent}});
-ok('5 stats count all 8 secrets and show the Cookie Legend',r.stats.includes('8 of 8')&&r.stats.includes('LEGEND'),r.stats.slice(0,60));
+ok('5 stats count all 7 secrets and show the Cookie Legend',r.stats.includes('7 of 7')&&r.stats.includes('LEGEND'),r.stats.slice(0,60));
 ok('5 the secret note (only for finding everything), all six photos unlocked, then the note',r.secret.includes(await p.evaluate(()=>ENDING.secretTitle))&&r.album.every(Boolean)&&r.note.includes('Merry Christmas'));
 await p.evaluate(()=>$('endNext').click());
 await reload();

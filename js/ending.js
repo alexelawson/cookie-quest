@@ -7,7 +7,6 @@ const SECRETS=[
   {id:'ginghouse',has:()=>!!have.gingerHouseCostume},
   {id:'sprinkles',has:()=>have.sprinkles},
   {id:'icecream', has:()=>have.icecream},
-  {id:'oakleys',  has:()=>have.gear&&'oakleys' in have.gear},
   {id:'headband', has:()=>have.gear&&'headband' in have.gear},
   {id:'shoes',    has:()=>have.gear&&'shoes' in have.gear},
   {id:'clover',   has:()=>have.gear&&'clover' in have.gear},

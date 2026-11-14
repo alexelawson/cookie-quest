@@ -429,7 +429,6 @@ const FARGO = {
 // ---------- Joe's gear, hidden around the main map (where: GEAR in extras.js) ----------
 const GEAR_TEXT = {
   place:"Found something!",
-  oakleys: {name:"Oakleys", found:"Oakley sunglasses, half buried in the sand. Joe puts them on. Instantly 40% faster.", wear:"Put them on"},
   headband:{name:"Headband", found:"A ski headband in the snow! It smells faintly of klister. Perfect.", wear:"Put it on"},
   shoes:   {name:"Carbon racing shoes", found:"Carbon-plated racing shoes! Joe could run a marathon in these. Or at least to the mailbox.", wear:"Lace them up"},
   clover:  {name:"Lucky clover", found:"A real four-leaf clover. Joe pins it on. Feeling lucky.", wear:"Pin it on", from:"From Logan"},
@@ -506,7 +505,7 @@ const ENDING = {
   statsTitle:"Joe's stats",
   stats:{birkie:"Birkie time", golf:"Wylee Woods", anagrams:"Anagrams vs Lars", spotted:"Spotted on the rooftops", snacks:"Wrong snacks for Alex", steps:"Steps walked", look:"Look"},
   secretsLine:(n,of)=>`Secrets found: ${n} of ${of}`,
-  secretNames:{ginghouse:'Gingerbread house',cupcake:'Cupcake',sprinkles:'Sprinkles',icecream:'Ice cream',oakleys:'Oakleys',headband:'Headband',shoes:'Carbon shoes',clover:'Lucky clover'},
+  secretNames:{ginghouse:'Gingerbread house',cupcake:'Cupcake',sprinkles:'Sprinkles',icecream:'Ice cream',headband:'Headband',shoes:'Carbon shoes',clover:'Lucky clover'},
   secretsTip:"Keep exploring to find the rest. Find them all for a surprise.",
   legend:"COOKIE LEGEND! Every secret found. The crown has been upgraded.",
   secretTitle:"For finding everything",
@@ -595,12 +594,12 @@ const KITCHEN = {place:'Home', speaker:'Your kitchen',
 // The labels on the buttons, and what Joe reads when he looks at things. Change any of these.
 const VANCOUVER = {
   place:'Vancouver',
-  cross:'Cross the Lions Gate Bridge',
+  bridgeMark:'TO VANCOUVER',               // the label on the bouncing arrow over the bridge (capitals only)
   elevator:'Enter here',                   // the button at the REALLY GOOD PHO door (the way up to the rooftops)
   sign:'Vancouver',                       // the name shown on the look-at boxes
   looks:{
     totems:   {label:'Look at the totem poles',  text:"The totem poles at Brockton Point."},
-    lighthouse:{label:'Look at the lighthouse',  text:"The Brockton Point lighthouse. Red and white, right on the seawall."},
+    lighthouse:{label:'Visit the lighthouse',    text:"The Brockton Point lighthouse. Joe climbs to the top. You can see the whole harbour from up here."},
     clock:    {label:'Look at the steam clock',  text:"The Gastown steam clock. It whistles."},
     sails:    {label:'Look at Canada Place',     text:"Canada Place. Five white sails."},
     science:  {label:'Look at Science World',    text:"Science World. The big shiny ball."},

@@ -13,7 +13,8 @@ const EXITS={
   fargo:  [{z:R(0,166,6,28),   when:()=>!fargo.onFoot,   // (no arrow here: the LEAVE FARGO highway sign points the way)
            go:()=>goTo('world','fromFargo')}],
   city:   [{z:LADDER,          mark:{x:21,y:170,dir:'down'}, go:()=>goTo('vancouver','fromRoof')}],   // down the ladder: back on the street by the elevator
-  vancouver:[{z:R(134,0,20,7), go:()=>goTo('world','fromVancouver')}],                                       // back north over the bridge
+  vancouver:[{z:R(134,0,20,7), go:()=>goTo('world','fromVancouver')}],
+  world:  [{z:R(70,212,16,38), mark:{x:78,y:186,dir:'down',text:VANCOUVER.bridgeMark}, go:()=>goTo('vancouver','fromBridge')}],            // walk out onto the Lions Gate Bridge and you cross it                                       // back north over the bridge
 };
 let exitArmed=false;   // you have to step out of an exit before it works (so arriving next to one doesn't bounce you out)
 const sceneName=()=>Object.keys(SCENES).find(k=>SCENES[k]===scene);
@@ -45,9 +46,8 @@ function drawNearMark(){
 // ---------- Joe's gear ----------
 // where each one is hidden on the main map (feet position)
 const GEAR={
-  oakleys: {x:40, y:237},    // on the beach in Vancouver
   headband:{x:366,y:86},     // in the snow by the Birkie yurt
-  shoes:   {x:228,y:232},    // out past the Fargo gas station
+  shoes:   {x:206,y:204},    // in the grass beside the road down to Wylee Woods
   clover:  {give:true},      // Logan gives Joe this one (people.js)
   // keepsakes: one from each stop, handed over right after that stop's reward (KEEPSAKES in story.js)
   hen:     {give:true, from:'farm'},     // Grp ("G"), Joe's rooster: follows him everywhere

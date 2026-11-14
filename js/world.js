@@ -25,7 +25,6 @@ const solids=[
 const triggers=[
   {z:R(320,70,24,18),  label:'Talk to John', btn:'Talk', act:()=>talkJohn()},
   {z:R(86,36,26,16),   label:'Talk to Brian', btn:'Talk', act:()=>talkBrian()},
-  {z:R(70,214,16,38), label:VANCOUVER.cross, act:()=>goTo('vancouver','fromBridge')},   // out on the Lions Gate Bridge: across to Stanley Park and the city
   {z:R(256,160,28,10), label:'Drive into Fargo',   act:()=>goTo('fargo','fromHighway')},   // the CR-V, parked on the sidewalk side, a step off the road
   {z:R(182,142,20,10), label:'Enter your kitchen', act:()=>goTo('kitchen','fromDoor')},
   {z:R(184,276,16,10), label:'Go to the disc golf course', act:()=>goTo('golf','fromRoad')},
@@ -374,7 +373,7 @@ const yurt=archSprite(36,32,g=>{const F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x
 const SCENES={};
 SCENES.world={ music:()=>farm.active?'chase':'world',
   w:WW, h:WH, bounds:R(2,10,WW-4,WH-12), bg, solids, triggers,
-  entries:{start:{x:192,y:156,dir:'down'}, fromKitchen:{x:192,y:157,dir:'down'}, fromCity:{x:78,y:216,dir:'up'}, fromVancouver:{x:78,y:216,dir:'up'}, fromFargo:{x:270,y:158,dir:'down'}, fromGolf:{x:192,y:266,dir:'up'}, fromMill:{x:316,y:92,dir:'down'}},
+  entries:{start:{x:192,y:156,dir:'down'}, fromKitchen:{x:192,y:157,dir:'down'}, fromCity:{x:78,y:196,dir:'up'}, fromVancouver:{x:78,y:196,dir:'up'}, fromFargo:{x:270,y:158,dir:'down'}, fromGolf:{x:192,y:266,dir:'up'}, fromMill:{x:316,y:92,dir:'down'}},
   hud:()=>farmHud(),
   dynTrigger:()=>farmTrigger(),
   ambient(dt){

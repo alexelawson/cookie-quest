@@ -19,7 +19,7 @@ const VAN={ tower:{x:144,y:26}, totems:{x:208,y:89}, light:{x:250,y:94}, clock:{
 const vanLook=k=>({z:null, label:VANCOUVER.looks[k].label, btn:'Look', act:()=>showDialog({place:VANCOUVER.place,speaker:VANCOUVER.sign,pages:[VANCOUVER.looks[k].text],actions:[CLOSE]})});
 const VAN_TRIGGERS=[
   {z:R(172,275,18,6), label:VANCOUVER.elevator, act:()=>openWardrobe(()=>{ heist.outfitReact=true; goTo('city','fromStreet') })},
-  {...vanLook('clock'),z:R(150,227,14,6)}, {...vanLook('totems'),z:R(198,91,22,8)}, {...vanLook('lighthouse'),z:R(238,91,10,8)},
+  {...vanLook('clock'),z:R(150,227,14,6)}, {...vanLook('totems'),z:R(198,91,22,8)}, {...vanLook('lighthouse'),z:R(236,91,12,8),act:()=>{ VAN.lit=time; sfx('pickup'); showDialog({place:VANCOUVER.place,speaker:VANCOUVER.sign,pages:[VANCOUVER.looks.lighthouse.text],actions:[CLOSE]}) }},
   {...vanLook('sails'),z:R(222,188,14,8)}, {...vanLook('science'),z:R(240,316,24,8)}, {...vanLook('beach'),z:R(44,106,12,30)},
 ];
 // where the land is (the park is a rounded point; it widens into the beaches and then the city)
@@ -143,7 +143,10 @@ function drawTotems(){ const F=(c,x,y,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,
 function drawVanLight(){ const F=(c,x,y,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,h)}, {x,y}=VAN.light;
   F('rgba(0,0,0,.25)',x-3,y,8,2); F('#8a8478',x-3,y-2,8,2); F('#f2efe6',x-2,y-14,6,12); F('#d6d0c4',x+3,y-14,1,12); F('#c8322b',x-2,y-9,6,3); F('#1d1d22',x,y-5,2,3);
   F('#c8322b',x-3,y-16,8,2); F('#2b2b33',x-2,y-19,6,3); F(Math.floor(time/700)%3?'#ffe9a8':'#fffbe0',x-1,y-18,4,2); F('#c8322b',x-1,y-21,4,2); F('#c8322b',x,y-22,2,1);
-  if(Math.floor(time/700)%3===0){ctx.fillStyle='rgba(255,240,180,.25)'; ctx.fillRect(x-7,y-20,16,5)} }
+  if(Math.floor(time/700)%3===0){ctx.fillStyle='rgba(255,240,180,.25)'; ctx.fillRect(x-7,y-20,16,5)}
+  F('#5a3a22',x-1,y-5,3,5); F('#ffe9a8',x,y-4,1,3);                                                        // a little door facing the trail
+  if(VAN.lit){ const a=(time-VAN.lit)/700; ctx.save(); ctx.translate(x+1,y-17); ctx.rotate(a); const gr=ctx.createLinearGradient(0,0,60,0); gr.addColorStop(0,'rgba(255,240,180,.55)'); gr.addColorStop(1,'rgba(255,240,180,0)');
+    ctx.fillStyle=gr; ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(60,-9); ctx.lineTo(60,9); ctx.closePath(); ctx.fill(); ctx.restore() } }   // once Joe's been up, the lamp sweeps its beam around
 const vanRain=[...Array(150)].map(()=>({x:Math.random()*VCW,y:Math.random()*VCH}));
 SCENES.vancouver={ place:VANCOUVER.place, music:'world',
   w:VCW, h:VCH, bounds:R(0,0,VCW,VCH), bg:vanBg, walk:VAN_WALK, solids:[], triggers:VAN_TRIGGERS,

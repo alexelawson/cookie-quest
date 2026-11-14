@@ -92,7 +92,7 @@ for(const [vpName,vp,touch] of [['desktop',{width:1280,height:800}],['phone',{wi
   await p.context().close()}
 
 // G. Start over: two taps erase everything
-{const p=await page(); await fresh(p,{...ALL,gear:{oakleys:1}});
+{const p=await page(); await fresh(p,{...ALL,gear:{headband:1}});
   await p.click('#resetBtn'); await p.click('#resetBtn'); await p.waitForLoadState('load'); await p.waitForTimeout(300); await p.click('#startBtn'); await p.waitForTimeout(200);
   const r=await p.evaluate(()=>({keys:Object.keys(have).filter(k=>k!=='welcomed'),welcome:$('dspeaker').textContent}));
   ok('G Start over (tap twice) erases everything and Alex welcomes Joe again',!r.keys.length&&r.welcome==='Alex',JSON.stringify(r));
