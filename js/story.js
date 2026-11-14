@@ -180,20 +180,32 @@ const ALEX_WELCOME = {speaker:'Alex', place:'Home',
   lookTitle:"Pick Joe's look", lookIntro:"First things first. What are you wearing today?", lookGo:"Looks good"};
 
 // ---------- Replays: once the cookies are baked, every game can be played again from whoever started it ----------
-const REPLAY={golf:"Play again", birkie:"Race again", fargo:"Race Lil Q again", heist:"Run the heist again", jackc:"Build another one", logan:"Play again",
-  heistReset:"Back to roof A. Same crew, same chocolate thief. Let's go.", jackcAgain:"Another one? Love that. Grab the crane."};
+const REPLAY={golf:"Play again", birkie:"Race again", fargo:"Race Lil Q again", heist:"Run the heist again", jackc:"Make another one", logan:"Play again",
+  heistReset:"Back to roof A. Same crew, same chocolate thief. Let's go.", jackcAgain:"Another one? Love that. Grab the saw."};
 
-// ---------- Jack C: building a little log cabin in the meadow. Help him stack the walls and he makes you a gingerbread house to wear ----------
-const JACKC = {name:'Jack C', place:'The Building Site',
-  hello:["Oh hey! Welcome to the site.","Little log cabin. Saddle-notched corners, spruce logs, dried a whole year so they don't twist on me.","Walls go up today. Seven logs. The crane's rigged, I just need someone on the drop. You in?"],
-  help:"Help stack the logs", later:"Maybe later",
-  title:"Raise the walls",
-  hint:"Watch the swing. Tap DROP when the log's right over the wall.",
-  drop:"Drop",
-  nice:"Nice. Notches seated.", perfect:"Oh, that's PERFECT. Dead level.", off:"Whoa, too far over. No stress, grab another one.",
-  done:"Seven courses, all square. Roof's on. Dude. Look at her.", doneBtn:"Done",
-  thanks:["You're a natural on the crane, man.","I had a pile of offcuts, so I built you a little something. A gingerbread house. Load-bearing icing. You wear it."],
-  unlock:"🔓 New costume unlocked: Gingerbread House! Change outfits any time in ⚙ Settings.",
+// ---------- Jack C: building a little log cabin in the meadow, and a woodworker. Help him make a cutting board and it's yours ----------
+const JACKC = {name:'Jack C', place:"Jack C's Workshop",
+  hello:["Oh hey! Welcome to the site.","Cabin's coming along. Saddle-notched corners, spruce logs, dried a whole year so they don't twist on me.","But today's a shop day. I'm making a cutting board. Maple, walnut, cherry. Want to build it with me?"],
+  help:"Make a cutting board", later:"Maybe later",
+  title:"Make a cutting board",
+  woods:["Walnut","Maple","Cherry"],                       // the three buttons in the glue-up (same order as the game: dark, light, red)
+  // 1. the saw
+  sawHint:"Cut to length. Tap SAW when the blade is right on the pencil line.", sawBtn:"Saw",
+  sawNice:"Clean cut.", sawPerfect:"Split the line. PERFECT.", sawOff:"Whoa, not there. Line it up on the pencil mark.",
+  sawKnot:"Other end now. Careful, there's a knot in this one. The saw likes to jump.",
+  // 2. the glue-up
+  glueShow:"Here's the pattern, top to bottom. Memorize it!", glueGo:"Okay, it's gone. Lay the strips in that order.",
+  glueNice:"Yep. Next strip.", glueWrong:"Not that one. Here, one more look.", glueDone:"Five strips, tight joints. Clamp it and let it cure.",
+  clampPop:"THE CLAMP! It's letting go! Tighten it!", clampBtn:"Tighten!", clampSaved:"Nice save. Keep going.", clampLost:"Aw, the last strip slid out. Lay that one again.",
+  // 3. the plane
+  planeHint:"Now plane it flat. Left, right, left, right. Follow the arrow, nice and steady.",
+  planeGo:"That's it. Long, even strokes.", planeFast:"Easy! Too fast tears the grain. Slow it down.", planeWrong:"Other way. Watch the arrow.",
+  sneeze:"ACHOO! Sawdust. ...Where were we? Watch the arrow.", planeDone:"Smooth as glass.",
+  // 4. the oil
+  oilHint:"Last step: oil. Hold to rub it in, and let go when the gauge is in the green.", oilBtn:"Hold to oil",
+  oilMore:"She's still thirsty. Keep going, up into the green.", oilOver:"Whoa, way too much. It's dripping. Wipe it off and go again.",
+  done:"Dude. Look at that grain. That's a real cutting board.", doneBtn:"Done",
+  thanks:["You've got good hands, man.","It's yours. Put the cookies on it. A cookie tastes better off a board you made yourself. That's just science."],
   after:"Come back when it snows. The woodstove goes in next. Cast iron. So excited."};
 
 // ---------- Brian: super chill, hanging out by his boat on the pond. Find him and he gives you sprinkles ----------
@@ -213,7 +225,6 @@ const WARDROBE = {title:"Suit up, Joe", intro:"It's a stealth mission. What are 
     {id:'avant',   name:"Avant Guard",      line:"One ENORMOUS white shoulder, a lime sleeve, a hot-pink zigzag, a spiky gold collar, mismatched boots, a beret with an antenna. Sparkles. It's a statement."},
     {id:'dave',    name:"Dave",             line:"A red cat. His name is Dave."},
     {id:'john',    name:"John",             line:"Red cap, white tee, jeans, boots. Basically John."},
-    {id:'ginghouse', name:"Gingerbread House", line:"A whole gingerbread house. Icing on the roof, gumdrops, a candy-cane door. Unlocked by helping Jack C.", unlock:'gingerHouseCostume'},
     {id:'cupcake', name:"Cupcake",          line:"A whole cupcake. Frosting hat, sprinkles, cherry on top. Unlocked by finding the cupcake.", unlock:'cupcakeCostume'},
   ],
   changeOutfit:"Change outfit",   // the button in Settings
@@ -226,7 +237,6 @@ const WARDROBE = {title:"Suit up, Joe", intro:"It's a stealth mission. What are 
          avant:[['Lars',"Is that... art?"],['John',"He looks like a security guard from the year 3000."],['Lars',"Avant Guard. I get it. I hate that I get it."]],
          dave:[['Lars',"...Who's this?"],['John',"That's Dave."],['Lars',"Hi, Dave."]],
          john:[['John',"Wait. Is that... me?"],['Lars',"It's a better you."],['John',"Wow."]],
-         ginghouse:[['Lars',"Is he... a house?"],['John',"He's a gingerbread house, Lars. Keep up."],['Lars',"Can I live in him?"]],
          cupcake:[['John',"Oh no. He's a cupcake."],['Lars',"Every searchlight in the city is about to want a bite."],['John',"I'd eat him. Respectfully."]],
          disco:[['John',"Bro."],['John',"BRO. It's a heist, not a roller rink."],['Lars',"Is that a gold chain?"],['John',"The searchlights are gonna think you're a disco ball. Do NOT do the Hustle up there."]]}};
 
@@ -505,7 +515,7 @@ const ENDING = {
   statsTitle:"Joe's stats",
   stats:{birkie:"Birkie time", golf:"Wylee Woods", anagrams:"Anagrams vs Lars", spotted:"Spotted on the rooftops", snacks:"Wrong snacks for Alex", steps:"Steps walked", look:"Look"},
   secretsLine:(n,of)=>`Secrets found: ${n} of ${of}`,
-  secretNames:{ginghouse:'Gingerbread house',cupcake:'Cupcake',sprinkles:'Sprinkles',icecream:'Ice cream',headband:'Headband',shoes:'Carbon shoes',clover:'Lucky clover'},
+  secretNames:{board:'Cutting board',cupcake:'Cupcake',sprinkles:'Sprinkles',icecream:'Ice cream',headband:'Headband',shoes:'Carbon shoes',clover:'Lucky clover'},
   secretsTip:"Keep exploring to find the rest. Find them all for a surprise.",
   legend:"COOKIE LEGEND! Every secret found. The crown has been upgraded.",
   secretTitle:"For finding everything",
@@ -587,6 +597,8 @@ const KITCHEN = {place:'Home', speaker:'Your kitchen',
     ['Lars',"Okay. But next time i'm making that jump."],['John',"Can I have six? I'm having six."],
     ['Margie',"Milk for dunking. My idea."],['Jack',"Ten out of ten. Margin of error: zero."],['Brian',"Nice."],['John',"SKOL!!! (the Vikings taught me that)",'Trail John'],
     ['','Everyone agrees. There is only one Cookie Baking King.'],['','Joe gets a crown.'],['Alex',"And now... THE COOKIE DANCE. Everybody!"]],
+  // only if Joe made the cutting board with Jack C: Maureen and Ethan notice it during the taste test (added after their verdict)
+  tasteBoard:[['Maureen',"And look at this board they're on! Walnut and maple... did you MAKE this?"],['Ethan',"Presentation points. Big ones. I'm adding that to the score."]],
   icecreamLine:"Cookie ice cream sandwiches. Rosemary maple. I found it on a roof. You're welcome.",   // only if Lars found the ice cream
   playAgain:"Play again", keepExploring:"Keep exploring",
   note:"Merry Christmas! Love, Alex"};

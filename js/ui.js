@@ -19,6 +19,7 @@ function renderBasket(){
   if(have.fargoPasta&&!have.jackieFed)extras.push(basketSlot('fargoPasta',FARGO.pastaName,true,'extra'));   // Jackie's pasta, until you give it to her
   if(have.sprinkles)extras.push(basketSlot('sprinkles','Sprinkles',true,'bonus'));   // a bonus from Brian
   if(have.icecream)extras.push(basketSlot('icecream','Ice cream',true,'bonus'));    // a bonus from Lars's long jump
+  if(have.board)extras.push(basketSlot('board','Cutting board',true,'bonus'));       // a bonus from Jack C's workshop
   if(extras.length){const d=document.createElement('span'); d.className='bdiv'; b.append(d,...extras)}
 }
 // pages: strings shown one at a time. actions: buttons on the last page.
@@ -123,6 +124,9 @@ const ART={
     F('#9a5a2a',8,13,16,8); F('#b8743a',8,13,16,1); F('#f2d49a',10,15,12,1); F('#f2d49a',10,18,8,1);
     F('#3f7a45',12,9,1,4); F('#5a9a50',11,10,1,1); F('#5a9a50',13,10,1,1); F('#5a9a50',11,12,1,1); F('#5a9a50',13,11,1,1);   // rosemary
     F('#ffffff',9,9,2,1); F('#ffffff',20,24,2,1); F('#cfe6f2',23,6,1,1); F('#cfe6f2',5,20,1,1) },
+  board(g){ const F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};
+    // the cutting board Joe made with Jack C: his own stripes, oiled, a hole to hang it by
+    F('rgba(0,0,0,.2)',6,25,30,2); drawBoard(g,5,6,30,19,have.boardPattern||[0,1,2,1,0],1); F('#3b2a1e',31,14,2,3); F('#ffffff',8,8,1,3); F('#ffffff',7,9,3,1) },
   sprinkles(g){ const F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};
     // a shaker of rainbow sprinkles
     F('#f2efe6',9,10,14,18); F('#d9d3c4',21,10,2,18); F('#c8322b',9,6,14,5); F('#a02a22',9,10,14,1); for(let x=11;x<22;x+=3)F('#ffffff',x,7,1,1);
@@ -175,6 +179,7 @@ const REWARDS={
   mill:{from:'From John (and the Vikings)', name:'Flour', hint:'Tap it to put it in your basket.'},
   icecream:{from:'From Lars (and a rooftop gutter)', name:'Rosemary Maple ice cream', hint:'A bonus! Tap it to put it in your basket.'},
   sprinkles:{from:'From Brian', name:'Sprinkles', hint:'A bonus! Tap them to put them in your basket.'},
+  board:{from:'Made with Jack C', name:'Cutting board', hint:'A bonus! Tap it to put it in your basket.'},
   fargoPasta:{from:FARGO.pastaFrom, name:FARGO.pastaName, hint:FARGO.pastaLine},
 };
 let rewardKey=null, rewardThen=null;

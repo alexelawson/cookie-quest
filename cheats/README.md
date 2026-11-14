@@ -78,7 +78,7 @@ Find all seven for the Cookie Legend crown and the secret note.
 | **Cupcake** | Behind the left side of the barn. Follow the faint track that leaves the barn path and loops around the back. Its frosting pokes up over the roof. |
 | **Sprinkles** | Talk to Brian, out in his boat on the pond at the top of the farm. |
 | **Lucky clover** | Logan, in the clover patch left of the farm path. Name the album 8 times in a row (answers below). |
-| **Gingerbread house** | Jack C, in the meadow just above the kitchen. Stack his seven logs with the crane. |
+| **Cutting board** | Jack C, in the meadow just above the kitchen. Make a board with him: saw on the pencil line (twice; the saw skips at the knot on the second cut), lay the five strips in the order on his drawing, plane left-right following the arrow without rushing, then hold to oil and let go in the green. Maureen and Ethan mention it at the taste test. |
 | **Headband** | In the snow just above the log cabin at the Birkie, on the right. |
 | **Carbon shoes** | In the grass on the right of the road down to Wylee Woods, about a third of the way. |
 | **Ice cream** | On the first rooftop of the heist, pick "Lars: long-jump it" at the gap. He finds a pint in the gutter. |

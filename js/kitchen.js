@@ -257,7 +257,7 @@ function tasteTick(dt){
   if(k.phase==='nervous'){ if(Math.floor((k.t-dt)/180)!==Math.floor(k.t/180))sfx('beat');   // a little drumroll
     if(k.t>=TASTE.NERVOUS){ k.phase='verdict'; sfx('fanfare'); kit.party=true;
       for(let j=0;j<70;j++)kit.confetti.push({x:Math.random()*224,y:-Math.random()*120,v:.02+Math.random()*.04,c:['#e54b4b','#f4d35e','#4fbf73','#5fa8e8','#e54b7a','#ffffff'][j%6]});
-      say(KITCHEN.tasteAfter,()=>{ kit.taste=null; kit.hugT=0; kit.hugging=true; paused=true }) } }
+      say(have.board?[...KITCHEN.tasteAfter.slice(0,2),...KITCHEN.tasteBoard,...KITCHEN.tasteAfter.slice(2)]:KITCHEN.tasteAfter,()=>{ kit.taste=null; kit.hugT=0; kit.hugging=true; paused=true }) } }
 }
 // while they chew: everyone else is sweating it
 function drawTasteNerves(){
@@ -410,7 +410,8 @@ function drawTable(){
   F('#4a2e1a',109,113,6,6); F('#4a2e1a',98,118,28,2); F('#5e3c22',98,118,28,1);                                                          // the trestle base
   for(let y=0;y<15;y++){const t=(y-7)/7.5, hw=Math.round(27*Math.sqrt(Math.max(0,1-t*t))); F(y>12?'#5e3c22':'#7a4e2c',112-hw,99+y,hw*2,1); if(y<2)F('#96643c',112-hw,99+y,hw*2,1)}   // an oval top, old dark wood
   for(const x of [96,104,120,128])F('#6b4426',x,101,1,10);
-  F('#fffdf6',104,103,14,8); F('#e8e2d6',104,110,14,1);
+  if(have.board){ F('rgba(0,0,0,.25)',101,112,22,1); drawBoard(ctx,100,102,22,10,have.boardPattern||[0,1,2,1,0],1); F('#3b2a1e',119,106,1,2) }   // Joe's cutting board, from Jack C's workshop
+  else { F('#fffdf6',104,103,14,8); F('#e8e2d6',104,110,14,1) }
   if(!have.baked){F('#c98a5a',107,105,3,3); F('#c98a5a',112,106,3,3)}                // a plate of (empty) promise
   else for(const [cx,cy] of [[106,104],[111,104],[108,106],[113,107],[106,108],[110,101]]){F('#c98a3a',cx,cy,4,3); F('#e0a85a',cx,cy,2,1); F('#5a3220',cx+2,cy+1,1,1); if(have.sprinkles)F('#e54b7a',cx+1,cy+2,1,1)}   // a pile of the real thing
   if(have.icecream){F('#f7f2e6',122,100,6,7); F('#9a5a2a',122,103,6,2); F('#3f7a45',124,99,1,2)   // the Maple Rosemary pint

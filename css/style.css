@@ -462,3 +462,8 @@ h1::before,h1::after{content:'✦';color:var(--berry);font-size:.6em;vertical-al
 .hudpic{width:16px;height:20px;image-rendering:pixelated;vertical-align:middle;margin:0 2px}
 
 #itemNo{margin-left:8px}
+
+/* Jack C's workshop: the extra buttons under the picture (three woods, or left / right) */
+.wkrow{gap:6px;margin:2px 0;width:100%}
+.wkbtn{flex:1;min-width:0;padding:8px 4px;font-size:.9rem}
+.wkrow .wkbtn[data-key^="Arrow"]{font-size:1.4rem;padding:8px 0}

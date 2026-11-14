@@ -143,7 +143,6 @@ const OUTFIT_LOOK={
   disco:  {top:'disco', pants:'#f2efe6', boots:'#e8b04a', head:'afro', flare:true},
   avant:  {top:'avant', pants:'#1d1d22', boots:'#f2f2ee', head:'beret', flare:true},
   cupcake:{top:'cupcake', pants:'#f2efe6', boots:'#e54b7a', head:'frosting'},
-  ginghouse:{top:'ginghouse', pants:'#9a5a2a', boots:'#6b3a1c', head:'roof'},            // a gingerbread house: walls, icing, gumdrops, a candy-cane door; the roof is the hat
   dave:   {top:'cat', pants:'#c8442a', boots:'#e86a4a', head:'cat', tail:true},          // Dave: a red cat
   john:   {top:'#f4f4f0', pants:'#3a5f9e', boots:'#3b2a1e', head:'cap', arms:true},        // John: red cap, white tee, jeans, boots
 };

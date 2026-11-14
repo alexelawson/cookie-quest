@@ -42,15 +42,22 @@ r=await p.evaluate(()=>{ goTo('world','start'); T.run(40); const out={};
   T.at(LOGAN.x+6,LOGAN.y+2); action(); T.pages(); T.click(LOGAN_TEXT.help); (()=>{for(let k=0;k<8&&hunt.open;k++){$('cloverField').querySelectorAll('.halbum')[hunt.song[1]].click(); hunt.lock=false; if(hunt.open)huntDeal()}})(); T.pages(); T.click('OK'); $('itemBtn').click(); out.clover=have.gear.clover;
   T.at(CUPCAKE.x,CUPCAKE.y); out.cupcake=!!have.cupcake; while(!dlg.hidden)[...$('dbtns').querySelectorAll('button')][0].click();
   talkBrian(); T.pages(); [...$('dbtns').querySelectorAll('button')][0].click();
-  // Jack C: help him stack five logs with the crane
+  return out});
+await p.click('#rewardArt',{force:true}); await p.waitForTimeout(900);   // (Brian's sprinkles)
+Object.assign(r,await p.evaluate(()=>{const out={};
+  // Jack C: make the cutting board (saw twice, glue up the pattern, plane, oil)
   talkJackC(); T.pages(); T.click(JACKC.help);
-  for(let n=0;n<CRANE.LOGS;n++){ for(let g=0;g<4000&&Math.abs(craneX()-craneTopX())>1;g++)craneTick(5); craneDrop(); for(let g=0;g<200&&cr.drop;g++)craneTick(16) }
-  out.crane=cr.done; craneDrop(); out.ginghouse=!!have.gingerHouseCostume; while(!dlg.hidden)[...$('dbtns').querySelectorAll('button')][0].click(); return out});
-await p.click('#rewardArt',{force:true}); await p.waitForTimeout(900);
+  for(let n=0;n<WORK.CUTS;n++){ const target=n?128-wk.line:wk.line; for(let g=0;g<8000&&Math.abs(sawX()-target)>1;g++)craneTick(4); craneDrop(true); for(let g=0;g<80&&wk.stage==='saw'&&(wk.off||wk.cut===n);g++)craneTick(16) }
+  out.sawed=wk.stage==='glue'; for(let g=0;g<400&&wk.show>0;g++)craneTick(16);
+  for(let g=0;g<40&&wk.stage==='glue'&&!wk.st;g++){ if(wk.clamp>0)craneDrop(true); else wkLay(wk.pattern[wk.laid.length]); craneTick(16) } for(let g=0;g<200&&wk.stage==='glue';g++)craneTick(16);
+  out.glued=wk.stage==='plane'; for(let g=0;g<80&&wk.stage==='plane'&&!wk.st;g++){ for(let k=0;k<20;k++)craneTick(16); wkStroke(wk.side) } for(let g=0;g<200&&wk.stage==='plane';g++)craneTick(16);
+  out.planed=wk.stage==='oil'; craneDrop(true); for(let g=0;g<2000&&wk.oil<(WORK.OIL_LO+WORK.OIL_HI)/2;g++)craneTick(16); craneDrop(false);
+  out.crane=wk.stage==='done'; craneDrop(true); while(!dlg.hidden)[...$('dbtns').querySelectorAll('button')][0].click(); out.boardCard=!$('reward').hidden&&$('rewardName').textContent; return out}));
+await p.click('#rewardArt',{force:true}); await p.waitForTimeout(900); r.board=await p.evaluate(()=>!!have.board&&Array.isArray(have.boardPattern)&&have.boardPattern.length===5);
 await p.evaluate(()=>{have.icecream=true; save(); renderBasket()});   // (Lars's long jump is tested in the heist suite)
 await reload();
 r=await p.evaluate(()=>({found:secretsFound(),of:SECRETS.length,bonus:[...$('basket').querySelectorAll('.slot.bonus,.slot.extra')].map(s=>s.dataset.key)}));
-ok('3 all eight secrets found by walking and talking (including helping Jack C), and they survive a reload',r.found===r.of,JSON.stringify(r));
+ok('3 all seven secrets found by walking and talking (including making the cutting board with Jack C), and they survive a reload',r.found===r.of,JSON.stringify(r));
 
 // 4. home: everyone's there, bake, party
 r=await p.evaluate(()=>{goTo('kitchen','fromDoor'); T.run(40); const crowd=CROWD.filter(c=>!c.needs||have[c.needs]).length;
@@ -86,7 +93,7 @@ ok('5 after a reload Joe still has his (legendary) crown',r.crown&&r.legend);
 r=await p.evaluate(()=>{ const opts=fn=>{ try{ closeDialog(); fn(); const b=[...$('dbtns').querySelectorAll('button')].map(b=>b.textContent); closeDialog(); paused=false; return b }catch(e){ return ['ERR '+e.message] } };
   if(scene!==SCENES.world){ goTo('world','start'); for(let i=0;i<100&&fade.next;i++)update(16.7) }
   return {golf:opts(talkMargie), birkie:opts(talkJohn), jackc:opts(talkJackC), logan:opts(talkLogan)} });
-ok('5b once the cookies are baked: Margie, Trail John, Jack C and Logan all offer a replay',r.golf.includes('Play again')&&r.birkie.includes('Race again')&&r.jackc.includes('Build another one')&&r.logan.includes('Play again'),JSON.stringify(r));
+ok('5b once the cookies are baked: Margie, Trail John, Jack C and Logan all offer a replay',r.golf.includes('Play again')&&r.birkie.includes('Race again')&&r.jackc.includes('Make another one')&&r.logan.includes('Play again'),JSON.stringify(r));
 // 6. Play again: everything starts over, including the new stuff
 r=await p.evaluate(()=>{goTo('kitchen','fromDoor'); T.run(40); T.at(64,60); action(); const ending=!$('ending').hidden; $('endSkip').click(); $('endNext').click(); $('endNext').click(); $('endNext').click();
   const pa=[...$('ecard').querySelectorAll('button')].find(b=>b.textContent===KITCHEN.playAgain); if(!pa)return {err:$('ecard').textContent.slice(0,80)+' | dlg '+$('dtext').textContent+' | near '+(near&&near.label),keys:[]}; pa.click(); T.run(40);

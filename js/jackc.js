@@ -1,8 +1,13 @@
-// Jack C: building a little log cabin in the meadow above the kitchen, at the edge of the snow.
-// Help him stack seven logs with the crane and he gives you a Gingerbread House costume. Words live in story.js (JACKC).
+// Jack C: building a little log cabin in the meadow above the kitchen, at the edge of the snow. He's also a woodworker.
+// Help him make a cutting board at his bench (saw, glue up the stripes, plane, oil) and it's yours: the cookies get served on it,
+// and Maureen and Ethan notice. Words live in story.js (JACKC).
 const JACKC_SITE={x:204, y:44};                  // the middle of the cabin's foundation
 const JACKC_SPOT={x:185, y:54};                  // where he stands
-const CRANE={LOGS:7, LOG_W:26, LOG_H:6, GROUND:84, BASE_X:64, SWING:38, SPEEDS:[1.9,2.2,2.5,2.8,3.1,3.4,3.7], OK:8, PERFECT:2, SWAY:5};   // SWAY: the stack sways in the wind more the taller it gets   // per log: how fast it swings (radians a second); how far off still sits, and how close is perfect
+const WORK={ CUTS:2, SAW_SPEEDS:[1.9,2.7], SAW_OK:4, SAW_PERFECT:1, KNOT_JUMP:9,          // the saw: how fast it slides (radians a second) on each cut, how close to the line counts
+  STRIPS:5, SHOW_MS:2600, PEEK_MS:900, CLAMP_AT:3, CLAMP_MS:2400,                              // the glue-up: how long the pattern shows; the clamp pops after this many strips
+  STROKES:16, TOO_FAST:200, SNEEZE_AT:8,                                                       // the plane: strokes to finish; faster than this (ms) tears the grain
+  OIL_RATE:.42, OIL_LO:.76, OIL_HI:.92 };                                                      // the oil: how fast it soaks in while you hold; let go between these
+const WOODS=[{id:'walnut',col:'#5a3a26',lt:'#74503a',dk:'#422a1a'},{id:'maple',col:'#e6cf9e',lt:'#f2e2bc',dk:'#cdb480'},{id:'cherry',col:'#a8563a',lt:'#c06e4e',dk:'#8a4028'}];
 
 // ---------- how he looks: shortish, clean-shaven, light-medium brown hair, a red plaid shirt, jeans, tan work boots, a tool belt with a hammer ----------
 const JACKC_PAL={H:'#a4744a',h:'#86592f',S:'#f0c6a0',s:'#e3b48e',E:'#2b2236',M:'#c9786a',r:'#eaa3a0',
@@ -35,7 +40,7 @@ PORTRAITS['Jack C']={size:32, bg:'#f3e6d8', draw(g){ const F=px(g);
 function drawJackSite(){
   const F=(c,x,y,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,h)}, s=JACKC_SITE, x0=s.x-10, y0=s.y-6;
   F('#9aa3b0',x0-1,y0+10,22,3); F('#c9ced4',x0-1,y0+10,22,1); F('#6b7380',x0-1,y0+12,22,1);   // a stone foundation
-  if(have.gingerHouseCostume){                                                               // the finished cabin
+  if(have.board){                                                                            // the finished cabin
     for(let k=0;k<5;k++){F(k%2?'#8a5a34':'#a8743f',x0,y0+8-k*2,20,2); F('#d9b27a',x0-1,y0+8-k*2,1,2); F('#d9b27a',x0+20,y0+8-k*2,1,2)}
     F('#5a3a22',x0+8,y0+3,4,7); F('#fff3a8',x0+2,y0+2,3,3); F('#fff3a8',x0+15,y0+2,3,3);    // door and windows
     for(let k=0;k<7;k++)F(k%2?'#7a2a2a':'#8a3a2a',x0-2+k,y0-k,24-k*2,1); F('#5f6676',x0+15,y0-8,3,5);   // roof, chimney
@@ -44,14 +49,15 @@ function drawJackSite(){
   for(const [lx,ly] of [[0,0],[4,0],[8,0],[2,-4],[6,-4],[4,-8]]){ const x=x0+2+lx, y=y0+22+ly;   // a pile of logs waiting, out front (seen end-on)
     F('#6b4428',x,y,4,4); F('#d9b27a',x,y,3,3); F('#b88a50',x+1,y+1,1,1) }
 }
-function drawJackCrane(){   // a small crane beside the site (until the cabin's done)
-  if(have.gingerHouseCostume)return; const F=(c,x,y,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,h)}, s=JACKC_SITE;
-  F('#f4b400',s.x+12,s.y-26,2,30); F('#c98f00',s.x+13,s.y-26,1,30); F('#f4b400',s.x-10,s.y-26,24,2); F('#c98f00',s.x-10,s.y-25,24,1);   // a yellow crane on the right, its arm over the site
-  F('#3b3b44',s.x,s.y-24,1,10+Math.round(Math.sin(time/500)*1)); F('#3b3b44',s.x-2,s.y-14,5,1);
-}
+function drawJackCrane(){   // his workbench beside the site: a vise, a hand plane, boards leaning on it, a sawhorse
+  const F=(c,x,y,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,h)}, s=JACKC_SITE, x=s.x+11, y=s.y-6;
+  F('rgba(0,0,0,.2)',x-1,y+8,10,2); F('#8a5a34',x,y+3,8,2); F('#a8743f',x,y+3,8,1); F('#6b4428',x,y+5,1,4); F('#6b4428',x+7,y+5,1,4);       // the bench
+  F('#5f6676',x+6,y+1,2,2); F('#9aa3b0',x+1,y+2,3,1); F('#3b2416',x+2,y+1,1,1);                                                             // vise, plane
+  F('#e6cf9e',x+9,y-2,1,10); F('#5a3a26',x+10,y-1,1,9); F('#a8563a',x+11,y,1,8);                                                            // maple, walnut and cherry boards leaning up
+  if(!have.board&&Math.floor(time/700)%2)F('#f4d35e',x+3,y-2,1,1) }
 function talkJackC(){
   const J=JACKC;
-  if(have.gingerHouseCostume)return showDialog({place:J.place,speaker:J.name,pages:[J.after],actions:have.baked?[{label:REPLAY.jackc,fn:()=>{closeDialog(); say([[J.name,REPLAY.jackcAgain]],openCrane)}},CLOSE]:[CLOSE]});
+  if(have.board)return showDialog({place:J.place,speaker:J.name,pages:[J.after],actions:have.baked?[{label:REPLAY.jackc,fn:()=>{closeDialog(); say([[J.name,REPLAY.jackcAgain]],openCrane)}},CLOSE]:[CLOSE]});
   showDialog({place:J.place,speaker:J.name,pages:J.hello,actions:[{label:J.help,fn:()=>{closeDialog(); openCrane()}},{label:J.later,ghost:true,fn:closeDialog}]});
 }
 triggers.push({z:R(JACKC_SPOT.x-12,JACKC_SPOT.y-10,24,20), label:'Talk to Jack C', btn:'Talk', act:talkJackC});
@@ -59,70 +65,153 @@ solids.push(R(JACKC_SITE.x-11,JACKC_SITE.y-2,22,9), R(JACKC_SITE.x-9,JACKC_SITE.
 {const ents=SCENES.world.ents; SCENES.world.ents=function(list){ ents.call(this,list);
   list.push({y:JACKC_SITE.y+14,draw:drawJackSite},{y:JACKC_SITE.y-1,draw:drawJackCrane},{y:JACKC_SPOT.y,draw:()=>drawJackC(JACKC_SPOT.x,JACKC_SPOT.y,'down')}) }}
 
-// ---------- the crane game: stack seven logs ----------
-const cr={open:false, logs:[], t:0, raf:0, last:0, drop:null, done:false, fall:null, msgT:0};
+// ---------- the workshop game: make a cutting board in four steps (saw, glue-up, plane, oil) ----------
+// It plays in the same pop-up the old crane game used (#crane). One big button does most of it; the glue-up adds three wood buttons
+// (or keys 1 2 3) and the plane adds left / right (or the arrow keys).
+const wk={open:false, stage:'saw', t:0, raf:0, last:0, parts:[], shake:0, msgT:0};
+const wkMsg=t=>{ $('craneMsg').textContent=t };
+const wkBtn=(t,show=true)=>{ $('craneBtn').textContent=t; $('craneBtn').hidden=!show };
+function wkChoices(list){   // extra buttons under the picture: [{label, key, fn, cls}]
+  let row=$('craneChoices'); if(!row){ row=document.createElement('div'); row.id='craneChoices'; row.className='brow wkrow'; $('craneBtn').parentNode.before(row) }
+  row.replaceChildren(...(list||[]).map(o=>{ const b=document.createElement('button'); b.className='btn wkbtn'; b.textContent=o.label; if(o.col){b.style.background=o.col; b.style.color=o.dark?'#f7efdf':'#2b2236'} b.dataset.key=o.key;
+    b.addEventListener('pointerdown',e=>{e.preventDefault(); o.fn()}); return b })); row.hidden=!list||!list.length }
 function openCrane(){
-  Object.assign(cr,{open:true, logs:[], t:0, drop:null, done:false, fall:null}); const J=JACKC;
-  $('craneTitle').textContent=J.title; $('craneMsg').textContent=J.hint; $('craneBtn').textContent=J.drop; $('craneLater').textContent=J.later; $('craneLater').hidden=false;
+  const J=JACKC; Object.assign(wk,{open:true, t:0, parts:[], shake:0});
+  $('craneTitle').textContent=J.title; $('craneLater').textContent=J.later; $('craneLater').hidden=false;
   const f=$('craneFace'), g=f.getContext('2d'), p=PORTRAITS['Jack C']; g.fillStyle=p.bg; g.fillRect(0,0,32,32); p.draw(g);
-  $('crane').hidden=false; paused=true; prompt.hidden=true; craneLoop(); setTimeout(()=>$('craneBtn').focus({preventScroll:true}),0);
+  $('crane').hidden=false; paused=true; prompt.hidden=true; wkStage('saw'); wkLoop(); setTimeout(()=>$('craneBtn').focus({preventScroll:true}),0);
 }
-function closeCrane(){ cr.open=false; $('crane').hidden=true; paused=overlayOpen() }
-const craneSway=()=>Math.sin(cr.t/650)*CRANE.SWAY*cr.logs.length/CRANE.LOGS;                       // the taller the walls, the more they sway
-const craneTopX=()=>(cr.logs.length?cr.logs[cr.logs.length-1]:CRANE.BASE_X)+craneSway();
-const craneX=()=>CRANE.BASE_X+Math.sin(cr.t/1000*CRANE.SPEEDS[Math.min(cr.logs.length,CRANE.LOGS-1)])*CRANE.SWING;
-function craneDrop(){
-  if(!cr.open)return; if(cr.done){ closeCrane(); return craneWon() }
-  if(cr.drop||cr.fall)return; cr.drop={x:craneX(), y:16}; sfx('click');
+function closeCrane(){ wk.open=false; $('crane').hidden=true; wkChoices(null); paused=overlayOpen() }
+function wkStage(st){ const J=JACKC; wk.stage=st; wk.st=0; wkChoices(null);
+  if(st==='saw'){ wk.cut=0; wk.cuts=[]; wk.line=34+Math.random()*20|0; wk.knot=null; wk.off=null; wk.sawT=0; wkMsg(J.sawHint); wkBtn(J.sawBtn) }
+  if(st==='glue'){ do{ wk.pattern=[...Array(WORK.STRIPS)].map(()=>Math.random()*3|0) }while(new Set(wk.pattern).size<2);
+    wk.laid=[]; wk.show=WORK.SHOW_MS; wk.clamp=0; wk.clamped=false; wk.bounce=null; wkMsg(J.glueShow); wkBtn('',false) }
+  if(st==='plane'){ wk.strokes=0; wk.side=-1; wk.lastStroke=-9999; wk.planeX=0; wk.sneezed=false; wkMsg(J.planeHint); wkBtn('',false);
+    wkChoices([{label:'◀',key:'ArrowLeft',fn:()=>wkStroke(-1)},{label:'▶',key:'ArrowRight',fn:()=>wkStroke(1)}]) }
+  if(st==='oil'){ wk.oil=0; wk.holding=false; wkMsg(J.oilHint); wkBtn(J.oilBtn) }
+  if(st==='done'){ sfx('fanfare'); wkMsg(J.done); wkBtn(J.doneBtn); $('craneLater').hidden=true; for(let k=0;k<26;k++)wk.parts.push({x:40+Math.random()*48,y:44+Math.random()*14,vx:(Math.random()-.5)*.03,vy:-.02-Math.random()*.03,c:'#f4d35e',life:900+Math.random()*700}) }
 }
-function craneTick(dt){
-  cr.t+=dt;
-  if(cr.drop){ const d=cr.drop, ty=CRANE.GROUND-(cr.logs.length+1)*CRANE.LOG_H; d.y+=dt*.12;
-    if(d.y>=ty){ const off=d.x-craneTopX(); cr.drop=null;
-      if(Math.abs(off)<=CRANE.OK){ cr.logs.push(d.x-craneSway()); sfx('thud'); $('craneMsg').textContent=Math.abs(off)<=CRANE.PERFECT?JACKC.perfect:JACKC.nice;
-        if(cr.logs.length>=CRANE.LOGS){ cr.done=true; sfx('fanfare'); $('craneMsg').textContent=JACKC.done; $('craneBtn').textContent=JACKC.doneBtn; $('craneLater').hidden=true } }
-      else { sfx('bad'); cr.fall={x:d.x, y:ty, dir:off>0?1:-1, t:0}; $('craneMsg').textContent=JACKC.off } } }
-  if(cr.fall){ cr.fall.t+=dt; if(cr.fall.t>700)cr.fall=null }
+const sawX=()=>64+Math.sin(wk.sawT/1000*WORK.SAW_SPEEDS[wk.cut])*46;
+// the big button (also Space / Enter)
+function craneDrop(down=true){ const J=JACKC;
+  if(!wk.open)return;
+  if(wk.stage==='done'){ if(down){ closeCrane(); craneWon() } return }
+  if(wk.stage==='saw'&&down){ if(wk.off)return; const x=sawX(), target=wk.cut?128-wk.line:wk.line, d=Math.abs(x-target);
+    if(d<=WORK.SAW_OK){ sfx('thud'); wk.cuts.push(x); wk.off={x,side:wk.cut?1:-1,t:0}; for(let k=0;k<10;k++)wk.parts.push({x,y:52,vx:(Math.random()-.5)*.05,vy:-.03-Math.random()*.04,c:'#e6cf9e',life:500});
+      wkMsg(d<=WORK.SAW_PERFECT?J.sawPerfect:J.sawNice) }
+    else { sfx('bad'); wk.shake=250; wkMsg(J.sawOff) } return }
+  if(wk.stage==='glue'&&down&&wk.clamp>0){ wk.clamp=0; wk.clamped=true; sfx('click'); wkMsg(J.clampSaved); wkGlueButtons(); return }
+  if(wk.stage==='oil'){ if(down){ wk.holding=true; return }
+    if(!wk.holding)return; wk.holding=false;
+    if(wk.oil>=WORK.OIL_LO&&wk.oil<=WORK.OIL_HI){ sfx('pickup'); return wkStage('done') }
+    wkMsg(wk.oil<WORK.OIL_LO?J.oilMore:J.oilHint) }
 }
-function craneLoop(){
-  if(cr.raf)return; cr.last=performance.now();
-  const f=now=>{ cr.raf=0; if(!cr.open)return; const dt=Math.min(50,now-cr.last); cr.last=now; craneTick(dt); drawCrane(); cr.raf=requestAnimationFrame(f) };
-  cr.raf=requestAnimationFrame(f);
+function wkGlueButtons(){ wkChoices(WOODS.map((w,i)=>({label:JACKC.woods[i], key:'Digit'+(i+1), col:w.col, dark:i!==1, fn:()=>wkLay(i)}))) }
+function wkLay(i){ const J=JACKC; if(wk.stage!=='glue'||wk.show>0||wk.clamp>0)return;
+  if(i===wk.pattern[wk.laid.length]){ wk.laid.push(i); sfx('click'); wk.slide=180;
+    if(wk.laid.length>=WORK.STRIPS){ wkChoices(null); wkMsg(J.glueDone); wk.st=1; wk.wait=900; return }
+    if(wk.laid.length===WORK.CLAMP_AT&&!wk.clamped){ wk.clamp=WORK.CLAMP_MS; sfx('bad'); wk.shake=300; wkMsg(J.clampPop); wkChoices(null); wkBtn(J.clampBtn); return }
+    wkMsg(J.glueNice) }
+  else { sfx('bad'); wk.bounce={i,t:0}; wk.show=WORK.PEEK_MS; wkMsg(J.glueWrong); wkChoices(null) } }
+function wkStroke(dir){ const J=JACKC; if(wk.stage!=='plane'||wk.st)return;
+  const dt=wk.t-wk.lastStroke;
+  if(dir!==wk.side){ sfx('bad'); wkMsg(J.planeWrong); return }
+  wk.lastStroke=wk.t;
+  if(dt<WORK.TOO_FAST){ wk.strokes=Math.max(0,wk.strokes-2); sfx('bad'); wk.shake=200; wkMsg(J.planeFast); wk.side=-wk.side; return }
+  wk.strokes++; wk.planeDir=dir; wk.planeT=220; sfx('whoosh'); for(let k=0;k<3;k++)wk.parts.push({x:64+dir*20,y:50,vx:dir*(.02+Math.random()*.03),vy:-.03-Math.random()*.03,c:k%2?'#f2e2bc':'#e6cf9e',life:700,curl:true});
+  if(wk.strokes>=WORK.STROKES){ wkChoices(null); wkMsg(J.planeDone); wk.st=1; wk.wait=900; return }
+  if(wk.strokes===WORK.SNEEZE_AT&&!wk.sneezed){ wk.sneezed=true; wk.shake=500; sfx('alarm'); wkMsg(J.sneeze); for(let k=0;k<30;k++)wk.parts.push({x:64+(Math.random()-.5)*50,y:46,vx:(Math.random()-.5)*.08,vy:-.02-Math.random()*.06,c:'#e6cf9e',life:900}); wk.side=Math.random()<.5?-1:1; return }   // sawdust: Joe sneezes and loses his place (watch the arrow)
+  wk.side=-wk.side; wkMsg(J.planeGo) }
+function craneTick(dt){ const J=JACKC; wk.t+=dt; if(wk.shake>0)wk.shake-=dt;
+  for(const p of wk.parts){ p.x+=p.vx*dt; p.y+=p.vy*dt; p.vy+=.00012*dt; p.life-=dt } wk.parts=wk.parts.filter(p=>p.life>0);
+  if(wk.stage==='saw'){ if(!wk.off){ const before=sawX(); wk.sawT+=dt; if(wk.cut===1){ const kx=wk.knotX=86, a=sawX(); if((before-kx)*(a-kx)<0)wk.sawT+=WORK.KNOT_JUMP*18 } }   // the knot: the saw skips as it crosses it
+    else { wk.off.t+=dt; if(wk.off.t>650){ wk.off=null; wk.cut++; if(wk.cut>=WORK.CUTS)wkStage('glue'); else { wk.sawT=0; wkMsg(J.sawKnot) } } } }
+  if(wk.stage==='glue'){ if(wk.slide>0)wk.slide-=dt; if(wk.bounce){wk.bounce.t+=dt; if(wk.bounce.t>500)wk.bounce=null}
+    if(wk.show>0){ wk.show-=dt; if(wk.show<=0&&!wk.st){ wkMsg(J.glueGo); wkBtn('',false); wkGlueButtons() } }
+    if(wk.clamp>0){ wk.clamp-=dt; if(wk.clamp<=0){ wk.laid.pop(); sfx('thud'); wkMsg(J.clampLost); wkBtn('',false); wkGlueButtons() } }
+    else if($('craneBtn').textContent===J.clampBtn&&!$('craneBtn').hidden)wkBtn('',false);
+    if(wk.st&&(wk.wait-=dt)<=0)wkStage('plane') }
+  if(wk.stage==='plane'){ if(wk.planeT>0)wk.planeT-=dt; if(wk.st&&(wk.wait-=dt)<=0)wkStage('oil') }
+  if(wk.stage==='oil'&&wk.holding){ wk.oil+=dt/1000*WORK.OIL_RATE; if(Math.floor((wk.oil-dt/1000*WORK.OIL_RATE)*12)!==Math.floor(wk.oil*12))sfx('click');
+    if(wk.oil>1){ wk.holding=false; wk.oil=.45; sfx('bad'); wk.shake=300; wkMsg(J.oilOver); for(let k=0;k<14;k++)wk.parts.push({x:44+Math.random()*40,y:56,vx:0,vy:.02+Math.random()*.02,c:'#c98a3a',life:700}) } }
 }
-function drawLog(g,cx,y,rot){ const F=(c,x,yy,w,h)=>{g.fillStyle=c;g.fillRect(Math.round(x),Math.round(yy),w,h)}, W=CRANE.LOG_W, H=CRANE.LOG_H, x=cx-W/2;
-  if(rot){g.save(); g.translate(cx,y+H/2); g.rotate(rot); g.translate(-cx,-(y+H/2))}
-  F('#8a5a34',x,y,W,H); F('#a8743f',x,y,W,2); F('#6b4428',x,y+H-1,W,1); F('#7a4a2a',x+8,y+3,6,1); F('#7a4a2a',x+18,y+2,5,1);
-  F('#d9b27a',x-1,y,2,H); F('#d9b27a',x+W-1,y,2,H); F('#b88a50',x-1,y+2,2,2); F('#b88a50',x+W-1,y+2,2,2);
-  if(rot)g.restore() }
+function wkLoop(){
+  if(wk.raf)return; wk.last=performance.now();
+  const f=now=>{ wk.raf=0; if(!wk.open)return; const dt=Math.min(50,now-wk.last); wk.last=now; craneTick(dt); drawCrane(); wk.raf=requestAnimationFrame(f) };
+  wk.raf=requestAnimationFrame(f);
+}
+// a cutting board, striped: (x,y) its top left; strips run left to right. shine 0..1 = how oiled it is
+function drawBoard(g,x,y,w,h,pattern,shine=0,n=pattern.length){ const F=(c,xx,yy,ww,hh)=>{g.fillStyle=c;g.fillRect(Math.round(xx),Math.round(yy),ww,hh)}, sh=h/pattern.length;
+  for(let k=0;k<n;k++){ const W=WOODS[pattern[k]], yy=y+Math.round(k*sh), hh=Math.round((k+1)*sh)-Math.round(k*sh); F(W.col,x,yy,w,hh); F(W.lt,x,yy,w,1); for(let i=3;i<w-2;i+=7)F(W.dk,x+i+(k*3)%5,yy+1+(i%2),3,1) }
+  if(shine>0){ g.globalAlpha=shine*.35; F('#ffb347',x,y,w,Math.round(n*sh)); g.globalAlpha=shine*.5; F('#fff3d0',x+2,y+1,w-4,1); F('#fff3d0',x+4,y+3,Math.round(w/3),1); g.globalAlpha=1 } }
 function drawCrane(){
-  const c=$('craneArt'), g=c.getContext('2d'), F=(col,x,y,w,h)=>{g.fillStyle=col;g.fillRect(Math.round(x),Math.round(y),w,h)}, W=c.width, H=c.height;
-  g.imageSmoothingEnabled=false;
-  for(let y=0;y<H;y++){F(y<40?'#a9d4f0':'#c4e4f6',0,y,W,1)}                                       // sky
-  F('#6aa85a',0,CRANE.GROUND,W,H-CRANE.GROUND); F('#5a9a4a',0,CRANE.GROUND,W,1);                  // meadow
-  for(const [tx,ty] of [[8,60],[118,64],[104,58]]){F('#2f6b3a',tx-4,ty,9,CRANE.GROUND-ty); F('#3f7d45',tx-3,ty-6,7,8); F('#4f8d4f',tx-2,ty-10,5,6)}   // pine trees
-  F('#9aa3b0',CRANE.BASE_X-20,CRANE.GROUND-2,40,3); F('#c9ced4',CRANE.BASE_X-20,CRANE.GROUND-2,40,1);   // foundation
-  // the crane: a yellow tower on the left, the arm across the top
-  F('#f4b400',2,6,4,CRANE.GROUND-6); for(let y=10;y<CRANE.GROUND;y+=6)F('#c98f00',2,y,4,1); F('#f4b400',2,4,W-8,3); F('#c98f00',2,6,W-8,1);
-  // Jack C cheering on the right
-  { const was=ctx; ctx=g; drawJackC(112,CRANE.GROUND+1,'down'); ctx=was; if(cr.done&&Math.floor(cr.t/300)%2)F('#f4d35e',108,CRANE.GROUND-24,2,2) }
-  // the walls so far
-  const sw=craneSway(); cr.logs.forEach((x,i)=>drawLog(g,x+sw*(i+1)/cr.logs.length,CRANE.GROUND-(i+1)*CRANE.LOG_H,0));
-  if(cr.done){ const top=CRANE.GROUND-CRANE.LOGS*CRANE.LOG_H, cx=craneTopX(); for(let k=0;k<12;k++)F(k%2?'#7a2a2a':'#8a3a2a',cx-19+k*1.5,top-1-k,38-k*3,1); return }   // the roof goes on
-  // the swinging log on its cable (or the one falling)
-  const sx=craneX(), hx=cr.drop?cr.drop.x:sx;
-  F('#3b3b44',hx-2,7,5,2);                                                                   // trolley
-  if(!cr.drop){ F('#3b3b44',sx,9,1,7); drawLog(g,sx,16,0) }
-  else { F('#3b3b44',hx,9,1,7); drawLog(g,cr.drop.x,cr.drop.y,0) }
-  if(cr.fall){ const k=cr.fall.t/700; drawLog(g,cr.fall.x+cr.fall.dir*k*30,cr.fall.y+k*k*40,cr.fall.dir*k*2) }
-  // a faint guide straight down from the log
-  if(!cr.drop&&!cr.fall){ g.globalAlpha=.25; F('#2b2236',sx,22,1,CRANE.GROUND-cr.logs.length*CRANE.LOG_H-22); g.globalAlpha=1 }
+  const c=$('craneArt'), g=c.getContext('2d'), W=c.width, H=c.height, J=JACKC; g.imageSmoothingEnabled=false; g.setTransform(1,0,0,1,0,0);
+  const sx=wk.shake>0?Math.round(Math.sin(wk.t/22)*2):0; g.translate(sx,0);
+  const F=(col,x,y,w,h)=>{g.fillStyle=col;g.fillRect(Math.round(x),Math.round(y),w,h)};
+  // the workshop: plank walls, a window onto the snow, a pegboard of tools, a lamp, the bench
+  F('#b98a58',-4,0,W+8,66); for(let x=-4;x<W+4;x+=12){F('#a87a4a',x,0,1,66); F('#c79a66',x+1,0,1,66)} for(let i=0;i<14;i++)F('#a87a4a',(i*37)%W,(i*23)%60,3,1);
+  F('#3b2a1e',8,8,30,24); F('#cfe6f5',10,10,26,20); F('#e9f2f8',10,24,26,6); F('#3b2a1e',22,10,2,20); F('#3b2a1e',10,19,26,2); for(let k=0;k<6;k++)F('#ffffff',12+(k*9+Math.floor(wk.t/260))%22,11+(k*7+Math.floor(wk.t/130))%12,1,1);   // window: it's snowing
+  F('#2f6b3a',13,22,3,8); F('#2f6b3a',30,20,3,10);
+  F('#6b4a2f',78,8,42,26); F('#7a5838',79,9,40,24); for(let x=82;x<118;x+=6)for(let y=12;y<32;y+=6)F('#5a3d26',x,y,1,1);                           // pegboard
+  F('#9aa3b0',84,12,2,12); F('#5a3a22',83,22,4,6); F('#9aa3b0',92,12,10,2); F('#5a3a22',92,14,3,8); F('#c8322b',106,12,3,10); F('#9aa3b0',112,12,1,14); F('#f4d35e',111,24,3,4);   // chisel, saw, level, a square
+  F('#3b3b44',60,0,1,8); F('#2b2e36',55,8,11,4); F('#ffe9a8',57,12,7,1); g.globalAlpha=.10; F('#ffe9a8',40,13,48,53); g.globalAlpha=1;               // a hanging lamp
+  F('#6b4a2f',-4,66,W+8,H-66); for(let x=-4;x<W+4;x+=16)F('#5a3d26',x,66,1,H-66); F('#7f5a3a',-4,66,W+8,1);                                         // floor
+  F('#8a5a34',10,60,96,6); F('#a8743f',10,60,96,1); F('#6b4428',10,65,96,1); F('#6b4428',14,66,5,22); F('#6b4428',97,66,5,22); F('#5a3a22',14,78,88,3);   // the bench
+  F('#5f6676',12,54,6,6); F('#9aa3b0',12,54,6,1); F('#3b3b44',9,56,3,2);                                                                             // a vise on the end
+  for(const [x,y] of [[30,88],[70,90],[52,86],[90,87],[22,91]])F('#e6cf9e',x,y,3,1);                                                                 // shavings on the floor
+  { const was=ctx; ctx=g; drawJackC(118,90,'down'); ctx=was; if(wk.stage==='done'&&Math.floor(wk.t/300)%2)F('#f4d35e',114,64,2,2) }                   // Jack C, watching
+  // the step dots
+  ['saw','glue','plane','oil'].forEach((s,i)=>{ const on=['saw','glue','plane','oil','done'].indexOf(wk.stage); F(i<on?'#4fbf73':i===on?'#f4d35e':'#5a3d26',50+i*8,3,5,3) });
+  if(wk.stage==='saw'){
+    const x0=18, x1=110, y=50, kept0=wk.cuts[0]||x0, kept1=wk.cuts[1]||x1;
+    F('rgba(0,0,0,.2)',kept0+1,y+9,kept1-kept0,1); F('#e6cf9e',kept0,y,kept1-kept0,9); F('#f2e2bc',kept0,y,kept1-kept0,1); F('#cdb480',kept0,y+8,kept1-kept0,1); for(let i=kept0+4;i<kept1-4;i+=9)F('#cdb480',i,y+3+(i%3),5,1);   // the maple board
+    if(wk.cut===1){ F('#8a5a34',wk.knotX-2,y+3,4,3); F('#5a3a22',wk.knotX-1,y+4,2,1) }                                                              // a knot
+    const target=wk.cut?128-wk.line:wk.line; if(!wk.off){ for(let k=0;k<9;k+=2)F('#3b3b44',target,y+k,1,1); F('#c8322b',target-1,y-3,3,2) }          // the pencil line, a little arrow
+    if(wk.off){ const k=wk.off.t/650, ox=wk.off.side<0?x0:wk.off.x, ow=wk.off.side<0?wk.off.x-x0:x1-wk.off.x; F('#e6cf9e',ox+wk.off.side*k*8,y+k*k*40,ow,9) }
+    const sxw=wk.off?wk.off.x:sawX(), bob=wk.off?0:Math.round(Math.sin(wk.t/60)*1.5);                                                              // the hand saw
+    F('#c9ced4',sxw,y-16+bob,2,22); F('#e9eef3',sxw,y-16+bob,1,22); for(let k=0;k<22;k+=2)F('#8a8f9a',sxw+2,y-16+bob+k,1,1); F('#8a5a34',sxw-2,y-24+bob,6,9); F('#5a3a22',sxw,y-22+bob,2,5);
+  }
+  if(wk.stage==='glue'){
+    const bx=34, by=40, bw=60, bh=20;
+    F('#5f6676',bx-6,by-3,4,bh+6); F('#9aa3b0',bx-6,by-3,1,bh+6); F('#5f6676',bx+bw+2,by-3,4,bh+6); F('#3b3b44',bx-8,by+bh/2-1,2,3);                       // the clamps
+    if(wk.clamp>0){ const k=Math.floor(wk.t/90)%2; F('#c8322b',bx+bw+2+k*3,by-5-k*2,5,bh+6); F('#f4d35e',bx+bw+10,by-8,2,2); F('#f4d35e',bx+bw+13,by-3,2,2) }   // one's popping off!
+    F('#3b2a1e',bx-1,by-1,bw+2,bh+2); F('#2b2018',bx,by,bw,bh);
+    drawBoard(g,bx,by,bw,bh,wk.pattern,0,wk.laid.length);
+    if(wk.slide>0&&wk.laid.length){ const k=wk.laid.length-1, W=WOODS[wk.laid[k]]; F(W.lt,bx-Math.round(wk.slide/6),by+k*4,6,4) }
+    for(let k=0;k<wk.laid.length-1;k++)F('#f6f0dc',bx,by+(k+1)*4-1+((k%2)?0:0),bw,1), g.globalAlpha=1;                                               // glue lines
+    if(wk.bounce){ const k=wk.bounce.t/500, W=WOODS[wk.bounce.i]; F(W.col,bx+bw*.3+k*40,by+wk.laid.length*4-k*30+k*k*50,30,4) }
+    if(wk.show>0){ F('#fffdf6',40,12,48,24); F('#3b3b44',40,12,48,1); F('#c8322b',62,10,4,3); drawBoard(g,44,15,40,18,wk.pattern,0); for(let k=0;k<WORK.STRIPS;k++)pixText(g,String(k+1),36-0,15+k*3.6|0,'#3b2a1e') }   // Jack's drawing, pinned up: remember it!
+    else { F('#fffdf6',40,12,48,24); F('#3b3b44',40,12,48,1); F('#c8322b',62,10,4,3); for(let k=0;k<WORK.STRIPS;k++){ const yy=15+Math.round(k*3.6); if(k<wk.laid.length){const Wd=WOODS[wk.pattern[k]]; F(Wd.col,44,yy,40,4)} else { F('#e6dcc4',44,yy,40,3); if(k===wk.laid.length&&Math.floor(wk.t/300)%2)F('#f4d35e',44,yy,40,3) } } }   // (the drawing's gone: blanks, the next one blinking)
+  }
+  if(wk.stage==='plane'){
+    const bx=34, by=44, bw=60, bh=14, k=wk.strokes/WORK.STROKES;
+    drawBoard(g,bx,by,bw,bh,wk.pattern,0); g.globalAlpha=(1-k)*.55; for(let i=0;i<40;i++)F(i%2?'#3b2a1e':'#f6f0dc',bx+(i*17)%bw,by+(i*7)%bh,3,1); g.globalAlpha=1;   // rough and gluey, until it's planed
+    const px=64+(wk.planeT>0?wk.planeDir*(1-wk.planeT/220)*22:0)-9;
+    F('#3b3b44',px,by-7,18,5); F('#9aa3b0',px,by-7,18,1); F('#8a5a34',px+2,by-13,5,6); F('#8a5a34',px+12,by-11,4,4); F('#c9ced4',px+8,by-3,3,2);            // the hand plane
+    if(!wk.st){ const d=wk.side, cx=d<0?20:108, on=Math.floor(wk.t/200)%2, col=on?'#f4d35e':'#c9a640'; F('#3b2a1e',cx-9,40,18,13); F(col,cx-5+(d<0?3:0),45,8,3); for(let i=0;i<5;i++)F(col,d<0?cx-6+i:cx+5-i,46-i,1,1+i*2) }   // which way next: a big arrow on that side
+    F('#3b2a1e',34,70,60,5); F('#4fbf73',35,71,Math.round(58*k),3);
+  }
+  if(wk.stage==='oil'||wk.stage==='done'){
+    const bx=34, by=42, bw=60, bh=18, o=wk.stage==='done'?1:Math.min(1,wk.oil);
+    F('rgba(0,0,0,.25)',bx+2,by+bh,bw,2); drawBoard(g,bx,by,bw,bh,wk.pattern,o); F('#3b2a1e',bx+bw-6,by+bh/2-2,3,3);                                       // (a hole to hang it by)
+    if(wk.stage==='oil'){ if(wk.holding){ const rx=bx+8+(Math.sin(wk.t/140)+1)*20; F('#f2efe6',rx,by+4+Math.round(Math.sin(wk.t/90)*3),12,8); F('#d9d5ca',rx,by+10+Math.round(Math.sin(wk.t/90)*3),12,2) }
+      F('#5a3a22',16,40,8,14); F('#c98a3a',17,44,6,9); F('#3b2a1e',18,37,4,3);                                                                           // the oil bottle
+      F('#3b2a1e',104,20,8,44); F('#2b2018',105,21,6,42); const lo=63-Math.round(42*WORK.OIL_LO), hi=63-Math.round(42*WORK.OIL_HI); F('#4fbf73',105,hi,6,lo-hi); F('#c98a3a',105,63-Math.round(42*Math.min(1,wk.oil)),6,Math.round(42*Math.min(1,wk.oil))); F('#f4d35e',103,hi,10,1); F('#f4d35e',103,lo,10,1) }   // the gauge: let go in the green
+    else if(Math.floor(wk.t/250)%2){ F('#ffffff',bx+8,by+2,1,3); F('#ffffff',bx+7,by+3,3,1); F('#ffffff',bx+44,by+12,1,3); F('#ffffff',bx+43,by+13,3,1) }
+  }
+  for(const p of wk.parts){ g.globalAlpha=Math.min(1,p.life/300); F(p.c,p.x,p.y,p.curl?2:1,p.curl?2:1); if(p.curl)F(p.c,p.x+1,p.y-1,1,1) } g.globalAlpha=1;
+  g.setTransform(1,0,0,1,0,0);
 }
 function craneWon(){
-  const again=!!have.gingerHouseCostume; have.gingerHouseCostume=true; save(); sfx('reward'); renderBasket&&renderBasket();
-  showDialog({place:JACKC.place,speaker:JACKC.name,pages:again?[JACKC.thanks[0]]:[...JACKC.thanks,JACKC.unlock],actions:again?[CLOSE]:outfitActions('ginghouse')});   // a new costume: wear it now?
+  const again=!!have.board; have.boardPattern=wk.pattern.slice(); save(); sfx('reward');
+  if(again)return showDialog({place:JACKC.place,speaker:JACKC.name,pages:[JACKC.thanks[0]],actions:[CLOSE]});
+  say(JACKC.thanks.map(t=>[JACKC.name,t,'Jack C']),()=>showReward('board'));
 }
-$('craneBtn').addEventListener('pointerdown',e=>{e.preventDefault(); craneDrop()});
-$('craneBtn').addEventListener('keydown',e=>{ if(['Space','Enter'].includes(e.code)){e.preventDefault(); e.stopImmediatePropagation(); if(!e.repeat)craneDrop()} });
+$('craneBtn').addEventListener('pointerdown',e=>{e.preventDefault(); craneDrop(true)});
+for(const ev of ['pointerup','pointerleave','pointercancel'])$('craneBtn').addEventListener(ev,()=>craneDrop(false));
 $('craneLater').onclick=closeCrane;
-addEventListener('keydown',e=>{ if(!cr.open)return; if(e.code==='Escape'){e.preventDefault(); closeCrane(); return}
-  if(['Space','Enter'].includes(e.code)&&document.activeElement!==$('craneLater')){e.preventDefault(); e.stopImmediatePropagation(); if(!e.repeat)craneDrop()} },true);
+addEventListener('keydown',e=>{ if(!wk.open)return; if(e.code==='Escape'){e.preventDefault(); closeCrane(); return}
+  const b=[...document.querySelectorAll('#craneChoices button')].find(b=>b.dataset.key===e.code||(b.dataset.key==='ArrowLeft'&&e.code==='KeyA')||(b.dataset.key==='ArrowRight'&&e.code==='KeyD')||(e.code==='Numpad'+(b.dataset.key||'').slice(-1)));
+  if(b){ e.preventDefault(); e.stopImmediatePropagation(); if(!e.repeat)b.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,cancelable:true})); return }
+  if(['Space','Enter'].includes(e.code)&&document.activeElement!==$('craneLater')){e.preventDefault(); e.stopImmediatePropagation(); if(!e.repeat)craneDrop(true)} },true);
+addEventListener('keyup',e=>{ if(wk.open&&['Space','Enter'].includes(e.code))craneDrop(false) },true);
