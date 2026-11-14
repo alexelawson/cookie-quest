@@ -322,18 +322,19 @@ const treeSprite=document.createElement('canvas'); treeSprite.width=16; treeSpri
 const drawTree=(x,y)=>ctx.drawImage(treeSprite,x-8,y-19);
 // Brian: medium brown hair, buzzed super short, gray tee, jeans. Very chill.
 // Brian: chill, buzz cut, half-asleep smile, grey tee, jeans, brown boots. 12 x 20 px.
-const BRIAN_PAL={H:'#7a5232',h:'#5e3e25',S:'#e8b48e',s:'#d09a74',E:'#3b2a20',M:'#b5654f',T:'#8d949e',t:'#737a85',l:'#a5abb4',J:'#3a5f9e',j:'#2c4a7c',B:'#5a3a22'};
+// Brian: easygoing. Brown hair, heavy-lidded eyes, a grey tee, jeans, boots. 12 x 21 px.
+const BRIAN_PAL={H:'#7a5232',h:'#5e3e25',L:'#96693f',S:'#e8b48e',s:'#d09a74',b:'#c08a66',W:'#ffffff',E:'#3b2a20',M:'#b5654f',T:'#8d949e',t:'#737a85',l:'#a5abb4'};
 const BRIAN_SPR={
-  down:["...HHHHHH...","..HhHHhHHH..","..HSSSSSSH..","..SEESSEES..","..sSSssSSs..","...SMMMMS...",
-        ".TTTTllTTTT.",".TTTTTTTTtT.",".TTTTTTTTtT.",".STTTTTTTtS.",".STTTTTTTtS.",".SttttttttS."],
-  right:["...HHHHHH...","..HHhHHHHH..","..HHHSSSSS..","..HHsSSEES..","..hSSSSSSSS.","...sSSSSMS..",
-        ".TTTTTTTTTT.",".TTTTTTTTtT.",".TTTTSTTTtT.",".TTTTSTTTtT.",".TTTTSTTTtT.",".ttttsttttt."],
+  down:["...HHHHHH...","..HHLHHHHH..","..HhHHHhHH..","..HSSSSSSH..","..SbbSSbbS..","..SWESSEWS..","..sSSssSSs..","...SMMMMS...","....sSSs....",
+        ".TTTTllTTTT.",".TTTTTTTTtT.",".STTTTTTTtS.",".STTTTTTTtS.",".STTTTTTTtS.",".s.tttttt.s."],
+  right:["...HHHHHH...","..HHLHHHHH..","..HHHHHHHH..","..HHhSSSSS..","..HHSSSbbS..","..HhSSSWES..","..hSSSSSSSS.","...sSSSMMS..","....sSSs....",
+        "..TTTTTTTt..","..TTTlTTTt..","..TTTSSTTt..","..TTTSSTTt..","..TTTsSTTt..","..tttttttt.."],
 };
 function drawBrian(x,y,dir='right',g=ctx){
-  const X=Math.round(x)-6, Y=Math.round(y)-19, F=(c,dx,dy,w,h)=>{g.fillStyle=c;g.fillRect(X+dx,Y+dy,w,h)};
-  F('rgba(0,0,0,.2)',1,18,10,2);
-  F('#3a5f9e',3,12,3,6); F('#3a5f9e',6,12,3,6); F('#2c4a7c',5,12,1,5); F('#4d74b4',3,13,1,3); F('#4d74b4',6,13,1,3);   // jeans
-  F('#5a3a22',2,17,4,2); F('#5a3a22',6,17,4,2); F('#7a5236',2,17,2,1); F('#7a5236',6,17,2,1);                          // boots
+  const X=Math.round(x)-6, Y=Math.round(y)-21, F=(c,dx,dy,w,h)=>{g.fillStyle=c;g.fillRect(X+dx,Y+dy,w,h)};
+  F('rgba(0,0,0,.2)',1,20,10,2);
+  F('#3a5f9e',3,15,3,5); F('#3a5f9e',6,15,3,5); F('#2c4a7c',5,15,1,4); F('#2c4a7c',8,15,1,5); F('#4d74b4',3,16,1,3); F('#4d74b4',6,16,1,3);   // jeans
+  F('#5a3a22',2,19,4,2); F('#5a3a22',6,19,4,2); F('#7a5236',2,19,2,1); F('#7a5236',6,19,2,1);                          // boots
   drawSprite(g,X,Y,BRIAN_SPR,BRIAN_PAL,dir==='up'?'down':dir,null,2);   // (his eyes are already half shut)
 }
 // Brian lounging in his boat by the dock: leaning back, hands behind his head, feet up

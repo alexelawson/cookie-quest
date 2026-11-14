@@ -312,11 +312,14 @@ function drawPastaBowl(g,x,y,s=1){ const F=(c,dx,dy,w,h)=>{g.fillStyle=c;g.fillR
   F('#ffffff',0,2,9,2); F('#3d8ad6',0,2,9,1); F('#e9eef3',1,4,7,1); F('#c9ced4',2,5,5,1); F('#9aa0aa',3,6,3,1) }   // a white bowl with a blue rim
 // Deb, the diner cook, out front: white apron, a hairnet, a spatula
 const DEB={x:132,y:86};   // (in the lot, beside the diner's sign)
-function drawDeb(x,y){ const X=Math.round(x)-5, Y=Math.round(y)-17, F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(X+dx,Y+dy,w,h)};
-  F('rgba(0,0,0,.2)',1,16,9,2); F('#3a4458',3,12,2,4); F('#3a4458',6,12,2,4); F('#1d1d22',2,15,3,1); F('#1d1d22',6,15,3,1);
-  F('#3fa59a',1,6,9,7); F('#ffffff',3,6,5,7); F('#e9eef3',3,11,5,2); F('#f0c6a0',0,7,1,4); F('#f0c6a0',10,7,1,4);   // teal uniform, white apron
-  F('#9aa0aa',10,3,1,5); F('#5f6676',9,2,3,2);                                                               // spatula
-  F('#f0c6a0',2,1,7,5); F('#c99a66',1,0,9,2); F('#e9eef3',2,-1,7,2); F('#2b2b2b',4,3,1,1); F('#2b2b2b',6,3,1,1); F('#b5654f',4,5,3,1);   // face, hair under a hairnet
+// Deb, the diner cook: a paper cap over sandy curls, a teal uniform, a white apron, a spatula at the ready. 11 x 19 px.
+const DEB_PAL={C:'#f4f6f8',c:'#cfd6de',H:'#c99a66',h:'#a87a4a',S:'#f0c6a0',s:'#dcae88',W:'#ffffff',E:'#2b2236',M:'#b5654f',r:'#f2a7a0',U:'#3fa59a',u:'#2f8279',A:'#ffffff',a:'#dfe5ec'};
+const DEB_SPR={down:["...CCCCC...","..CCCCCCC..","..ccccccc..",".HHSSSSSHH.",".HSWESEWSH.","..SrSSSrS..","..sSMMMSs..","...sSSSs...",
+  ".UUAAAAAUU.","SUUAAAAAUUS","SuUAAAAAUuS","SuUAAAAAUuS","s.UAAAAAU.s","..UaaaaaU.."]};
+function drawDeb(x,y){ const X=Math.round(x)-5, Y=Math.round(y)-18, F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(X+dx,Y+dy,w,h)};
+  F('rgba(0,0,0,.2)',1,17,9,2); F('#3a4458',3,14,2,3); F('#3a4458',6,14,2,3); F('#2c3446',4,14,1,3); F('#2c3446',7,14,1,3); F('#1d1d22',2,17,3,1); F('#1d1d22',6,17,3,1); F('#3a3a44',2,17,1,1); F('#3a3a44',6,17,1,1);
+  drawSprite(ctx,X,Y,DEB_SPR,DEB_PAL,'down',4,14);
+  F('#9aa0aa',10,6,1,6); F('#5f6676',9,3,3,3); F('#7d8494',9,3,3,1);                                          // spatula
   if(!have.fargoPasta&&have.jackieAsked&&Math.floor(time/400)%2){ F('#ffffff',11,-9,7,7); F('#1d2130',14,-8,1,3); F('#1d2130',14,-4,1,1) }   // "!" once Jackie's asked for pasta
 }
 // back outside with Alex's snacks: Lil Q gives you the sugar

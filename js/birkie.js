@@ -366,22 +366,18 @@ function birkHowTo(then){
 }
 // John at the trailhead (not heist John): brown hair, reading glasses, Birkie volunteer jacket, clipboard
 function trailJohnDir(){ const dx=P.x-331, dy=P.y-81; return scene!==SCENES.world||Math.hypot(dx,dy)>60?'down':Math.abs(dx)>Math.abs(dy)?(dx<0?'left':'right'):(dy<0?'up':'down') }
+const TJOHN_PAL={H:'#6b4429',h:'#4f301b',L:'#8a5a38',S:'#eab896',s:'#d4a07c',G:'#c9a24a',W:'#ffffff',E:'#2b2236',M:'#b5735a',C:'#1d3f73',c:'#163261',l:'#2a5590',R:'#c8322b',w:'#ffffff'};
+const TJOHN_SPR={
+  down: ["...HHHHH...","..HHLLHHH..","..HSSSSSH..","..GGGSGGG..","..GEWGWEG..","..sSSSSSs..","...SMMMS...","..CCwwwCC..",".CCCCCCCCC.","CClCCCCCcCC","CRRRRRRRRRC","CCCCCCCCcCC","CCCCCCCCcCC","SCCCCCCCcCS",".ccccccccc."],
+  up:   ["...HHHHH...","..HHLLHHH..","..HHHHHHH..","..HHHLHHH..","..HhHHHhH..","..shhhhhs..","...sSSSs...","..CCCCCCC..",".CCCCCCCCC.","CCCCCCCCcCC","CRRRRRRRRRC","CCCCCCCCcCC","CCCCCCCCcCC","SCCCCCCCcCS",".ccccccccc."],
+  right:["...HHHHH...","..HHLLHHH..","..HHHSSSS..","..HHSSGGG..","..HhSSGEG..","..hSSSSSSS.","...sSSMS...","..CCCCww...","..CCCCCCC..","..CCClCCc..","..RRCCCRR..","..CCCCCCc..","..CCCCCCc..","..CCCSSCc..","..ccccccc.."],
+};
 function drawTrailJohn(cx,cy,dir){
-  const x=cx-5, y=cy-20, F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x+dx,y+dy,w,h)};
-  const skin='#eab896', hair='#6b4429', coat='#1d3f73', pants='#b59a6e', glass='#c9a24a';
-  F('rgba(0,0,0,.25)',1,19,9,2);
-  F(pants,2,13,3,6); F(pants,6,13,3,6); F('#2b2b2b',2,18,3,2); F('#2b2b2b',6,18,3,2);
-  F(coat,1,6,9,8); F('#c8322b',1,9,9,1); F('#ffffff',4,6,3,1);                     // jacket with a red stripe
-  F(coat,0,7,1,6); F(coat,10,7,1,6); F(skin,0,13,1,1); F(skin,10,13,1,1);
-  F(skin,3,1,5,5); F(skin,4,5,3,1);
-  F(hair,3,0,5,2); F(hair,2,1,1,3); F(hair,8,1,1,3);
-  if(dir==='up')F(hair,3,0,5,5);
-  else if(dir==='left'){F('#2b2b2b',3,3,1,1); F(glass,3,3,2,1); F(hair,7,1,1,3)}
-  else if(dir==='right'){F('#2b2b2b',7,3,1,1); F(glass,6,3,2,1); F(hair,3,1,1,3)}
-  else {F(glass,3,3,2,2); F(glass,6,3,2,2); F(glass,5,3,1,1); F('#2b2b2b',4,4,1,1); F('#2b2b2b',6,4,1,1); F('#b5735a',4,5,3,1)}   // reading glasses
-  if(dir!=='up'){F('#8a5a34',8,9,3,5); F('#ffffff',8,10,3,3)}                       // clipboard
-  F('#163261',8,7,2,6); F('#163261',1,13,9,1); F('#2a5590',2,7,2,1); F('#9a805a',4,13,1,5); F('#9a805a',8,13,1,5); F('#8a5a38',4,0,2,1);   // coat shading, pants shade, hair shine
-  if(dir!=='up'){F('#d4a07c',3,5,1,1); F('#d4a07c',7,5,1,1); if(dir==='down'){F('#8a8f9a',8,11,2,1); F('#8a8f9a',8,12,1,1); F('#c9ced4',9,9,1,1)}}   // cheeks, notes on the clipboard, its clip
+  const x=Math.round(cx)-5, y=Math.round(cy)-21, F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x+dx,y+dy,w,h)};
+  F('rgba(0,0,0,.25)',1,20,9,2);
+  F('#b59a6e',2,15,3,5); F('#b59a6e',6,15,3,5); F('#9a805a',4,15,1,5); F('#9a805a',8,15,1,5); F('#2b2b2b',2,19,3,2); F('#2b2b2b',6,19,3,2); F('#4a4a55',2,19,2,1); F('#4a4a55',6,19,2,1);   // khakis, boots
+  drawSprite(ctx,x,y,TJOHN_SPR,TJOHN_PAL,dir||'down',4,9);
+  if(dir==='down'||!dir){F('#8a5a34',8,10,3,5); F('#ffffff',8,11,3,3); F('#8a8f9a',8,12,2,1); F('#8a8f9a',8,13,1,1); F('#c9ced4',9,10,1,1); F('#eab896',10,13,1,1)}   // the clipboard, with notes
 }
 function talkJohn(){
   const T=BIRKIE;
