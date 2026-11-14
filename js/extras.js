@@ -12,7 +12,8 @@ const EXITS={
   golf:   [{z:R(96,160,32,8),  mark:{x:112,y:160,dir:'down'}, when:()=>!golf.active, go:()=>goTo('world','fromGolf')}],
   fargo:  [{z:R(0,166,6,28),   when:()=>!fargo.onFoot,   // (no arrow here: the LEAVE FARGO highway sign points the way)
            go:()=>goTo('world','fromFargo')}],
-  city:   [{z:LADDER,          mark:{x:21,y:170,dir:'down'}, go:()=>goTo('vancouver','fromRoof')}],   // down the ladder: back on the street by the elevator
+  city:   [{z:LADDER,          mark:{x:21,y:170,dir:'down'}, go:()=>goTo('vancouver','fromRoof')},
+           {z:R(SKYLIGHT.x-4,SKYLIGHT.y+SKYLIGHT.h,SKYLIGHT.w+8,10), when:()=>heistStage()>=5&&!heist.lug&&!heist.dance, mark:{x:SKYLIGHT.x+12,y:SKYLIGHT.y+SKYLIGHT.h+12,dir:'down'}, go:()=>goTo('vancouver','fromRoof')}],   // once the heist is done (you come back in on this roof), the fire escape is a way out too   // down the ladder: back on the street by the elevator
   vancouver:[{z:R(134,0,20,7), go:()=>goTo('world','fromVancouver')}],
   world:  [{z:R(70,212,16,38), mark:{x:78,y:186,dir:'down',text:VANCOUVER.bridgeMark}, go:()=>goTo('vancouver','fromBridge')}],            // walk out onto the Lions Gate Bridge and you cross it                                       // back north over the bridge
 };

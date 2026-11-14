@@ -190,4 +190,8 @@ r=await p.evaluate(()=>{T.enter(); T.clickThrough(); openAnagrams(); anaGo(); fo
   let t=0; while(heist.lug&&t<20000){update(16.7); t+=16.7} return {res,dancer,frozen,gloat,lugging,t:Math.round(t),reward:!$('reward').hidden,name:$('rewardName').textContent,st:have.heistStage}});
 ok('K lose to Lars: he does a little dance (you can\'t walk off mid-dance), then gloats',r.res.startsWith('Lars wins')&&r.dancer==='lars'&&r.frozen&&r.gloat.join().includes('Loser carries'),r.gloat.join(' | '));
 ok('K then Joe lugs the giant chocolate over and down the fire escape himself, and you get the chocolate anyway',r.lugging&&r.t>2000&&r.t<15000&&r.reward&&r.name==='Chocolate'&&r.st===5,JSON.stringify(r));
+// L. coming back after the heist is done: you land on the last roof, and the fire escape (the blinking EXIT) lets you straight back out
+await fresh(); r=await p.evaluate(()=>{Object.assign(have,{city:true,heistStage:5,heistBriefed:true,heistHowTo:true,lasersOff:true,plankGate:true,confectionerBeat:true}); goTo('city','fromStreet'); T.run(60); try{closeDialog()}catch(e){} paused=false; T.run(5);
+  const onC=hit(R(P.x-1,P.y-1,2,2),ROOF_C), marks=exitsHere().length; for(const c of heist.crew){c.x=SKYLIGHT.x+12;c.y=SKYLIGHT.y+SKYLIGHT.h+5} P.x=SKYLIGHT.x+12; P.y=SKYLIGHT.y+SKYLIGHT.h+5; T.run(50); return {onC,marks,out:scene===SCENES.vancouver}});
+ok('L after the heist the fire escape is a second way out (to the street in Vancouver)',r.onC&&r.marks===2&&r.out,JSON.stringify(r));
 console.log(R.join('\n')); console.log('page errors:',errs.length?errs:'none'); await b.close()})();
