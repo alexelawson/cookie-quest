@@ -311,18 +311,19 @@ function drawHug(){
 
 const kitBg=document.createElement('canvas'); kitBg.width=224; kitBg.height=168;
 (function(){
-  // a classic farmhouse kitchen: white shiplap under a wood beam, a black-framed window over a deep apron sink, white shaker cabinets
-  // with black pulls, butcher-block counters, subway tile, open wood shelves on iron brackets, a steel range under a hood,
-  // the fridge (the recipe card is stuck to it), wide oak floors and a striped runner under the farm table.
+  // an old New England farmhouse kitchen: warm plaster walls between dark hand-hewn posts and beams, a black-framed window over a deep
+  // apron sink, grey-green cabinets with brass pulls, butcher-block counters, handmade tile, open shelves (a plate rack, baskets, a round
+  // bread board), a steel range under a wood hood, the fridge (the recipe card is stuck to it), a stone fireplace with a fire going,
+  // dark wide-plank floors and a worn red rug under an oval farm table with black spindle chairs.
   const g=kitBg.getContext('2d'), F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};
-  // shiplap walls (boards run sideways, a thin shadow line between them)
-  F('#f3f0e8',0,0,224,58); for(let y=9;y<58;y+=6){F('#dedad0',0,y,224,1); F('#faf8f2',0,y+1,224,1)}
-  for(let i=0;i<26;i++)F('#e9e5db',rnd()*224|0,6+rnd()*50|0,3+rnd()*5|0,1);
-  F('#6b4a2f',0,0,224,4); F('#7f5a3a',0,0,224,1); F('#55391f',0,4,224,1); for(let i=0;i<20;i++)F('#5e3f26',rnd()*224|0,1+rnd()*2|0,6,1);   // the ceiling beam
-  for(let x=2;x<224;x+=5)F(x%10?'#3d8443':'#2f6b36',x,4,4,2);                                          // a pine garland along it...
-  for(let x=4;x<224;x+=8)F(['#e54b4b','#f4d35e','#3d8ad6','#4d9a50'][(x/8|0)%4],x,6+((x/8|0)%2),2,2);   // ...with Christmas lights
-  // subway tile behind the counter
-  F('#f8f7f3',6,24,114,10); for(let y=24;y<34;y+=3){F('#d9d6cd',6,y,114,1); for(let x=6+((y-24)/3%2?3:0);x<120;x+=6)F('#d9d6cd',x,y,1,3)}
+  // plaster walls
+  F('#ece3cf',0,0,224,58); for(let i=0;i<70;i++)F(rnd()<.5?'#e4dac4':'#f2ead8',rnd()*224|0,6+rnd()*50|0,2+rnd()*6|0,1);
+  const beam=(x,y,w,h)=>{F('#5a3d26',x,y,w,h); if(w>h){F('#6f4d31',x,y,w,1); F('#3f2a19',x,y+h-1,w,1); for(let i=0;i<w/9;i++)F('#4a3120',x+rnd()*w|0,y+1+rnd()*(h-2)|0,5+rnd()*6|0,1)} else {F('#6f4d31',x,y,1,h); F('#3f2a19',x+w-1,y,1,h); for(let i=0;i<h/7;i++)F('#4a3120',x+1,y+rnd()*h|0,w-2,1)}};
+  beam(0,0,224,5); beam(0,5,4,53); beam(220,5,4,53); beam(153,5,3,53); beam(186,5,3,53);                    // the ceiling beam and the posts
+  for(let x=2;x<224;x+=5)F(x%10?'#3d8443':'#2f6b36',x,5,4,2);                                          // a pine garland along it...
+  for(let x=4;x<224;x+=8)F(['#e54b4b','#f4d35e','#3d8ad6','#4d9a50'][(x/8|0)%4],x,7+((x/8|0)%2),2,2);   // ...with Christmas lights
+  // handmade cream tile behind the counter (every tile a slightly different white)
+  for(let y=24;y<34;y+=3)for(let x=6;x<120;x+=4){const t=rnd(); F(t<.3?'#f1eadb':t<.6?'#e8e0cf':'#f6f0e3',x,y,4,3)} for(let y=24;y<34;y+=3)F('#d6ccb8',6,y,114,1); for(let x=6;x<120;x+=4)F('#d6ccb8',x,24,1,10);
   // the window: black steel frame, six panes, snow falling outside; a rolled linen shade
   F('#1f2024',23,8,38,26); F('#1e2a4a',25,10,34,22); F('#2b3a63',25,25,34,7);
   for(let i=0;i<16;i++)F('#e9eef7',25+rnd()*34|0,10+rnd()*22|0,1,1);
@@ -331,31 +332,32 @@ const kitBg=document.createElement('canvas'); kitBg.width=224; kitBg.height=168;
   F('#3a3b40',22,34,40,1);                                                                              // the sill
   // butcher-block counter
   F('#c9975e',6,34,114,7); for(let x=6;x<120;x+=4)F('#b9874f',x,34,1,7); F('#dcae74',6,34,114,1); F('#9e6d3c',6,40,114,2);
-  // white shaker cabinets, matte black pulls
-  F('#eeebe3',6,42,114,16); F('#d6d2c8',6,42,114,1);
-  const door=(x,w)=>{F('#f7f5ef',x,44,w,12); F('#dcd8ce',x,44,w,1); F('#dcd8ce',x,44,1,12); F('#cfcbc0',x+w-1,44,1,12); F('#cfcbc0',x,55,w,1); F('#ebe8df',x+2,46,w-4,8); F('#dcd8ce',x+2,46,w-4,1); F('#dcd8ce',x+2,46,1,8); F('#26272b',x+(w>>1)-1,44,3,1)};
+  // grey-green shaker cabinets, brass pulls
+  F('#5c655c',6,42,114,16); F('#4a524a',6,42,114,1);
+  const door=(x,w)=>{F('#69736a',x,44,w,12); F('#7a857b',x,44,w,1); F('#7a857b',x,44,1,12); F('#4e574e',x+w-1,44,1,12); F('#4e574e',x,55,w,1); F('#5f695f',x+2,46,w-4,8); F('#4e574e',x+2,46,w-4,1); F('#4e574e',x+2,46,1,8); F('#d9b55a',x+(w>>1)-1,44,3,1)};
   door(8,14); door(64,17); door(83,17); door(102,16);
   F('#fbfaf6',24,36,36,13); F('#d9d5ca',24,48,36,1); F('#eceae3',25,37,34,2); F('#cfcbc0',24,36,1,13); F('#cfcbc0',59,36,1,13); F('#e3e0d7',26,40,32,1);   // the apron-front sink
   F('#c9a24a',41,25,2,9); F('#c9a24a',41,24,6,2); F('#c9a24a',46,25,1,3); F('#e6c876',41,24,1,10); F('#c9a24a',38,32,2,2); F('#c9a24a',44,32,2,2);   // a brass gooseneck faucet
-  F('#3a3226',6,57,114,1);                                                                              // toe kick shadow
+  F('#2e2620',6,57,114,1);                                                                              // toe kick shadow
   // on the counter: a mixing bowl of dough, a crock of wooden spoons, eggs in a wire basket, a cutting board leaning on the tile
   F('#f6f4ee',66,28,16,8); F('#dedad0',67,34,14,2); F('#d8b46a',69,27,10,2); F('#3a5f9e',66,30,16,1);
   F('#eceae3',100,29,8,6); F('#cfcbc0',100,34,8,1); F('#c9975e',101,25,2,5); F('#a8763f',104,24,2,6); F('#c9975e',106,26,1,4);
   F('#3a3b40',86,31,12,4); F('#55565c',86,31,12,1); F('#fff8ec',88,29,3,3); F('#e9c9a0',92,29,3,3); F('#fff8ec',95,30,2,2);
-  F('#b9874f',110,24,8,10); F('#c9975e',111,25,6,9); F('#8a5f34',113,24,2,1);
   F('#d9b27c',10,32,12,2); F('#8a5a34',8,32,2,2); F('#8a5a34',22,32,2,2);                                 // the rolling pin
-  // open shelves: thick oak on black iron brackets; white plates and bowls, a few glass jars, a little pot of rosemary
-  for(const y of [11,20]){F('#a8763f',68,y,50,2); F('#c08f54',68,y,50,1); F('#26272b',71,y+2,1,3); F('#26272b',72,y+2,2,1); F('#26272b',114,y+2,1,3); F('#26272b',112,y+2,2,1)}
-  const jar=(x,y,fill)=>{F('#dfeef2',x,y-7,5,7); F(fill,x+1,y-5,3,5); F('#ffffff',x+1,y-6,1,3); F('#9aa3b0',x,y-8,5,1)};
-  jar(70,11,'#f6f2e8'); jar(77,11,'#f2d49a'); jar(84,11,'#7a4a2c');
-  for(let k=0;k<3;k++){F('#fbfaf6',92,9-k*2,12,2); F('#d9d5ca',92,10-k*2,12,1)}                            // a stack of white plates
-  F('#b5654f',108,7,6,4); F('#8a4a3a',108,10,6,1); F('#3d8443',109,3,1,4); F('#4d9a50',111,2,1,5); F('#3d8443',113,4,1,3);   // rosemary in terracotta
-  for(const x of [70,78,86]){F('#fbfaf6',x,16,6,4); F('#d9d5ca',x+1,19,4,1); F('#eceae3',x,16,6,1)}       // bowls
-  for(const x of [97,103,109]){F('#fbfaf6',x,15,4,5); F('#d9d5ca',x+4,16,1,2); F('#eceae3',x,15,4,1)}     // mugs
+  // open shelves: thick oak on black iron brackets. Up top a plate rack and a basket; below, bowls, a pitcher, mugs
+  for(const y of [12,21]){F('#8a5f34',68,y,50,2); F('#a8763f',68,y,50,1); F('#26272b',71,y+2,1,3); F('#26272b',72,y+2,2,1); F('#26272b',114,y+2,1,3); F('#26272b',112,y+2,2,1)}
+  F('#6b4a2f',70,6,22,6); F('#8a5f34',70,6,22,1); for(let x=72;x<91;x+=3){F('#fbfaf6',x,7,2,5); F('#d9d5ca',x+1,7,1,5)}       // the plate rack
+  F('#b08850',96,7,12,5); F('#c9a06a',96,7,12,1); for(let x=97;x<108;x+=2)F('#8a6a3a',x,8,1,4); F('#8a6a3a',99,5,6,1); F('#8a6a3a',98,6,1,1); F('#8a6a3a',105,6,1,1);   // a woven basket
+  F('#b5654f',111,8,5,4); F('#8a4a3a',111,11,5,1); F('#3d8443',112,4,1,4); F('#4d9a50',114,3,1,5);                              // rosemary in terracotta
+  for(const x of [70,78]){F('#fbfaf6',x,17,6,4); F('#d9d5ca',x+1,20,4,1); F('#eceae3',x,17,6,1)}                              // bowls
+  F('#fbfaf6',87,15,5,6); F('#d9d5ca',91,16,1,4); F('#fbfaf6',86,15,1,1); F('#d9d5ca',92,17,2,1); F('#d9d5ca',93,18,1,2);     // an ironstone pitcher
+  for(const x of [97,103]){F('#fbfaf6',x,16,4,5); F('#d9d5ca',x+4,17,1,2)} F('#b8733a',109,16,7,5); F('#d08a4a',109,16,7,1); F('#8a5522',109,20,7,1);   // mugs, a copper pot
+  // a round bread board leaning on the tile
+  F('#b9874f',109,25,8,9); F('#b9874f',108,27,10,6); F('#c9975e',110,26,6,7); F('#8a5f34',112,23,2,2);
   // a cast-iron skillet on a hook
   F('#26272b',65,13,1,2); F('#2b2b2f',62,15,7,6); F('#3a3a40',63,16,5,4); F('#2b2b2f',65,21,2,4);
   // the range: stainless steel, black glass door, chunky knobs; a steel hood above
-  F('#b9bfc8',124,8,26,3); F('#d6dbe2',124,8,26,1); F('#c3c9d2',121,11,32,7); F('#e2e6ec',121,11,32,1); F('#9aa3b0',121,17,32,1); F('#7d8694',121,18,32,1); F('#ffe9a8',128,18,18,1);
+  F('#ece3cf',124,7,26,6); F('#8a5f34',120,13,34,6); F('#a8763f',120,13,34,1); F('#6b4a2f',120,18,34,1); for(let x=124;x<152;x+=7)F('#7a5230',x,14,1,4); F('#6b4a2f',121,19,2,3); F('#6b4a2f',151,19,2,3); F('#ffe9a8',128,19,18,1);   // a plaster chimney over a wood hood on corbels
   F('#c3c9d2',122,26,30,32); F('#e2e6ec',122,26,1,32); F('#9aa3b0',151,26,1,32); F('#7d8694',122,57,30,1);
   F('#2b2b2f',124,27,26,4); for(const x of [126,138]){F('#1d1d22',x,28,8,2); F('#45454c',x+1,28,6,1)}       // burner grates
   F('#9aa3b0',124,32,26,2); for(const x of [126,131,136,141,146])F('#26272b',x,32,2,2);                     // knobs
@@ -367,23 +369,32 @@ const kitBg=document.createElement('canvas'); kitBg.width=224; kitBg.height=168;
   F('#d6dbe2',159,9,2,34); F('#d6dbe2',173,9,2,34);
   F('#fffdf6',159,31,10,11); for(let y=34;y<41;y+=2)F('#d0605a',160,y,8,1); F('#c8322b',163,30,2,2);         // the recipe card
   F('#f4d35e',176,20,5,5); F('#3d8ad6',178,29,4,4); F('#e54b7a',175,36,3,3);                               // a few magnets and a drawing
-  // a round wall clock, a little shelf, and the wreath
-  F('#8a5a34',188,40,14,1); F('#26272b',189,41,1,2); F('#26272b',200,41,1,2); for(const [x,c] of [[190,'#fbfaf6'],[194,'#b5654f'],[198,'#fbfaf6']])F(c,x,35,3,5); F('#3d8443',194,32,3,3);
-  for(let a=0;a<16;a++){const t=a/16*Math.PI*2; F(a%3?'#2f6b36':'#3d8443',204+Math.cos(t)*7-1|0,22+Math.sin(t)*7-1|0,3,3)}
-  F('#c8322b',201,28,6,3); F('#e54b4b',203,18,2,2); F('#e54b4b',210,23,2,2);
-  F('#26272b',10,12,9,9); F('#26272b',11,11,7,11); F('#fbfaf6',11,13,7,7); F('#fbfaf6',12,12,5,9); F('#26272b',14,14,1,3); F('#26272b',14,16,3,1);   // the clock
+  // the fireplace: fieldstone, a hewn mantel with stockings, the wreath above it (the fire itself flickers: see under())
+  for(let y=27;y<58;y+=4)for(let x=190+((y-27)/4%2?-3:0);x<220;x+=7){const t=rnd(), x0=Math.max(190,x), w=Math.min(220,x+7)-x0; F(t<.3?'#9a9488':t<.6?'#aba598':'#8a8478',x0,y,w,4); F('#6f6a60',x0,y+3,w,1); F('#6f6a60',x0+w-1,y,1,4); F('#bdb7aa',x0,y,w-1,1)}
+  F('#1d1814',197,38,16,20); F('#2b231c',198,39,14,19); F('#8a8478',196,36,18,2); F('#bdb7aa',196,36,18,1);                    // the firebox under a stone lintel
+  F('#3a2a1c',199,55,12,3); F('#5a3d26',200,54,10,2); F('#26272b',198,57,14,1);                                               // logs on the grate
+  beam(188,23,34,4);                                                                                                           // the mantel
+  for(const [x,c] of [[192,'#c8322b'],[216,'#2f6b36']]){F(c,x,27,3,6); F(c,x-2,31,3,2); F('#fbfaf6',x,27,3,2)}                  // two stockings
+  F('#d9b55a',199,19,2,4); F('#fbfaf6',199,17,2,2); F('#d9b55a',209,19,2,4); F('#fbfaf6',209,17,2,2);                          // brass candlesticks
+  for(let a=0;a<16;a++){const t=a/16*Math.PI*2; F(a%3?'#2f6b36':'#3d8443',205+Math.cos(t)*5-1|0,14+Math.sin(t)*5-1|0,3,3)}
+  F('#c8322b',203,18,5,2); F('#e54b4b',201,11,2,2); F('#e54b4b',209,14,2,2);
+  // a black dome pendant hanging over the sink
+  F('#26272b',42,8,1,3); F('#26272b',40,11,5,1); F('#26272b',38,12,9,2); F('#3a3b40',38,12,9,1); F('#ffe9a8',40,14,5,1);
   // wide oak floorboards, with knots and nail heads
-  F('#c99a5e',0,58,224,110);
-  for(let y=58;y<168;y+=12){for(let x=((y/12|0)%3)*30-90;x<224;x+=90){const t=rnd(); F(t<.33?'#c08f54':t<.66?'#d2a568':'#c99a5e',x+1,y+1,89,11); F('#a8763f',x,y,1,12)}
-    F('#a8763f',0,y,224,1); for(let x=4;x<224;x+=30)F('#8a5f34',x,y+2,1,1)}
-  for(let i=0;i<180;i++)F(rnd()<.5?'#b8874c':'#d8ae74',rnd()*224|0,59+rnd()*108|0,3+rnd()*6|0,1);       // grain
-  for(let i=0;i<10;i++){const x=rnd()*220|0, y=60+rnd()*104|0; F('#9a6a38',x,y,3,2); F('#7f5530',x+1,y,1,1)}   // knots
-  F('#3a3226',0,58,224,1); F('#f7f5ef',0,59,6,2); F('#f7f5ef',120,59,2,2); F('#f7f5ef',152,59,4,2); F('#f7f5ef',186,59,38,2); F('#a8763f',0,61,224,1);   // baseboard where the wall shows
-  // a flat-woven cotton runner under the table: cream with charcoal stripes, a fringe at each end
-  {const x=62,y=90,w=100,h=52; F('rgba(0,0,0,.12)',x+1,y+h,w,1); F('#ece6d8',x,y,w,h); for(let yy=y+1;yy<y+h;yy+=2)F('#e2dbcb',x,yy,w,1);
-   for(const k of [4,8,20,h-21,h-9,h-5])F('#3f4046',x,y+k,w,k===20||k===h-21?1:2);
-   F('#d2c9b4',x,y,w,1); F('#d2c9b4',x,y+h-1,w,1);
-   for(let yy=y+1;yy<y+h;yy+=2){F('#ece6d8',x-2,yy,2,1); F('#ece6d8',x+w,yy,2,1)}}
+  F('#96643c',0,58,224,110);
+  for(let y=58;y<168;y+=12){for(let x=((y/12|0)%3)*30-90;x<224;x+=90){const t=rnd(); F(t<.33?'#8c5c36':t<.66?'#a06e44':'#96643c',x+1,y+1,89,11); F('#6b4426',x,y,1,12)}
+    F('#6b4426',0,y,224,1); for(let x=4;x<224;x+=30)F('#4f311b',x,y+2,1,1)}
+  for(let i=0;i<180;i++)F(rnd()<.5?'#84542f':'#a87548',rnd()*224|0,59+rnd()*108|0,3+rnd()*6|0,1);       // grain
+  for(let i=0;i<10;i++){const x=rnd()*220|0, y=60+rnd()*104|0; F('#6b4426',x,y,3,2); F('#4f311b',x+1,y,1,1)}   // knots
+  F('#3f2a19',0,58,224,2); F('#6b4426',0,60,224,1); F('#8a8478',190,58,30,3); F('#bdb7aa',190,58,30,1); F('#6f6a60',190,60,30,1);   // the wall's shadow; the stone hearth
+  // a worn oriental rug under the table: brick red and cream, a border, medallions, a fringe at each end
+  {const x=60,y=88,w=104,h=56, R1='#a8423a', R2='#8f352f', C='#e8dcc0', B='#3f5a6a', Y='#d2a850';
+   F('rgba(0,0,0,.15)',x+1,y+h,w,1); F(C,x,y,w,h); F(R1,x+2,y+2,w-4,h-4); F(C,x+4,y+4,w-8,h-8); F(R1,x+6,y+6,w-12,h-12);
+   for(let k=x+3;k<x+w-3;k+=4){F(B,k,y+2,2,2); F(B,k,y+h-4,2,2)} for(let k=y+5;k<y+h-5;k+=4){F(B,x+2,k,2,2); F(B,x+w-4,k,2,2)}                 // a dotted border
+   for(const cx of [x+22,x+52,x+82])for(const cy of [y+16,y+h-17]){ for(let r=0;r<5;r++){F(C,cx-r*2,cy-4+r,r*4+1,1); F(C,cx-r*2,cy+4-r,r*4+1,1)} F(B,cx-3,cy-1,7,3); F(Y,cx-1,cy,3,1); F(R2,cx,cy-3,1,1); F(R2,cx,cy+3,1,1) }   // medallions
+   for(let k=x+10;k<x+w-8;k+=6){F(Y,k,y+8,1,1); F(Y,k+3,y+h-9,1,1); F(R2,k+2,y+28,2,1)}
+   for(let i=0;i<60;i++)F('rgba(232,220,192,.35)',x+6+rnd()*(w-12)|0,y+6+rnd()*(h-12)|0,2,1);                                                // worn patches
+   for(let yy=y+1;yy<y+h;yy+=2){F(C,x-2,yy,2,1); F(C,x+w,yy,2,1)}}
   // door + a coir mat
   F('#5a3a22',98,162,28,6); F('#2b1a10',100,164,24,4); F('#b08f5a',100,150,24,10); F('#3a3226',100,150,24,1); F('#3a3226',100,159,24,1); F('#3a3226',100,150,1,10); F('#3a3226',123,150,1,10); for(let x=103;x<121;x+=3)F('#9a7a48',x,152,1,6);
   // a plant in a galvanized pail by the sink... (it sits on the floor at the end of the counter)
@@ -395,10 +406,10 @@ const kitBg=document.createElement('canvas'); kitBg.width=224; kitBg.height=168;
 function drawTable(){
   const F=(c,x,y,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,h)};
   for(const x of [80,136]){F('#26272b',x,104,8,12); F('#3a3b40',x,100,8,4); F('#4a4b52',x,100,8,1); F('#26272b',x,91,8,2); for(const k of [0,2,5,7])F('#26272b',x+k,92,1,9)}   // black spindle-back chairs
-  F('rgba(0,0,0,.18)',87,117,52,2);
-  F('#c9975e',86,100,52,14); for(let x=86;x<138;x+=13)F('#b9874f',x,100,1,14); F('#dcae74',86,100,52,2); F('#9e6d3c',86,113,52,1); F('#f2efe8',86,114,52,2); F('#d6d2c8',86,115,52,1);   // an oak plank top on a white apron
-  F('#f2efe8',88,116,3,5); F('#f2efe8',133,116,3,5); F('#d6d2c8',90,116,1,5); F('#d6d2c8',135,116,1,5);                               // turned white legs
-  F('#e6dfcf',96,100,32,13); F('#d2c9b4',96,100,1,13); F('#d2c9b4',127,100,1,13); F('#8a8f9a',98,100,1,13); F('#8a8f9a',125,100,1,13);   // a linen runner with a grey stripe
+  F('rgba(0,0,0,.2)',90,118,44,2);
+  F('#4a2e1a',109,113,6,6); F('#4a2e1a',98,118,28,2); F('#5e3c22',98,118,28,1);                                                          // the trestle base
+  for(let y=0;y<15;y++){const t=(y-7)/7.5, hw=Math.round(27*Math.sqrt(Math.max(0,1-t*t))); F(y>12?'#5e3c22':'#7a4e2c',112-hw,99+y,hw*2,1); if(y<2)F('#96643c',112-hw,99+y,hw*2,1)}   // an oval top, old dark wood
+  for(const x of [96,104,120,128])F('#6b4426',x,101,1,10);
   F('#fffdf6',104,103,14,8); F('#e8e2d6',104,110,14,1);
   if(!have.baked){F('#c98a5a',107,105,3,3); F('#c98a5a',112,106,3,3)}                // a plate of (empty) promise
   else for(const [cx,cy] of [[106,104],[111,104],[108,106],[113,107],[106,108],[110,101]]){F('#c98a3a',cx,cy,4,3); F('#e0a85a',cx,cy,2,1); F('#5a3220',cx+2,cy+1,1,1); if(have.sprinkles)F('#e54b7a',cx+1,cy+2,1,1)}   // a pile of the real thing
@@ -439,6 +450,11 @@ SCENES.kitchen={ place:KITCHEN.place, music:()=>kit.dance?'jingle':'kitchen',
     const f=.55+.15*Math.sin(time/300)+.08*Math.sin(time/77);
     ctx.fillStyle=`rgba(255,140,40,${f})`; ctx.fillRect(127,38,20,12);
     ctx.fillStyle=`rgba(255,200,90,${f*.6})`; ctx.fillRect(129,41,16,6);
+    // the fire in the fireplace: a few flickering tongues, embers, a warm glow on the hearth and the floor in front
+    const t=time/110; for(let k=0;k<6;k++){const h=4+Math.round(3*Math.abs(Math.sin(t*.7+k*1.9))+2*Math.sin(t*1.3+k)), x=199+k*2;
+      ctx.fillStyle='#e8642a'; ctx.fillRect(x,54-h,2,h); ctx.fillStyle='#f4a03a'; ctx.fillRect(x,54-h+2,2,Math.max(0,h-2)); if(h>5){ctx.fillStyle='#ffe08a'; ctx.fillRect(x,52,1,2)}}
+    ctx.fillStyle=Math.floor(time/200)%2?'#ff8a3a':'#c8322b'; ctx.fillRect(201,56,1,1); ctx.fillRect(207,55,1,1);
+    ctx.fillStyle=`rgba(255,150,60,${.10+.05*Math.sin(time/170)})`; ctx.fillRect(186,58,38,26); ctx.fillRect(194,58,22,36);
   },
   over(){ctx.fillStyle='rgba(255,190,110,.06)'; ctx.fillRect(0,0,224,168);   // warm light
     for(const p of kit.confetti){ctx.fillStyle=p.c; ctx.fillRect(p.x|0,p.y|0,2,2)}
