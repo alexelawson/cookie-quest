@@ -13,7 +13,7 @@ const helpers=()=>{window.T={
      for(const k in dirs)dirs[k]=false; return Math.hypot(x-P.x,y-P.y)<3?'ok':'stuck at '+(P.x|0)+','+(P.y|0)},
   path:(pts)=>{for(const [x,y] of pts){const r=T.walkTo(x,y); if(r!=='ok')return r} return 'ok'},
   hints:[],
-  enter:()=>{P.x=134;P.y=244;update(16.7);action(); if(!$('wardrobe').hidden)$('wardGo').click(); for(let i=0;i<200&&(scene!==SCENES.city||fade.next);i++)update(16.7); T.run(5)},
+  enter:()=>{if(scene!==SCENES.vancouver){goTo('vancouver','fromBridge'); for(let i=0;i<40;i++)update(16.7)} P.x=181;P.y=279;update(16.7);action(); if(!$('wardrobe').hidden)$('wardGo').click(); for(let i=0;i<200&&(scene!==SCENES.city||fade.next);i++)update(16.7); T.run(5)},
 }};
 const BOTS=require('fs').readFileSync(path.join(__dirname,'heist-bots.js'),'utf8').split('if(typeof module')[0];
 const fresh=async()=>{await p.goto(URL);await p.evaluate(()=>localStorage.clear());await p.reload();await p.click('#startBtn'); await p.evaluate(()=>skipWelcome());await p.evaluate(helpers); await p.addScriptTag({content:BOTS})};

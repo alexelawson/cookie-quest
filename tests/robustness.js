@@ -78,7 +78,7 @@ for(const [vpName,vp,touch] of [['desktop',{width:1280,height:800}],['phone',{wi
 // E. round trips through every door: no errors, right music, exits don't bounce you straight back
 {const p=await page(); await fresh(p,{...ALL,heistBriefed:true,heistHowTo:true,fargoIntro:true,birkieHowTo:true});
   const r=await p.evaluate(async()=>{const T=(n)=>{for(let i=0;i<n;i++)update(16.7)}; const out=[];
-    const trips=[['kitchen','fromDoor','world',()=>{P.x=112;P.y=162}],['golf','fromRoad','world',()=>{P.x=112;P.y=164}],['fargo','fromHighway','world',()=>{P.x=3;P.y=180}],['city','fromStreet','world',()=>{P.x=20;P.y=172}]];
+    const trips=[['kitchen','fromDoor','world',()=>{P.x=112;P.y=162}],['golf','fromRoad','world',()=>{P.x=112;P.y=164}],['fargo','fromHighway','world',()=>{P.x=3;P.y=180}],['city','fromStreet','vancouver',()=>{P.x=20;P.y=172}],['vancouver','fromBridge','world',()=>{P.x=144;P.y=5}]];
     for(let k=0;k<3;k++)for(const [s,e,back,walk] of trips){ goTo(s,e); T(40); while(!dlg.hidden)[...$('dbtns').querySelectorAll('button')][0].click(); $('howto').hidden=true; paused=false;
       const there=scene===SCENES[s]; T(30); const stayed=scene===SCENES[s]; const music=song; walk(); T(40); out.push(there&&stayed&&scene===SCENES[back]?'':`${s}: there ${there} stayed ${stayed} back ${scene===SCENES[back]}`); }
     return out.filter(Boolean)});

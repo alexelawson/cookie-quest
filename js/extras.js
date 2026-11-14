@@ -12,7 +12,8 @@ const EXITS={
   golf:   [{z:R(96,160,32,8),  mark:{x:112,y:160,dir:'down'}, when:()=>!golf.active, go:()=>goTo('world','fromGolf')}],
   fargo:  [{z:R(0,166,6,28),   when:()=>!fargo.onFoot,   // (no arrow here: the LEAVE FARGO highway sign points the way)
            go:()=>goTo('world','fromFargo')}],
-  city:   [{z:LADDER,          mark:{x:21,y:170,dir:'down'}, go:()=>goTo('world','fromCity')}],
+  city:   [{z:LADDER,          mark:{x:21,y:170,dir:'down'}, go:()=>goTo('vancouver','fromRoof')}],   // down the ladder: back on the street by the elevator
+  vancouver:[{z:R(134,0,20,7), go:()=>goTo('world','fromVancouver')}],                                       // back north over the bridge
 };
 let exitArmed=false;   // you have to step out of an exit before it works (so arriving next to one doesn't bounce you out)
 const sceneName=()=>Object.keys(SCENES).find(k=>SCENES[k]===scene);
@@ -120,8 +121,8 @@ function drawGear(c,g=ctx,look=null){
   }
 }
 
-// ---------- crabs on the Vancouver beaches: they scuttle sideways and wave their claws ----------
-const CRABS=[[44,241,1.7],[108,261,2.4]];   // [x, y, phase]
+// ---------- crabs on the Vancouver beaches (see vancouver.js): they scuttle sideways and wave their claws ----------
+// (they live on the beaches in vancouver.js)
 function drawCrab(x,y,ph){
   const F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(Math.round(x+dx),Math.round(y+dy),w,h)}, claw=Math.floor(time/260+ph*3)%2;
   F('rgba(0,0,0,.2)',-3,1,7,1);
@@ -130,8 +131,6 @@ function drawCrab(x,y,ph){
   F('#d9452f',-4,-3-claw,2,2); F('#d9452f',3,-3-claw,2,2);                                   // claws, waving
   F('#a8322a',-3,0,1,1); F('#a8322a',3,0,1,1); F('#a8322a',-3,1,1,1); F('#a8322a',3,1,1,1);  // legs
 }
-{const ents=SCENES.world.ents; SCENES.world.ents=function(list){ ents.call(this,list);
-  for(const [cx,cy,ph] of CRABS){ const x=cx+Math.sin(time/900+ph)*6, y=cy; list.push({y,draw:()=>drawCrab(x,y,ph)}) } }}
 
 // ---------- a few fun little things: ducks paddling on Brian's pond, a snowman by the Birkie lot ----------
 function drawDuck(x,y,flip,ph){

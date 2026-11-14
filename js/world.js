@@ -7,7 +7,6 @@ const REG={farm:R(0,0,164,144), mill:R(220,0,164,144), city:R(0,170,164,118), fa
 const trees=[[172,30],[172,64],[214,228],[270,154]];
 // snowy pines around the Birkie trailhead, dark pines in Wylee Woods (the disc golf entrance)
 const pines=[[228,14],[244,30],[262,12],[284,26],[232,52],[268,48],[290,62],[352,10],[372,24],[358,44],[378,62],[346,30],[236,74]];
-const cedars=[[62,224]];   // mossy cedars in the city
 const woods=[[168,250],[176,240],[171,270],[166,284],[217,262],[211,282],[218,242]];
 const solids=[
   R(20,30,56,44),                                            // barn
@@ -19,15 +18,14 @@ const solids=[
   R(178,282,4,4),R(201,282,4,4),                             // Wylee Woods arch posts
   R(166,98,52,42),                                           // farmhouse (your kitchen)
   R(108,16,52,30),                                           // Brian's pond (he's out in his boat)
-  R(67,204,3,3),R(103,258,3,3),                              // city streetlamps
-  R(8,178,40,52),R(110,184,48,56),R(0,244,72,44),R(72,264,92,24),R(94,224,6,4),   // city towers, the ocean, the steam clock
+  R(0,170,70,118),R(86,170,78,118),R(70,250,16,38),            // Burrard Inlet, either side of the Lions Gate Bridge (and the far end of the bridge)
   R(222,184,162,66),R(259,170,22,12),R(230,258,130,10),                              // downtown Fargo's buildings, the CR-V, the parked cars
-  ...[...trees,...pines,...woods,...cedars].map(([x,y])=>R(x-3,y-3,6,4)),
+  ...[...trees,...pines,...woods].map(([x,y])=>R(x-3,y-3,6,4)),
 ];
 const triggers=[
   {z:R(320,70,24,18),  label:'Talk to John', btn:'Talk', act:()=>talkJohn()},
   {z:R(86,36,26,16),   label:'Talk to Brian', btn:'Talk', act:()=>talkBrian()},
-  {z:R(124,240,20,12), label:'Take the elevator up', act:()=>openWardrobe(()=>{ heist.outfitReact=true; goTo('city','fromStreet') })},
+  {z:R(70,214,16,38), label:VANCOUVER.cross, act:()=>goTo('vancouver','fromBridge')},   // out on the Lions Gate Bridge: across to Stanley Park and the city
   {z:R(256,160,28,10), label:'Drive into Fargo',   act:()=>goTo('fargo','fromHighway')},   // the CR-V, parked on the sidewalk side, a step off the road
   {z:R(182,142,20,10), label:'Enter your kitchen', act:()=>goTo('kitchen','fromDoor')},
   {z:R(184,276,16,10), label:'Go to the disc golf course', act:()=>goTo('golf','fromRoad')},
@@ -118,60 +116,24 @@ const bg=document.createElement('canvas'); bg.width=WW; bg.height=WH;
   const car=(x,y,c,rack)=>{F('rgba(0,0,0,.25)',x+1,y+14,10,2); F(c,x,y,10,15); F('rgba(255,255,255,.18)',x,y,2,15); F('rgba(0,0,0,.18)',x+8,y,2,15); F('#9fc4dc',x+1,y+2,8,3); F('#cfe4f0',x+1,y+2,3,1); F('#9fc4dc',x+1,y+11,8,2); F('#ffffff',x,y,10,1); F('#1d1d22',x-1,y+3,1,3); F('#1d1d22',x+10,y+3,1,3); F('#1d1d22',x-1,y+10,1,3); F('#1d1d22',x+10,y+10,1,3);
     if(rack){F('#2b2b2b',x+1,y+5,8,1); F('#2b2b2b',x+1,y+9,8,1); F('#c8322b',x+2,y+5,1,5); F('#ffc62f',x+5,y+5,1,5); F('#2f6db0',x+7,y+5,1,5)} else {F('#1d1d22',x+2,y+5,6,5); F('#3a3f4a',x+2,y+5,6,1)} };   // skis on the roof rack, or a cargo box
   car(237,90,'#2f6b36',true); car(261,90,'#2f6db0',false); car(273,124,'#8a8f9a',true);
-  // city (Vancouver, in the rain): the "City of Glass". Glass condo towers with green roofs, the Harbour Centre lookout pod,
-  // Gastown's red-brick sidewalk and steam clock, a green bike lane, the beach, Canada Place's five white sails, Stanley Park
-  // (seawall, totem poles, the red-and-white Brockton Point lighthouse), freighters in the bay and the North Shore mountains.
-  F('#3a4055',0,170,164,118); F('#4a5064',0,168,164,2); F('#4a5064',164,168,2,68); F('#5a6278',0,168,164,1);   // a curb all the way round
-  for(let x=0;x<164;x+=8)F('#343a4e',x,170,1,118); for(let y=172;y<288;y+=8)F('#343a4e',0,y,164,1);                // paving slabs
-  for(let i=0;i<70;i++)F('#464d66',rnd()*164|0,170+rnd()*118|0,4,1);                                              // wet sheen
-  for(let i=0;i<40;i++)F('#2e3346',rnd()*164|0,170+rnd()*118|0,3,1);
-  // Gastown: a red-brick sidewalk (herringbone) down the east side of the street, where the steam clock stands
-  F('#7a4a42',90,170,20,74); for(let y=170;y<244;y+=2)for(let x=90+(y/2%2?0:2);x<110;x+=4)F('#693c36',x,y,2,1); for(let i=0;i<50;i++)F('#8a5a50',90+rnd()*20|0,170+rnd()*74|0,2,1);
-  F('#5a6278',90,170,1,74); F('#5a322e',109,170,1,74);
-  const tower=(b,base,dark,line,shine)=>{
-    F('rgba(0,0,0,.28)',b.x+3,b.y+b.h,b.w,3);                                                                         // its shadow on the pavement
-    F(base,b.x,b.y,b.w,b.h); F(dark,b.x+b.w-8,b.y,8,b.h);                                                             // the front, and a shaded side
-    for(let y=b.y+3;y<b.y+b.h-8;y+=4)F(line,b.x,y,b.w,1); for(let x=b.x+4;x<b.x+b.w-8;x+=5)F(line,x,b.y,1,b.h-8);     // floors + mullions
-    for(let k=0;k<b.h-8;k++){const x=b.x+b.w-14-Math.floor(k*.6); if(x>b.x)F(shine,x,b.y+k,2,1)}                      // a reflection streak
-    for(let y=b.y+4;y<b.y+b.h-10;y+=4){for(let x=b.x+1;x<b.x+b.w-11;x+=5)if(rnd()<.42)F(rnd()<.8?'#f3d27a':'#ffb3d0',x,y,3,2);   // lit windows (a few catch the pink sunset)
-      F('rgba(225,245,255,.42)',b.x+b.w-8,y+1,7,1); F('rgba(0,0,0,.25)',b.x+b.w-8,y+2,7,1); if(rnd()<.3)F('#f3d27a',b.x+b.w-6,y-1,3,2)}   // glass balconies up the side
-    F('rgba(255,255,255,.22)',b.x,b.y,1,b.h); F('rgba(255,255,255,.3)',b.x,b.y,b.w,1)};
-  // a teal glass condo tower with a green roof garden
-  {const b=R(8,178,40,52); F('#1d3a42',b.x-1,b.y-5,b.w+2,6); F('#3d6b3a',b.x+2,b.y-5,b.w-4,4);
-    for(let x=b.x+4;x<b.x+b.w-4;x+=7){F('#4f8a45',x,b.y-6,4,3); F('#62a356',x+1,b.y-6,2,1)}
-    tower(b,'#2f7a76','#235c5a','#27635f','#8fe0d2'); F('#1d2a30',b.x+10,b.y+b.h-10,20,10); F('#ffe9a8',b.x+12,b.y+b.h-8,16,8); F('#d9c27a',b.x+19,b.y+b.h-8,1,8); F('#9aa3b2',b.x+9,b.y+b.h-11,22,1)}   // glowing lobby under a canopy
-  // the tall blue one is Harbour Centre: the round lookout pod on top, and an elevator lobby (the way up to the rooftops)
-  {const b=R(110,184,48,56);
-    tower(b,'#2c6a8a','#22506c','#255a76','#8ccff0');
-    F('#1c2c44',b.x-1,b.y-2,b.w+2,3);
-    F('#7d8694',127,181,14,3); F('#9aa3b2',123,179,22,2);                                                             // the pod's stem and underside
-    F('#c9ced8',116,174,36,5); F('#e2e6ee',118,173,32,1); F('#9aa3b2',116,178,36,1); F('#e9edf3',121,171,26,2);       // the lookout: a wide disc
-    for(let x=117;x<151;x+=2)F('#ffe9a8',x,176,1,1); F('#3a4a62',116,175,36,1);                                       // a ring of windows, all lit
-    F('#ffe9a8',126,b.y+b.h-10,16,10); F('#d9c27a',134,b.y+b.h-10,1,10); F('#9aa3b2',125,b.y+b.h-11,18,1);
-    for(let k=0;k<20;k++)F(k%4<2?'#c8322b':'#f2efe6',124+k,b.y+b.h-14,1,4); F('#8a1f1a',124,b.y+b.h-10,20,1);           // a striped awning over the lobby
-    F('#1d2130',123,b.y+b.h-22,35,7); pixText(g,'ELEVATOR',124,b.y+b.h-21,'#7fe8ff');                  // a glowing ELEVATOR sign
-    F('#8a1f1a',128,b.y+b.h,12,4)}                                                                                     // and a red carpet out front
-  // moss: in the sidewalk cracks and along the curbs
-  for(let i=0;i<90;i++){const x=rnd()*164|0, y=170+rnd()*90|0; if(x>=90&&x<110)continue; F(rnd()<.5?'#3a5e36':'#4a7442',x,y,1+(rnd()*2|0),1)}
-  for(let x=0;x<70;x+=3)F(rnd()<.5?'#3a5e36':'#4a7442',x,231,2,1);
-  // the beach (driftwood logs to sit against, like English Bay), the harbour, and the North Shore mountains across the water
-  F('#d8c69a',0,232,72,12); F('#d8c69a',72,256,92,8); for(let i=0;i<90;i++)F(rnd()<.5?'#c4b184':'#e6d6ae',rnd()*164|0,232+rnd()*32|0,1,1);
-  F('#b8a57a',0,232,72,1);
-  for(const [x,y,w] of [[6,236,16],[30,239,12],[50,235,14],[92,259,14]]){F('rgba(0,0,0,.18)',x+1,y+2,w,1); F('#8a7458',x,y,w,2); F('#b39c78',x,y,w,1); F('#6b5a44',x+w-1,y,1,2); F('#d8c8a8',x,y,1,2); F('#6b5a44',x+4,y,1,1)}   // driftwood
-  F('#2b4a86',0,244,72,44); F('#2b4a86',72,264,92,24); F('#f2e6ee',0,244,72,1); F('#f2e6ee',72,264,92,1); F('#8fb0d8',0,245,72,1); F('#8fb0d8',72,265,92,1);   // the harbour, little waves at the shore
-  for(let i=0;i<90;i++){const x=rnd()*164|0, y=247+rnd()*30|0; if(x>=72&&y<267)continue; F(['#3a5c9c','#c86a9a','#f3c46a','#5a7cc0'][i%4],x,y,i%4===2?2:5,1)}   // pink and gold sunset light on the water
-  // Stanley Park: a forested point in the bottom corner, ringed by the seawall, with the totem poles and the red-and-white lighthouse
-  {F('#b9b2a6',0,252,34,36); F('#ded8cc',0,253,33,1); F('#ded8cc',32,253,1,35); F('#2f5a36',0,255,31,33); F('#3d7044',2,256,26,30);
-   for(const [tx,ty] of [[4,258],[11,256],[18,259],[25,258],[6,266],[14,264],[8,274],[4,282],[13,281]]){F('#1f4a2c',tx-3,ty,7,5); F('#2f6b3a',tx-2,ty-1,5,4); F('#4a8a52',tx-1,ty,2,1)}
-   F('#5d9a58',18,268,12,10); F('#6aa862',19,269,10,8);                                                                // a clearing for the totem poles
-   for(const [tx,c] of [[20,'#c8322b'],[24,'#2f8a8a'],[28,'#c8322b']]){F('rgba(0,0,0,.25)',tx+1,276,2,1); F('#7a4a2a',tx,268,2,8); F('#3a2418',tx,270,2,1); F('#f2efe6',tx,272,2,1); F(c,tx,274,2,1); F(c,tx-1,269,4,1); F('#1d1d22',tx,268,2,1)}
-   F('#f2efe6',28,259,4,9); F('#c8322b',28,263,4,2); F('#c8322b',28,258,4,2); F('#1d1d22',29,257,2,1); F('#ffe9a8',29,259,2,1); F('#8a8478',27,268,6,1)}
-  for(let x=0;x<164;x++){const lion=Math.max(0,5-Math.abs(x-98)*2,5-Math.abs(x-104)*2), h=6+Math.round(5*Math.sin(x/9)+3*Math.sin(x/4.3+1))+lion; F('#3a4a62',x,288-h,1,h); if(h>9)F('#e8eef4',x,288-h,1,2+(lion>2))}   // mountains (the twin peaks are the Lions)
-  for(let x=0;x<164;x+=2){const h=3+Math.round(2*Math.sin(x/5)); F('#2b3a50',x,288-h,2,h)}
-  for(let k=0;k<5;k++)F('#ffe9a8',60+k*2,283-k,1,1);                                                                    // the ski hill's lights on Grouse
-  F('rgba(200,210,225,.18)',0,276,164,4);   // mist
-  // the green bike lane next to the street
-  F('#3f8a4a',86,170,4,74); F('#e8eef0',86,170,1,74); for(let y=180;y<240;y+=22){F('#e8eef0',87,y,2,1); F('#e8eef0',87,y+2,1,2); F('#e8eef0',89,y+2,1,2)}
+  // Vancouver's corner: Burrard Inlet at dusk. The Lions Gate Bridge runs south from the road, over the water, to Stanley Park on the far shore.
+  F('#2b4a86',0,170,164,118); F('#4a5064',0,168,164,2); F('#5a6278',0,168,164,1); F('#4a5064',164,168,2,68);
+  for(let x=0;x<164;x+=3){const h=2+(rnd()*3|0); F(rnd()<.5?'#8a8478':'#6f6a60',x,170,3,h); F('#a8a296',x,170,2,1)}                 // a rocky north shore
+  F('#8fb0d8',0,175,164,1);
+  for(let i=0;i<150;i++){const x=rnd()*164|0, y=178+rnd()*88|0; F(['#3a5c9c','#c86a9a','#f3c46a','#5a7cc0','#24407a'][i%5],x,y,i%5===2?2:5,1)}   // pink and gold sunset light on the water
+  // the far shore: Stanley Park's seawall and a wall of cedars
+  F('#b9b2a6',0,266,164,3); F('#ded8cc',0,266,164,1); F('#2f5a36',0,269,164,19);
+  for(let y=269;y<288;y+=5)for(let x=-4;x<166;x+=6){const ox=x+((y/5|0)%2)*3+(rnd()*3|0)-1, oy=y+(rnd()*3|0)-1, d=rnd()<.5; if(ox>64&&ox<88)continue; F('#16381f',ox,oy+1,8,7); F(d?'#1f4a2c':'#24532c',ox,oy,8,7); F(d?'#2f6b3a':'#2b6034',ox+1,oy,6,5); F('#3d8443',ox+1,oy+1,3,2)}
+  F('#3a3f4a',70,268,16,20); for(let y=270;y<288;y+=7){F('#d9d9d0',75,y,1,4); F('#d9d9d0',80,y,1,4)}                                    // the causeway carries on into the trees
+  F('#f2efe6',148,258,4,9); F('#c8322b',148,262,4,2); F('#c8322b',148,257,4,2); F('#1d1d22',149,256,2,1); F('#ffe9a8',149,258,2,1);   // the Brockton Point lighthouse
+  // the bridge deck: three lanes, green railings, concrete piers under the two towers
+  F('rgba(10,20,50,.35)',88,172,5,94);                                                                                            // its shadow on the water
+  for(const ty of [198,240]){F('#8a8478',62,ty-2,32,9); F('#a8a296',62,ty-2,32,1); F('#6f6a60',62,ty+6,32,1)}
+  F('#3a3f4a',70,164,16,104); for(let i=0;i<60;i++)F(rnd()<.5?'#343944':'#424854',70+rnd()*16|0,164+rnd()*104|0,2,1);
+  for(let y=166;y<268;y+=7){F('#d9d9d0',75,y,1,4); F('#d9d9d0',80,y,1,4)}
+  F('#2f7a4a',68,164,2,104); F('#4f9a68',68,164,1,104); F('#2f7a4a',86,164,2,104); F('#1f5a36',87,164,1,104);
+  for(let y=166;y<268;y+=4){F('#1f5a36',68,y,2,1); F('#1f5a36',86,y,2,1)}
+  F('#c9a46b',70,160,16,5);                                                                                                       // where it meets the road
   // fargo: downtown Broadway, like the real thing. A brick sidewalk along the main road (the CR-V is parked there: that's the way in),
   // then a row of old brick buildings facing you: a tan one with balconies, the Fargo Theatre in the middle (red brick, a row of
   // arched windows, the teal FARGO marquee), and brick storefronts with green awnings.
@@ -233,16 +195,6 @@ const bg=document.createElement('canvas'); bg.width=WW; bg.height=WH;
   // the cupcake trail: a narrow trodden track that peels off the barn path and sneaks round behind the barn
   const track=(x,y,w,h)=>F('#c2b07a',x,y,w,h);
   track(12,98,31,3); track(10,22,3,79); track(10,20,34,3);
-  // city streets: wet asphalt, dashed lines, puddles reflecting the lights, a manhole (it steams)
-  F('#22252f',72,164,12,92); F('#22252f',72,244,72,12); F('#6a7088',71,164,1,80); F('#6a7088',84,164,1,80);
-  for(let x=71;x<86;x+=3)F('#e8e8e0',x,152,2,10);                                                                   // a crosswalk on the main road
-  for(let y=168;y<244;y+=8)F('#c9a640',77,y,2,4); for(let x=88;x<144;x+=8)F('#c9a640',x,249,4,2);
-  for(const [x,y,w] of [[74,186,8],[96,252,12],[74,232,6]]){F('#2e3a55',x,y,w,3); F('#f3d27a',x+2,y+1,w-5,1)}
-  F('#14161f',75,214,6,4); F('#30343f',76,215,4,2);
-  // Canada Place: the pier with its five white sails
-  {const x=114,y=263; F('rgba(0,0,0,.25)',x,y+1,48,2); F('#aab2c0',x,y-4,48,5); F('#d6dbe4',x,y-4,48,1); for(let k=x+2;k<x+48;k+=4)F('#5a6a84',k,y-2,2,1);
-    for(let k=0;k<5;k++){const sx=x+2+k*9; for(let r=0;r<8;r++){const w=1+r; F('#ffffff',sx+4-Math.ceil(w/2),y-12+r,w,1); F('#b4bccb',sx+4+Math.floor(w/2),y-12+r,1,1)} F('#8a93a4',sx+4,y-13,1,1)}
-    F('#c8322b',x+46,y-9,1,5); F('#f2efe6',x+47,y-9,2,2); F('#c8322b',x+47,y-9,1,2)}                                    // and a little flag
   // Wylee Woods: forest floor around the end of the south road (the arch itself is a sprite)
   F('#3f6b3a',164,236,56,52); for(let i=0;i<160;i++)F(rnd()<.5?'#355c31':'#4d7d45',164+rnd()*56|0,236+rnd()*52|0,1,1);
   for(let i=0;i<30;i++)F('#7a5a3a',164+rnd()*56|0,236+rnd()*52|0,1,1);
@@ -381,8 +333,8 @@ const birkArch=archSprite(52,30,g=>{const F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRe
   pixText(g,'AMERICAN',9,5,'#ffffff'); pixText(g,'BIRKEBEINER',4,11,'#ffffff')});
 // The Gastown steam clock: a bronze case with glass sides (you can see the ball-chain works inside), four clock faces under a
 // little roof, and five steam whistles on top: one big, four small. It puffs every few seconds (the real one: every quarter hour).
-function drawSteamClock(){
-  const x=93,y=228, F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x+dx,y+dy,w,h)};
+function drawSteamClock(x=93,y=228){
+  const F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x+dx,y+dy,w,h)};
   F('rgba(0,0,0,.3)',0,0,10,2);
   F('#3a2a1c',-1,-3,10,3); F('#5a4028',0,-5,8,2); F('#8a6a3a',-1,-3,10,1);                               // the plinth
   F('#5a4028',1,-21,6,16); F('#22303a',2,-20,4,14); F('#3d5560',2,-20,1,14);                               // the case, glass sides
@@ -422,7 +374,7 @@ const yurt=archSprite(36,32,g=>{const F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x
 const SCENES={};
 SCENES.world={ music:()=>farm.active?'chase':'world',
   w:WW, h:WH, bounds:R(2,10,WW-4,WH-12), bg, solids, triggers,
-  entries:{start:{x:192,y:156,dir:'down'}, fromKitchen:{x:192,y:157,dir:'down'}, fromCity:{x:134,y:256,dir:'down'}, fromFargo:{x:270,y:158,dir:'down'}, fromGolf:{x:192,y:266,dir:'up'}, fromMill:{x:316,y:92,dir:'down'}},
+  entries:{start:{x:192,y:156,dir:'down'}, fromKitchen:{x:192,y:157,dir:'down'}, fromCity:{x:78,y:216,dir:'up'}, fromVancouver:{x:78,y:216,dir:'up'}, fromFargo:{x:270,y:158,dir:'down'}, fromGolf:{x:192,y:266,dir:'up'}, fromMill:{x:316,y:92,dir:'down'}},
   hud:()=>farmHud(),
   dynTrigger:()=>farmTrigger(),
   ambient(dt){
@@ -441,37 +393,39 @@ SCENES.world={ music:()=>farm.active?'chase':'world',
     list.push({y:-99,draw:drawCupcake});   // the cupcake peeking over the barn roof (drawn first so the barn covers its bottom)   // Brian fishing in his boat on the pond (outlined like everyone else)   // Christmas trees (extras.js)
 
     pines.forEach(([x,y],i)=>list.push({y,draw:()=>drawPine(x,y,i%3===1?birchSprite:snowPine)}));   // every third one's a birch
-    list.push({y:228,draw:drawSteamClock});
-    cedars.forEach(([x,y])=>list.push({y,draw:()=>drawPine(x,y,mossCedar)})); woods.forEach(([x,y])=>list.push({y,draw:()=>drawPine(x,y,darkPine)}));
+    woods.forEach(([x,y])=>list.push({y,draw:()=>drawPine(x,y,darkPine)}));
     list.push({y:67,draw:()=>ctx.drawImage(birkArch,290,38)}); list.push({y:286,draw:()=>ctx.drawImage(woodsArch,176,254)});
     list.push({y:124,draw:()=>ctx.drawImage(yurt,336,94)}); list.push({y:81,draw:()=>drawTrailJohn(331,81,trailJohnDir())}); list.push({y:-98,flat:true,draw:()=>ctx.drawImage(siloSprite,66,3)}); list.push({y:74,draw:drawBarn}); farmEntities(list)},
   over(){
     farmOverlay();
     drawFargoTop();
-    ctx.save(); ctx.beginPath(); ctx.rect(0,170,164,118); ctx.clip();                                        // city: dark, rain, searchlight
-    {const gr=ctx.createLinearGradient(0,170,0,288); gr.addColorStop(0,'rgba(255,140,170,.2)'); gr.addColorStop(.45,'rgba(190,110,210,.13)'); gr.addColorStop(1,'rgba(70,90,190,.1)'); ctx.fillStyle=gr; ctx.fillRect(0,170,164,118)}   // Vancouver at sunset
-    drawMarina();
-    ctx.fillStyle='rgba(200,210,240,.36)'; for(const r of rain)ctx.fillRect(Math.round(r.x),Math.round(r.y),1,3);   // it's always raining in Vancouver
-    for(const [x,y] of [[68,206],[104,260]]){ctx.fillStyle='#4a4f60'; ctx.fillRect(x,y-16,1,16); ctx.fillRect(x-1,y-17,4,1); ctx.fillStyle='#ffe9a8'; ctx.fillRect(x+1,y-16,2,2);   // streetlamps
-      const gr=ctx.createRadialGradient(x+2,y-8,1,x+2,y-4,20); gr.addColorStop(0,'rgba(255,225,150,.32)'); gr.addColorStop(1,'rgba(255,225,150,0)'); ctx.fillStyle=gr; ctx.fillRect(x-20,y-28,44,40)}
-    // rain rings on the water, and the little rainbow ferry going back and forth
-    ctx.fillStyle='rgba(170,200,230,.45)'; for(let i=0;i<14;i++){const k=Math.floor(time/500+i*.37), ph=((time/500+i*.37)%1), rx=(i*23+k*17)%160+2, ry=(rx<72?248:268)+(i*13+k*7)%8, r=1+ph*3; ctx.fillRect(rx-r,ry,r*2,1)}
-    // the freighters anchored out in the bay (they're always there)
-    const ship=(x,y,len,cols)=>{const b=Math.round(Math.sin(time/1400+x)*.6); ctx.fillStyle='rgba(0,0,0,.25)'; ctx.fillRect(x+1,y+6+b,len,2);
-      ctx.fillStyle='#2b2f3a'; ctx.fillRect(x,y+1+b,len,5); ctx.fillStyle='#8a2a22'; ctx.fillRect(x+1,y+5+b,len-2,1); ctx.fillRect(x+len,y+3+b,1,2);
-      cols.forEach((c,i)=>{ctx.fillStyle=c; ctx.fillRect(x+3+i*4,y-2+b,4,3)});
-      ctx.fillStyle='#e8eef0'; ctx.fillRect(x+len-7,y-5+b,5,6); ctx.fillStyle='#ffe9a8'; ctx.fillRect(x+len-6,y-4+b,1,1); ctx.fillRect(x+len-4,y-4+b,1,1);
-      if(Math.floor(time/900+x)%2){ctx.fillStyle='#ff3b3b'; ctx.fillRect(x+len-5,y-7+b,1,1)}
-      const XC=['#e54b4b','#f4d35e','#5fa8e8','#7fd39a']; for(let k=0;k<=len;k+=3){const yy=k<len-7?y-3-Math.round(Math.sin(k/len*Math.PI)*3):y-6; ctx.fillStyle=XC[(k/3+Math.floor(time/350))%4]; ctx.fillRect(x+k,yy+b,1,1)}   // Christmas lights strung bow to stern
-      ctx.fillStyle='rgba(243,196,106,.35)'; for(let k=2;k<len;k+=6)ctx.fillRect(x+k,y+8+b,1,2+(Math.floor(time/300+k)%2))};   // their lights on the water
-    ship(36,252,34,['#c8322b','#2f6db0','#e8a020','#2f8a4a','#c8322b','#5fa8e8']); ship(122,270,40,['#2f8a4a','#e8a020','#c8322b','#2f6db0','#e8a020','#8a5a9a','#2f6db0']);
-    {const bx=Math.round(38+(Math.sin(time/5000)+1)*8), by=268; ctx.fillStyle='rgba(0,0,0,.25)'; ctx.fillRect(bx,by+5,14,2); ctx.fillStyle='#f2efe6'; ctx.fillRect(bx,by,14,5);
-      ['#e54b4b','#f4a03a','#f4d35e','#4fbf73','#5fa8e8'].forEach((c,i)=>{ctx.fillStyle=c; ctx.fillRect(bx+2+i*2,by-2,2,2)}); ctx.fillStyle='#ffe9a8'; ctx.fillRect(bx+3,by+1,8,1)}
-    drawLionsGate();
-    ctx.fillStyle='#c9ced8'; ctx.fillRect(134,170,1,2); if(Math.floor(time/700)%2){ctx.fillStyle='#ff3b3b'; ctx.fillRect(133,170,3,1)}   // antenna
+    ctx.save(); ctx.beginPath(); ctx.rect(0,164,164,124); ctx.clip();                                        // Vancouver's corner: dusk, rain, boats, the bridge towers
+    const F=(c,x,y,w,h)=>{ctx.fillStyle=c;ctx.fillRect(Math.round(x),Math.round(y),w,h)};
+    // rain rings on the water
+    ctx.fillStyle='rgba(170,200,230,.45)'; for(let i=0;i<16;i++){const k=Math.floor(time/500+i*.37), ph=((time/500+i*.37)%1), rx=(i*23+k*17)%160+2, ry=180+(i*13+k*7)%80, r=1+ph*3; if(rx>64&&rx<92)continue; ctx.fillRect(rx-r,ry,r*2,1)}
+    // the freighters anchored out in the inlet (they're always there), strung with Christmas lights
+    const ship=(x,y,len,cols)=>{const b=Math.round(Math.sin(time/1400+x)*.6); F('rgba(0,0,0,.25)',x+1,y+6+b,len,2);
+      F('#2b2f3a',x,y+1+b,len,5); F('#8a2a22',x+1,y+5+b,len-2,1); F('#8a2a22',x+len,y+3+b,1,2);
+      cols.forEach((c,i)=>F(c,x+3+i*4,y-2+b,4,3));
+      F('#e8eef0',x+len-7,y-5+b,5,6); F('#ffe9a8',x+len-6,y-4+b,1,1); F('#ffe9a8',x+len-4,y-4+b,1,1);
+      if(Math.floor(time/900+x)%2)F('#ff3b3b',x+len-5,y-7+b,1,1);
+      const XC=['#e54b4b','#f4d35e','#5fa8e8','#7fd39a']; for(let k=0;k<=len;k+=3){const yy=k<len-7?y-3-Math.round(Math.sin(k/len*Math.PI)*3):y-6; F(XC[(k/3+Math.floor(time/350))%4],x+k,yy+b,1,1)}
+      ctx.fillStyle='rgba(243,196,106,.35)'; for(let k=2;k<len;k+=6)ctx.fillRect(x+k,y+8+b,1,2+(Math.floor(time/300+k)%2))};
+    ship(14,204,36,['#c8322b','#2f6db0','#e8a020','#2f8a4a','#c8322b','#5fa8e8']); ship(108,232,40,['#2f8a4a','#e8a020','#c8322b','#2f6db0','#e8a020','#8a5a9a','#2f6db0']);
+    {const bx=Math.round(104+(Math.sin(time/6000)+1)*18), by=190; F('rgba(0,0,0,.25)',bx,by+5,14,2); F('#f2efe6',bx,by,14,5); F('#2f6db0',bx,by+3,14,1); F('#ffe9a8',bx+2,by+1,10,1); F('rgba(255,255,255,.5)',bx-3,by+4,3,1)}   // the SeaBus, going back and forth
+    {const kx=30+Math.sin(time/4000)*8, ky=246; F('#e8a020',kx,ky,7,2); F('#f0c6a0',kx+3,ky-2,1,2); F('#c8322b',kx+3,ky-1,1,1); F('#3a3f4a',kx+1+(Math.floor(time/400)%2)*4,ky-1,1,3)}       // somebody out in a kayak
+    // the two bridge towers (you walk under them): green steel portals with cross-bracing, aircraft lights on top
+    for(const ty of [198,240]){ for(const tx of [66,88]){F('#2f7a4a',tx,ty-22,3,26); F('#4f9a68',tx,ty-22,1,26); F('#1f5a36',tx+2,ty-22,1,26)}
+      F('#2f7a4a',66,ty-22,25,2); F('#4f9a68',66,ty-22,25,1); F('#2f7a4a',69,ty-12,19,2); for(let k=0;k<9;k++){F('#2f7a4a',69+k*2,ty-20+k,2,1); F('#2f7a4a',86-k*2,ty-20+k,2,1)}
+      if(Math.floor(time/900)%2){F('#ff3b3b',67,ty-23,1,1); F('#ff3b3b',89,ty-23,1,1)} }
+    // the main cables, sagging between the towers, with their necklace of lights
+    const cable=(x,y0,y1,sag)=>{ for(let y=y0;y<=y1;y++){const k=(y-y0)/(y1-y0), dx=Math.round(sag*4*k*(1-k)); F('#5f8a6e',x+dx,y,1,1); if((y-y0)%5===2)F(Math.floor(time/400+y)%4?'#fff3c4':'#ffffff',x+dx,y,1,1)} };
+    for(const [x,sg] of [[66,3],[90,-3]]){ cable(x,176,164,0); cable(x,176,218,sg); cable(x,218,268,sg*.6) }
     if(have.city){ // the cookie signal, up on the clouds
-      ctx.fillStyle='rgba(255,240,180,.22)'; ctx.beginPath(); ctx.ellipse(46,184,16,9,0,0,Math.PI*2); ctx.fill();
-      ctx.fillStyle='rgba(30,22,16,.55)'; ctx.beginPath(); ctx.arc(46,184,6,0,Math.PI*2); ctx.fill(); ctx.fillStyle='rgba(255,240,180,.5)'; ctx.fillRect(43,182,2,2); ctx.fillRect(48,185,2,2); ctx.fillRect(45,187,1,1)}
+      ctx.fillStyle='rgba(255,240,180,.22)'; ctx.beginPath(); ctx.ellipse(126,196,16,9,0,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='rgba(30,22,16,.55)'; ctx.beginPath(); ctx.arc(126,196,6,0,Math.PI*2); ctx.fill(); ctx.fillStyle='rgba(255,240,180,.5)'; ctx.fillRect(123,194,2,2); ctx.fillRect(128,197,2,2); ctx.fillRect(125,199,1,1)}
+    {const gr=ctx.createLinearGradient(0,170,0,288); gr.addColorStop(0,'rgba(255,140,170,.2)'); gr.addColorStop(.45,'rgba(190,110,210,.13)'); gr.addColorStop(1,'rgba(70,90,190,.1)'); ctx.fillStyle=gr; ctx.fillRect(0,170,164,118)}   // sunset
+    ctx.fillStyle='rgba(200,210,240,.36)'; for(const r of rain)ctx.fillRect(Math.round(r.x),Math.round(r.y),1,3);   // it's always raining in Vancouver
     ctx.restore();
     ctx.fillStyle='#ffffff'; for(const s of snow)ctx.fillRect(Math.round(s.x),Math.round(s.y),1,1);
   },

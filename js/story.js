@@ -485,7 +485,7 @@ const HINTS = {
   AFTER_MS:12000,   // how long Joe has to stand still before Alex chimes in
   farm:"Eggs and butter: Keelan's at the farm, top left. His hens could use some help.",
   mill:"Flour: John's at the Birkie trailhead, top right, under the big arch.",
-  city:"Chocolate: the rainy city, bottom left. Take the elevator up to the rooftops.",
+  city:"Chocolate: Vancouver, bottom left. Cross the bridge, go through the park, and find the really good pho.",
   fargo:"Sugar: Fargo, bottom right. Drive in and find Lil Q's.",
   golf:"Milk: Wylee Woods, straight down the road from the kitchen. Beat Margie and Jack.",
   home:"That's everything! Head home to the kitchen and let's bake.",
@@ -590,3 +590,20 @@ const KITCHEN = {place:'Home', speaker:'Your kitchen',
   icecreamLine:"Cookie ice cream sandwiches. Rosemary maple. I found it on a roof. You're welcome.",   // only if Lars found the ice cream
   playAgain:"Play again", keepExploring:"Keep exploring",
   note:"Merry Christmas! Love, Alex"};
+
+// ===================== VANCOUVER (the walk in: bridge, Stanley Park, downtown) =====================
+// The labels on the buttons, and what Joe reads when he looks at things. Change any of these.
+const VANCOUVER = {
+  place:'Vancouver',
+  cross:'Cross the Lions Gate Bridge',
+  elevator:'Enter here',                   // the button at the REALLY GOOD PHO door (the way up to the rooftops)
+  sign:'Vancouver',                       // the name shown on the look-at boxes
+  looks:{
+    totems:   {label:'Look at the totem poles',  text:"The totem poles at Brockton Point."},
+    lighthouse:{label:'Look at the lighthouse',  text:"The Brockton Point lighthouse. Red and white, right on the seawall."},
+    clock:    {label:'Look at the steam clock',  text:"The Gastown steam clock. It whistles."},
+    sails:    {label:'Look at Canada Place',     text:"Canada Place. Five white sails."},
+    science:  {label:'Look at Science World',    text:"Science World. The big shiny ball."},
+    beach:    {label:'Look at the crabs',        text:"Crabs. They are busy."},
+  },
+};

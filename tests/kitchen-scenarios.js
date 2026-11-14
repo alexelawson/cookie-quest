@@ -93,7 +93,7 @@ r=await p.evaluate(()=>{const moves=new Set(); for(let k=0;k<16;k++){kit.danceAt
 ok('E the Cookie Dance: step left, step right, hops, cookies up',r.length>=4,r.join(' | '));
 // F. the wardrobe before the city
 await fresh({});
-r=await p.evaluate(()=>{P.x=134;P.y=244;update(16.7); action(); const open=!$('wardrobe').hidden, n=$('outfits').children.length;
+r=await p.evaluate(()=>{goTo('vancouver','fromBridge'); T.run(40); P.x=181;P.y=279;update(16.7); action(); const open=!$('wardrobe').hidden, n=$('outfits').children.length;
   [...$('outfits').children].find(b=>b.dataset.id==='sweater').click(); const line=$('wardLine').textContent; $('wardGo').click(); T.run(40);
   return {open,n,line,outfit:have.outfit,city:scene===SCENES.city}});
 ok('F the elevator opens the wardrobe first; pick an outfit; then the city',r.open&&r.n===8&&r.line.includes('Festive')&&r.outfit==='sweater'&&r.city,r.line);
@@ -141,8 +141,8 @@ ok('L the Cookie Dance switches to Jingle Bells; Settings > Music turns it off a
 await fresh(ALL);
 r=await p.evaluate(()=>{const out={}; goTo('kitchen','fromDoor'); T.run(40); out.stay=scene===SCENES.kitchen; P.x=112;P.y=162; T.run(40); out.kitchen=scene===SCENES.world;
   goTo('fargo','fromHighway'); T.run(40); try{closeDialog()}catch(e){} paused=false; P.x=3;P.y=180; T.run(40); out.fargo=scene===SCENES.world;
-  have.heistBriefed=true; have.heistHowTo=true; goTo('city','fromStreet'); T.run(90); try{closeDialog()}catch(e){} paused=false; T.run(2); P.x=20;P.y=172; T.run(40); out.city=scene===SCENES.world; return out});
-ok('M exits: kitchen door, Fargo highway and the rooftop ladder all just take you out',r.stay&&r.kitchen&&r.fargo&&r.city,JSON.stringify(r));
+  have.heistBriefed=true; have.heistHowTo=true; goTo('city','fromStreet'); T.run(90); try{closeDialog()}catch(e){} paused=false; T.run(2); P.x=20;P.y=172; T.run(40); out.city=scene===SCENES.vancouver; P.x=144;P.y=5; T.run(40); out.bridge=scene===SCENES.world; P.x=78;P.y=240; update(16.7); action(); T.run(40); out.over=scene===SCENES.vancouver; return out});
+ok('M exits: kitchen door and Fargo highway take you out; the rooftop ladder puts you on the street in Vancouver; the bridge goes both ways',r.stay&&r.kitchen&&r.fargo&&r.city&&r.bridge&&r.over,JSON.stringify(r));
 // N. gear: find it on the map, Joe wears it, Settings can take it off
 await fresh({});
 r=await p.evaluate(()=>{const got=[]; for(const k in GEAR){if(GEAR[k].give)continue; P.x=GEAR[k].x;P.y=GEAR[k].y; T.run(1); got.push(k+':'+(have.gear&&have.gear[k])+':'+(!$('itemCard').hidden&&$('itemName').textContent)+':'+$('itemCanvas').getContext('2d').getImageData(0,0,40,30).data.some((v,i)=>i%4===3&&v>0)); $('itemBtn').click()}
