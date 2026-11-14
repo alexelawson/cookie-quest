@@ -2,18 +2,9 @@
 
 Everything you need to finish The Great Cookie Quest. **Spoilers from here down.**
 
-- [Skipping ahead](#skipping-ahead)
 - [The five stops](#the-five-stops)
 - [The kitchen](#the-kitchen)
 - [All seven secrets](#all-seven-secrets)
-
-## Skipping ahead
-
-While `js/devskip.js` is still in the game, ⚙ Settings has two testing buttons:
-
-- **Skip to the kitchen** puts every ingredient in the basket.
-- **Skip to the ending** jumps to the credits, stats, album and note.
-
 
 ## The five stops
 

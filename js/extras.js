@@ -340,19 +340,6 @@ function showItem(k,then,noAsk){   // noAsk: just "OK" (no "Not now")
   setTimeout(()=>$('itemBtn').focus({preventScroll:true}),0);
 }
 
-// the Lions Gate Bridge across the bottom of Vancouver: two green towers, the deck, and the necklace of lights on the cables
-function drawLionsGate(){
-  const F=(c,x,y,w,h)=>{ctx.fillStyle=c;ctx.fillRect(Math.round(x),Math.round(y),w,h)}, DECK=279, TOP=261, T1=46, T2=118;
-  F('rgba(0,0,0,.25)',0,DECK+2,164,2);
-  F('#2a4a3a',0,DECK,164,2); F('#3f6b52',0,DECK,164,1);                                          // the deck
-  for(let x=2;x<164;x+=6)F(Math.floor(time/600+x)%5?'#ffe9a8':'#fff8d8',x,DECK+1,1,1);             // streetlights on the deck
-  const cable=(x0,y0,x1,y1,sag)=>{ for(let k=0;k<=1;k+=1/(Math.abs(x1-x0)*1.2)){const x=x0+(x1-x0)*k, y=y0+(y1-y0)*k+sag*4*k*(1-k); F('#5f8a6e',x,y,1,1)}
-    for(let k=.04;k<1;k+=.09){const x=x0+(x1-x0)*k, y=y0+(y1-y0)*k+sag*4*k*(1-k); F(Math.floor(time/400+k*20)%4?'#fff3c4':'#ffffff',x,y,1,1); if(Math.round(k*100)%18<9)F('rgba(63,107,82,.55)',x,y+1,1,DECK-y-1)}};   // lights + a few hangers
-  cable(T1+2,TOP+1,T2+2,TOP+1,12); cable(-6,DECK-4,T1+2,TOP+1,-3); cable(T2+2,TOP+1,170,DECK-4,-3);
-  for(const x of [T1,T2]){F('#2f7a4a',x,TOP,4,DECK-TOP+2); F('#4f9a68',x,TOP,1,DECK-TOP+2); F('#1f5a36',x+3,TOP,1,DECK-TOP+2); F('#2f7a4a',x-1,TOP+5,6,1); F('#2f7a4a',x-1,TOP+11,6,1);
-    if(Math.floor(time/900)%2)F('#ff3b3b',x+1,TOP-1,2,1)}                                         // the towers (with aircraft lights)
-}
-
 // ---------- Christmas on the main map ----------
 // decorated Christmas trees: a snowy fir with a garland, twinkling ornaments and a gold star
 function drawXmasTree(x,y,big){
@@ -368,12 +355,3 @@ const BIG_TREE={x:211,y:147};   // by the kitchen porch, out of the hens' way
 solids.push(R(BIG_TREE.x-5,BIG_TREE.y-3,10,4));
 {const e=SCENES.world.ents; SCENES.world.ents=function(list){ e.call(this,list); list.push({y:BIG_TREE.y,draw:()=>{drawXmasTree(BIG_TREE.x,BIG_TREE.y,true);
   const g=ctx; g.fillStyle='#c8322b'; g.fillRect(BIG_TREE.x-9,BIG_TREE.y-3,5,4); g.fillStyle='#f4d35e'; g.fillRect(BIG_TREE.x-7,BIG_TREE.y-3,1,4); g.fillStyle='#3d6fb0'; g.fillRect(BIG_TREE.x+5,BIG_TREE.y-2,4,3); g.fillStyle='#ffffff'; g.fillRect(BIG_TREE.x+6,BIG_TREE.y-2,1,3)}}) }}   // with presents
-// the marina at False Creek: a dock with little boats tied up, their lights glowing in the water
-function drawMarina(){
-  const F=(c,x,y,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,h)}, b=k=>Math.round(Math.sin(time/900+k)*.6);
-  F('#6b4a2f',74,265,30,2); F('#8a6a4a',74,265,30,1); for(const fx of [80,90,100])F('#6b4a2f',fx,267,2,7);   // dock and fingers
-  for(const [bx,k] of [[75,0],[84,1],[94,2]]){ const yy=269+b(k);
-    F('#f2f2ee',bx,yy,5,3); F('#d9d9d4',bx,yy+2,5,1); F('#9aa3b2',bx+2,yy-5,1,5); F('#ffe9a8',bx+1,yy,2,1);    // a little sailboat, cabin light on
-    F('rgba(243,196,106,.4)',bx+1,yy+4,1,2+(Math.floor(time/300+k)%2)) }
-  for(const px of [74,84,94,103]){F('#3a3a44',px,262,1,3); F(Math.floor(time/500+px)%3?'#ffe9a8':'#fff6c8',px,261,1,1)}   // dock lamps
-}

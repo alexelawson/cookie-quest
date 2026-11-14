@@ -265,9 +265,6 @@ canvas{border-radius:6px}
 .ending .btn.ghost{color:var(--paper);border-color:#4d5a78;background:transparent}
 .ending .btn:disabled{opacity:.35}
 .polaroid canvas{height:auto}
-.devskip{display:flex;flex-direction:column;gap:4px;width:100%;border-top:2px dashed #4d5a78;padding-top:6px;margin-top:2px}
-.devskip small{font-size:.7rem!important;color:#8a93a8!important}
-.devskip .btn{color:var(--paper);border-color:#4d5a78}
 .alexhint.radio{bottom:auto;top:6px;animation:none;pointer-events:none}
 .alexhint.radio b{display:block;font-family:var(--pixel);font-size:.72rem;color:var(--berry);margin-bottom:1px}
 .alexhint.caption{width:auto;max-width:92%;padding:6px 14px;text-align:center}
@@ -421,10 +418,43 @@ h1::before,h1::after{content:'✦';color:var(--berry);font-size:.6em;vertical-al
   .app:has(#crewbar:not([hidden])){max-width:min(calc(100vw - 32px),max(340px,calc((100svh - 186px)*4/3)))}   /* (room for the heist crew buttons) */
 }
 @media (max-width:899px){ .resetrow{justify-content:center} .resetrow .hint{width:100%;margin:0 0 4px;text-align:center} }
-/* full screen: no page around the game, it fills the display */
-:fullscreen body,body:fullscreen{padding:6px 12px}
-:fullscreen .app,.app:fullscreen{max-width:min(calc(100vw - 24px),calc((100vh - 112px)*4/3))}
-:fullscreen .app:has(#crewbar:not([hidden])){max-width:min(calc(100vw - 24px),calc((100vh - 170px)*4/3))}
+/* ---------- full screen (the ⛶ button) ----------
+   The game fills the whole height of the display, edge to edge, on black. On a wide display (most laptops and monitors) the bars either
+   side of it hold everything else: the basket down the left, the buttons (and the heist crew) down the right. Text in the pop-ups
+   grows with the display so it isn't tiny on a big monitor. On a tall or squarish display there are no side bars, so the basket
+   stays in a slim strip above the game. */
+:root:fullscreen{font-size:clamp(16px,2.1vh,30px)}
+:root:fullscreen body{padding:0;background:#000;overflow:hidden}
+:root:fullscreen .app,:root:fullscreen .app:has(#crewbar:not([hidden])){max-width:none;width:100vw;height:100vh;gap:0;align-items:center;justify-content:center}
+:root:fullscreen .screen{border:0;border-radius:0;width:min(100vw,calc(100vh*4/3));flex:none}
+:root:fullscreen h1{display:none}
+:root:fullscreen .resetrow .hint{display:none}
+@media (min-aspect-ratio:3/2){
+  :root:fullscreen{--bar:calc((100vw - 100vh*4/3)/2)}
+  :root:fullscreen header{position:fixed;left:0;top:0;width:var(--bar);height:100vh;padding:1.2vh;flex-direction:column;flex-wrap:nowrap;justify-content:flex-start;align-items:center}
+  :root:fullscreen .basket{flex-direction:column;flex-wrap:nowrap;align-items:stretch;gap:.6vh;padding:.8vh;max-height:100%;overflow:hidden;width:min(calc(var(--bar) - 2.4vh),13vh)}
+  :root:fullscreen .slot{font-size:clamp(.5rem,1.25vh,.8rem)}
+  :root:fullscreen .slot{width:100%}
+  :root:fullscreen .slot canvas{width:100%;height:auto;aspect-ratio:4/3}
+  :root:fullscreen .slot b{text-align:center}
+  :root:fullscreen .bdiv{width:auto;height:2px;margin:.3vh 2px}
+  :root:fullscreen .resetrow{position:fixed;right:0;bottom:0;width:var(--bar);padding:1.2vh;flex-direction:column;align-items:stretch;gap:.8vh}
+  :root:fullscreen .resetrow .reset{width:100%}
+  :root:fullscreen .crewbar{position:fixed;right:0;top:0;width:var(--bar);padding:1.2vh;flex-direction:column;flex-wrap:nowrap;align-items:stretch;gap:.8vh}
+  :root:fullscreen .crewbar button{justify-content:flex-start}
+  :root:fullscreen .controls{position:fixed;inset:auto 0 0 0;pointer-events:none;padding:0;align-items:flex-end}
+  :root:fullscreen .controls>*{pointer-events:auto;width:var(--bar);display:flex;justify-content:center;padding-bottom:2vh}
+  :root:fullscreen .controls .pad{display:grid;width:auto;margin:0 calc((var(--bar) - 156px)/2) 2vh}
+  @media (hover:none),(pointer:coarse){ :root:fullscreen .resetrow{bottom:auto;top:0} :root:fullscreen .crewbar{top:auto;bottom:42vh}
+    :root:fullscreen .basket{flex-direction:row;flex-wrap:wrap;width:calc(var(--bar) - 12px);justify-content:center;gap:3px;padding:3px}   /* on a phone: small pictures, two to a row, above the arrows */
+    :root:fullscreen .slot{width:calc(50% - 3px);padding:2px} :root:fullscreen .slot b{font-size:0} :root:fullscreen .bdiv{display:none} :root:fullscreen header{padding:4px} }   /* on a touch screen the A button has the bottom right corner */
+}
+@media (max-aspect-ratio:3/2){
+  :root:fullscreen .app{justify-content:flex-start}
+  :root:fullscreen header{width:100%;justify-content:center;padding:4px}
+  :root:fullscreen .screen{width:min(100vw,calc((100vh - 150px)*4/3))}
+  :root:fullscreen .resetrow{padding:4px}
+}
 .hudpic{width:16px;height:20px;image-rendering:pixelated;vertical-align:middle;margin:0 2px}
 
 #itemNo{margin-left:8px}

@@ -14,7 +14,7 @@ Joe has five stops to make before he can bake: eggs and butter from the farm, fl
 
 Open `index.html` in a browser. That's it: no install, no build, no internet needed.
 
-Arrow keys (or the on-screen pad) to walk, **Space** or **A** to do things. It works on a phone too.
+Arrow keys (or the on-screen pad) to walk, **Space** or **A** to do things. **⛶ Full screen** under the game fills the whole display. It works on a phone too.
 
 ## The stops
 
@@ -32,8 +32,7 @@ Every line anyone says is in **`js/story.js`**, grouped by place. Edit the text 
 
 - [ ] Write the note at the end: `KITCHEN.note` in `js/story.js`
 - [ ] Write the secret note (for finding every secret): `ENDING.secretNote` in `js/story.js`
-- [ ] Delete `js/devskip.js` and its `<script>` line in `index.html` (the testing skip buttons in ⚙ Settings)
-- [ ] Open the game, go to ⚙ Settings and press **Start over** twice, so it begins fresh
+- [ ] Open the game and press **Start over** twice (under the game), so it begins fresh
 
 ## Stuck?
 
