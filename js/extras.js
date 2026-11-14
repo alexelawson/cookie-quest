@@ -121,7 +121,7 @@ function drawGear(c,g=ctx,look=null){
 }
 
 // ---------- crabs on the Vancouver beaches: they scuttle sideways and wave their claws ----------
-const CRABS=[[44,241,1.7],[118,262,2.4]];   // [x, y, phase]
+const CRABS=[[44,241,1.7],[108,261,2.4]];   // [x, y, phase]
 function drawCrab(x,y,ph){
   const F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(Math.round(x+dx),Math.round(y+dy),w,h)}, claw=Math.floor(time/260+ph*3)%2;
   F('rgba(0,0,0,.2)',-3,1,7,1);

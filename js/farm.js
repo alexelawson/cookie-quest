@@ -22,7 +22,7 @@ const BARN = R(20,30,56,44);
 const DROP = R(108,118,24,14);              // stand here holding a hen to put it back
 const GATE = {x:120, y:124};
 const FARM_AREA = R(4,12,158,134);          // loose hens stay in here
-const CUPCAKE = {x:48, y:22};               // behind the barn; its frosting peeks up over the roof
+const CUPCAKE = {x:29, y:22};               // behind the barn; its frosting peeks up over the roof
 const KEELAN_HOME = {x:142, y:134};
 
 const rand=(a,b)=>a+Math.random()*(b-a);

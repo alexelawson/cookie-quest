@@ -54,7 +54,7 @@ ok('3 mid-chase menu has progress + cupcake + back',r.menu&&r.menu.includes('How
 ok('3 Keelan idle before cupcake, helps after',!r.helpedBefore&&r.helped); ok('3 win',r.e==='paused'&&r.pen===20);
 
 // 4. pick up the cupcake behind the barn during the chase, then give it
-await fresh(); r=await p.evaluate(()=>{T.start(); T.step(200); for(const k in dirs)dirs[k]=false; P.x=60;P.y=24; dirs.right=true; let i=0; for(;i<60&&dlg.hidden;i++)update(16.7); dirs.right=false;
+await fresh(); r=await p.evaluate(()=>{T.start(); T.step(200); for(const k in dirs)dirs[k]=false; P.x=14;P.y=22; dirs.right=true; let i=0; for(;i<60&&dlg.hidden;i++)update(16.7); dirs.right=false;
   const got=!!have.cupcake, txt=$('dtext').textContent; closeDialog(); T.talk(); const menu=T.btns(); T.click('Give Keelan the cupcake'); T.pages(); T.click('OK'); T.click('Back to it');
   const e=T.runToEnd(); return {got,txt,menu,e,helped:T.kHelped,active:farm.active}});
 ok('4 cupcake can be found mid-chase',r.got,r.txt); ok('4 then given and Keelan helps',r.helped&&r.e==='paused');
