@@ -514,6 +514,7 @@ const ENDING = {
   photos:{
     farm:"Keelan, Joe, and the world's least cooperative hens.",
     mill:"50 km with the Vikings. Main Street, Hayward.",
+    vancouver:"Vancouver. It rained. The pho was really good.",
     city:"Lars and John, mid-heist. Nobody saw anything.",
     fargo:"Ginger ale and Mott's. Nailed it. (Eventually.)",
     golf:"Wylee Woods. Margie insisted on being in the photo.",

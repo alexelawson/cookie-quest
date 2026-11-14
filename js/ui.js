@@ -94,7 +94,10 @@ $('setOutfit').onclick=()=>{ $('settings').hidden=true; openWardrobe(()=>{ pause
   if(can){ fb.hidden=false;
     fb.onclick=()=>{ const d=document, el=d.documentElement; if(d.fullscreenElement||d.webkitFullscreenElement)(d.exitFullscreen||d.webkitExitFullscreen).call(d); else (el.requestFullscreen||el.webkitRequestFullscreen).call(el).catch?.(()=>{fb.hidden=true}) };
     const sync=()=>{ fb.textContent=(document.fullscreenElement||document.webkitFullscreenElement)?'⛶ Exit full screen':'⛶ Full screen' };
-    document.addEventListener('fullscreenchange',sync); document.addEventListener('webkitfullscreenchange',sync) }}
+    document.addEventListener('fullscreenchange',sync); document.addEventListener('webkitfullscreenchange',sync);
+    // in full screen the pop-ups scale with the game (style.css uses --fs): 1 at the normal size, bigger on a big display
+    const fit=()=>{ const h=document.querySelector('.screen').clientHeight; document.documentElement.style.setProperty('--fs',Math.max(1,Math.min(2.6,h/600)).toFixed(3)) };
+    for(const ev of ['fullscreenchange','webkitfullscreenchange'])document.addEventListener(ev,()=>setTimeout(fit,60)); addEventListener('resize',fit) }}
 function start(){$('titlecard').hidden=true; paused=false; audioInit(); sceneMusic(); if(!have.welcomed)welcome()}
 // the first time you press Start: Alex explains everything, then you pick Joe's look
 function welcome(){

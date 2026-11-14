@@ -73,6 +73,19 @@ const fargoBg=document.createElement('canvas'); fargoBg.width=FW; fargoBg.height
     F('#a9aeb8',s.island.x-1,s.island.y+s.island.h,s.island.w+2,1); F('#8a8f9a',s.island.x,s.island.y,s.island.w,s.island.h); F('#a9aeb8',s.island.x,s.island.y,s.island.w,1); F(s.brand,s.island.x+2,s.island.y-3,3,6); F(s.brand,s.island.x+7,s.island.y-3,3,6);
     F('#8a8f9a',s.sign.x+8,s.sign.y+9,2,14);   // sign pole
   }
+  // sidewalks along the streets
+  for(const r of ROADS){ if(r.w>r.h){F('#d6cfbc',r.x,r.y-3,r.w,2); F('#d6cfbc',r.x,r.y+r.h+1,r.w,2); for(let x=r.x;x<r.x+r.w;x+=6){F('#bdb6a2',x,r.y-3,1,2); F('#bdb6a2',x,r.y+r.h+1,1,2)}}
+    else {F('#d6cfbc',r.x-3,r.y,2,r.h); F('#d6cfbc',r.x+r.w+1,r.y,2,r.h); for(let y=r.y;y<r.y+r.h;y+=6){F('#bdb6a2',r.x-3,y,2,1); F('#bdb6a2',r.x+r.w+1,y,2,1)}} }
+  for(const v of ROADS.filter(r=>r.h>r.w))for(const h of ROADS.filter(r=>r.w>r.h)){F('#9a9690',v.x-3,h.y,v.w+6,h.h); F('#9a9690',v.x,h.y-3,v.w,h.h+6)}   // (not across the intersections)
+  // every house gets a watered lawn, a front walk, and something in the yard
+  HOUSES.forEach((h,i)=>{ const lx=h.x-6, ly=h.y-5, lw=h.w+12, lh=h.h+13;
+    F('#a8b867',lx,ly,lw,lh); for(let k=0;k<lw*lh/9;k++)F(rnd()<.5?'#9aab5c':'#b6c474',lx+rnd()*lw|0,ly+rnd()*lh|0,2,1);
+    for(let x=lx;x<lx+lw;x+=2)if(rnd()<.6){F('#bfc97c',x,ly-1,1,1); F('#bfc97c',x,ly+lh,1,1)}
+    F('#cfc8b4',h.x+(h.w>>1)-1,h.y+h.h+2,3,6);                                                                 // the front walk
+    if(i%4===0){for(let x=lx;x<lx+lw;x+=3){F('#f2efe6',x,ly+lh-2,1,3)} F('#f2efe6',lx,ly+lh-1,lw,1)}             // a white picket fence
+    else if(i%4===1){F('#c8322b',lx+2,ly+lh-5,4,3); F('#8a8f9a',lx+2,ly+lh-2,1,2); F('#8a8f9a',lx+5,ly+lh-2,1,2); F('#1d1d22',lx+1,ly+lh-6,6,1)}   // a grill
+    else if(i%4===2){F('#3d8ad6',lx+lw-8,ly+2,6,4); F('#7fc4f0',lx+lw-7,ly+3,4,2)}                                // a kiddie pool
+    else {F('#8a6a4a',lx+lw-4,ly+1,1,6); F('#f2efe6',lx+lw-8,ly+2,5,1); F('#e54b7a',lx+lw-7,ly+3,2,2); F('#5fa8e8',lx+lw-5,ly+3,2,3)} });   // washing on a line
   for(const h of HOUSES){
     const wall=['#b5654f','#e8dcc2','#7fa0b8','#c9a06a','#9fb38a','#f0ece2'][(h.x*7+h.y)%6], roof=['#5f564e','#4a5a6a','#6b4a3a'][(h.x+h.y)%3];
     F('rgba(60,50,30,.25)',h.x+1,h.y+h.h,h.w,2);                                                    // shadow
@@ -83,6 +96,8 @@ const fargoBg=document.createElement('canvas'); fargoBg.width=FW; fargoBg.height
     for(const wx of [h.x+3,h.x+h.w-10]){F('#f6efe2',wx,h.y+10,7,6); F('#ffd98a',wx+1,h.y+11,5,4); F('#f6efe2',wx+3,h.y+11,1,4); F('#5a6a4a',wx-1,h.y+10,1,6); F('#5a6a4a',wx+7,h.y+10,1,6)}
     F('#f6efe2',h.x+h.w/2-3|0,h.y+h.h-8,7,8); F('#5a3a22',h.x+h.w/2-2|0,h.y+h.h-7,5,7); F('#f4d35e',h.x+h.w/2+1|0,h.y+h.h-4,1,1);
     F('#8a8f9a',h.x+h.w/2-4|0,h.y+h.h,9,2);                                                          // front step
+    if((h.x*3+h.y)%2){ const cx=h.x+(h.w>>1); for(let k=0;k<5;k++)F(roof,cx-k*2-1,h.y-4+k,k*4+3,1); F(wall,cx-3,h.y+1,7,5); F('#ffd98a',cx-1,h.y+2,3,3); F('rgba(255,255,255,.18)',cx-1,h.y-4,3,1) }   // a front gable with an attic window
+    else { F('#f6efe2',h.x+2,h.y+h.h-10,h.w-4,1); F('#f6efe2',h.x+2,h.y+h.h-10,1,10); F('#f6efe2',h.x+h.w-3,h.y+h.h-10,1,10) }                                    // or a front porch
     if((h.x+h.y)%2){F('#6b4a2f',h.x-4,h.y+h.h-4,1,5); F('#3d6fb0',h.x-5,h.y+h.h-6,3,2)}              // mailbox
     else for(let x=h.x+1;x<h.x+h.w;x+=5){F('#4f7d3a',x,h.y+h.h-2,3,2); F('#e54b7a',x+1,h.y+h.h-2,1,1)}   // flower bed
   }

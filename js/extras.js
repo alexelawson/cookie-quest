@@ -66,6 +66,7 @@ function giveKeepsake(key,then){
   next();
   function gotIt(){ have.gear=have.gear||{}; have.gear[k]=1; save(); sfx('pickup'); showItem(k,then) }
 }
+if(have.gear&&'oakleys' in have.gear){ delete have.gear.oakleys; save() }   // (the Oakleys were taken out of the game: tidy them out of older saves)
 const gearWorn=k=>have.gear&&have.gear[k]===1;
 function gearTick(){
   if(scene!==SCENES.world)return;

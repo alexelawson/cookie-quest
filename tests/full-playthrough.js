@@ -76,7 +76,7 @@ r=await p.evaluate(()=>{$('endSkip').click(); const stats=$('ecard').textContent
   const album=[]; for(let i=0;i<6;i++){album.push(!!$('ecard').querySelector('.polaroid canvas')); const n=$('ecard').querySelectorAll('.pnav button')[1]; if(i<5)n.click()}
   $('endNext').click(); return {stats,secret,album,note:$('ecard').textContent}});
 ok('5 stats count all 7 secrets and show the Cookie Legend',r.stats.includes('7 of 7')&&r.stats.includes('LEGEND'),r.stats.slice(0,60));
-ok('5 the secret note (only for finding everything), all six photos unlocked, then the note',r.secret.includes(await p.evaluate(()=>ENDING.secretTitle))&&r.album.every(Boolean)&&r.note.includes('Merry Christmas'));
+ok('5 the secret note (only for finding everything), all seven photos unlocked, then the note',r.secret.includes(await p.evaluate(()=>ENDING.secretTitle))&&r.album.every(Boolean)&&r.note.includes('Merry Christmas'));
 await p.evaluate(()=>$('endNext').click());
 await reload();
 r=await p.evaluate(()=>({crown:!!have.crown,legend:allSecrets(),scene:scene===SCENES.world}));

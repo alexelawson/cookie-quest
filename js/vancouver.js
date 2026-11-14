@@ -148,7 +148,7 @@ function drawVanLight(){ const F=(c,x,y,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x,y,
   if(VAN.lit){ const a=(time-VAN.lit)/700; ctx.save(); ctx.translate(x+1,y-17); ctx.rotate(a); const gr=ctx.createLinearGradient(0,0,60,0); gr.addColorStop(0,'rgba(255,240,180,.55)'); gr.addColorStop(1,'rgba(255,240,180,0)');
     ctx.fillStyle=gr; ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(60,-9); ctx.lineTo(60,9); ctx.closePath(); ctx.fill(); ctx.restore() } }   // once Joe's been up, the lamp sweeps its beam around
 const vanRain=[...Array(150)].map(()=>({x:Math.random()*VCW,y:Math.random()*VCH}));
-SCENES.vancouver={ place:VANCOUVER.place, music:'world',
+SCENES.vancouver={ place:VANCOUVER.place, music:'vancouver',
   w:VCW, h:VCH, bounds:R(0,0,VCW,VCH), bg:vanBg, walk:VAN_WALK, solids:[], triggers:VAN_TRIGGERS,
   entries:{start:{x:144,y:14,dir:'down'}, fromBridge:{x:144,y:14,dir:'down'}, fromRoof:{x:181,y:285,dir:'down'}},
   ambient(dt){ for(const r of vanRain){r.y+=dt*.25; r.x-=dt*.05; if(r.y>VCH){r.y=-4; r.x=Math.random()*(VCW+40)} if(r.x<0)r.x+=VCW} },

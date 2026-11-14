@@ -82,11 +82,11 @@ ok('E Alex walks over and hugs Joe first',r.hugging&&r.noDlg&&r.near<10&&Math.hy
 ok('E party: everyone has a line, and they bounce',r.party&&r.closed&&['Alex','Keelan','Lil Q','Lars','John','Margie','Jack'].every(n=>r.lines.some(l=>l.startsWith(n+':'))),r.lines.length+' lines');
 ok('E Joe gets a crown, everyone does THE COOKIE DANCE, then the credits roll',r.dance&&r.crown&&r.baked&&r.ending&&r.credits);
 r=await p.evaluate(()=>{const names=[...document.querySelectorAll('.crow b')].map(b=>b.textContent); $('endSkip').click(); const stats=$('ecard').textContent; $('endNext').click(); const album=$('ecard').querySelector('small').textContent, cv=!!$('ecard').querySelector('.polaroid canvas');
-  for(let i=0;i<5;i++)$('ecard').querySelectorAll('.pnav button')[1].click(); const last=$('ecard').querySelector('.polaroid p').textContent; $('endNext').click(); const note=$('ecard').textContent, again=[...$('ecard').querySelectorAll('button')].some(b=>b.textContent==='Play again'), keep=$('endNext').textContent;
+  for(let i=0;i<PHOTO_IDS.length-1;i++)$('ecard').querySelectorAll('.pnav button')[1].click(); const last=$('ecard').querySelector('.polaroid p').textContent; $('endNext').click(); const note=$('ecard').textContent, again=[...$('ecard').querySelectorAll('button')].some(b=>b.textContent==='Play again'), keep=$('endNext').textContent;
   return {names,stats,album,cv,last,note,again,keep,cap:ENDING.photos.kitchen}});
 ok('E credits list the whole cast (no Jackie if Joe never met her)',r.names.includes('Joe')&&r.names.includes('Logan')&&r.names.includes('Lil Q')&&!r.names.includes('Jackie'),r.names.length+' names');
 ok('E then Joe\'s stats, with secrets found',r.stats.includes('Birkie time')&&r.stats.includes('Secrets found'),r.stats.slice(0,80));
-ok('E then the photo album (six photos), then Alex\'s note with Play again',r.album.includes('album')&&r.cv&&r.last===r.cap&&r.note.includes('Merry Christmas')&&r.again&&r.keep==='Keep exploring',r.last);
+ok('E then the photo album (seven photos), then Alex\'s note with Play again',r.album.includes('album')&&r.cv&&r.last===r.cap&&r.note.includes('Merry Christmas')&&r.again&&r.keep==='Keep exploring',r.last);
 r=await p.evaluate(()=>{$('endNext').click(); goTo('world','fromKitchen'); T.run(30); return {crown:!!have.crown,scene:scene===SCENES.world}});
 ok('E the crown stays on outside',r.crown&&r.scene);
 r=await p.evaluate(()=>{const moves=new Set(); for(let k=0;k<16;k++){kit.danceAt=time-k*PARTY.BEAT-1; const m=danceMove(0); moves.add(m.dx+','+(m.dy<-1?'up':'0')+','+m.cookie)} return [...moves]});

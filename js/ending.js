@@ -28,6 +28,11 @@ const PHOTO_SCENES={
   city(F){ F('#1b2236',0,0,64,48); F('#2a3350',0,30,64,18); F('#f2efe6',50,4,6,6); F('#1b2236',52,4,4,4);
     for(let i=0;i<24;i++)F('rgba(170,190,230,.6)',(i*11)%64,(i*7)%40,1,3);
     drawLars({x:20,y:42,dir:'right',moving:false,step:0}); F('#8a5a34',27,28,12,9); F('#efe2c4',29,30,8,3); drawJohn({x:48,y:44,dir:'left',moving:false,step:0}) },
+  vancouver(F){ F('#2b4a86',0,0,64,48); for(let i=0;i<22;i++)F(['#3a5c9c','#c86a9a','#f3c46a'][i%3],(i*19)%64,(i*7)%20,4,1); F('#c9c2b4',0,20,64,3); F('#4a5064',0,23,64,25); F('#2a2e3a',0,34,64,14);
+    for(let y=-9;y<=9;y++){const w=Math.round(Math.sqrt(81-y*y)); for(let x=-w;x<w;x++)F(((x+9)>>1)+((y+9)>>1)&1?((-x-y)>3?'#eef3f8':'#a9b4c4'):((-x-y)>3?'#d6dee8':'#74819a'),50+x,12+y,1,1)}   // Science World
+    for(let k=0;k<3;k++){for(let r=0;r<5;r++)F('#ffffff',4+k*7+3-((r+1)>>1),9+r,r+1,1); F('#aab2c0',3+k*7,14,7,2)}                                  // a few of Canada Place's sails
+    F('#1d1420',2,24,28,8); F('#c8322b',2,24,28,1); pixText(ctx,'PHO',10,26,'#7fe8ff');
+    drawSteamClock(34,46); joeAt(50,45); drawCrab(22,44,1); for(let i=0;i<14;i++)F('rgba(200,210,240,.6)',(i*11)%64,(i*17)%44,1,3) },
   fargo(F){ F('#87c4e8',0,0,64,14); F('#cdb978',0,14,64,34); F('#9a9690',0,20,64,8); for(let x=2;x<64;x+=8)F('#e2c75a',x,24,4,1);
     drawCar(20,24,'right',true); drawAlex(40,44,'happy'); drawBob(54,44); F('#2f7a46',33,30,2,4); F('#7a2b5a',46,32,3,3) },
   golf(F){ F('#7cc35a',0,0,64,48); for(let y=0;y<48;y+=8)F('#86cb63',0,y,64,4);
@@ -48,7 +53,7 @@ function photo(id){
   ctx.restore(); c.getContext('2d').drawImage(cv,0,0,PHOTO_W,PHOTO_H,0,0,PHOTO_W,PHOTO_H);
   return photoCache[id]=c;
 }
-const photoUnlocked=id=>id==='kitchen'?!!have.baked:!!have[id];
+const photoUnlocked=id=>id==='kitchen'?!!have.baked:id==='vancouver'?!!have.city:!!have[id];
 
 // ---------- the screens ----------
 const ending={page:null, photo:0, fromSettings:false};
@@ -95,7 +100,7 @@ function showStats(){
   endButtons({label:E.next,fn:()=>allSecrets()?showSecretNote():showAlbum()},null);
 }
 function showSecretNote(){ const E=ENDING, c=card(E.secretTitle), p=document.createElement('p'); p.className='enote'; p.textContent=E.secretNote; c.append(p); endButtons({label:E.next,fn:showAlbum},null) }
-const PHOTO_IDS=['farm','mill','city','fargo','golf','kitchen'];
+const PHOTO_IDS=['farm','mill','vancouver','city','fargo','golf','kitchen'];
 function showAlbum(){
   const E=ENDING, c=card(E.albumTitle), id=PHOTO_IDS[ending.photo], open=photoUnlocked(id);
   const pol=document.createElement('div'); pol.className='polaroid';

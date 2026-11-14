@@ -423,7 +423,8 @@ h1::before,h1::after{content:'✦';color:var(--berry);font-size:.6em;vertical-al
    side of it hold everything else: the basket down the left, the buttons (and the heist crew) down the right. Text in the pop-ups
    grows with the display so it isn't tiny on a big monitor. On a tall or squarish display there are no side bars, so the basket
    stays in a slim strip above the game. */
-:root:fullscreen{font-size:clamp(16px,2.1vh,30px)}
+/* everything that pops up over the game (dialogs, cards, the prompt, the little status bar) is scaled up to match the bigger picture: --fs is set in ui.js */
+:root:fullscreen :is(.dialog,.prompt,.hud,.minibtn,.rcard,.vcard,.acard,.pcard,.howto,.alexhint,.roundbanner,.ecard,.ebtns,.credits .roll,.tcontent){zoom:var(--fs,1)}
 :root:fullscreen body{padding:0;background:#000;overflow:hidden}
 :root:fullscreen .app,:root:fullscreen .app:has(#crewbar:not([hidden])){max-width:none;width:100vw;height:100vh;gap:0;align-items:center;justify-content:center}
 :root:fullscreen .screen{border:0;border-radius:0;width:min(100vw,calc(100vh*4/3));flex:none}
@@ -440,6 +441,9 @@ h1::before,h1::after{content:'✦';color:var(--berry);font-size:.6em;vertical-al
   :root:fullscreen .bdiv{width:auto;height:2px;margin:.3vh 2px}
   :root:fullscreen .resetrow{position:fixed;right:0;bottom:0;width:var(--bar);padding:1.2vh;flex-direction:column;align-items:stretch;gap:.8vh}
   :root:fullscreen .resetrow .reset{width:100%}
+  :root:fullscreen .resetrow .reset,:root:fullscreen .crewbar button{font-size:clamp(.8rem,1.8vh,1.4rem);padding:.8vh 1vh}
+  :root:fullscreen .crewbar button canvas{width:3.6vh;height:5.85vh}
+  :root:fullscreen .slot{font-size:clamp(.56rem,1.3vh,1rem)}
   :root:fullscreen .crewbar{position:fixed;right:0;top:0;width:var(--bar);padding:1.2vh;flex-direction:column;flex-wrap:nowrap;align-items:stretch;gap:.8vh}
   :root:fullscreen .crewbar button{justify-content:flex-start}
   :root:fullscreen .controls{position:fixed;inset:auto 0 0 0;pointer-events:none;padding:0;align-items:flex-end}
