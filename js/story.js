@@ -180,32 +180,26 @@ const ALEX_WELCOME = {speaker:'Alex', place:'Home',
   lookTitle:"Pick Joe's look", lookIntro:"First things first. What are you wearing today?", lookGo:"Looks good"};
 
 // ---------- Replays: once the cookies are baked, every game can be played again from whoever started it ----------
-const REPLAY={golf:"Play again", birkie:"Race again", fargo:"Race Lil Q again", heist:"Run the heist again", jackc:"Make another one", logan:"Play again",
-  heistReset:"Back to roof A. Same crew, same chocolate thief. Let's go.", jackcAgain:"Another one? Love that. Grab the saw."};
+const REPLAY={golf:"Play again", birkie:"Race again", fargo:"Race Lil Q again", heist:"Run the heist again", jackc:"Do the yard again", logan:"Play again",
+  heistReset:"Back to roof A. Same crew, same chocolate thief. Let's go.", jackcAgain:"Again? Love that. The logs are right back where they were."};
 
-// ---------- Jack C: building a little log cabin in the meadow, and a woodworker. Help him make a cutting board and it's yours ----------
-const JACKC = {name:'Jack C', place:"Jack C's Workshop",
-  hello:["Oh hey! Welcome to the site.","Cabin's coming along. Saddle-notched corners, spruce logs, dried a whole year so they don't twist on me.","But today's a shop day. I'm making a cutting board. Maple, walnut, cherry. Want to build it with me?"],
-  help:"Make a cutting board", later:"Maybe later",
-  title:"Make a cutting board",
-  woods:["Walnut","Maple","Cherry"],                       // the three buttons in the glue-up (same order as the game: dark, light, red)
-  // 1. the saw
-  sawHint:"Cut to length. Tap SAW when the blade is right on the pencil line.", sawBtn:"Saw",
-  sawNice:"Clean cut.", sawPerfect:"Split the line. PERFECT.", sawOff:"Whoa, not there. Line it up on the pencil mark.",
-  sawKnot:"Other end now. Careful, there's a knot in this one. The saw likes to jump.",
-  // 2. the glue-up
-  glueShow:"Here's the pattern, top to bottom. Memorize it!", glueGo:"Okay, it's gone. Lay the strips in that order.",
-  glueNice:"Yep. Next strip.", glueWrong:"Not that one. Here, one more look.", glueDone:"Five strips, tight joints. Clamp it and let it cure.",
-  clampPop:"THE CLAMP! It's letting go! Tighten it!", clampBtn:"Tighten!", clampSaved:"Nice save. Keep going.", clampLost:"Aw, the last strip slid out. Lay that one again.",
-  // 3. the plane
-  planeHint:"Now plane it flat. Left, right, left, right. Follow the arrow, nice and steady.",
-  planeGo:"That's it. Long, even strokes.", planeFast:"Easy! Too fast tears the grain. Slow it down.", planeWrong:"Other way. Watch the arrow.",
-  sneeze:"ACHOO! Sawdust. ...Where were we? Watch the arrow.", planeDone:"Smooth as glass.",
-  // 4. the oil
-  oilHint:"Last step: oil. Hold to rub it in, and let go when the gauge is in the green.", oilBtn:"Hold to oil",
-  oilMore:"She's still thirsty. Keep going, up into the green.", oilOver:"Whoa, way too much. It's dripping. Wipe it off and go again.",
-  done:"Dude. Look at that grain. That's a real cutting board.", doneBtn:"Done",
-  thanks:["You've got good hands, man.","It's yours. Put the cookies on it. A cookie tastes better off a board you made yourself. That's just science."],
+// ---------- Jack C: building a little log cabin in the meadow, and a woodworker. Free his maple plank from the lumber yard (a sliding puzzle) and he makes you a cutting board ----------
+const JACKC = {name:'Jack C', place:"Jack C's Lumber Yard",
+  hello:["Oh hey! Welcome to the site.","Cabin's coming along. Saddle-notched corners, spruce logs, dried a whole year so they don't twist on me.","Thing is, I want to make a cutting board today, and my best maple plank is buried in the yard. Help me dig it out?"],
+  help:"Help in the lumber yard", later:"Maybe later",
+  title:"Free the maple plank",
+  // one line for each of the three yards, said when it starts
+  yards:["Logs only slide the long way. Drag them (or use the arrows) until the pale maple plank can slide out the gate on the right.",
+         "Yard two. See the stump? Stumps don't move. Ever. I've tried.",
+         "Last yard. This is the good maple, the one for the board. It's really in there."],
+  hintBtn:"Ask Jack ({n})",                 // {n} = hints left in this yard
+  hintSay:"See the one flashing? Slide it to the yellow spot.", noHints:"I'm out of ideas, man. You've got this.",
+  reset:"Start over", next:"Next yard",
+  nudge:"No rush. You can always start the yard over.",
+  won:"She's out! {n} moves.", wonPar:"She's out in {n}! That's as few as it can be done. Dude.",   // {n} = your moves, {par} = the fewest possible
+  movesWord:"MOVES", parWord:"BEST",        // on the little scoreboard (capitals only)
+  done:"That's the one. Give me a sec at the bench.", doneBtn:"Done",
+  thanks:["You've got a good eye, man.","Planed it, glued it, oiled it. It's yours. Put the cookies on it. A cookie tastes better off a handmade board. That's just science."],
   after:"Come back when it snows. The woodstove goes in next. Cast iron. So excited."};
 
 // ---------- Brian: super chill, hanging out by his boat on the pond. Find him and he gives you sprinkles ----------
