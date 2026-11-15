@@ -7,7 +7,7 @@ const REG={farm:R(0,0,164,144), mill:R(220,0,164,144), city:R(0,170,164,118), fa
 const trees=[[172,30],[172,64],[214,228],[270,154]];
 // snowy pines around the Birkie trailhead, dark pines in Wylee Woods (the disc golf entrance)
 const pines=[[228,14],[244,30],[262,12],[284,26],[232,52],[268,48],[290,62],[352,10],[372,24],[358,44],[378,62],[346,30],[236,74]];
-const woods=[[168,250],[176,240],[171,270],[166,284],[217,262],[211,282],[218,242]];
+const woods=[[166,246],[165,268],[166,286],[220,244],[221,266],[219,286]];
 const solids=[
   R(20,30,56,44),                                            // barn
   R(90,60,60,3),R(90,117,60,3),R(90,60,3,60),R(147,60,3,60), // pen fence
@@ -18,7 +18,8 @@ const solids=[
   R(178,282,4,4),R(201,282,4,4),                             // Wylee Woods arch posts
   R(166,98,52,42),                                           // farmhouse (your kitchen)
   R(108,16,52,30),                                           // Brian's pond (he's out in his boat)
-  R(0,170,70,118),R(86,170,78,118),R(70,250,16,38),            // Burrard Inlet, either side of the Lions Gate Bridge (and the far end of the bridge)
+  R(0,170,70,118),R(86,170,78,118),R(70,250,16,38),
+  R(164,262,20,8),R(200,262,22,8),R(174,236,5,4),R(206,236,5,4),R(212,192,4,4),   // the brook either side of the covered bridge; the two tapped maples; the Wylee Woods road sign            // Burrard Inlet, either side of the Lions Gate Bridge (and the far end of the bridge)
   R(222,184,162,66),R(259,170,22,12),R(230,258,130,10),                              // downtown Fargo's buildings, the CR-V, the parked cars
   ...[...trees,...pines,...woods].map(([x,y])=>R(x-3,y-3,6,4)),
 ];
@@ -200,8 +201,9 @@ const bg=document.createElement('canvas'); bg.width=WW; bg.height=WH;
   soft(R(164,236,56,52),'#3f6b3a','t');
   for(const [fx,fy] of [[170,244],[180,262],[168,278],[204,254],[214,272],[206,284],[181,246]]){F('#2f5a2c',fx-2,fy,5,1); F('#4f8a45',fx-1,fy-1,1,1); F('#4f8a45',fx+1,fy-1,1,1); F('#62a356',fx,fy-2,1,2)}   // ferns
   F('rgba(0,0,0,.2)',171,261,10,1); F('#6b4a2f',170,258,10,3); F('#8a6a4a',170,258,10,1); F('#c9a878',179,258,1,3); F('#4a7442',172,258,3,1);   // a mossy fallen log
-  {const x=208,y=252; F('rgba(0,0,0,.25)',x-3,y,8,1); F('#7d8694',x,y-11,1,11); F('#f4d35e',x-3,y-12,7,2); F('#c9a640',x-3,y-11,7,1);         // a disc golf basket: yellow band,
-   for(let k=-2;k<=2;k++)F('#b8c0cc',x+k,y-10+Math.abs(k),1,5-Math.abs(k)*2+1); F('#5a6474',x-3,y-5,7,2); F('#9aa3b2',x-3,y-5,7,1); F('#e8584c',x+3,y-2,3,1)}   // chains, the basket, and somebody's disc
+  // the brook: it runs across in front of the woods, under the bridge. Stones, a little white water
+  {const by=263; F('#5d8f6a',164,by-1,58,8); F('#3d7fb8',164,by,58,6); for(let x=164;x<222;x+=5){F('#5a9bd0',x+(x%3),by+1+(x%4),3,1); if(x%10<5)F('#d7ecf8',x+1,by+3,2,1)}
+    for(const [x,y] of [[168,by+1],[178,by+4],[203,by+2],[214,by+4],[209,by]]){F('#8a8478',x,y,3,2); F('#a8a296',x,y,2,1)} }
   road(186,236,12,52); for(let i=0;i<12;i++)F('#5a7f3f',186+rnd()*12|0,240+rnd()*48|0,1,1);
   // your kitchen: a classic white farmhouse. Board-and-batten siding, a black standing-seam metal roof, black-framed windows glowing warm,
   // a natural wood front door with a wreath, a deep front porch on square wood posts, lanterns either side of the door.
@@ -346,14 +348,26 @@ function drawSteamClock(x=93,y=228){
   if(Math.floor(time/2600)%3===0){const t=(time%2600)/2600; ctx.fillStyle='rgba(240,240,245,.6)';
     for(let k=0;k<5;k++)ctx.fillRect(x+2+((k*3+Math.floor(t*6))%5)-1,Math.round(y-43-k*3-t*7),3+(k>2),3); ctx.fillRect(x-1,Math.round(y-39-t*5),2,2); ctx.fillRect(x+8,Math.round(y-39-t*5),2,2)}
 }
-// Wylee Woods log arch over the south road
-const woodsArch=archSprite(30,32,g=>{const F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};
-  F('#6b4a2f',2,4,3,28); F('#6b4a2f',25,4,3,28); F('#5a3d26',4,4,1,28); F('#5a3d26',27,4,1,28);
-  F('#7a5636',0,2,30,4); F('#5a3d26',0,5,30,1); F('#8f6a46',2,2,26,1);          // log crossbar
-  F('#3c2a1c',4,6,1,2); F('#3c2a1c',25,6,1,2);                                  // ropes
-  F('#e9d9b4',3,8,24,15); F('#c8b48a',3,22,24,1); F('#c8b48a',3,8,24,1);
-  pixText(g,'WYLEE',5,10,'#2f5a32'); pixText(g,'WOODS',5,16,'#2f5a32');
-  F('#3d8443',0,0,5,3); F('#3d8443',24,0,6,3); F('#4d9a50',2,0,2,1); F('#4d9a50',26,0,2,1)});   // moss
+// Wylee Woods: a red covered bridge over the brook (you walk in through it), the name on a board over the portal
+const woodsArch=archSprite(50,36,g=>{const F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};
+  F('#a8322b',1,9,48,27); for(let x=3;x<49;x+=3)F('#8a2620',x,9,1,27); F('#bf4034',1,9,1,27);                       // red board-and-batten walls
+  for(let r=0;r<10;r++){ const hw=Math.round(2+r*2.5); F('#a8322b',25-hw,r,hw*2,1); F('#3a3f4a',25-hw-2,r,3,1); F('#3a3f4a',25+hw-1,r,3,1); F('#f1e3c9',25-hw+1,r,1,1); F('#f1e3c9',25+hw-2,r,1,1) }   // the gable: dark metal roof edge, white trim
+  F('#3a3f4a',22,-1,6,2); F('#5a6070',23,0,4,1); F('#3a3f4a',0,9,3,2); F('#3a3f4a',47,9,3,2);
+  F('#f1e3c9',23,3,4,4); F('#3a2418',24,4,2,2);                                                                      // a little louvre in the peak
+  F('#e9d9b4',0,10,50,8); F('#c8b48a',0,17,50,1); F('#fff6dc',0,10,50,1); pixText(g,'WYLEE WOODS',2,11,'#2f5a32');   // the name board
+  F('#f1e3c9',14,18,22,18); F('#1d1420',16,20,18,16);                                                                // the portal, white trim
+  for(let k=0;k<7;k++){F('#3a2a22',17+k,21+k*2,1,2); F('#3a2a22',32-k,21+k*2,1,2)} F('#2b201a',16,26,18,1);          // the trusses inside, just visible
+  F('#5a3d26',16,32,18,4); for(let x=16;x<34;x+=3)F('#4a3120',x,32,1,4); F('#7a5636',16,32,18,1);                     // deck planks
+  for(const x of [5,38]){F('#f1e3c9',x,21,7,7); F('#1d1420',x+1,22,5,5); F('#f1e3c9',x+3,22,1,5); F('#f1e3c9',x+1,24,5,1)}   // a window each side
+  for(const x of [13,36]){F('#3a3f4a',x,22,1,2); F('#ffe9a8',x,24,1,2)}                                                // lanterns
+  for(const [x0,w] of [[0,16],[34,16]])for(let x=x0;x<x0+w;x+=4){F('#8a8478',x,31+((x>>2)%2),4,5); F('#a8a296',x,31+((x>>2)%2),3,1); F('#6f6a60',x+3,32,1,4)}   // fieldstone abutments
+  F('#3d8443',19,18,12,2); F('#2f6b36',20,19,10,1); F('#c8322b',24,18,2,3); F('#e54b4b',21,18,1,1); F('#e54b4b',29,18,1,1) });   // a pine swag with a red bow, for Christmas
+// the road sign at the turn for Wylee Woods, Vermont style: a green board with a white border on a wooden post, an arrow pointing down the road
+const woodsSign=archSprite(26,30,g=>{const F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};
+  F('#6b4a2f',12,14,2,16); F('#8a6a4a',12,14,1,16);
+  F('#ffffff',1,0,24,22); F('#ffffff',0,1,26,20); F('#1f6b3a',1,1,24,20); F('#2a8048',1,1,24,1);
+  pixText(g,'WYLEE',3,3,'#ffffff'); pixText(g,'WOODS',3,9,'#ffffff');
+  F('#ffffff',12,15,2,3); for(let i=0;i<3;i++)F('#ffffff',10+i,17+i,6-i*2,1) });
 // the warming cabin at the trailhead: peeled logs, a green metal roof with snow on it, a stone chimney, skis leaning by the door
 const yurt=archSprite(36,32,g=>{const F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};
   F('rgba(0,0,0,.2)',2,29,33,3);
@@ -393,7 +407,8 @@ SCENES.world={ music:()=>farm.active?'chase':'world',
 
     pines.forEach(([x,y],i)=>list.push({y,draw:()=>drawPine(x,y,i%3===1?birchSprite:snowPine)}));   // every third one's a birch
     woods.forEach(([x,y])=>list.push({y,draw:()=>drawPine(x,y,darkPine)}));
-    list.push({y:67,draw:()=>ctx.drawImage(birkArch,290,38)}); list.push({y:286,draw:()=>ctx.drawImage(woodsArch,176,254)});
+    list.push({y:67,draw:()=>ctx.drawImage(birkArch,290,38)}); list.push({y:286,draw:()=>ctx.drawImage(woodsArch,167,250)}); list.push({y:196,draw:()=>ctx.drawImage(woodsSign,201,166)});
+    for(const [mx,my] of [[176,240],[208,240]])list.push({y:my,draw:()=>{ drawTree(mx,my); ctx.fillStyle='#9aa3b0'; ctx.fillRect(mx+2,my-6,3,4); ctx.fillStyle='#c9ced4'; ctx.fillRect(mx+2,my-6,3,1); ctx.fillStyle='#5f6676'; ctx.fillRect(mx+1,my-7,1,2) }});   // two sugar maples, tapped: a sap bucket on each
     list.push({y:124,draw:()=>ctx.drawImage(yurt,336,94)}); list.push({y:81,draw:()=>drawTrailJohn(331,81,trailJohnDir())}); list.push({y:-98,flat:true,draw:()=>ctx.drawImage(siloSprite,66,3)}); list.push({y:74,draw:drawBarn}); farmEntities(list)},
   over(){
     farmOverlay();

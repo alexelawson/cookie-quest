@@ -80,4 +80,7 @@ if(!r.btns.includes('Play again')){console.log(R.join('\n'));console.log('weak r
 // leaving the course
 r=await p.evaluate(()=>{T.click('Maybe later'); P.x=112;P.y=150;update(16.7); P.y=164;update(16.7); T.run(40); return {world:scene===SCENES.world}});
 ok('F walk out the EXIT at the bottom and you are back on the road (no button)',r.world);
+// the sixth hole: a dogleg par 4 (Margie explains), and every hole has a length in feet on its sign
+r=await p.evaluate(()=>{ golf.active=true; golf.hole=5; golfStartHole(); const hint=T.through().join(' '); const h=HOLES[5]; return {n:HOLES.length, par:h.par, hint, feet:HOLES.map(holeFeet), direct:Math.hypot(h.basket.x-h.tee.x,h.basket.y-h.tee.y)>GOLF.MAX} });
+ok('F six holes; the last is a dogleg par 4, too far to reach in one, and Margie says so',r.n===6&&r.par===4&&r.direct&&r.hint.includes('dogleg')&&r.feet.every(f=>f>=150&&f<=420),JSON.stringify(r));
 console.log(R.join('\n')); console.log('page errors:',errs.length?errs:'none'); await b.close()})();

@@ -11,7 +11,7 @@ const YARDS=[
   {par:11, p:[[0,2,2,'h','p'],[4,0,1,'h','s'],[3,1,3,'v','l'],[0,4,2,'v','l'],[4,3,2,'h','l'],[3,5,2,'h','l'],[5,0,3,'v','l'],[4,1,2,'v','l'],[2,1,2,'v','l'],[3,4,3,'h','l']]},
   {par:14, p:[[1,2,2,'h','p'],[3,3,1,'h','s'],[3,0,2,'h','l'],[2,0,2,'v','l'],[5,1,3,'v','l'],[0,1,2,'v','l'],[4,1,2,'v','l'],[4,4,2,'h','l'],[2,5,3,'h','l'],[0,4,3,'h','l'],[3,1,2,'v','l']]},
 ];
-const YARD={N:6, CELL:13, OX:14, OY:9, HINTS:3};                                              // grid size, a cell in px, where the grid sits in the picture, hints per yard
+const YARD={N:6, CELL:20, OX:8, OY:8, HINTS:3};                                              // grid size, a cell in px, where the grid sits in the picture, hints per yard
 const WOODS=[{id:'walnut',col:'#5a3a26',lt:'#74503a',dk:'#422a1a'},{id:'maple',col:'#e6cf9e',lt:'#f2e2bc',dk:'#cdb480'},{id:'cherry',col:'#a8563a',lt:'#c06e4e',dk:'#8a4028'}];
 
 // ---------- how he looks: shortish, clean-shaven, light-medium brown hair, a red plaid shirt, jeans, tan work boots, a tool belt with a hammer ----------
@@ -101,13 +101,14 @@ function wkChoices(list){   // extra buttons under the picture: [{label, key, fn
   let row=$('craneChoices'); if(!row){ row=document.createElement('div'); row.id='craneChoices'; row.className='brow wkrow'; $('craneBtn').parentNode.before(row) }
   row.replaceChildren(...(list||[]).map(o=>{ const b=document.createElement('button'); b.className=$('craneLater').className+' wkbtn'; b.textContent=o.label; b.dataset.key=o.key; b.addEventListener('click',e=>{e.preventDefault(); o.fn()}); return b })); row.hidden=!list||!list.length }
 // slide piece i by k cells (negative = left / up). Returns true if it moved
-function ydMove(i,k){ const J=JACKC; if(yd.won||!k)return false; const p=yd.ps[i], [lo,hi]=ydRange(yd.ps,i); k=Math.max(-lo,Math.min(hi,k)); if(!k){ sfx('bad'); p.bump=160; return false }
+function ydMove(i,k,quiet){ const J=JACKC; if(yd.won||!k)return false; const p=yd.ps[i], [lo,hi]=ydRange(yd.ps,i); k=Math.max(-lo,Math.min(hi,k)); if(!k){ sfx('bad'); p.bump=160; return false }
   if(p.dir==='h'){p.x+=k; p.dx=-k*YARD.CELL} else {p.y+=k; p.dy=-k*YARD.CELL}
-  if(!(yd.lastMv&&yd.lastMv.i===i&&yd.lastMv.s===Math.sign(k)))yd.moves++; yd.lastMv={i,s:Math.sign(k)}; yd.sel=i; yd.hint=null;   // (sliding the same log further the same way is still one move) sfx(p.kind==='p'?'click':'thud');
-  if(p.kind==='p'&&p.x+p.len>=YARD.N){ yd.won=1; yd.out=0; sfx('fanfare'); const par=YARDS[yd.lvl].par;
+  if(!quiet){ if(!(yd.lastMv&&yd.lastMv.i===i&&yd.lastMv.s===Math.sign(k)))yd.moves++; yd.lastMv={i,s:Math.sign(k)} }   // keys: holding the same log the same way is one move. (A drag counts itself, once, when you let go)
+  yd.sel=i; yd.hint=null; sfx(p.kind==='p'?'click':'thud');
+  if(p.kind==='p'&&p.x+p.len>=YARD.N){ if(quiet)yd.moves++; yd.drag=null; yd.won=1; yd.out=0; sfx('fanfare'); const par=YARDS[yd.lvl].par;
     wkMsg((yd.moves<=par?J.wonPar:J.won).replace('{n}',yd.moves).replace('{par}',par)+(yd.lvl===YARDS.length-1?' '+J.done:'')); ydButtons();
-    for(let n=0;n<24;n++)yd.parts.push({x:100+Math.random()*10,y:38+Math.random()*10,vx:(Math.random()-.3)*.05,vy:-.02-Math.random()*.05,c:n%2?'#f4d35e':'#e6cf9e',life:700+Math.random()*600}) }
-  else if(yd.moves===YARDS[yd.lvl].par+6)wkMsg(J.nudge);
+    for(let n=0;n<30;n++)yd.parts.push({x:132+Math.random()*14,y:50+Math.random()*16,vx:(Math.random()-.3)*.05,vy:-.02-Math.random()*.05,c:n%2?'#f4d35e':'#e6cf9e',life:700+Math.random()*600}) }
+  else if(!quiet&&yd.moves===YARDS[yd.lvl].par+6)wkMsg(J.nudge);
   return true }
 function craneDrop(){ const J=JACKC;   // the big button: a hint, or on to the next yard
   if(!yd.open)return;
@@ -131,35 +132,61 @@ function drawBoard(g,x,y,w,h,pattern,shine=0,n=pattern.length){ const F=(c,xx,yy
   for(let k=0;k<n;k++){ const W=WOODS[pattern[k]], yy=y+Math.round(k*sh), hh=Math.round((k+1)*sh)-Math.round(k*sh); F(W.col,x,yy,w,hh); F(W.lt,x,yy,w,1); for(let i=3;i<w-2;i+=7)F(W.dk,x+i+(k*3)%5,yy+1+(i%2),3,1) }
   if(shine>0){ g.globalAlpha=shine*.35; F('#ffb347',x,y,w,Math.round(n*sh)); g.globalAlpha=shine*.5; F('#fff3d0',x+2,y+1,w-4,1); F('#fff3d0',x+4,y+3,Math.round(w/3),1); g.globalAlpha=1 } }
 function drawCrane(){
-  const c=$('craneArt'), g=c.getContext('2d'), W=c.width, H=c.height, J=JACKC, N=YARD.N, C=YARD.CELL, ox=YARD.OX, oy=YARD.OY; g.imageSmoothingEnabled=false;
-  const F=(col,x,y,w,h)=>{g.fillStyle=col;g.fillRect(Math.round(x),Math.round(y),w,h)};
-  // the yard from above: snow-dusted grass, packed dirt inside a split-rail fence, a gate on the right of row 2, the bench beyond it
-  F('#7fb563',0,0,W,H); for(let i=0;i<70;i++)F(i%3?'#72a857':'#8cc270',(i*37)%W,(i*53)%H,2,1); for(let i=0;i<16;i++)F('#eef4f8',(i*29)%W,(i*41)%H,3,2);
-  F('#b9976a',ox-2,oy-2,N*C+4,N*C+4); for(let i=0;i<90;i++)F(i%2?'#a98658':'#c7a67a',ox+(i*31)%(N*C),oy+(i*17)%(N*C),2,1);
-  for(let k=1;k<N;k++){ g.globalAlpha=.12; F('#3b2a1e',ox+k*C,oy,1,N*C); F('#3b2a1e',ox,oy+k*C,N*C,1); g.globalAlpha=1 }
-  const gy=oy+2*C;                                                                                               // the gate row
-  F('#8a6a4a',ox-4,oy-4,N*C+8,2); F('#8a6a4a',ox-4,oy+N*C+2,N*C+8,2); F('#8a6a4a',ox-4,oy-4,2,N*C+8); F('#8a6a4a',ox+N*C+2,oy-4,2,2*C+3); F('#8a6a4a',ox+N*C+2,gy+C+1,2,N*C-3*C+3);
-  for(let k=0;k<=N;k+=2){ F('#6b4a2f',ox-5+k*C,oy-5,3,4); F('#6b4a2f',ox-5+k*C,oy+N*C+1,3,4) } F('#6b4a2f',ox+N*C+1,gy-2,4,3); F('#6b4a2f',ox+N*C+1,gy+C,4,3);
-  F('#c7a67a',ox+N*C,gy,24,C); for(let k=0;k<3;k++){ const a=Math.floor(yd.t/260+k)%3; F(a?'#d9c08a':'#f4d35e',ox+N*C+5+k*5,gy+4,3,1); F(a?'#d9c08a':'#f4d35e',ox+N*C+6+k*5,gy+3,1,3); F(a?'#d9c08a':'#f4d35e',ox+N*C+7+k*5,gy+5,1,1) }   // arrows out the gate
-  F('#8a5a34',104,14,20,6); F('#a8743f',104,14,20,1); F('#6b4428',106,20,2,8); F('#6b4428',120,20,2,8); F('#5f6676',118,11,4,3); F('#9aa3b0',106,12,6,2);   // his bench outside, a plane on it
-  { const was=ctx; ctx=g; drawJackC(114,90,'down'); ctx=was }
-  // the pieces
-  const piece=(p,i)=>{ const x=ox+p.x*C+p.dx+(p.bump>0?Math.sin(yd.t/25)*1.5*(p.dir==='h'?1:0):0)+(i===0&&yd.won?Math.min(40,yd.out*.05):0), y=oy+p.y*C+p.dy+(p.bump>0?Math.sin(yd.t/25)*1.5*(p.dir==='v'?1:0):0), w=(p.dir==='h'?p.len:1)*C, h=(p.dir==='v'?p.len:1)*C;
-    if(p.kind==='s'){ F('rgba(0,0,0,.25)',x+2,y+3,C-2,C-2); F('#6b4428',x+1,y+1,C-2,C-2); F('#d9b27a',x+2,y+2,C-4,C-4); F('#b88a50',x+4,y+4,C-8,C-8); F('#d9b27a',x+5,y+5,C-10,C-10); F('#4f8a45',x+1,y+C-4,3,2); return }   // a stump: growth rings, a bit of moss
-    F('rgba(0,0,0,.25)',x+2,y+3,w-2,h-2);
-    if(p.kind==='p'){ F('#cdb480',x+1,y+2,w-2,h-4); F('#e6cf9e',x+1,y+2,w-2,h-5); F('#f2e2bc',x+1,y+2,w-2,1); for(let k=4;k<w-4;k+=6)F('#cdb480',x+k,y+4+(k%4),4,1); F('#f4d35e',x+w-4,y+5,2,2);
-      if(Math.floor(yd.t/350)%2){F('#ffffff',x+4,y+3,1,3); F('#ffffff',x+3,y+4,3,1)} }                                                                             // the maple plank: pale, clean, a little sparkle
-    else { const a=['#8a5a34','#7a4e2c','#96643c'][i%3], b=['#a8743f','#96643c','#b07a48'][i%3];
-      if(p.dir==='h'){ F(a,x+1,y+2,w-2,h-4); F(b,x+1,y+2,w-2,2); F('#6b4428',x+1,y+h-3,w-2,1); for(let k=5;k<w-5;k+=7)F('#6b4428',x+k,y+5+(k%3),4,1); F('#d9b27a',x+1,y+2,2,h-4); F('#d9b27a',x+w-3,y+2,2,h-4); F('#b88a50',x+1,y+5,2,2); F('#b88a50',x+w-3,y+5,2,2) }
-      else { F(a,x+2,y+1,w-4,h-2); F(b,x+2,y+1,2,h-2); F('#6b4428',x+w-3,y+1,1,h-2); for(let k=5;k<h-5;k+=7)F('#6b4428',x+5+(k%3),y+k,1,4); F('#d9b27a',x+2,y+1,w-4,2); F('#d9b27a',x+2,y+h-3,w-4,2); F('#b88a50',x+5,y+1,2,2); F('#b88a50',x+5,y+h-3,2,2) }
-      if((i*7)%5===0)F('#eef4f8',x+3,y+2,4,1) }                                                                                                                   // a dusting of snow on some
-    if(i===yd.sel&&!yd.won){ const on=Math.floor(yd.t/300)%2; g.strokeStyle=on?'#ffffff':'#f4d35e'; g.lineWidth=1; g.strokeRect(Math.round(x)+.5,Math.round(y)+.5,w-1,h-1) } };
+  const c=$('craneArt'), g=c.getContext('2d'), W=c.width, H=c.height, J=JACKC, N=YARD.N, C=YARD.CELL, ox=YARD.OX, oy=YARD.OY, G=N*C; g.imageSmoothingEnabled=false;
+  const F=(col,x,y,w,h)=>{g.fillStyle=col;g.fillRect(Math.round(x),Math.round(y),w,h)}, hsh=(a,b)=>((a*73856093)^(b*19349663))>>>0;
+  let st=$('craneStat'); if(!st){ st=document.createElement('div'); st.id='craneStat'; c.after(st) }
+  const stat=`${J.yardWord} <b>${yd.lvl+1}/${YARDS.length}</b><span>${J.movesWord} <b>${yd.moves}</b></span><span>${J.parWord} <b>${YARDS[yd.lvl].par}</b></span>`; if(st.dataset.v!==stat){ st.dataset.v=stat; st.innerHTML=stat }
+  // ---- the ground: winter grass, with the yard's packed dirt inside a split-rail fence ----
+  F('#7fb563',0,0,W,H); for(let i=0;i<140;i++){const h=hsh(i,7); F(h%3?'#72a857':'#8cc270',h%W,(h>>8)%H,2,1)} for(let i=0;i<26;i++){const h=hsh(i,91); F('#eef4f8',h%W,(h>>8)%H,4+(h>>4)%4,2); F('#ffffff',h%W+1,(h>>8)%H,2,1)}
+  F('#a98658',ox-3,oy-3,G+6,G+6); F('#b9976a',ox-2,oy-2,G+4,G+4);
+  for(let i=0;i<260;i++){const h=hsh(i,3); F(h%4===0?'#c7a67a':h%4===1?'#a98658':'#b08e62',ox+h%G,oy+(h>>9)%G,2+(h>>3)%2,1)}
+  for(let i=0;i<40;i++){const h=hsh(i,55); F('#e6cf9e',ox+h%G,oy+(h>>9)%G,1,1)}                                         // sawdust
+  for(let k=0;k<=N;k++)for(let j=0;j<=N;j++)F('rgba(59,42,30,.28)',ox+k*C-(k===N),oy+j*C-(j===N),1,1);                    // a dot at each grid corner
+  for(let y=oy+6;y<oy+G;y+=7){F('rgba(90,61,38,.10)',ox+38,y,3,1); F('rgba(90,61,38,.10)',ox+74,y+3,3,1)}                // old wheel ruts
+  const gy=oy+2*C;                                                                                                       // the gate row
+  // the fence: two rails on posts all the way round, a gap on the right at the gate
+  const rail=(x,y,w,h)=>{ F('rgba(0,0,0,.2)',x+1,y+2,w,h); F('#8a6a4a',x,y,w,h); if(w>h){F('#a8866a',x,y,w,1); F('#6b4a2f',x,y+h-1,w,1)} else {F('#a8866a',x,y,1,h); F('#6b4a2f',x+w-1,y,1,h)} };
+  rail(ox-5,oy-6,G+10,3); rail(ox-5,oy+G+3,G+10,3); rail(ox-6,oy-5,3,G+10); rail(ox+G+3,oy-5,3,2*C+4); rail(ox+G+3,gy+C+1,3,G-3*C+4);
+  for(let k=0;k<=N;k+=2)for(const y of [oy-8,oy+G+1]){F('#5a3d26',ox-7+k*C+(k===N?4:0),y,4,7); F('#7a5636',ox-7+k*C+(k===N?4:0),y,4,1)}
+  for(let k=1;k<N;k+=2){F('#5a3d26',ox-8,oy-2+k*C,5,5); F('#7a5636',ox-8,oy-2+k*C,5,1)}
+  for(const y of [gy-5,gy+C]){F('#5a3d26',ox+G+2,y,5,6); F('#7a5636',ox+G+2,y,5,1); F('#ffe9a8',ox+G+3,y-3,3,3); F('#3b3b44',ox+G+3,y-4,3,1)}   // gate posts with lanterns
+  rail(ox+G+7,gy-12,2,9);                                                                                                // the gate, swung open
+  // outside the gate: a path to his bench under a little roof, the woodpile, Jack C
+  F('#b9976a',ox+G+1,gy,W-ox-G,C); for(let i=0;i<50;i++){const h=hsh(i,17); F(h%2?'#a98658':'#c7a67a',ox+G+2+h%42,gy+1+(h>>8)%(C-2),2,1)}
+  for(let k=0;k<3;k++){ const on=Math.floor(yd.t/240+k)%3===0, cx=ox+G+12+k*10, col=on?'#fff3a8':'#e0c070'; F(col,cx,gy+9,5,2); F(col,cx+3,gy+7,2,6); F(col,cx+5,gy+8,1,4); F(col,cx+6,gy+9,1,2) }   // arrows: out this way
+  { const bx=138, by=82; F('rgba(0,0,0,.2)',bx-2,by+22,38,3); F('#5a3d26',bx,by+6,3,18); F('#5a3d26',bx+31,by+6,3,18);                   // the lean-to
+    F('#3a3f4a',bx-4,by-2,42,8); F('#5a6070',bx-4,by-2,42,1); for(let x=bx-2;x<bx+38;x+=5)F('#2b2e36',x,by-1,1,7); F('#eef4f8',bx-3,by-3,16,2); F('#eef4f8',bx+20,by-3,14,1);
+    F('#8a5a34',bx+3,by+14,28,4); F('#a8743f',bx+3,by+14,28,1); F('#6b4428',bx+5,by+18,2,6); F('#6b4428',bx+27,by+18,2,6);              // the bench
+    F('#5f6676',bx+26,by+10,5,4); F('#9aa3b0',bx+26,by+10,5,1); F('#3b3b44',bx+6,by+11,9,3); F('#9aa3b0',bx+6,by+11,9,1); F('#8a5a34',bx+8,by+8,3,3);   // a vise, a hand plane
+    if(yd.won&&yd.lvl===YARDS.length-1&&yd.out>900){ drawBoard(g,bx+10,by+9,14,6,[1,0,1,2,1],1); if(Math.floor(yd.t/250)%2){F('#ffffff',bx+12,by+7,1,3); F('#ffffff',bx+11,by+8,3,1)} } }   // ...and at the very end, the finished board
+  for(let r=0;r<3;r++)for(let k=0;k<5-r;k++){ const x=136+k*7+r*3, y=30-r*6; F('#6b4428',x,y,6,6); F('#d9b27a',x+1,y+1,4,4); F('#b88a50',x+2,y+2,2,2) } F('#eef4f8',139,11,18,2);   // the woodpile, snow on top
+  { const was=ctx; ctx=g; drawJackC(158,128,yd.won?'down':'left'); ctx=was }
+  // ---- the pieces ----
+  const piece=(p,i)=>{ const wob=p.bump>0?Math.sin(yd.t/25)*1.5:0, x=Math.round(ox+p.x*C+p.dx+(p.dir==='h'?wob:0)+(i===0&&yd.won?Math.min(60,yd.out*.06):0)), y=Math.round(oy+p.y*C+p.dy+(p.dir==='v'?wob:0)), w=(p.dir==='h'?p.len:1)*C, h=(p.dir==='v'?p.len:1)*C;
+    if(p.kind==='s'){ F('rgba(0,0,0,.28)',x+4,y+6,C-5,C-6);                                                              // a stump: bark, growth rings, an axe left in it
+      F('#5a3d26',x+3,y+4,C-6,C-6); F('#5a3d26',x+2,y+6,C-4,C-10); F('#6b4a2f',x+4,y+3,C-8,2);
+      F('#d9b27a',x+4,y+5,C-8,C-9); F('#c9a06a',x+5,y+6,C-10,C-11); F('#d9b27a',x+6,y+7,C-12,C-13); F('#b88a50',x+8,y+9,C-16,C-17); F('#b88a50',x+5,y+8,1,4); F('#4f8a45',x+3,y+C-6,4,2); F('#eef4f8',x+5,y+4,5,1);
+      F('#8a5a34',x+10,y,2,9); F('#a8743f',x+10,y,1,9); F('#9aa3b0',x+7,y+6,6,3); F('#c9ced4',x+7,y+6,6,1); F('#5f6676',x+7,y+8,3,1); return }
+    if(p.kind==='p'){ F('rgba(0,0,0,.28)',x+3,y+6,w-4,h-7);                                                              // the maple plank: pale, straight grain, sawn ends, a red tag
+      F('#cdb480',x+2,y+4,w-4,h-8); F('#e6cf9e',x+2,y+4,w-4,h-10); F('#f2e2bc',x+2,y+4,w-4,2); F('#b99c68',x+2,y+h-5,w-4,1);
+      for(let k=5;k<w-6;k+=8){F('#d6bd88',x+k,y+7+(k%5),6,1); F('#d6bd88',x+k+3,y+11-(k%3),5,1)} F('#f8eccb',x+2,y+4,1,h-9); F('#b99c68',x+w-3,y+4,1,h-8);
+      F('#c8322b',x+w-8,y+2,4,5); F('#e54b4b',x+w-8,y+2,4,1); F('#3b2a1e',x+w-7,y+1,1,2);
+      const tw=Math.floor(yd.t/300)%4; if(tw<2){ const sx=x+6+tw*14, sy=y+5+tw*3; F('#ffffff',sx,sy-1,1,3); F('#ffffff',sx-1,sy,3,1) } }
+    else { const k=i%3, bark=['#7a4e2c','#6b4428','#8a5a34'][k], lt=['#96643c','#855838','#a8743f'][k], dk=['#553520','#4a2e1a','#6b4428'][k], hz=p.dir==='h';
+      const L=hz?w:h, B=(u,v,uu,vv,col)=>hz?F(col,x+u,y+v,uu,vv):F(col,x+v,y+u,vv,uu);                                    // B(along, across, length, thickness)
+      F('rgba(0,0,0,.28)',x+3,y+5,w-4,h-6);
+      B(2,3,L-4,14,bark); B(2,3,L-4,3,lt); B(2,15,L-4,2,dk); B(2,2,L-4,1,dk);
+      for(let u=7;u<L-7;u+=6){ const hh=hsh(i*31+u,5); B(u,6+hh%6,3+hh%3,1,dk); if(hh%3===0)B(u+1,5+hh%7,2,1,lt) }           // bark furrows
+      if(hsh(i,3)%2)B(Math.floor(L/2)-2,7,4,4,dk), B(Math.floor(L/2)-1,8,2,2,'#3b2416');                                   // a knot
+      for(const u of [1,L-4]){ B(u,3,3,14,'#d9b27a'); B(u,5,3,10,'#c9a06a'); B(u+1,7,1,6,'#b88a50'); B(u,3,3,1,'#e6cf9e') }  // sawn ends, with rings
+      if(hsh(i,9)%3===0){ B(6,3,L-14,2,'#eef4f8'); B(8,2,L-20,1,'#ffffff') }                                               // snow along the top of some
+      if(hsh(i,4)%4===0)B(L-12,14,5,2,'#4f8a45') }
+    if(i===yd.sel&&!yd.won){ const on=Math.floor(yd.t/300)%2; g.strokeStyle=on?'#ffffff':'#f4d35e'; g.lineWidth=1; g.strokeRect(x+1.5,y+2.5,w-3,h-5);               // the chosen log: an outline, and a chevron wherever it can slide
+      const [lo,hi]=ydRange(yd.ps,i), ch=(cx,cy,dx,dy)=>{ for(let n=0;n<3;n++)F(on?'#ffffff':'#f4d35e',cx+(dx?dx*n:-2+n*0)+(dy?-n:0),cy+(dy?dy*n:-n),dx?1:n*2+1,dy?1:n*2+1) };
+      if(p.dir==='h'){ if(lo)ch(x-3,y+h/2,-1,0); if(hi)ch(x+w+2,y+h/2,1,0) } else { if(lo)ch(x+w/2,y-3,0,-1); if(hi)ch(x+w/2,y+h+2,0,1) } } };
   yd.ps.forEach((p,i)=>{ if(i)piece(p,i) }); piece(yd.ps[0],0);
-  if(yd.hint&&!yd.won){ const p=yd.ps[yd.hint.i], d=yd.hint.to-(p.dir==='h'?p.x:p.y), on=Math.floor(yd.hint.t/220)%2;                                              // the hint: a ghost of where that log should go
-    if(on){ g.globalAlpha=.55; const hx=ox+(p.dir==='h'?yd.hint.to:p.x)*C, hy=oy+(p.dir==='v'?yd.hint.to:p.y)*C; F('#f4d35e',hx+1,hy+1,(p.dir==='h'?p.len:1)*C-2,(p.dir==='v'?p.len:1)*C-2); g.globalAlpha=1 } }
-  // moves, par, which yard
-  F('rgba(29,20,32,.8)',96,51,32,21); pixText(g,J.movesWord+' '+yd.moves,98,54,'#ffffff'); pixText(g,J.parWord+' '+YARDS[yd.lvl].par,98,63,'#f4d35e');
-  YARDS.forEach((_,i)=>F(i<yd.lvl||(i===yd.lvl&&yd.won)?'#4fbf73':i===yd.lvl?'#f4d35e':'#5a3d26',104+i*7,3,5,3));
+  if(yd.hint&&!yd.won){ const p=yd.ps[yd.hint.i], on=Math.floor(yd.hint.t/220)%2;                                                   // the hint: a glowing ghost of where that log should go
+    if(on){ const hx=ox+(p.dir==='h'?yd.hint.to:p.x)*C, hy=oy+(p.dir==='v'?yd.hint.to:p.y)*C, w=(p.dir==='h'?p.len:1)*C, h=(p.dir==='v'?p.len:1)*C; g.globalAlpha=.5; F('#f4d35e',hx+2,hy+3,w-4,h-6); g.globalAlpha=1; g.strokeStyle='#fff3a8'; g.strokeRect(hx+1.5,hy+2.5,w-3,h-5) } }
   for(const q of yd.parts){ g.globalAlpha=Math.min(1,q.life/300); F(q.c,q.x,q.y,2,2) } g.globalAlpha=1;
 }
 function craneWon(){
@@ -170,9 +197,10 @@ function craneWon(){
 // touch / mouse: press a log, drag it along its length
 { const cv=$('craneArt'), cell=e=>{ const r=cv.getBoundingClientRect(), x=(e.clientX-r.left)/r.width*cv.width, y=(e.clientY-r.top)/r.height*cv.height; return [(x-YARD.OX)/YARD.CELL,(y-YARD.OY)/YARD.CELL] };
   cv.style.touchAction='none';
-  cv.addEventListener('pointerdown',e=>{ if(!yd.open||yd.won)return; const [fx,fy]=cell(e), i=ydAt(yd.ps,Math.floor(fx),Math.floor(fy)); if(i<0||yd.ps[i].kind==='s')return; e.preventDefault(); yd.sel=i; const p=yd.ps[i]; yd.drag={i,at:p.dir==='h'?fx:fy}; try{cv.setPointerCapture(e.pointerId)}catch(_){} });
-  cv.addEventListener('pointermove',e=>{ if(!yd.drag)return; const [fx,fy]=cell(e), p=yd.ps[yd.drag.i], now=p.dir==='h'?fx:fy, k=Math.round(now-yd.drag.at); if(k&&ydMove(yd.drag.i,k>0?1:-1))yd.drag.at+=k>0?1:-1 });
-  for(const ev of ['pointerup','pointercancel'])cv.addEventListener(ev,()=>{ yd.drag=null }); }
+  cv.addEventListener('pointerdown',e=>{ if(!yd.open||yd.won)return; const [fx,fy]=cell(e), i=ydAt(yd.ps,Math.floor(fx),Math.floor(fy)); if(i<0||yd.ps[i].kind==='s')return; e.preventDefault(); yd.sel=i; const p=yd.ps[i]; yd.drag={i,at:p.dir==='h'?fx:fy,from:p.dir==='h'?p.x:p.y}; try{cv.setPointerCapture(e.pointerId)}catch(_){} });
+  cv.addEventListener('pointermove',e=>{ if(!yd.drag)return; const [fx,fy]=cell(e), d=yd.drag, p=yd.ps[d.i], now=p.dir==='h'?fx:fy, k=Math.round(now-d.at); if(k&&ydMove(d.i,k>0?1:-1,true)&&yd.drag)d.at+=k>0?1:-1 });
+  const drop=()=>{ const d=yd.drag; if(!d)return; yd.drag=null; const p=yd.ps[d.i]; if((p.dir==='h'?p.x:p.y)!==d.from){ yd.moves++; yd.lastMv=null; if(yd.moves===YARDS[yd.lvl].par+6)wkMsg(JACKC.nudge) } };   // one drag, however far = one move (none if you put it back)
+  for(const ev of ['pointerup','pointercancel'])cv.addEventListener(ev,drop); }
 $('craneBtn').addEventListener('click',e=>{e.preventDefault(); craneDrop()});
 $('craneLater').onclick=closeCrane;
 addEventListener('keydown',e=>{ if(!yd.open)return; if(e.code==='Escape'){e.preventDefault(); closeCrane(); return}

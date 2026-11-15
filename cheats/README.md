@@ -46,7 +46,7 @@ Everything you need to finish The Great Cookie Quest. **Spoilers from here down.
 
 ### Wylee Woods (milk) · straight down from the kitchen
 
-- Five holes. You need to beat Jack and at least tie Margie.
+- Six holes. You need to beat Jack and at least tie Margie.
 - A or Space stops the aim arrow, then again to stop the power bar.
 - Long throws curve left at the end, so aim a little right. Inside the dotted circle it's a putt and flies straight.
 - Trees stop the disc. Water and out of bounds cost a stroke.

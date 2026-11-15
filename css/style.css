@@ -388,8 +388,10 @@ h1::before,h1::after{content:'✦';color:var(--berry);font-size:.6em;vertical-al
 .gdots i{width:10px;height:10px;border-radius:50%;background:#3a4258}
 .gdots i.now{background:var(--gold)} .gdots i.done{background:#7fd39a}
 @media (max-width:520px){ .lgrid{gap:4px} .lsq{width:calc(var(--sq,44px) - 4px);height:calc(var(--sq,44px) - 4px)} .lgrid{grid-template-columns:repeat(var(--cols,5),calc(var(--sq,44px) - 4px))} }
-#craneArt{width:256px;height:192px;image-rendering:pixelated;border:2px solid var(--ink);border-radius:6px;background:#a9d4f0}
-@media (max-width:520px){ #craneArt{width:192px;height:144px} }
+/* Jack C's lumber yard gets a big picture: the card is as wide as the game allows */
+#crane .pcard{width:min(100%,500px)}
+#craneArt{width:min(100%,440px);height:auto;aspect-ratio:176/136;image-rendering:pixelated;border:2px solid var(--ink);border-radius:6px;background:#7fb563;touch-action:none}
+#craneStat{font-family:var(--pixel);font-size:.85rem;display:flex;gap:14px;justify-content:center} #craneStat b{color:var(--berry)}
 /* Logan's which-album game */
 .cloverfield:has(.hcard){display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px 10px;background:#2f5a24}
 .hcard{display:flex;align-items:center;gap:8px;background:#fffdf6;border:2px solid var(--ink);border-radius:8px;padding:10px 14px;min-width:220px;justify-content:center}

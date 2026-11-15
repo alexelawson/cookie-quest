@@ -180,4 +180,8 @@ r=await p.evaluate(()=>{goTo('world','start'); T.run(40); if(!dlg.hidden)closeDi
   drawVikingStanding=orig; window.drawBob=ob; return {kinds:[...kinds].join(),bob,label:t&&t.label,said,who}});
 ok('P only the football Vikings jog the main road',r.kinds==='football'&&r.bob===0,JSON.stringify(r));
 ok('P talk to them as they run by: a different line each time',r.label==='Talk to the Vikings'&&r.who==='A football Viking'&&r.said.split(' / ').length===2&&r.said.split(' / ')[0]!==r.said.split(' / ')[1],r.said);
+// the pet crab: talk to the crabs on Third Beach, take one, it follows Joe; it can be left at home from Settings like any gear
+await fresh(); r=await p.evaluate(()=>{ goTo('vancouver','fromBridge'); T.run(40); P.x=50;P.y=120; update(16.7); const lbl=near&&near.label; action(); const offer=T.btns(); T.click(VANCOUVER.crabs.take); const card=!$('itemCard').hidden&&$('itemName').textContent; $('itemBtn').click();
+  T.run(5); const worn=gearWorn('crab'), follows=!!crabEnt(); have.gear.crab=0; const off=!crabEnt(); have.gear.crab=1; P.x=50;P.y=121; update(16.7); action(); const again=T.btns(); closeDialog(); return {lbl,offer,card,worn,follows,off,again} });
+ok('P the crabs: talk to them, take the small one, it follows Joe (and can be taken off); they only give one',r.lbl==='Talk to the crabs'&&r.offer.length===2&&r.card&&r.worn&&r.follows&&r.off&&r.again.length===1,JSON.stringify(r));
 console.log(R.join('\n')); console.log('page errors:',errs.length?errs:'none'); await b.close()})();

@@ -15,7 +15,7 @@ const EXITS={
   city:   [{z:LADDER,          mark:{x:21,y:170,dir:'down'}, go:()=>goTo('vancouver','fromRoof')},
            {z:R(SKYLIGHT.x-4,SKYLIGHT.y+SKYLIGHT.h,SKYLIGHT.w+8,10), when:()=>heistStage()>=5&&!heist.lug&&!heist.dance, mark:{x:SKYLIGHT.x+12,y:SKYLIGHT.y+SKYLIGHT.h+12,dir:'down'}, go:()=>goTo('vancouver','fromRoof')}],   // once the heist is done (you come back in on this roof), the fire escape is a way out too   // down the ladder: back on the street by the elevator
   vancouver:[{z:R(134,0,20,7), go:()=>goTo('world','fromVancouver')}],
-  world:  [{z:R(70,212,16,38), mark:{x:78,y:186,dir:'down',text:VANCOUVER.bridgeMark}, go:()=>goTo('vancouver','fromBridge')}],            // walk out onto the Lions Gate Bridge and you cross it                                       // back north over the bridge
+  world:  [{z:R(70,212,16,38), mark:{x:78,y:209,dir:'down',text:''}, go:()=>goTo('vancouver','fromBridge')}],   // walk out onto the Lions Gate Bridge and you cross it (the sign over it already says VANCOUVER)
 };
 let exitArmed=false;   // you have to step out of an exit before it works (so arriving next to one doesn't bounce you out)
 const sceneName=()=>Object.keys(SCENES).find(k=>SCENES[k]===scene);
@@ -31,8 +31,8 @@ function drawExitMark(m){
   // the arrow: a gold triangle with a dark outline
   if(m.dir==='down'){for(let i=0;i<5;i++){F('#1d2130',ax-5+i,ay-3+i,11-i*2,1)} for(let i=0;i<4;i++)F('#f4d35e',ax-4+i,ay-3+i,9-i*2,1); F('#1d2130',ax-2,ay-8,5,5); F('#f4d35e',ax-1,ay-8,3,5)}
   else {for(let i=0;i<5;i++){F('#1d2130',ax+i,ay-4+i,1,9-i*2)} for(let i=0;i<4;i++)F('#f4d35e',ax+1+i,ay-3+i,1,7-i*2); F('#1d2130',ax+5,ay-2,6,5); F('#f4d35e',ax+5,ay-1,5,3)}
-  const lx=m.dir==='left'?m.x+2:m.x+8, ly=m.dir==='left'?m.y-14:m.y-8, word=m.text||'EXIT';
-  F('#1d2130',lx-1,ly-1,textW(word)+3,7); pixText(ctx,word,lx+1,ly,'#f4d35e');
+  const lx=m.dir==='left'?m.x+2:m.x+8, ly=m.dir==='left'?m.y-14:m.y-8, word=m.text==null?'EXIT':m.text;   // (text:'' = just the arrow)
+  if(word){ F('#1d2130',lx-1,ly-1,textW(word)+3,7); pixText(ctx,word,lx+1,ly,'#f4d35e') }
 }
 // the bouncing arrow over Joe's head when there's something to do right here
 function drawNearMark(){
@@ -51,6 +51,7 @@ const GEAR={
   shoes:   {x:206,y:204},    // in the grass beside the road down to Wylee Woods
   clover:  {give:true},      // Logan gives Joe this one (people.js)
   // keepsakes: one from each stop, handed over right after that stop's reward (KEEPSAKES in story.js)
+  crab:    {give:true},      // a pet crab from the beach in Vancouver: scuttles along behind Joe (vancouver.js)
   hen:     {give:true, from:'farm'},     // Grp ("G"), Joe's rooster: follows him everywhere
   goggles: {give:true, from:'city'},     // Doc Alex's spare goggles, pushed up on his head
   disc:    {give:true, from:'golf'},     // Margie's "lucky" disc, on his back
@@ -204,20 +205,25 @@ function drawFargoTop(){
     list.push({y:182,draw:()=>drawCar(270,176,'right',true)});   // the CR-V at Fargo, parked a step back from the road: walk up to it to drive into town
   }}
 
-// the lucky clover sheds little green sparkles as Joe walks; Grp the rooster trots along behind him
+// the lucky clover sheds little green sparkles as Joe walks; Grp the rooster trots along behind him, and the pet crab behind Grp
 const sparkles=[], henTrail=[]; let sparkleT=0, henScene=null;
 function cloverTick(dt){
   if(gearWorn('clover')&&P.moving&&scene!==SCENES.birkie){ sparkleT-=dt; if(sparkleT<=0){ sparkleT=110; sparkles.push({x:P.x+(Math.random()*8-4),y:P.y-10+(Math.random()*6-3),vx:(Math.random()-.5)*.01,vy:-.012-Math.random()*.01,t:0,c:['#7fe08a','#c9f5a0','#fff3a8'][Math.floor(Math.random()*3)]}) } }
   for(const s of sparkles){s.t+=dt; s.x+=s.vx*dt; s.y+=s.vy*dt} while(sparkles.length&&sparkles[0].t>900)sparkles.shift();
   if(henScene!==scene){henScene=scene; henTrail.length=0}   // a new place: she starts right next to Joe
-  if(henHere()){ const last=henTrail[henTrail.length-1]; if(!last||Math.hypot(P.x-last.x,P.y-last.y)>1.5){henTrail.push({x:P.x,y:P.y}); if(henTrail.length>40)henTrail.shift()}
-    if(Math.random()<dt/7000)sfx('cluck') } else henTrail.length=0;
+  if(henHere()||crabHere()){ const last=henTrail[henTrail.length-1]; if(!last||Math.hypot(P.x-last.x,P.y-last.y)>1.5){henTrail.push({x:P.x,y:P.y}); if(henTrail.length>40)henTrail.shift()}
+    if(henHere()&&Math.random()<dt/7000)sfx('cluck') } else henTrail.length=0;
 }
 function henPos(){ if(!henTrail.length)return {x:P.x-10,y:P.y+2}; const k=Math.max(0,henTrail.length-12); return henTrail[k] }
 function drawSparkles(){ for(const s of sparkles){ const a=1-s.t/900; ctx.globalAlpha=Math.max(0,a); ctx.fillStyle=s.c; ctx.fillRect(Math.round(s.x),Math.round(s.y),1,1); if(s.t<300){ctx.fillRect(Math.round(s.x)-1,Math.round(s.y),3,1); ctx.fillRect(Math.round(s.x),Math.round(s.y)-1,1,3)} } ctx.globalAlpha=1 }
 // Grp ("G" for short: Green Red Poultry) comes everywhere once Keelan gives him to Joe (after the farm), dressed for each place.
 // Drawn from Joe's own sketch: red comb and wattle, yellow beak, a white body streaked blue, purple and green, a yellow wing, a big red-brown and dark tail.
-const henHere=()=>gearWorn('hen');
+const henHere=()=>gearWorn('hen'), crabHere=()=>gearWorn('crab');
+// the pet crab: scuttles sideways along Joe's trail (behind Grp if he's along too). Not on the scooter, in the car, or in the ski race
+function crabEnt(){
+  if(!crabHere()||scene===SCENES.scooter||scene===SCENES.birkie||(scene===SCENES.fargo&&!fargo.onFoot))return null;
+  const back=henHere()?24:12, c=henTrail.length?henTrail[Math.max(0,henTrail.length-back)]:{x:P.x+9,y:P.y+3}, wig=P.moving?Math.round(Math.sin(time/70)):0;
+  return {y:c.y+1, draw:()=>drawCrab(c.x+wig,c.y+1,2.2)} }
 function henEnt(){
   if(!henHere()||scene===SCENES.scooter)return null;   // (no room on the scooter)
   if(scene===SCENES.fargo&&!fargo.onFoot){ const d=P.dir==='left'?-1:1; return {y:P.y+1, draw:()=>drawGrp(P.x-1-3*d,P.y+11,d,'fargo',true)} }   // riding shotgun
@@ -303,6 +309,10 @@ const GEAR_ART={
   shoes(F){ // a pair of carbon racing shoes: orange uppers, big white soles, yellow laces
     for(const [x,y] of [[2,8],[20,14]]){ F('#ff5a1f',x+2,y,13,6); F('#ff5a1f',x,y+3,4,3); F('#ff7a3f',x+3,y,10,1); F('#ffffff',x-1,y+6,19,3); F('#d9d9d9',x-1,y+8,19,1);
       F('#1d1d22',x+14,y+1,3,5); F('#f4d35e',x+6,y+1,1,1); F('#f4d35e',x+8,y+1,1,1); F('#f4d35e',x+10,y+1,1,1); F('#2b2b33',x+3,y+4,8,1) } },
+  crab(F){ // a small red crab, claws up
+    F('rgba(0,0,0,.2)',8,24,24,2); F('#d9452f',11,13,18,10); F('#f06a4a',13,13,14,3); F('#a8322a',11,21,18,2); F('#d9452f',14,8,2,5); F('#d9452f',24,8,2,5); F('#ffffff',13,5,4,4); F('#ffffff',23,5,4,4); F('#1d1d22',15,6,2,2); F('#1d1d22',25,6,2,2);
+    F('#d9452f',3,6,7,6); F('#d9452f',30,6,7,6); F('#f06a4a',4,6,5,2); F('#f06a4a',31,6,5,2); F('#1d1420',6,8,4,1); F('#1d1420',30,8,4,1); F('#d9452f',7,12,5,3); F('#d9452f',28,12,5,3);
+    for(const x of [8,6,9]){} F('#a8322a',7,17,4,2); F('#a8322a',29,17,4,2); F('#a8322a',5,20,5,2); F('#a8322a',30,20,5,2); F('#a8322a',8,23,3,2); F('#a8322a',29,23,3,2); F('#1d1420',17,18,6,1) },
   clover(F){ // one big four-leaf clover
     const leaf=(x,y)=>{F('#2e7d32',x,y,9,9); F('#2e7d32',x+1,y-1,7,11); F('#5fbf5f',x+1,y,6,6); F('#a8ecb0',x+2,y+1,2,2)};
     leaf(10,2); leaf(21,2); leaf(10,13); leaf(21,13); F('#1d5a2a',19,11,2,2); F('#2e7d32',19,22,2,6); F('#2e7d32',21,26,2,2) },

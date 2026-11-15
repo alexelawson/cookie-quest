@@ -22,7 +22,7 @@ Arrow keys (or the on-screen pad) to walk, **Space** or **A** to do things. **â›
 |:---:|:---:|
 | <img src="docs/images/map.png" width="400" alt="The main map"><br>**Home.** The kitchen, and the road to everywhere | <img src="docs/images/vancouver.png" width="400" alt="Downtown Vancouver"><br>**Vancouver.** Over the bridge, through the park, find the pho |
 | <img src="docs/images/birkie.png" width="400" alt="The Birkie start line"><br>**The Birkie.** Cable to Main Street, ahead of the Vikings | <img src="docs/images/heist.png" width="400" alt="Rooftops at night under searchlights"><br>**The heist.** Three rooftops, one very large chocolate |
-| <img src="docs/images/golf.png" width="400" alt="A disc golf hole"><br>**Wylee Woods.** Five holes against Jack and Margie | <img src="docs/images/kitchen.png" width="400" alt="The farmhouse kitchen"><br>**The kitchen.** Measure, crack, stir, bake |
+| <img src="docs/images/golf.png" width="400" alt="A disc golf hole"><br>**Wylee Woods.** Six holes through the woods against Jack and Margie | <img src="docs/images/kitchen.png" width="400" alt="The farmhouse kitchen"><br>**The kitchen.** Measure, crack, stir, bake |
 
 ## Changing the words
 

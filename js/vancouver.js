@@ -20,7 +20,8 @@ const vanLook=k=>({z:null, label:VANCOUVER.looks[k].label, btn:'Look', act:()=>s
 const VAN_TRIGGERS=[
   {z:R(172,275,18,6), label:VANCOUVER.elevator, act:()=>openWardrobe(()=>{ heist.outfitReact=true; goTo('city','fromStreet') })},
   {...vanLook('clock'),z:R(150,227,14,6)}, {...vanLook('totems'),z:R(198,91,22,8)}, {...vanLook('lighthouse'),z:R(236,91,12,8),act:()=>{ VAN.lit=time; sfx('pickup'); showDialog({place:VANCOUVER.place,speaker:VANCOUVER.sign,pages:[VANCOUVER.looks.lighthouse.text],actions:[CLOSE]}) }},
-  {...vanLook('sails'),z:R(222,188,14,8)}, {...vanLook('science'),z:R(240,316,24,8)}, {...vanLook('beach'),z:R(44,106,12,30)},
+  {...vanLook('sails'),z:R(222,188,14,8)}, {...vanLook('science'),z:R(240,316,24,8)}, {z:R(44,106,12,30), label:VANCOUVER.crabs.label, act:()=>{ const C=VANCOUVER.crabs, got=have.gear&&'crab' in have.gear;
+    showDialog({place:VANCOUVER.place,speaker:VANCOUVER.sign,pages:[got?C.after:C.hello],actions:got?[CLOSE]:[{label:C.take,fn:()=>{closeDialog(); have.gear=have.gear||{}; have.gear.crab=1; save(); sfx('pickup'); showItem('crab')}},{label:C.leave,fn:closeDialog}]}) }},
 ];
 // where the land is (the park is a rounded point; it widens into the beaches and then the city)
 const vanParkW=y=>105*Math.sqrt(Math.max(0,1-((y-112)/72)**2));

@@ -197,7 +197,7 @@ const JACKC = {name:'Jack C', place:"Jack C's Lumber Yard",
   reset:"Start over", next:"Next yard",
   nudge:"No rush. You can always start the yard over.",
   won:"She's out! {n} moves.", wonPar:"She's out in {n}! That's as few as it can be done. Dude.",   // {n} = your moves, {par} = the fewest possible
-  movesWord:"MOVES", parWord:"BEST",        // on the little scoreboard (capitals only)
+  yardWord:"Yard", movesWord:"Moves", parWord:"Fewest possible",   // the line under the picture: Yard 2/3 · Moves 7 · Fewest possible 11
   done:"That's the one. Give me a sec at the bench.", doneBtn:"Done",
   thanks:["You've got a good eye, man.","Planed it, glued it, oiled it. It's yours. Put the cookies on it. A cookie tastes better off a handmade board. That's just science."],
   after:"Come back when it snows. The woodstove goes in next. Cast iron. So excited."};
@@ -307,7 +307,7 @@ const BIRKIE = {
 const GOLF_TEXT = {
   place:'Wylee Woods Disc Golf',
   jack:'Jack', margie:'Margie',
-  margieHello:["Oh hey! You here for the milk? Cool cool cool.","The creamery only gives the good stuff to whoever wins the round. I made that rule up just now. It's legally binding.","Five holes. Beat Jack, and at least tie me. You won't. But I love that for you."],
+  margieHello:["Oh hey! You here for the milk? Cool cool cool.","See those cans on the picnic table? Fresh this morning. They go to whoever wins the round. I made that rule up just now. It's legally binding.","Six holes. Beat Jack, and at least tie me. You won't. But I love that for you."],
   jackHello:"Margie's averaging 2.6 throws a hole this month. I'm at 4.9. I have a spreadsheet. I don't want to talk about the spreadsheet.",
   ready:"Let's play",
   notYet:"Maybe later",
@@ -316,7 +316,8 @@ const GOLF_TEXT = {
   howToSteps:["A (or Space): stop the arrow to aim, then stop the power bar.",
               "Long throws curve left at the end. Inside the dotted circle it's a putt.",
               "Trees stop or bounce your disc. Out of bounds or water: +1 stroke.",
-              "Five holes. Beat Jack, and tie or beat Margie."],
+              "The white notch on the power bar is how hard to throw to reach the basket.",
+              "Six holes. Beat Jack, and tie or beat Margie."],
   howToOk:"Got it",
   practiceAsk:"Want a practice throw first? It doesn't count. I count mine, but I'm built different.",
   practice:"Practice throw",
@@ -328,7 +329,10 @@ const GOLF_TEXT = {
   practiceOb:"Out of bounds. Bold. Wrong, but bold.",
   practiceTree:"Bonk! Trees are just aggressive bushes.",
   restartAsk:"Start the round over from hole 1? Your scores so far get wiped.", restartYes:"Start over", restartNo:"Keep playing",
-  holeNames:["Hole 1: The Opener","Hole 2: The Lookout","Hole 3: Cow Pond","Hole 4: Hut! Hut!","Hole 5: The Tunnel"],
+  holeNames:["Hole 1: The Opener","Hole 2: The Lookout","Hole 3: Beaver Pond","Hole 4: Hut! Hut!","Hole 5: The Tunnel","Hole 6: The Sugarbush"],
+  doglegHint:"Last one. It's a dogleg: the basket's around the corner, behind the maples. Go up the fairway first, THEN turn. Or go through the trees. I would. I'm me.",
+  // the words on the signs and the scorecard (capitals only)
+  ui:{hole:"HOLE", par:"PAR", ft:"FT", power:"POWER", putt:"PUTT", card:"WYLEE WOODS SCORECARD", total:"TOT"},
   platformHint:"You throw this one from the platform. Up there your drive sails right over the trees. I call it my throne. Don't look down. I never look down.",
   hikeHint:"House rule: face away from the basket and hike it through your legs. My through-the-legs accuracy is 11%. Up from 8%. HUT! HUT!",
   water:"Splash. That's a penalty stroke, back to where you threw from.",
@@ -340,13 +344,13 @@ const GOLF_TEXT = {
   tree:"*THWACK* Right off a tree.",
   chains:"Chains!",
   ace:"ACE!!! In one throw!",
-  margieHole:{'-1':"Birdie. Obviously. Somebody paint my portrait.",'0':"Par. I let you have that one. You're welcome.",'1':"Bogey?! A cow made eye contact with me. Mid-throw."},
+  margieHole:{'-1':"Birdie. Obviously. Somebody paint my portrait.",'0':"Par. I let you have that one. You're welcome.",'1':"Bogey?! A chipmunk made eye contact with me. Mid-throw."},
   jackHole:{'-1':"BIRDIE. That's my first birdie since April 3rd. Writing it down.",'0':"Par. Par is 100th percentile for me. Logging it.",'1':"Bogey. Wind out of the northwest at four miles an hour. Statistically significant.",'2':"Double bogey. Updating the spreadsheet. Lowering my expectations column.",'3':"Triple bogey. It went in the pond. Then a goose took it. Logging the goose.",'4':"Quadruple bogey. A personal record. Wrong direction, but a record."},
   win:["Okay, okay. You earned it. I'm still the best, but you earned it.","Jack, give them the milk."],
   jackWin:"Whole milk. 3.25% fat. I checked. Cookies deserve the data.",
   lose:["Good round though! Not MY round, but good! Want to go again?"],
   again:"Play again",
-  after:"Come back anytime. The cows like you. The cows have taste. Like me.",
+  after:"Come back anytime. The chipmunks like you. The chipmunks have taste. Like me.",
   enter:"Go to the disc golf course",
   leave:"Head back to the road",
 };
@@ -435,6 +439,7 @@ const GEAR_TEXT = {
   place:"Found something!",
   headband:{name:"Headband", found:"A ski headband in the snow! It smells faintly of klister. Perfect.", wear:"Put it on"},
   shoes:   {name:"Carbon racing shoes", found:"Carbon-plated racing shoes! Joe could run a marathon in these. Or at least to the mailbox.", wear:"Lace them up"},
+  crab:    {name:"A pet crab", found:"The small crab climbs onto Joe's shoe. Then off again. It's coming along.", wear:"Come on, crab", from:"From Third Beach"},
   clover:  {name:"Lucky clover", found:"A real four-leaf clover. Joe pins it on. Feeling lucky.", wear:"Pin it on", from:"From Logan"},
   hen:     {name:"Grp the rooster", found:"Grp (G for short) is coming with you!", wear:"Come on, G", from:"From Keelan"},
   goggles: {name:"Lab goggles", found:"Doc Alex's spare goggles. Joe pushes them up on his head. Very scientific.", wear:"Put them on", from:"From Doc Alex"},
@@ -601,15 +606,15 @@ const KITCHEN = {place:'Home', speaker:'Your kitchen',
 // The labels on the buttons, and what Joe reads when he looks at things. Change any of these.
 const VANCOUVER = {
   place:'Vancouver',
-  bridgeMark:'TO VANCOUVER',               // the label on the bouncing arrow over the bridge (capitals only)
   elevator:'Enter here',                   // the button at the REALLY GOOD PHO door (the way up to the rooftops)
   sign:'Vancouver',                       // the name shown on the look-at boxes
+  // the crabs on Third Beach: talk to them and one comes along as a pet (take it off again in Settings, like the other gear)
+  crabs:{label:'Talk to the crabs', hello:"Click. Click click. (The small one waves a claw at Joe. It seems to want to come along.)", take:"Take the small one", leave:"Leave them be", after:"Click click. (They wave. The small one's cousins, probably.)"},
   looks:{
     totems:   {label:'Look at the totem poles',  text:"The totem poles at Brockton Point."},
     lighthouse:{label:'Visit the lighthouse',    text:"The Brockton Point lighthouse. Joe climbs to the top. You can see the whole harbour from up here."},
     clock:    {label:'Look at the steam clock',  text:"The Gastown steam clock. It whistles."},
     sails:    {label:'Look at Canada Place',     text:"Canada Place. Five white sails."},
     science:  {label:'Look at Science World',    text:"Science World. The big shiny ball."},
-    beach:    {label:'Look at the crabs',        text:"Crabs. They are busy."},
   },
 };
