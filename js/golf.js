@@ -48,6 +48,12 @@ function drawBasket(x,y){
   F('rgba(0,0,0,.25)',-5,6,11,2); F('#8a8f9a',-1,-14,2,20); F('#c9ced4',-5,-14,11,2); F('#f4d35e',-5,-12,11,1);
   for(let i=-4;i<=4;i+=2)F('#b4bac3',i,-11,1,6); F('#8a8f9a',-5,-5,11,4); F('#5f6676',-4,-4,9,2);
 }
+function drawCow(x,y){
+  const F=(c,dx,dy,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x+dx,y+dy,w,h)};
+  F('rgba(0,0,0,.2)',0,8,14,2); F('#fffaf0',0,0,12,7); F('#2b2b2b',2,1,3,3); F('#2b2b2b',8,3,3,2);
+  F('#fffaf0',11,-2,5,5); F('#f2a7a0',14,1,2,2); F('#2b2b2b',13,-1,1,1); F('#3b2a1e',1,7,2,2); F('#3b2a1e',9,7,2,2);
+  if((time/1500|0)%3===0)F('#2b2b2b',-1,1,1,3);   // tail swish
+}
 // Jack: short blond hair, teal polo, khaki shorts
 // Jack: extremely serious, extremely into stats. Blond, teal polo, khaki shorts, a disc in hand. 12 x 20 px.
 const JACK_PAL={L:'#e6c46a',l:'#c9a54a',y:'#f2d88a',S:'#f3cba8',s:'#ddb18c',B:'#a8873a',W:'#ffffff',E:'#2b2b2b',M:'#b07060',P:'#2a9d8f',p:'#1f7a6f',K:'#c9b17a',k:'#a8925e'};
@@ -293,7 +299,7 @@ SCENES.golf={ place:GOLF_TEXT.place, music:'golf',
       F('rgba(0,0,0,.22)',t.x-9,t.y+1,22,6); F('#6b4a2f',t.x-10,t.y-4,2,8); F('#6b4a2f',t.x+8,t.y-4,2,8);
       F('#a26c40',t.x-11,t.y-8,22,6); for(let xx=t.x-11;xx<t.x+11;xx+=4)F('#8a5a34',xx,t.y-8,1,6); F('#5a3a22',t.x-11,t.y-10,22,1);
       F('#6b4a2f',t.x+11,t.y-7,2,12); for(let yy=t.y-5;yy<t.y+5;yy+=3)F('#8a5a34',t.x+11,yy,4,1)}
-    if(!golf.active&&golf.state!=='between')drawGolfClearing();
+    if(!golf.active&&golf.state!=='between'){ drawGolfClearing(); drawCow(22,44); drawCow(150,132) }   // (and a couple of cows who wandered over from next door)
   },
   ents(list){
     const h=golf.active||golf.state==='between'?golfHole():HOLES[0];
